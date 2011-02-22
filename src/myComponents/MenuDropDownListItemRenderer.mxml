@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!--
+author : Johan Degraeve
+The reason for defining a custom Itemrenderer is to be able to define the item height, fontsize, fontfamily, ...based on the height of the owning dropdownlist.
+So it will look good on every device : the size for the text in the items depends on the size of the owning dropdownlist, chosen by the flex framework for that specific device
+ownerHeight is the height of the owning dropdownlist, when not opened 
+
+-->
+
+
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				autoDrawBackground="false"
+				>
+	<fx:Script>
+		<![CDATA[
+			override public function set data(value:Object):void {
+				super.data = value;
+				
+				if (!ownerFontRead)
+					getOwnerProperties();
+			}
+			
+			// owner font settings already read or not ? 
+			 private var ownerFontRead:Boolean = false;
+			
+			[Bindable]
+			 private var myHeight:Number = 20;//default value
+			[Bindable]
+			 private var myFontSize:Number = 10;//default value
+			[Bindable]
+			 private var myTopPadding:Number = 5;//default value
+			[Bindable]
+			 private var myFontWeight:String = "normal";//default value
+			[Bindable]
+			 private var myFontStyle:String=FontStyle.REGULAR;//default value
+			[Bindable]
+			 private var myFontFamily:String="sans-serif";//default value
+			
+			private function getOwnerProperties() : void {
+				ownerFontRead = true;
+				myHeight = (this.owner as MenuDropDownList).getRowHeight();
+				myFontSize = (this.owner as MenuDropDownList).getStyle("fontSize");
+				myTopPadding = (myHeight - myFontSize)/2;
+				myFontWeight = (this.owner as MenuDropDownList).getStyle("fontWeight");
+				myFontStyle = (this.owner as MenuDropDownList).getStyle("fontStyle");
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<!--  defines the states that an item can have -->
+	<s:states> 
+		<s:State name="normal"/> 
+		<s:State name="hovered"/> 
+	</s:states> 
+
+	<s:Label text="{data}" 
+			 height="{myHeight}" width="100%"
+			 fontSize="{myFontSize}" 
+			 fontWeight="{myFontWeight}"
+			 fontStyle="{myFontStyle}"
+			 fontFamily="{myFontFamily}"
+			 textAlign="left"
+			 paddingTop="{myTopPadding}"
+			 backgroundColor="white"
+			 color = "black"
+			 />
+	
+</s:ItemRenderer>

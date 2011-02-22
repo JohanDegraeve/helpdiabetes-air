@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!-- Used some source on the Internet :
+http://blog.flexexamples.com/2009/04/14/displaying-images-in-a-spark-dropdownlist-control-in-flex-gumbo/ 
+and
+http://stackoverflow.com/questions/2291957/flex-how-to-change-open-dropdownlist-height
+-->
+<!--
+author: Johan Degraeve
+Goal of this skin is to modify the dropdownlist skin so that it can be used as an option selector.
+-->
+<s:Skin name="CustomDropDownListSkin"
+		xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:myComponents="myComponents.*"
+		alpha.disabled="0.5">
+	<!-- states -->
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="open" />
+		<s:State name="disabled" />
+	</s:states>
+	
+	<!-- host component -->
+	<fx:Metadata>
+		<![CDATA[ 
+		[HostComponent("spark.components.DropDownList")]
+		]]>
+	</fx:Metadata> 
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			import mx.utils.object_proxy;
+			
+			import myComponents.MenuDropDownList;
+			import myComponents.MenuDropDownListItemRenderer;
+
+			
+			// get the width of this object, ie of the rectangle that will hold the items, 
+			private  function getWidth():Number {
+				return (hostComponent as MenuDropDownList).getSizeOfLongestText();
+			}
+			
+			
+		]]>
+	</fx:Script> 	
+	
+	
+	<!--- The PopUpAnchor control that opens the drop-down list. -->
+	<s:PopUpAnchor id="popUp"  displayPopUp.normal="false" displayPopUp.open="true" includeIn="open" 
+				   left="0" right="0" top="0" bottom="0" itemDestructionPolicy="auto"
+				   popUpPosition="right" popUpWidthMatchesAnchorWidth="false"  >
+		
+		<!--- The drop down area of the skin. This includes borders, background colors, scrollers, and filters.
+		removed maxHeight -->
+
+		<s:Group id="dropDown" minHeight="22" >
+			
+			<s:RectangularDropShadow blurX="20" blurY="20" alpha="1.0" distance="5" 
+									 angle="90" color="#000000" left="0" top="0" right="0" bottom="0"/>
+			<!-- border/fill -->
+			<s:Rect left="0" right="0" top="0" bottom="0" 
+					width="{getWidth()}"
+					>
+				<s:stroke>
+					<s:SolidColorStroke color="#CCCCCC" />
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor id="bgFill" color="#AAAAAA" />
+				</s:fill>
+			</s:Rect>
+			
+			<s:Scroller id="dropdownlistScroller" left="0" top="0" right="0" bottom="0" focusEnabled="false" minViewportInset="1">
+				<!--- The container for the data items in the drop-down list. -->
+				<s:DataGroup id="dataGroup" itemRenderer="myComponents.MenuDropDownListItemRenderer">
+					<s:layout>
+						<s:VerticalLayout gap="0" horizontalAlign="contentJustify"/>
+					</s:layout>
+				</s:DataGroup>
+			</s:Scroller>
+		</s:Group>
+	</s:PopUpAnchor>
+	
+	<!--- The anchor button used by the DropDownList. The default skin is DropDownListButtonSkin. -->
+	<!-- JDG : set alpha = 0, this apparently removes the arrow -->
+	
+	<s:Button id="openButton" left="0" right="0" top="0" bottom="0" 
+			  focusEnabled="false" 
+			  alpha="1" 
+			  skinClass="skins.MenuButtonSkin"
+			  />  
+	
+	<!-- setting alpha = 0 makes sure that chosen option is not displayed in button -->
+	<s:Label id="labelDisplay" verticalAlign="middle" lineBreak="explicit"
+			 mouseEnabled="false" mouseChildren="false" alpha="0"
+			 left="7" right="30" top="2" bottom="2" width="75" verticalCenter="1" /> 
+	
+</s:Skin>
