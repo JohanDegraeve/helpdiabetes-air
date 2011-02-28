@@ -34,8 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<fx:Script>
 		<![CDATA[
-			import databaseclasses.FoodTable;
-			
 			import mx.core.FlexGlobals;
 			import mx.resources.ResourceBundle;
 			
@@ -51,7 +49,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					resourceManager.getString("foodcounterview","to_tracking"),
 					resourceManager.getString("foodcounterview","own_food_item"),
 					resourceManager.getString("foodcounterview","templates")];		
-				var foodTable:FoodTable = (new FoodTable());
+				
 			}
 			
 			
