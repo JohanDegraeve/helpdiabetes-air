@@ -17,10 +17,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <s:TabbedMobileApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
-					 xmlns:s="library://ns.adobe.com/flex/spark"  >
+					 xmlns:s="library://ns.adobe.com/flex/spark" 
+					 initialize="initApplication()">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import databaseclasses.Database;
+			import databaseclasses.DatabaseEvent;
+			import databaseclasses.DatabaseResponder;
+			
+			/**
+			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
+			 */
+			private function initApplication():void {
+				var internalResponder:DatabaseResponder = new DatabaseResponder();
+				internalResponder.addEventListener(DatabaseEvent.RESULT_EVENT,onResult);
+				internalResponder.addEventListener(DatabaseEvent.ERROR_EVENT,onError);
+				Database.getInstance().init(internalResponder);
+				
+				function onResult(de:DatabaseEvent):void
+				{
+					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onError);
+					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, onResult);				
+				}
+				
+				function onError(de:DatabaseEvent):void
+				{				
+					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onError);
+					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, onResult);
+				}
+			}
+
+		]]>
+	</fx:Script>
 	<s:ViewNavigator id="Counter" label="Counter" width="100%" height="100%"
 					 firstView="views.FoodCounterView"/>
 	<s:ViewNavigator id="Track" label="Track" width="100%" height="100%"

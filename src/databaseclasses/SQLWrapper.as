@@ -16,20 +16,28 @@
  
  */
 /**
-based on Survey Ape - Mobile on http://labs.adobe.com/technologies/flexsdk_hero/samples/
-*/
+ based on Survey Ape - Mobile on http://labs.adobe.com/technologies/flexsdk_hero/samples/
+ */
 package databaseclasses
 {
-	import flash.events.EventDispatcher;
-	import flash.events.IEventDispatcher;
+	import flash.data.SQLResult;
+	import flash.data.SQLStatement;
 	
-	public class DatabaseResponder extends EventDispatcher
+	public class SQLWrapper
 	{
 		{
-			[Event(name="errorEvent",  type="database.DatabaseEvent")]
-			[Event(name="resultEvent", type="database.DatabaseEvent")]
+			public var responder:DatabaseResponder;
+			public var statement:SQLStatement;
+			public var result:SQLResult;
 			
-			public function DatabaseResponder()
+			// Called when a query is executed successfully or unsuccessfully. Usually called to dispatch events
+			public var onResult:Function;
+			public var onError:Function;
+			
+			// Removes event listeners for the garbage collector  
+			public var cleanUp:Function; 
+			
+			public function SQLWrapper()
 			{
 			}
 		}

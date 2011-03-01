@@ -1,4 +1,4 @@
-	<!--
+/**
 	Copyright (C) 2011  hippoandfriends
 	
 	This program is free software: you can redistribute it and/or modify
@@ -14,17 +14,32 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
-	-->
-<!--
-based on Survey Ape - Mobile on http://labs.adobe.com/technologies/flexsdk_hero/samples/
--->
+*/
+/**
+based on Survey Ape - Mobile on http://labs.adobe.com/technologies/flexsdk_hero/samples
+*/
 package databaseclasses
 {
+	import flash.data.SQLConnection;
+	import flash.data.SQLMode;
+	import flash.data.SQLResult;
+	import flash.data.SQLStatement;
 	import flash.events.EventDispatcher;
-	import flash.events.IEventDispatcher;
+	import flash.events.SQLErrorEvent;
+	import flash.events.SQLEvent;
+	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
+	import flash.net.Responder;
 	
-	public class Database extends EventDispatcher
+	
+	/**
+	 * Database class is a singleton
+	 */ 
+	public final class Database extends EventDispatcher
 	{
+		private static var instance:Database = new Database;
+		
 		private var dbFile:File;
 		public var aConn:SQLConnection;		
 		private var sqlStatementFactory:SQLStatementFactory;
@@ -46,26 +61,26 @@ package databaseclasses
 																					"kcal INTEGER, " +
 																					"protein REAL, " +
 																					"carbs REAL NOT NULL, " +
-																					"fat REAL);";
+																					"fat REAL)";
 		private const CREATE_TABLE_EVENTS:String = "CREATE TABLE IF NOT EXISTS events (eventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																					  "exerciseevents_exerciseeventid INTEGER ," +
 																					  "medicinevents_medicineventid INTEGER, " +
 																					  "bloodglucoseevents_bloodglucoseeventid INTEGER, " +
 																					  "mealevents_mealeventid INTEGER, " +
 																					  "creationtimestamp TIMESTAMP, " +
-																					  ");";
+																					  ")";
 		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (exerciseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																									   "level TEXT, " +
-																									   "comment_2 TEXT);";
+																									   "comment_2 TEXT)";
 		private const CREATE_TABLE_BLOODGLUCOSE_EVENTS:String = "CREATE TABLE IF NOT EXISTS bloodglucoseevents (bloodglucoseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																											   "unit TEXT NOT NULL, " +
-																											   "value INTEGER NOT NULL);";
+																											   "value INTEGER NOT NULL)";
 		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (medicineventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																									 "medicinname TEXT NOT NULL, " +
-																									 "amount REAL NOT NULL);";		
+																									 "amount REAL NOT NULL)";		
 		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																							   "mealtype TEXT NOT NULL, " +
-																							   "lastmodifiedtimestamp TIMESTAMP NOT NULL);";		
+																							   "lastmodifiedtimestamp TIMESTAMP NOT NULL)";		
 		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																											 "mealevents_mealeventid INTEGER NOT NULL, " +
 																											 "itemdescription TEXT NOT NULL, " +
@@ -75,7 +90,7 @@ package databaseclasses
 																					   					     "kcal INTEGER, " +
 																											 "protein REAL, " +
 																											 "carbs REAL NOT NULL, " +
-																											 "fat REAL);";		
+																											 "fat REAL)";		
 		private const CREATE_TABLE_TEMPLATE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS templatefooditems (templateitemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																											 "templates_templateid INTEGER NOT NULL, " +
 																											 "itemdescription TEXT NOT NULL, " +
@@ -85,13 +100,13 @@ package databaseclasses
 																											 "kcal INTEGER, " +
 																											 "protein REAL, " +
 																											 "carbs REAL NOT NULL, " +
-																											 "fat REAL);";		
+																											 "fat REAL)";		
 		private const CREATE_TABLE_TEMPLATES:String = "CREATE TABLE IF NOT EXISTS templates (templateid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																							"name TEXT NOT NULL);";		
+																							"name TEXT NOT NULL)";		
 
 		
 		private const GET_FOODITEM:String = "SELECT * FROM fooditems WHERE itemid = :itemid";
-		
+
 		/*************/
 		private const GET_SURVEYS:String = "SELECT * FROM surveys ORDER BY id DESC";
 		private const GET_QUESTIONS:String = "SELECT * FROM questions";
@@ -107,13 +122,24 @@ package databaseclasses
 		private const INSERT_INTO_ANSWERS:String = "INSERT INTO answers (answer) VALUES (:answer)";
 		
 		private const UPDATE_SURVEY_PHOTO_PATH:String = "UPDATE surveys SET photo_path = :photo_path WHERE id = :id";
-		/*************/
+
 		/**
-		 * constructor, does nothing
+		 * constructor, should not be used, use getInstance()
 		 */
 		public function Database()
 		{
-			
+			if (instance != null) {
+				throw new Error("Database class can only be accessed through Database.getInstance()");	
+			}
+			instance = this;
+		}
+		
+		/**
+		 * returns the Database Singleton
+		 */
+		public static function getInstance():Database {
+			if (instance == null) instance = new Database();
+			return instance;
 		}
 		
 		/**
@@ -381,6 +407,20 @@ package databaseclasses
 		 **/
 		private function finishedCreatingTables(args:Array):void
 		{
+			/****ADDING TEST DATA*************/
+			 var insertString1:String = "INSERT INTO fooditems (description) VALUES ('food item 1')";
+			 var insertString2:String = "INSERT INTO fooditems (description) VALUES ('food item 2')";
+			 var insertString3:String = "INSERT INTO fooditems (description) VALUES ('food item 3')";
+			 var insertString4:String = "INSERT INTO fooditems (description) VALUES ('food item 4')";
+			 var insertString5:String = "INSERT INTO fooditems (description) VALUES ('food item 5')";
+			 var insertString6:String = "INSERT INTO fooditems (description) VALUES ('food item 6')";
+			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString1,null);
+			/*var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString2,null);
+			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString3,null);
+			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString4,null);
+			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString5,null);
+			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString6,null);*/
+			
 			if ( args[0] is DatabaseResponder )
 			{
 				var de:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
@@ -601,6 +641,5 @@ package databaseclasses
 				sqlWrapper.statement.execute();
 			}
 		}
-	}
 	}
 }
