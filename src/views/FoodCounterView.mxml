@@ -34,6 +34,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<fx:Script>
 		<![CDATA[
+			import model.ModelLocator;
+			
 			import mx.core.FlexGlobals;
 			import mx.resources.ResourceBundle;
 			
@@ -63,6 +65,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (foodCounterViewMenu.selectedIndex ==  1)
 					toTracking();
 			}
+			
 				
 		]]>
 	</fx:Script>
@@ -85,5 +88,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		</myComponents:MenuDropDownList>
 		<mx:Spacer width="15" height="100%"/>
 	</s:navigationContent>
-	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0"></s:List>
+	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" dataProvider="{ModelLocator.getInstance().foodItemList}"></s:List>
 </s:View>

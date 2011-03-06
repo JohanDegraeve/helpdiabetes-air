@@ -38,17 +38,16 @@ package databaseclasses
 	 */ 
 	public final class Database extends EventDispatcher
 	{
-		private static var instance:Database = new Database;
+		private static var instance:Database = new Database();
 		
-		private var dbFile:File;
 		public var aConn:SQLConnection;		
 		private var sqlStatementFactory:SQLStatementFactory;
 		
 		public static const TABLES_CREATED:String = "TABLES_CREATED";
 		
 		private const MG_DL:String = "mg/dL";
-		private const mmol:String="mmol";
-		private const dbFileName:String="HelpDiabetes.db"
+		private const mmol:String = "mmol";
+		private  var dbFile:File  = File.applicationStorageDirectory.resolvePath("HelpDiabetes.db");;
 		
 		
 		private const CREATE_TABLE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS fooditems (itemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -63,11 +62,11 @@ package databaseclasses
 																					"carbs REAL NOT NULL, " +
 																					"fat REAL)";
 		private const CREATE_TABLE_EVENTS:String = "CREATE TABLE IF NOT EXISTS events (eventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																					  "exerciseevents_exerciseeventid INTEGER ," +
+																					  "exerciseevents_exerciseeventid INTEGER," +
 																					  "medicinevents_medicineventid INTEGER, " +
 																					  "bloodglucoseevents_bloodglucoseeventid INTEGER, " +
 																					  "mealevents_mealeventid INTEGER, " +
-																					  "creationtimestamp TIMESTAMP, " +
+																					  "creationtimestamp TIMESTAMP " +
 																					  ")";
 		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (exerciseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																									   "level TEXT, " +
@@ -106,6 +105,7 @@ package databaseclasses
 
 		
 		private const GET_FOODITEM:String = "SELECT * FROM fooditems WHERE itemid = :itemid";
+		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
 
 		/*************/
 		private const GET_SURVEYS:String = "SELECT * FROM surveys ORDER BY id DESC";
@@ -226,6 +226,7 @@ package databaseclasses
 		 */
 		private function openConnection(responder:DatabaseResponder):void
 		{
+			
 			this.aConn = new SQLConnection();
 			this.aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
 			this.aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
@@ -269,9 +270,10 @@ package databaseclasses
 		{	
 			if ( args[0] is DatabaseResponder )
 			{						
-				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0], CREATE_TABLE_FOODITEMS, createUnitsTable)
+				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0], CREATE_TABLE_FOODITEMS, createUnitsTable);
 				sqlWrapper.statement.execute();
 			}
+			
 		}
 		
 		/**
@@ -287,6 +289,10 @@ package databaseclasses
 				sqlWrapper.statement.execute();				
 			}
 		}	
+		
+		private function onError(args:Array):void {
+			var  i:int=0;
+		}
 		
 		/**
 		 * Creates the events table
@@ -311,7 +317,7 @@ package databaseclasses
 		{
 			if ( args[0] is DatabaseResponder )
 			{
-				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0], CREATE_TABLE_EXERCISE_EVENTS, createBloodglucoseEventsTable);
+				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0], CREATE_TABLE_EXERCISE_EVENTS, createBloodglucoseEventsTable,onError);
 				sqlWrapper.statement.execute();
 			}
 		}
@@ -395,10 +401,11 @@ package databaseclasses
 		{
 			if ( args[0] is DatabaseResponder )
 			{
-				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0], CREATE_TABLE_FOODITEMS, finishedCreatingTables);
+				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0], CREATE_TABLE_FOODITEMS, insertNewString);
 				sqlWrapper.statement.execute();
 			}
 		}	
+		
 		
 		/**
 		 * Dispatches a complete event
@@ -407,27 +414,31 @@ package databaseclasses
 		 **/
 		private function finishedCreatingTables(args:Array):void
 		{
-			/****ADDING TEST DATA*************/
-			 var insertString1:String = "INSERT INTO fooditems (description) VALUES ('food item 1')";
-			 var insertString2:String = "INSERT INTO fooditems (description) VALUES ('food item 2')";
-			 var insertString3:String = "INSERT INTO fooditems (description) VALUES ('food item 3')";
-			 var insertString4:String = "INSERT INTO fooditems (description) VALUES ('food item 4')";
-			 var insertString5:String = "INSERT INTO fooditems (description) VALUES ('food item 5')";
-			 var insertString6:String = "INSERT INTO fooditems (description) VALUES ('food item 6')";
-			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString1,null);
-			/*var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString2,null);
-			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString3,null);
-			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString4,null);
-			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString5,null);
-			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(null,insertString6,null);*/
-			
 			if ( args[0] is DatabaseResponder )
 			{
 				var de:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 				de.data = Database.TABLES_CREATED;
 				args[0].dispatchEvent(de);
+				//aConn.commit();
 			}
 		}
+
+		/****ADDING TEST DATA*************/
+		private var insertString:String;
+		private var i:int = 0 ;
+		private function insertNewString(args:Array):void {
+			i++;
+			if (i ==100) {
+				finishedCreatingTables([args[0]]);
+				return;
+			}
+			insertString = "INSERT INTO fooditems   (description) VALUES (:description)";
+			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0],insertString,insertNewString);
+			sqlWrapper.statement.parameters[":description"] = "food item" + i;
+			sqlWrapper.statement.execute();
+		}
+		/***************/
+		
 		
 		/**
 		 * Gets the list of surveys
@@ -458,6 +469,20 @@ package databaseclasses
 				sqlWrapper.statement.execute();
 			}
 		}	
+		
+		/**
+		 * Gets all fooditems from the fooditems table. 
+		 * 
+		 * @param args Array [responder:DatabaseResponder]
+		 **/
+		public function getAllFoodItems(args:Array):void
+		{					
+			
+				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0], GET_ALLFOODITEMS);
+				sqlWrapper.statement.execute();
+		}	
+		
+				
 		
 		/*******************************************************************************
 		 * Gets all questions from the database

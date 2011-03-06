@@ -28,25 +28,63 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import databaseclasses.DatabaseEvent;
 			import databaseclasses.DatabaseResponder;
 			
-			/**
+			import model.ModelLocator;
+			
+			import mx.collections.ArrayCollection;
+			
+			private var  foodItems:ArrayCollection;
+			
+			/**   
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
 			 */
 			private function initApplication():void {
 				var internalResponder:DatabaseResponder = new DatabaseResponder();
-				internalResponder.addEventListener(DatabaseEvent.RESULT_EVENT,onResult);
-				internalResponder.addEventListener(DatabaseEvent.ERROR_EVENT,onError);
+				internalResponder.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
+				internalResponder.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
+				/********* DELETE THIS**********/
+				//Database.getInstance().deleteDatabase();
+				/********* DELETE THIS**********/
+
 				Database.getInstance().init(internalResponder);
 				
-				function onResult(de:DatabaseEvent):void
+				function onInitResult(de:DatabaseEvent):void
 				{
-					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onError);
-					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, onResult);				
+					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
+					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
+					internalResponder = new DatabaseResponder();
+					internalResponder.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
+					internalResponder.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
+					Database.getInstance().getAllFoodItems([internalResponder]);
 				}
 				
-				function onError(de:DatabaseEvent):void
-				{				
-					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onError);
-					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, onResult);
+				function onRetrieveListError(de:DatabaseEvent):void
+				{	
+					/*******handle error event !!!!*******/
+					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
+					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
+				}
+				
+				function onInitError(de:DatabaseEvent):void
+				{	
+					/*******handle error event !!!!*******/
+					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
+					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
+				}
+				
+				function retrieveFoodItemList(de:DatabaseEvent):void {
+					
+					foodItems = new ArrayCollection();
+
+					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
+					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
+					
+					if (de.data && de.data is Array) {
+						for each ( var o:Object in de.data )
+						{
+							foodItems.addItem(o.description);
+						}
+						ModelLocator.getInstance().foodItemList = foodItems;
+					} 
 				}
 			}
 
