@@ -106,6 +106,7 @@ package databaseclasses
 		
 		private const GET_FOODITEM:String = "SELECT * FROM fooditems WHERE itemid = :itemid";
 		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
+		private const COUNT_ALLFOODITEMS:String = "SELECT itemid FROM fooditems";
 
 		/*************/
 		private const GET_SURVEYS:String = "SELECT * FROM surveys ORDER BY id DESC";
@@ -401,7 +402,7 @@ package databaseclasses
 		{
 			if ( args[0] is DatabaseResponder )
 			{
-				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0], CREATE_TABLE_FOODITEMS, insertNewString);
+				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(args[0], CREATE_TABLE_FOODITEMS, loadData);
 				sqlWrapper.statement.execute();
 			}
 		}	
@@ -411,7 +412,7 @@ package databaseclasses
 		 * Dispatches a complete event
 		 * 
 		 * @param args Expects element 0 to be a DatabaseResponder
-		 **/
+		 **
 		private function finishedCreatingTables(args:Array):void
 		{
 			if ( args[0] is DatabaseResponder )
@@ -419,11 +420,40 @@ package databaseclasses
 				var de:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 				de.data = Database.TABLES_CREATED;
 				args[0].dispatchEvent(de);
-				//aConn.commit();
 			}
-		}
+		}*/
+		
+		private function loadData(args:Array):void {
+			var internalResponder:DatabaseResponder = new DatabaseResponder();
+			internalResponder.addEventListener(DatabaseEvent.RESULT_EVENT, onResult);
+			internalResponder.addEventListener(DatabaseEvent.ERROR_EVENT, onError);		
+			
+			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(internalResponder, COUNT_ALLFOODITEMS, null);
+			sqlWrapper.statement.execute();
+			
+			function onResult(de:DatabaseEvent):void
+			{
+				internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onError);
+				internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, onResult);
+				if (!de.data) //NOT SURE IF THIS WORKS WHEN THERE ARE ACTUALLY RESULTS
+				{	//READ THE FILE
+					
+				}
+				var de:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+				de.data = Database.TABLES_CREATED;
+				args[0].dispatchEvent(de);
+				
+			}
+			
+			function onError(de:DatabaseEvent):void
+			{				
+				internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onError);
+				internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, onResult);
+			}
 
-		/****ADDING TEST DATA*************/
+		}		
+
+		/*
 		private var insertString:String;
 		private var i:int = 0 ;
 		private function insertNewString(args:Array):void {
@@ -437,7 +467,7 @@ package databaseclasses
 			sqlWrapper.statement.parameters[":description"] = "food item" + i;
 			sqlWrapper.statement.execute();
 		}
-		/***************/
+		**************/
 		
 		
 		/**
