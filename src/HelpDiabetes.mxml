@@ -59,14 +59,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function onRetrieveListError(de:DatabaseEvent):void
 				{	
-					/*******handle error event !!!!*******/
 					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
 					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 				}
 				
 				function onInitError(de:DatabaseEvent):void
 				{	
-					/*******handle error event !!!!*******/
 					internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
 					internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
 				}

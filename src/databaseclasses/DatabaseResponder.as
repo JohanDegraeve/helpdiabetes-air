@@ -31,6 +31,7 @@ package databaseclasses
 			
 			public function DatabaseResponder()
 			{
+				
 			}
 		}
 	}
