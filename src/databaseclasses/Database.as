@@ -21,6 +21,7 @@ package databaseclasses
 	import flash.data.SQLMode;
 	import flash.data.SQLResult;
 	import flash.data.SQLStatement;
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.SQLErrorEvent;
 	import flash.events.SQLEvent;
@@ -44,6 +45,7 @@ package databaseclasses
 
 		private var sqlStatement:SQLStatement;
 		
+		private var globalDispatcher:EventDispatcher;
 		
 		/*private const MG_DL:String = "mg/dL";
 		private const mmol:String = "mmol";*/
@@ -57,7 +59,6 @@ package databaseclasses
 																					"fooditems_itemid INTEGER NOT NULL, " +
 																					"description TEXT NOT NULL, " +
 																					"standardamount INTEGER, " +
-																					"weight INTEGER, " +
 																					"kcal INTEGER, " +
 																					"protein REAL, " +
 																					"carbs REAL NOT NULL, " +
@@ -86,7 +87,6 @@ package databaseclasses
 																											 "itemdescription TEXT NOT NULL, " +
 																											 "unitdescription TEXT, " +
 																											 "standardamount INTEGER, " +
-						 	    																			 "weight INTEGER, " +
 																					   					     "kcal INTEGER, " +
 																											 "protein REAL, " +
 																											 "carbs REAL NOT NULL, " +
@@ -96,7 +96,6 @@ package databaseclasses
 																											 "itemdescription TEXT NOT NULL, " +
 																											 "unitdescription TEXT, " +
 																											 "standardamount INTEGER, " +
-																											 "weight INTEGER, " +
 																											 "kcal INTEGER, " +
 																											 "protein REAL, " +
 																											 "carbs REAL NOT NULL, " +
@@ -111,17 +110,16 @@ package databaseclasses
 		private const COUNT_ALLFOODITEMS:String = "SELECT itemid FROM fooditems";
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
 		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description) VALUES (:description)";
-		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid," +
+		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid,"+
 											"description," +
 											"standardamount," +
-											"weight," +
 											"kcal," +
 											"protein," +
 											"carbs," +
 											"fat) VALUES " +
-											"(:description," +
+											"(:fooditems_itemid," + 
+											":description," +
 											":standardamount," +
-											":weight," +
 											":kcal," +
 											":protein," +
 											":carbs," +
@@ -199,12 +197,12 @@ package databaseclasses
 		/**
 		 * Create the asynchronous connection to the database, then create the tables
 		 * 
-		 * @param responder:DatabaseResponder Will dispatch result or error events when the tables are created. Dispatches an event with data TABLES_CREATED 
-		 *  when all tables have been successfully created. 
 		 **/
-		public function init(responder:Responder):void
+		public function init(dispatcher:EventDispatcher):void
 		{
 			
+			this.globalDispatcher = dispatcher;
+
 			this.aConn = new SQLConnection();
 			this.aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
 			this.aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
@@ -255,7 +253,7 @@ package databaseclasses
 				createUnitsTable();
 			}
 
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -278,7 +276,7 @@ package databaseclasses
 				createEventsTable();
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -302,7 +300,7 @@ package databaseclasses
 				createExerciseEventsTable();
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -325,7 +323,7 @@ package databaseclasses
 				createBloodglucoseEventsTable();
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -348,7 +346,7 @@ package databaseclasses
 				createMedicinEventsTable();
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -371,7 +369,7 @@ package databaseclasses
 				createTableMealEvents();
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -394,7 +392,7 @@ package databaseclasses
 				createTableSelectedFoodItems();
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -417,7 +415,7 @@ package databaseclasses
 				createTableTemplateFoodItems();
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -440,7 +438,7 @@ package databaseclasses
 				createTableTemplates();
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -463,7 +461,7 @@ package databaseclasses
 				createTableSource();
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -484,183 +482,219 @@ package databaseclasses
 			function tableCreated(se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
-				finishedCreatingTables();
+				loadSourceXML("foodfile-nl.xml");
 			}
 			
-			function tableCreated(see:SQLErrorEvent):void {
+			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
 		}
 		
-		private function finishedCreatingTables():void {
-			//xml laden in fooditemxmllist
-			..source stockeren en verder gaan
-		}
-		
 		/**
 		 * stores a source name in the database
-		 * Database responder can be null
+		 * if dispatcher != null then an event will be dispatches when finished
 		 */
-		private function insertSource(dbResponder:DatabaseResponder, source:String):void {
-			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(dbResponder, INSERT_SOURCE, null);
-			sqlWrapper.statement.parameters[":source"] = source;
-			sqlWrapper.statement.execute();
+		public function insertSource(source:String, dispatcher:EventDispatcher):void {
+			sqlStatement.text = INSERT_SOURCE;
+			sqlStatement.parameters[":source"] = source;
+			sqlStatement.addEventListener(SQLEvent.RESULT, sourceInserted);
+			sqlStatement.addEventListener(SQLErrorEvent.ERROR, sourceInsertionError);
+			sqlStatement.execute();
+			
+			function sourceInserted(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,sourceInserted);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceInsertionError);
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT));
+			}
+			function sourceInsertionError(see:SQLErrorEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,sourceInserted);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceInsertionError);
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT));
+			}
+		}
+
+		/**
+		 * stores a food item in the database, obviously only the description, the dispatched databaseevent will have the inserted row id as lastInsertRowID
+		 * if dispatcher != null then an event will be dispatches when finished
+		 */
+		public function insertFoodItem(foodItemDescription:String, dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = INSERT_FOODITEM;
+			localSqlStatement.parameters[":description"] = foodItemDescription;
+			localSqlStatement.addEventListener(SQLEvent.RESULT, foodItemInserted);
+			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, foodItemInsertionError);
+			localSqlStatement.execute();
+			
+			function foodItemInserted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemInserted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemInsertionError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT);
+					event.lastInsertRowID = localSqlStatement.getResult().lastInsertRowID;
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			function foodItemInsertionError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemInserted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemInsertionError);
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT));
+			}
 		}
 		
 		/**
-		 * Dispatches a complete event
-		 * 
-		 * @param args Expects element 0 to be a DatabaseResponder
-		 **
-		private function finishedCreatingTables(args:Array):void
-		{
-			if ( args[0] is DatabaseResponder )
-			{
-				var de:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-				de.data = Database.TABLES_CREATED;
-				args[0].dispatchEvent(de);
-			}
-		}*/
-		
-		/** 
-		 * loads the initial food table into the database
-		 * args[0] should be databaseresponder
+		 * stores a unit in the database
+		 * if dispatcher != null then an event will be dispatches when finished
 		 */
-		private function loadData(args:Array):void {
-			databaseResponder = args[0];
-			var internalResponder:DatabaseResponder = new DatabaseResponder();
-			
-			var foodItemCounter:int = 0;
-			var unitCounter:int;
-			var lastInsertedRowId:int;
-			var unitList:XMLList;
-			var foodtableXML:XML;
-			
-			internalResponder.addEventListener(DatabaseEvent.RESULT_EVENT, allFoodItemsCounted);
-			internalResponder.addEventListener(DatabaseEvent.ERROR_EVENT, onErrorFoodItemsCounted);		
-			
-			var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(internalResponder, COUNT_ALLFOODITEMS, null);
-			sqlWrapper.statement.execute();
-			
-			function allFoodItemsCounted(de:DatabaseEvent):void
-			{
-				internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, allFoodItemsCounted);
-				internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT,onErrorFoodItemsCounted);
-				if (!de.data) //NOT SURE IF THIS WORKS WHEN THERE ARE ACTUALLY RESULTS
-				{	
-					/*******should be done differently because multiple source could be added ***/
-					var sourceFile:File = File.applicationStorageDirectory.resolvePath("foodfile-nl.xml");
-					
-					var fileStream:FileStream = new FileStream();
-					fileStream.open(sourceFile,FileMode.READ);
-					foodtableXML = new XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
-					insertSource(args[0], foodtableXML.source);
-					
-					fooditemList = foodtableXML.fooditemlist;
-					foodItemCounter  = 0;
-					if (fooditemList.fooditem.length() > 0) {
-						insertNextFoodItem();
-					}
-					else {
-						var de:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-						de.data = Database.TABLES_CREATED;
-						args[0].dispatchEvent(de);
-					}	
-				}
-				
-			}
-			
-			function insertNextFoodItem():void {
-				internalResponder.addEventListener(DatabaseEvent.RESULT_EVENT, fooditemInserted);
-				internalResponder.addEventListener(DatabaseEvent.ERROR_EVENT, onErrorfooditemInserted);
-				
-				var sqlWrapper:SQLWrapper = sqlStatementFactory.newInstance(internalResponder, INSERT_FOODITEM, null );
-				sqlWrapper.statement.parameters[":description"] = fooditemList.fooditem.description.text()[0].toString();
-				//var test:Object = fooditemList.fooditem.description.text()[0].toString();
-				sqlWrapper.statement.execute();
-				
-			}
-			
-			function fooditemInserted(de:DatabaseEvent):void {
-				internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, fooditemInserted);
-				internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onErrorfooditemInserted);
-				var unitList:XMLList = (fooditemList.fooditem[foodItemCounter]).unitlist;
-				unitCounter = 0;
-				if (unitList.unit.length() > 0) {
-					//var test:int = unitList.unit.length();
-					lastInsertedRowId = de.data.lastInsertRowID;
-					var test2:int = lastInsertedRowId;
-					insertNextUnit(internalResponder);
-				}
-				else {
-					foodItemCounter++;
+		public function insertUnit(description:String,standardAmount:int,kcal:int,protein:Number,carbs:Number,fat:Number, fooditems_itemid:int,dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = INSERT_UNIT;
+			localSqlStatement.parameters[":description"] = description;
+			localSqlStatement.parameters[":standardamount"] = standardAmount; 
+			localSqlStatement.parameters[":kcal"] = kcal;
+			localSqlStatement.parameters[":protein"] = protein;
+			localSqlStatement.parameters[":carbs"] = carbs;
+			localSqlStatement.parameters[":fat"] = fat;
+			localSqlStatement.parameters[":fooditems_itemid"] = fooditems_itemid;
+			localSqlStatement.addEventListener(SQLEvent.RESULT, unitInserted);
+			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, unitInsertionError);
+			localSqlStatement.execute();
 
-					if (foodItemCounter > fooditemList.fooditem.length() - 1) {
-						var de:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-						de.data = Database.TABLES_CREATED;
-						args[0].dispatchEvent(de);
-					} else {
-						insertNextFoodItem(databaseResponder);
-					}
-				}	
-			}
-			
-			function unitInserted(de:DatabaseEvent):void {
-				internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT,unitInserted);
-				internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onErrorInsertNextUnit);
-				unitCounter++;
-				if (unitCounter > unitList.length - 1) {
-					foodItemCounter++;
-					if (foodItemCounter > fooditemList.fooditem.length() - 1) {
-						internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT,onError);
-						var de:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-						de.data = Database.TABLES_CREATED;
-						databaseResponder.dispatchEvent(de);
-					} else {
-						insertNextFoodItem(internalResponder);
-					}
-				} else {
-					insertNextUnit(unitCounter);
+			function unitInserted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitInserted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitInsertionError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
 				}
 			}
-
-			function insertNextUnit(counter:int):void {
-				internalResponder.addEventListener(DatabaseEvent.RESULT_EVENT,unitInserted);
-				internalResponder.addEventListener(DatabaseEvent.ERROR_EVENT,onErrorInsertNextUnit);
-				var sqlWrapper:SQLWrapper = this.sqlStatementFactory.newInstance(internalResponder, INSERT_UNIT, null);
-				sqlWrapper.statement.parameters[":description"] = unitList[counter].description;
-				sqlWrapper.statement.parameters[":standardamount"] = unitList[counter].standardamount;
-				sqlWrapper.statement.parameters[":weight"] = unitList[counter].weight;
-				sqlWrapper.statement.parameters[":kcal"] = unitList[counter].kcal;
-				sqlWrapper.statement.parameters[":protein"] = unitList[counter].protein;
-				sqlWrapper.statement.parameters[":carbs"] = unitList[counter].carbs;
-				sqlWrapper.statement.parameters[":fat"] = unitList[counter].fat;
-				sqlWrapper.statement.parameters[":fooditems_itemid"] = lastInsertedRowId;
-				sqlWrapper.statement.execute();
+			function unitInsertionError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitInserted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitInsertionError);
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT));
 			}
-			
-			function onErrorFoodItemsCounted(de:DatabaseEvent):void
-			{				
-				internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onErrorFoodItemsCounted);
-				internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, allFoodItemsCounted);
-			}
-			
-			function onErrorfooditemInserted(de:DatabaseEvent):void
-			{				
-				internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onErrorfooditemInserted);
-				internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, fooditemInserted);
-			}
-			
-			function onErrorInsertNextUnit(de:DatabaseEvent):void
-			{				
-				internalResponder.removeEventListener(DatabaseEvent.ERROR_EVENT, onErrorInsertNextUnit);
-				internalResponder.removeEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
-			}
-			
-			
-
-		}		
+		
+		};
 
 		
+		
+		
+		/**
+		 * loads the XML sourcefile and populates the database
+		 */
+		private function loadSourceXML(sourceFileName:String):void {
+			var sourceFile:File = File.applicationStorageDirectory.resolvePath(sourceFileName);
+			var fileStream:FileStream = new FileStream();
+			var dispatcher:EventDispatcher = new EventDispatcher();
+			var foodtableXML:XML;
+		    var unitListXMLList:XMLList;
+			var foodItemDescriptionsXMLList:XMLList;
+			var foodItemListCounter:int;
+			var unitListCounter:int;
+			var unitListSize:int;
+			var foodItemListSize:int;
+			var actualFoodItemRowId:int;
+
+			fileStream.open(sourceFile,FileMode.READ);
+			foodtableXML = new XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
+			foodItemListSize = foodtableXML.fooditemlist.fooditem.length();
+			foodItemListCounter = 0;
+			
+			foodItemDescriptionsXMLList = foodtableXML.fooditemlist.fooditem.description;
+			
+			dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, sourceInserted);
+			dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, sourceInsertionError);
+			insertSource(foodtableXML.source == null ? "" : foodtableXML.source,dispatcher);
+			
+			function sourceInserted(se:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT,sourceInserted);
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT,sourceInsertionError);
+				goOnWithFoodItems();
+			}
+			function sourceInsertionError(see:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT,sourceInserted);
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT,sourceInsertionError);
+			}
+			
+			function goOnWithFoodItems():void {
+				
+				if (foodItemListCounter == foodItemListSize) {
+					finishedCreatingTables();					
+				} else {
+					dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, foodItemInserted);
+					dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, foodItemInsertionError);
+					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
+					insertFoodItem(foodItemDescriptionsXMLList[foodItemListCounter],dispatcher);
+				}
+			}
+			
+			function foodItemInserted(se:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT,foodItemInserted);
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT,foodItemInsertionError);
+				unitListCounter = 0;
+				unitListXMLList = foodtableXML.fooditemlist.fooditem[foodItemListCounter].unitlist.unit;
+				unitListSize = unitListXMLList.length();
+				actualFoodItemRowId = se.lastInsertRowID;
+				foodItemListCounter++;
+				goOnWithUnits();
+			}
+			
+			function foodItemInsertionError(see:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT,foodItemInserted);
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT,foodItemInsertionError);
+			}
+			
+			function goOnWithUnits():void {
+				if (unitListCounter == unitListSize) {
+					goOnWithFoodItems();					
+				} else {
+					dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, unitInserted);
+					dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, unitInsertionError);
+					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
+					insertUnit(unitListXMLList[unitListCounter ].description,
+						unitListXMLList[unitListCounter ].standardamount,
+						unitListXMLList[unitListCounter ].kcal,
+						unitListXMLList[unitListCounter ].protein,
+						unitListXMLList[unitListCounter ].carbs,
+						unitListXMLList[unitListCounter ].fat,
+						actualFoodItemRowId,
+						dispatcher);
+					unitListCounter++;
+
+				}
+			}
+			
+			function unitInserted(see:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, unitInserted);
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, unitInsertionError);
+				goOnWithUnits();
+			}
+			
+			function unitInsertionError(se:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, unitInserted);
+				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, unitInsertionError);
+			}
+			
+			
+			
+			
+		}
+		
+		
+		/**
+		 * if globalDispatcher not null then dispatches a result event
+		 */
+		private function finishedCreatingTables():void {
+			//xml laden in fooditemxmllist
+			//..source stockeren en verder gaan
+			if (globalDispatcher != null)
+				globalDispatcher.dispatchEvent(new Event(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT));
+		}
+	}		
 }
