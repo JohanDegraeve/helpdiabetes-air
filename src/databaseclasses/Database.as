@@ -49,7 +49,13 @@ package databaseclasses
 		
 		/*private const MG_DL:String = "mg/dL";
 		private const mmol:String = "mmol";*/
-		private  var dbFile:File  = File.applicationStorageDirectory.resolvePath("HelpDiabetes.db");
+		private var sampleDbFileName:String;
+		private const dbFileName:String = "foodfile.db";
+		private  var dbFile:File  ;
+		private var xmlFileName:String;
+		/********************* change to language dependent name *********/
+		private var foodFileName:String = "foodfile-nl";//foodfile name without extension
+		/*****************************************************************/
 		private var fooditemList:XMLList;
 		
 		
@@ -106,6 +112,7 @@ package databaseclasses
 
 		
 		private const GET_FOODITEM:String = "SELECT * FROM fooditems WHERE itemid = :itemid";
+		private const GET_SOURCE:String = "SELECT * FROM source";
 		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
 		private const COUNT_ALLFOODITEMS:String = "SELECT itemid FROM fooditems";
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
@@ -131,6 +138,9 @@ package databaseclasses
 		 */
 		public function Database()
 		{
+			sampleDbFileName = foodFileName + ".db";
+			xmlFileName = foodFileName + ".xml";
+
 			if (instance != null) {
 				throw new Error("Database class can only be accessed through Database.getInstance()");	
 			}
@@ -195,18 +205,34 @@ package databaseclasses
 		}
 		
 		/**
-		 * Create the asynchronous connection to the database, then create the tables
+		 * Create the asynchronous connection to the database
+		 * In the complete flow first an attempt will be made to open the database in update mode. 
+		 * If that fails, it means the database is not existing yet. Then an attempt is made to copy a sample from the assets. 
 		 * 
+<<<<<<< .mine
+		 * Independent of the result of the attempt to open the database and to copy from the assets, all tables will be created (if not existing yet).
+		 * At the end, a check will be done to see if a source record exists in the source table, if no then the complete xml file will be loaded into the database
+		 * Otherwise no reloading is done.
+		 * 
+=======
+>>>>>>> .r19
 		 **/
 		public function init(dispatcher:EventDispatcher):void
 		{
 			
+<<<<<<< .mine
+			trace("HelpDiabetes-air : Database.init");
+			this.globalDispatcher = dispatcher;
+			dbFile  = File.applicationStorageDirectory.resolvePath(dbFileName);
+			
+=======
 			this.globalDispatcher = dispatcher;
 
+>>>>>>> .r19
 			this.aConn = new SQLConnection();
 			this.aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
 			this.aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
-			this.aConn.openAsync(dbFile, SQLMode.CREATE);
+			this.aConn.openAsync(dbFile, SQLMode.UPDATE);
 			
 			function onConnOpen(se:SQLEvent):void
 			{
@@ -221,6 +247,17 @@ package databaseclasses
 				trace("SQL Error while attempting to open database. Database:0002");
 				aConn.removeEventListener(SQLEvent.OPEN, onConnOpen);
 				aConn.removeEventListener(SQLErrorEvent.ERROR, onConnError);
+				reAttempt();
+			}
+			
+			function reAttempt():void {
+				//attempt to create dbFile based on a sample in assets directory, 
+				//if that fails then dbFile will simply not exist and so will be created later on in openAsync 
+				createDatabaseFromAssets(dbFile);
+				this.aConn = new SQLStatement();
+				this.aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
+				this.aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
+				this.aConn.openAsync(dbFile, SQLMode.CREATE);
 			}
 			
 		}
@@ -467,6 +504,7 @@ package databaseclasses
 			}
 		}
 		
+		
 		/**
 		 * Creates the sourcre table
 		 * The source table should only have one row with the source of the food composition table 
@@ -482,7 +520,11 @@ package databaseclasses
 			function tableCreated(se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+<<<<<<< .mine
+				checkSource();
+=======
 				loadSourceXML("foodfile-nl.xml");
+>>>>>>> .r19
 			}
 			
 			function tableCreationError(see:SQLErrorEvent):void {
@@ -491,10 +533,57 @@ package databaseclasses
 			}
 		}
 		
+<<<<<<< .mine
+		private function checkSource():void {
+			var dispatcher:EventDispatcher = new EventDispatcher();
+
+			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, checkSourceResult);
+			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, checkSourceError);
+			getSource(dispatcher);
+			
+			function checkSourceResult(se:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,checkSourceResult);	
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,checkSourceError);	
+				if (se.data != null)
+					finishedCreatingTables();
+				else
+					loadFoodTable();
+			}
+			
+			function checkSourceError(se:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,checkSourceResult);	
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,checkSourceError);	
+			}
+			
+		}
+		
+=======
+>>>>>>> .r19
 		/**
 		 * stores a source name in the database
 		 * if dispatcher != null then an event will be dispatches when finished
 		 */
+<<<<<<< .mine
+		public function insertSource(source:String, dispatcher:EventDispatcher):void {
+			sqlStatement.text = INSERT_SOURCE;
+			sqlStatement.parameters[":source"] = source;
+			sqlStatement.addEventListener(SQLEvent.RESULT, sourceInserted);
+			sqlStatement.addEventListener(SQLErrorEvent.ERROR, sourceInsertionError);
+			sqlStatement.execute();
+			
+			function sourceInserted(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,sourceInserted);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceInsertionError);
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.RESULT_EVENT));
+			}
+			function sourceInsertionError(see:SQLErrorEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,sourceInserted);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceInsertionError);
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
+			}
+=======
 		public function insertSource(source:String, dispatcher:EventDispatcher):void {
 			sqlStatement.text = INSERT_SOURCE;
 			sqlStatement.parameters[":source"] = source;
@@ -514,7 +603,40 @@ package databaseclasses
 				if (dispatcher != null)
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT));
 			}
+>>>>>>> .r19
 		}
+<<<<<<< .mine
+
+		/**
+		 * stores a food item in the database, obviously only the description, the dispatched databaseevent will have the inserted row id as lastInsertRowID
+		 * if dispatcher != null then an event will be dispatches when finished
+		 */
+		public function insertFoodItem(foodItemDescription:String, dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = INSERT_FOODITEM;
+			localSqlStatement.parameters[":description"] = foodItemDescription;
+			localSqlStatement.addEventListener(SQLEvent.RESULT, foodItemInserted);
+			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, foodItemInsertionError);
+			localSqlStatement.execute();
+			
+			function foodItemInserted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemInserted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemInsertionError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					event.lastInsertRowID = localSqlStatement.getResult().lastInsertRowID;
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			function foodItemInsertionError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemInserted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemInsertionError);
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
+			}
+		}
+=======
 
 		/**
 		 * stores a food item in the database, obviously only the description, the dispatched databaseevent will have the inserted row id as lastInsertRowID
@@ -545,8 +667,36 @@ package databaseclasses
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT));
 			}
 		}
+>>>>>>> .r19
 		
 		/**
+<<<<<<< .mine
+		 * stores a unit in the database
+		 * if dispatcher != null then an event will be dispatches when finished
+		 */
+		public function insertUnit(description:String,standardAmount:int,kcal:int,protein:Number,carbs:Number,fat:Number, fooditems_itemid:int,dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = INSERT_UNIT;
+			localSqlStatement.parameters[":description"] = description;
+			localSqlStatement.parameters[":standardamount"] = standardAmount; 
+			localSqlStatement.parameters[":kcal"] = kcal;
+			localSqlStatement.parameters[":protein"] = protein;
+			localSqlStatement.parameters[":carbs"] = carbs;
+			localSqlStatement.parameters[":fat"] = fat;
+			localSqlStatement.parameters[":fooditems_itemid"] = fooditems_itemid;
+			localSqlStatement.addEventListener(SQLEvent.RESULT, unitInserted);
+			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, unitInsertionError);
+			localSqlStatement.execute();
+
+			function unitInserted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitInserted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitInsertionError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+=======
 		 * stores a unit in the database
 		 * if dispatcher != null then an event will be dispatches when finished
 		 */
@@ -572,14 +722,31 @@ package databaseclasses
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
 				}
+>>>>>>> .r19
 			}
+<<<<<<< .mine
+			function unitInsertionError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitInserted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitInsertionError);
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
+			}
+=======
 			function unitInsertionError(see:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitInserted);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitInsertionError);
 				if (dispatcher != null)
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT));
 			}
+>>>>>>> .r19
 		
+<<<<<<< .mine
+		};
+		
+		/**
+		 * msql query for all fooditems in fooditems table
+		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
+=======
 		};
 
 		
@@ -587,12 +754,95 @@ package databaseclasses
 		
 		/**
 		 * loads the XML sourcefile and populates the database
+>>>>>>> .r19
 		 */
+<<<<<<< .mine
+		public function getAllFoodItems(dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = GET_ALLFOODITEMS;
+			localSqlStatement.addEventListener(SQLEvent.RESULT, allFoodItemsRetrieved);
+			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, foodItemRetrievalError);
+			localSqlStatement.execute();
+
+			function allFoodItemsRetrieved(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,allFoodItemsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					event.data = localSqlStatement.getResult().data;
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			function foodItemRetrievalError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,allFoodItemsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
+			}
+			
+		}
+
+		/**
+		 * msql query for getting source
+		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
+		 */
+		public function getSource(dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = GET_SOURCE;
+			localSqlStatement.addEventListener(SQLEvent.RESULT, sourceRetrieved);
+			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, sourceRetrievalError);
+			localSqlStatement.execute();
+			
+			function sourceRetrieved(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,sourceRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceRetrievalError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					event.data = localSqlStatement.getResult().data;
+					
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			function sourceRetrievalError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,sourceRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceRetrievalError);
+			}
+			
+		}
+		
+		
+		
+		
+		/**
+		 * loads the XML sourcefile and populates the database
+		 */
+		private function loadFoodTable():void {
+			
+			var sourceFile:File = File.applicationDirectory.resolvePath("assets/database/" + xmlFileName);
+			var fileStream:FileStream = new FileStream();
+			var dispatcher:EventDispatcher = new EventDispatcher();
+=======
 		private function loadSourceXML(sourceFileName:String):void {
 			var sourceFile:File = File.applicationStorageDirectory.resolvePath(sourceFileName);
 			var fileStream:FileStream = new FileStream();
 			var dispatcher:EventDispatcher = new EventDispatcher();
+>>>>>>> .r19
 			var foodtableXML:XML;
+<<<<<<< .mine
+		    var unitListXMLList:XMLList;
+			var foodItemDescriptionsXMLList:XMLList;
+			var foodItemListCounter:int;
+			var unitListCounter:int;
+			var unitListSize:int;
+			var foodItemListSize:int;
+			var actualFoodItemRowId:int;
+
+			trace("HelpDiabetes-air = loadFoodTable - before opening file");
+			fileStream.open(sourceFile,FileMode.READ);
+			foodtableXML = new XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
+			foodItemListSize = foodtableXML.fooditemlist.fooditem.length();
+			foodItemListCounter = 0;
+=======
 		    var unitListXMLList:XMLList;
 			var foodItemDescriptionsXMLList:XMLList;
 			var foodItemListCounter:int;
@@ -605,25 +855,56 @@ package databaseclasses
 			foodtableXML = new XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
 			foodItemListSize = foodtableXML.fooditemlist.fooditem.length();
 			foodItemListCounter = 0;
+>>>>>>> .r19
 			
 			foodItemDescriptionsXMLList = foodtableXML.fooditemlist.fooditem.description;
 			
+<<<<<<< .mine
+			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, sourceInserted);
+			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, sourceInsertionError);
+			insertSource(foodtableXML.source == null ? "" : foodtableXML.source,dispatcher);
+=======
 			dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, sourceInserted);
 			dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, sourceInsertionError);
 			insertSource(foodtableXML.source == null ? "" : foodtableXML.source,dispatcher);
+>>>>>>> .r19
 			
+<<<<<<< .mine
+			function sourceInserted(se:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,sourceInserted);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,sourceInsertionError);
+				goOnWithFoodItems();
+=======
 			function sourceInserted(se:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT,sourceInserted);
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT,sourceInsertionError);
 				goOnWithFoodItems();
+>>>>>>> .r19
 			}
+<<<<<<< .mine
+			function sourceInsertionError(see:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,sourceInserted);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,sourceInsertionError);
+			}
+=======
 			function sourceInsertionError(see:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT,sourceInserted);
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT,sourceInsertionError);
 			}
+>>>>>>> .r19
 			
 			function goOnWithFoodItems():void {
 				
+<<<<<<< .mine
+				if (foodItemListCounter == foodItemListSize) {
+					finishedCreatingTables();					
+				} else {
+					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, foodItemInserted);
+					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, foodItemInsertionError);
+					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
+					insertFoodItem(foodItemDescriptionsXMLList[foodItemListCounter],dispatcher);
+				}
+=======
 				if (foodItemListCounter == foodItemListSize) {
 					finishedCreatingTables();					
 				} else {
@@ -632,8 +913,20 @@ package databaseclasses
 					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
 					insertFoodItem(foodItemDescriptionsXMLList[foodItemListCounter],dispatcher);
 				}
+>>>>>>> .r19
 			}
 			
+<<<<<<< .mine
+			function foodItemInserted(se:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemInserted);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemInsertionError);
+				unitListCounter = 0;
+				unitListXMLList = foodtableXML.fooditemlist.fooditem[foodItemListCounter].unitlist.unit;
+				unitListSize = unitListXMLList.length();
+				actualFoodItemRowId = se.lastInsertRowID;
+				foodItemListCounter++;
+				goOnWithUnits();
+=======
 			function foodItemInserted(se:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT,foodItemInserted);
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT,foodItemInsertionError);
@@ -643,8 +936,19 @@ package databaseclasses
 				actualFoodItemRowId = se.lastInsertRowID;
 				foodItemListCounter++;
 				goOnWithUnits();
+>>>>>>> .r19
 			}
 			
+<<<<<<< .mine
+			function foodItemInsertionError(see:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemInserted);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemInsertionError);
+			}
+			
+			function goOnWithUnits():void {
+				if (unitListCounter == unitListSize) {
+					goOnWithFoodItems();					
+=======
 			function foodItemInsertionError(see:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT,foodItemInserted);
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT,foodItemInsertionError);
@@ -653,7 +957,23 @@ package databaseclasses
 			function goOnWithUnits():void {
 				if (unitListCounter == unitListSize) {
 					goOnWithFoodItems();					
+>>>>>>> .r19
 				} else {
+<<<<<<< .mine
+					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
+					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
+					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
+					insertUnit(unitListXMLList[unitListCounter ].description,
+						unitListXMLList[unitListCounter ].standardamount,
+						unitListXMLList[unitListCounter ].kcal,
+						unitListXMLList[unitListCounter ].protein,
+						unitListXMLList[unitListCounter ].carbs,
+						unitListXMLList[unitListCounter ].fat,
+						actualFoodItemRowId,
+						dispatcher);
+					unitListCounter++;
+
+=======
 					dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, unitInserted);
 					dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, unitInsertionError);
 					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
@@ -667,25 +987,73 @@ package databaseclasses
 						dispatcher);
 					unitListCounter++;
 
+>>>>>>> .r19
 				}
 			}
 			
+<<<<<<< .mine
+			function unitInserted(see:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
+				goOnWithUnits();
+=======
 			function unitInserted(see:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, unitInserted);
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, unitInsertionError);
 				goOnWithUnits();
+>>>>>>> .r19
 			}
 			
+<<<<<<< .mine
+			function unitInsertionError(se:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
+=======
 			function unitInsertionError(se:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, unitInserted);
 				dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, unitInsertionError);
+>>>>>>> .r19
+			}
+		}
+		
+		
+		/**
+		 * if globalDispatcher not null then dispatches a result event
+		 */
+		private function finishedCreatingTables():void {
+			//xml laden in fooditemxmllist
+			//..source stockeren en verder gaan
+			if (globalDispatcher != null)
+				globalDispatcher.dispatchEvent(new Event(DatabaseEvent.RESULT_EVENT));
+		}
+		
+		private  function createDatabaseFromAssets(targetFile:File):Boolean 			
+		{
+			var isSuccess:Boolean = true; 
+			
+<<<<<<< .mine
+			var sampleFile:File = File.applicationDirectory.resolvePath("assets/database/" + sampleDbFileName);
+			if ( !sampleFile.exists )
+			{
+				isSuccess = false;
+			}
+=======
+>>>>>>> .r19
+			else
+			{
+				sampleFile.copyTo(targetFile);			
 			}
 			
-			
-			
+			return isSuccess;			
+		}
+<<<<<<< .mine
+
+	}		
+=======
 			
 		}
 		
+>>>>>>> .r19
 		
 		/**
 		 * if globalDispatcher not null then dispatches a result event

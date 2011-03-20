@@ -36,38 +36,62 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
 			 */
 			private function initApplication():void {
+<<<<<<< .mine
+				var dispatcher:EventDispatcher = new EventDispatcher();
+				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
+				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
+=======
 				var dispatcher:EventDispatcher = new EventDispatcher();
 				dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT,onInitResult);
 				dispatcher.addEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT,onInitError);
+>>>>>>> .r19
 				/********* DELETE THIS**********/
-				Database.getInstance().deleteDatabase();
+				//Database.getInstance().deleteDatabase();
 				/********* DELETE THIS**********/
 
 				Database.getInstance().init(dispatcher);
 				
 				function onInitResult(event:Event):void
 				{
+<<<<<<< .mine
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
+					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
+					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
+					Database.getInstance().getAllFoodItems(dispatcher);
+=======
 					dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, onInitError);
 					dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, onInitResult);
 					//internalResponder = new DatabaseResponder();
 					//dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
 					//dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
 					//Database.getInstance().getAllFoodItems([dispatcher]);
+>>>>>>> .r19
 				}
 				
 				
 				function onInitError(event:Event):void
 				{	
+<<<<<<< .mine
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
+=======
 					dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_ERROR_EVENT, onInitError);
 					dispatcher.removeEventListener(DatabaseEvent.DATABASE_INITIALIZED_RESULT_EVENT, onInitResult);
+>>>>>>> .r19
 				}
 				
 				/*function retrieveFoodItemList(event:Event):void {
 					
 					foodItems = new ArrayCollection();
 
+<<<<<<< .mine
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
+=======
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
+>>>>>>> .r19
 					
 					if (de.data && de.data is Array) {
 						for each ( var o:Object in de.data )
@@ -77,6 +101,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						ModelLocator.getInstance().foodItemList = foodItems;
 					} 
 				}*/
+
+				function onRetrieveListError(event:Event):void
+				{	
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
+				}
+				
+				
+				
 			}
 
 		]]>
