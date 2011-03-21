@@ -36,7 +36,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<![CDATA[
 			import model.ModelLocator;
 			
+			//is this import necessary ?
 			import mx.core.FlexGlobals;
+			
 			import mx.resources.ResourceBundle;
 			
 			import spark.components.TabbedMobileApplication;
