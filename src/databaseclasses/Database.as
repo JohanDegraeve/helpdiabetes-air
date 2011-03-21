@@ -247,9 +247,9 @@ package databaseclasses
 				//if that fails then dbFile will simply not exist and so will be created later on in openAsync 
 				createDatabaseFromAssets(dbFile);
 				this.aConn = new SQLStatement();
-				this.aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
-				this.aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
-				this.aConn.openAsync(dbFile, SQLMode.CREATE);
+				aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
+				aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
+				aConn.openAsync(dbFile, SQLMode.CREATE);
 			}
 			
 		}
