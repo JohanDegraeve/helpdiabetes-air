@@ -17,6 +17,9 @@
 */
 package databaseclasses
 {
+	
+	
+	import mx.resources.ResourceManager;
 	import flash.data.SQLConnection;
 	import flash.data.SQLMode;
 	import flash.data.SQLResult;
@@ -31,6 +34,8 @@ package databaseclasses
 	import flash.net.Responder;
 	import flash.xml.XMLDocument;
 	
+	import mx.resources.ResourceManager;
+	
 	import views.FoodCounterView;
 	
 	
@@ -39,6 +44,8 @@ package databaseclasses
 	 */ 
 	public final class Database 
 	{
+		[ResourceBundle("general")]
+
 		private static var instance:Database = new Database();
 		
 		public var aConn:SQLConnection;		
@@ -53,9 +60,7 @@ package databaseclasses
 		private const dbFileName:String = "foodfile.db";
 		private  var dbFile:File  ;
 		private var xmlFileName:String;
-		/********************* change to language dependent name *********/
-		private var foodFileName:String = "foodfile-nl";//foodfile name without extension
-		/*****************************************************************/
+		private var foodFileName:String;
 		private var fooditemList:XMLList;
 		
 		
@@ -138,8 +143,10 @@ package databaseclasses
 		 */
 		public function Database()
 		{
-			sampleDbFileName = foodFileName + ".db";
+			foodFileName = "foodfile-" + ResourceManager.getInstance().getString("general","TableLanguage");
+			sampleDbFileName = foodFileName + "-sample.db";
 			xmlFileName = foodFileName + ".xml";
+			
 
 			if (instance != null) {
 				throw new Error("Database class can only be accessed through Database.getInstance()");	
@@ -207,11 +214,12 @@ package databaseclasses
 		/**
 		 * Create the asynchronous connection to the database
 		 * In the complete flow first an attempt will be made to open the database in update mode. 
-		 * If that fails, it means the database is not existing yet. Then an attempt is made to copy a sample from the assets. 
+		 * If that fails, it means the database is not existing yet. Then an attempt is made to copy a sample from the assets, the database name searched will be
+		 * language dependent. 
 		 * 
 		 * Independent of the result of the attempt to open the database and to copy from the assets, all tables will be created (if not existing yet).
-		 * At the end, a check will be done to see if a source record exists in the source table, if no then the complete xml file will be loaded into the database
-		 * Otherwise no reloading is done.
+		 * At the end, a check will be done to see if a source record exists in the source table, if no then the complete xml foodfile will be loaded into the database
+		 * Otherwise no reloading is done. The foodfile name to be used is again language dependent.
 		 * 
 		 **/
 		public function init(dispatcher:EventDispatcher):void
