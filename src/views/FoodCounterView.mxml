@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:myComponents="myComponents.*"
 		title="FoodCounterView"
 		preinitialize="preInit()"
+		
 		>
 
 	<fx:Declarations>
@@ -36,31 +37,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<![CDATA[
 			import model.ModelLocator;
 			
-			//is this import necessary ?
 			import mx.core.FlexGlobals;
-			
 			import mx.resources.ResourceBundle;
 			
 			import spark.components.TabbedMobileApplication;
 			import spark.events.IndexChangeEvent;
+			
+			import utilities.ExcelSorting;
 
 			[Bindable]
 			public var listOfOptionsArray:Array ;
+			
+			private var excelSorting:ExcelSorting;
 			
 			private function preInit():void {
 				listOfOptionsArray =	[
 					resourceManager.getString("foodcounterview","view_meal"),
 					resourceManager.getString("foodcounterview","to_tracking"),
 					resourceManager.getString("foodcounterview","own_food_item"),
-					resourceManager.getString("foodcounterview","templates")];		
-				
+					resourceManager.getString("foodcounterview","templates")];	
+				excelSorting = new ExcelSorting(ModelLocator.getInstance().foodItemList);
 			}
-			
 			
 			private function toTracking():void { 
 				//(this.navigator.owner as TabbedMobileApplication).navigator.selectedIndex = 1;
 				FlexGlobals.topLevelApplication.navigator.selectedIndex = 1; 
-				
 			}
 			
 			private function changeHandler(event:IndexChangeEvent):void {
@@ -68,11 +69,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					toTracking();
 			}
 			
-				
+			private function searchTextChanged():void {
+				fooditemlist.selectedIndex = excelSorting.getFirstMatchingItem(searchtext.text);
+				var test:int = fooditemlist.selectedIndex;
+			}
+			
 		]]>
 	</fx:Script>
 	<s:titleContent>
-		<s:TextInput id="searchtext" width="249" text="search"/>
+		<s:TextInput id="searchtext" width="249" text="" change="searchTextChanged()" />
 		<mx:Spacer width="15" height="100%"/>
 	</s:titleContent>
 	<s:actionContent>

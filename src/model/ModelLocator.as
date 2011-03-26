@@ -17,11 +17,14 @@
  */
 /**
  data used through the application
+ * also defining constants here
  */
 package model
 {
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
+	
+	import utilities.ExcelSorting;
 
 
 	public class ModelLocator
@@ -61,6 +64,8 @@ package model
 			if (instance != null) throw new Error('Cannot create a new instance. Must use ModelLocator.getInstance().');
 			instance = this;
 			
+			var test:ExcelSorting;
+			
 		}
 		
 		/** 
@@ -81,6 +86,8 @@ package model
 		The table is read via some public functions 
 		It is initialized in the constructor */
 		private var foodTables:Array;
+		
+		public var maximumSearchStringLength:int = 25;
 		
 		/**** Add bindable application data here ***/
 		[Bindable]
