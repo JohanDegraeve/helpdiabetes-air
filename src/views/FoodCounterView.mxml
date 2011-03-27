@@ -42,6 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import spark.components.TabbedMobileApplication;
 			import spark.events.IndexChangeEvent;
+			import spark.skins.spark.DefaultItemRenderer;
 			
 			import utilities.ExcelSorting;
 
@@ -56,7 +57,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					resourceManager.getString("foodcounterview","to_tracking"),
 					resourceManager.getString("foodcounterview","own_food_item"),
 					resourceManager.getString("foodcounterview","templates")];	
-				excelSorting = new ExcelSorting(ModelLocator.getInstance().foodItemList);
 			}
 			
 			private function toTracking():void { 
@@ -70,8 +70,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function searchTextChanged():void {
-				fooditemlist.selectedIndex = excelSorting.getFirstMatchingItem(searchtext.text);
-				var test:int = fooditemlist.selectedIndex;
+				if (excelSorting == null)
+					excelSorting = new ExcelSorting(ModelLocator.getInstance().foodItemList);
+				var result:int = excelSorting.getFirstMatchingItem(searchtext.text);
+				fooditemlist.ensureIndexIsVisible(fooditemlist.dataProvider.length - 1);
+				fooditemlist.ensureIndexIsVisible(result);
 			}
 			
 		]]>
@@ -95,5 +98,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		</myComponents:MenuDropDownList>
 		<mx:Spacer width="15" height="100%"/>
 	</s:navigationContent>
-	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" dataProvider="{ModelLocator.getInstance().foodItemList}"></s:List>
+	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" dataProvider="{ModelLocator.getInstance().foodItemList}" ></s:List>
 </s:View>

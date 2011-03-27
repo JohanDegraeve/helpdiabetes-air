@@ -47,13 +47,13 @@ package utilities
 		 
 		 
 
-		public function ExcelSorting( foodItemList:ArrayCollection)
+		public function ExcelSorting(foodItemList:ArrayCollection)
 		{
 			firstIndex = new Array(ModelLocator.getInstance().maximumSearchStringLength);
 			lastIndex = new Array(ModelLocator.getInstance().maximumSearchStringLength);
 			firstIndex[0] = 0;
 			this.foodItemList = foodItemList;
-			lastIndex[0] = this.foodItemList.length;
+			//lastIndex[0] = this.foodItemList.length; need to do this later because at the moment this object is created, the foodItemList could still be empty
 			
 		}
 		
@@ -81,6 +81,8 @@ package utilities
 		public function getFirstMatchingItem(s:String):int {
 			var index:int = 0;//index to first character that should be searched for
 			var result:Array = [0,0];			
+			
+			lastIndex[0] = this.foodItemList.length -1; 
 			
 			/**
 			 * first of all check if previousSearchString contains anything and if
@@ -169,7 +171,7 @@ package utilities
 				
 			}
 			if (low > high) {
-				;
+				
 			} else {
 				be = (this.foodItemList.getItemAt(low - 1) as String);
 				belength = be.length;
@@ -222,12 +224,12 @@ package utilities
 				
 			}
 			if (high < low) {
-				;//returnvalue = -1;
+				//returnvalue = -1;
 			} else {
 				be = (this.foodItemList.getItemAt(high - 1) as String);
 				belength = be.length;
 				if (belength > index) {
-					if (((low-1) < high) && (compareToAsInExcel(be.charCodeAt[index], value) == 0))
+					if (((low-1) < high) && (compareToAsInExcel(be.charCodeAt(index), value) == 0))
 						returnvalue = high;
 				} else {
 					;//returnvalue = -1;
