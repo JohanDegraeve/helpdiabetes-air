@@ -556,7 +556,7 @@ package databaseclasses
 		 * stores a source name in the database
 		 * if dispatcher != null then an event will be dispatches when finished
 		 */
-		public function insertSource(source:String, dispatcher:EventDispatcher):void {
+		private function insertSource(source:String, dispatcher:EventDispatcher):void {
 			sqlStatement.text = INSERT_SOURCE;
 			sqlStatement.parameters[":source"] = source;
 			sqlStatement.addEventListener(SQLEvent.RESULT, sourceInserted);
@@ -581,7 +581,7 @@ package databaseclasses
 		 * stores a food item in the database, obviously only the description, the dispatched databaseevent will have the inserted row id as lastInsertRowID
 		 * if dispatcher != null then an event will be dispatches when finished
 		 */
-		public function insertFoodItem(foodItemDescription:String, dispatcher:EventDispatcher):void {
+		private function insertFoodItem(foodItemDescription:String, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			localSqlStatement.sqlConnection = aConn;
 			localSqlStatement.text = INSERT_FOODITEM;
@@ -611,7 +611,7 @@ package databaseclasses
 		 * stores a unit in the database
 		 * if dispatcher != null then an event will be dispatches when finished
 		 */
-		public function insertUnit(description:String,standardAmount:int,kcal:int,protein:Number,carbs:Number,fat:Number, fooditems_itemid:int,dispatcher:EventDispatcher):void {
+		private function insertUnit(description:String,standardAmount:int,kcal:int,protein:Number,carbs:Number,fat:Number, fooditems_itemid:int,dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			localSqlStatement.sqlConnection = aConn;
 			localSqlStatement.text = INSERT_UNIT;

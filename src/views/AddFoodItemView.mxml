@@ -1,7 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="AddFoodItemView">
+		xmlns:s="library://ns.adobe.com/flex/spark" title="AddFoodItemView"
+		preinitialize="preInit()">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	
+	<fx:Metadata>
+		[ResourceBundle("addfooditemview")]
+		[ResourceBundle("general")]
+	</fx:Metadata>
+
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.resources.ResourceBundle;
+			
+			private function preInit():void {
+				meal_button.label = resourceManager.getString("addfooditemview","meal_button");
+				add_button.label = resourceManager.getString("addfooditemview","add_button");
+				amount_textarea.text = resourceManager.getString("addfooditemview","amount");
+			}
+			
+			override public function set data(value:Object):void {
+				super.data=value;
+			}
+			
+		]]>
+	</fx:Script>
+
+	<s:TextArea id="description_textarea" x="10" y="10" width="460"/>
+	<s:TextArea id="details_textarea" x="10" y="73" width="460"/>
+	<s:TextArea id="amount_textarea" x="10" y="158" width="261"/>
+	<s:TextInput id="amount_textinput" x="325" y="158" width="145"/>
+	<s:Button id="meal_button" x="233" y="221" width="237" height="55" />
+	<s:TextArea id="meal_textarea" x="10" y="221" width="181"/>
+	<s:Button id="add_button" x="177" y="331" enabled="true"/>
 </s:View>
