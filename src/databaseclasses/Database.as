@@ -19,7 +19,6 @@ package databaseclasses
 {
 	
 	
-	import mx.resources.ResourceManager;
 	import flash.data.SQLConnection;
 	import flash.data.SQLMode;
 	import flash.data.SQLResult;
@@ -35,6 +34,8 @@ package databaseclasses
 	import flash.xml.XMLDocument;
 	
 	import mx.resources.ResourceManager;
+	
+	import objects.FoodItem;
 	
 	import views.FoodCounterView;
 	
@@ -830,5 +831,8 @@ package databaseclasses
 			return isSuccess;			
 		}
 
+		public function getFoodItem(event:EventDispatcher):FoodItem {
+			
+		}
 	}		
 }

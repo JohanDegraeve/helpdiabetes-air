@@ -50,7 +50,7 @@ package objects
 		public function Unit( unitDescription:String,
 			 unitWeight:int,
 			 standardAmount:int,
-			int kcal:int,
+			 kcal:int,
 			 protein:Number,
 			 carbs:Number,
 			 fat:Number) {
@@ -86,20 +86,6 @@ package objects
 					this.fat = -1;
 				}
 			}
-		
-		/**
-		 * constructor
-		 * @param newUnit
-		 */
-		public function Unit (newUnit:Unit) {
-			this.carbs = newUnit.carbs;
-			this.fat = newUnit.fat;
-			this.kcal = newUnit.kcal;
-			this.protein = newUnit.protein;
-			this.standardAmount = newUnit.standardAmount;
-			this.unitDescription = newUnit.unitDescription;
-			this.unitWeight = newUnit.unitWeight;
-		}
 		
 		/**
 		 * @return the unitDescription in a new String

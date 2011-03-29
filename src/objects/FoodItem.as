@@ -1,30 +1,28 @@
 package objects
 {
 	import mx.collections.ArrayCollection;
-
+	
+	import utilities.ExcelSorting;
+	
 	public class FoodItem
 	{
 		private var itemDescription:String;
 		
 		private var unitList:ArrayCollection;
 		
-		public function FoodItem()
-		{
+		/**
+		 * expects an array of units
+		 */
+		public function FoodItem(foodItemDescription:String, units:ArrayCollection) {
 			unitList = new ArrayCollection();
-		}
-		
-		public function FoodItem(newFoodItem:FoodItem) {
-			itemDescription = newFooditem.getItemDescription();
-			unitList = new ArrayCollection();
-			for (var i:int = 0;i < newfooditem.getNumberOfUnits(); i++) {
-				unitList.addItem(new Unit(newFooditem.getUnit(i)));
+
+			this.itemDescription = foodItemDescription;
+			
+			for (var i:int = 0;i < units.length; i++) {
+				var unitToAdd:Unit = units.getItemAt(i) as Unit;
+				unitList.addItem(new Unit(unitToAdd.getDescription(),unitToAdd.getWeight(),unitToAdd.getStandardAmount(),unitToAdd.getKcal(),unitToAdd.getProtein(),unitToAdd.getCarbs(),unitToAdd.getFat()));
+				unitList.addItem(unitToAdd);
 			}
-		}
-		
-		public function FoodItem(itemDescription:String, firstUnit:Unit) {
-			this.itemDescription = itemDescription;
-			unitList = new ArrayCollection();
-			unitList.addItem(new Unit(firstUnit));
 		}
 		
 		public function getItemDescription():String {
@@ -36,7 +34,7 @@ package objects
 		}
 		
 		public function getUnit(location:int):Unit {
-			return unitList.getItemAt(location);
+			return unitList.getItemAt(location) as Unit;
 		}
 		
 		public function addUnit(newUnit:Unit):void {
@@ -47,36 +45,36 @@ package objects
 		 * compares the itemdescriptions according to excel rules 
 		 **/
 		public function compareTo(foodItemToCompare:FoodItem):int {
-			return compareItemDescriptionTo (FoodItemToCompare.itemDescription);
+			return compareItemDescriptionTo (foodItemToCompare.itemDescription);
 		}
 		
 		/**
 		 * compares the strings according to excel rules 
 		 **/
-		public int compareItemDescriptionTo (String itemDescriptionToCompareString) {
-			int returnvalue = 0;
-			int index = 0;
+		public function compareItemDescriptionTo ( itemDescriptionToCompareString:String):int {
+			var returnvalue:int = 0;
+			var index:int = 0;
 			
-			char[] thisItemDescription = itemDescription.toCharArray(); 
-			char[] itemDescriptionToCompare = itemDescriptionToCompareString.toCharArray(); 
+			var thisItemDescription:Array = stringToUint(itemDescription); 
+			var itemDescriptionToCompare:Array = stringToUint(itemDescriptionToCompareString); 
 			
 			while ((index < thisItemDescription.length) && 
 				(index < itemDescriptionToCompare.length)) {
-				if (ExcelCharacter.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) != 0) {
+				if (ExcelSorting.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) != 0) {
 					break;
 				}
 				index++;	
 			}
-			if ((index < itemDescription.length()) && 
+			if ((index < itemDescription.length) && 
 				(index < itemDescriptionToCompare.length)) {
-				if (ExcelCharacter.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) < 0)
+				if (ExcelSorting.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) < 0)
 					return -1;
-				if (ExcelCharacter.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) > 0) 
+				if (ExcelSorting.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) > 0) 
 					return 1;
 			}
 			//for sure thisItemDescription[index] = ItemDescriptionToCompare[index]
 			//now it could still be that the lengths are different, we much be checked
-			if ((index >= itemDescription.length()) || 
+			if ((index >= itemDescription.length) || 
 				(index >= itemDescriptionToCompare.length)) {
 				if (thisItemDescription.length < itemDescriptionToCompare.length) return -1;
 				if (thisItemDescription.length > itemDescriptionToCompare.length) return  1;
@@ -85,7 +83,14 @@ package objects
 		}
 
 		public function getNumberOfUnits():int {
-			retun unitList.length;
+			return unitList.length;
+		}
+		
+		private function stringToUint(input:String):Array {
+			var returnvalue:Array = new Array();
+			for (var i:int = 0;i < input.length; i++)
+				returnvalue.push(input.charCodeAt(i));
+			return returnvalue;
 		}
 		
 		
