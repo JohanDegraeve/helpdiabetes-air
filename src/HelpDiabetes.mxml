@@ -30,7 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import mx.collections.ArrayCollection;
 			
-			private var  foodItems:ArrayCollection;
+			import objects.FoodTableArrayCollection;
+			
+			private var  foodItems:FoodTableArrayCollection;
 			
 			/**   
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
@@ -63,7 +65,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function retrieveFoodItemList(de:DatabaseEvent):void {
 					
-					foodItems = new ArrayCollection();
+					foodItems = new FoodTableArrayCollection();
 
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);

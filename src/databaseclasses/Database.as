@@ -33,9 +33,11 @@ package databaseclasses
 	import flash.net.Responder;
 	import flash.xml.XMLDocument;
 	
+	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
 	
 	import objects.FoodItem;
+	import objects.Unit;
 	
 	import views.FoodCounterView;
 	
@@ -147,7 +149,7 @@ package databaseclasses
 			foodFileName = "foodfile-" + ResourceManager.getInstance().getString("general","TableLanguage");
 			sampleDbFileName = foodFileName + "-sample.db";
 			xmlFileName = foodFileName + ".xml";
-			
+
 
 			if (instance != null) {
 				throw new Error("Database class can only be accessed through Database.getInstance()");	
@@ -644,33 +646,6 @@ package databaseclasses
 		
 		};
 		
-		/**
-		 * msql query for all fooditems in fooditems table
-		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
-		 */
-		public function getAllFoodItems(dispatcher:EventDispatcher):void {
-			var localSqlStatement:SQLStatement = new SQLStatement();
-			localSqlStatement.sqlConnection = aConn;
-			localSqlStatement.text = GET_ALLFOODITEMS;
-			localSqlStatement.addEventListener(SQLEvent.RESULT, allFoodItemsRetrieved);
-			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, foodItemRetrievalError);
-			localSqlStatement.execute();
-
-			function allFoodItemsRetrieved(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(SQLEvent.RESULT,allFoodItemsRetrieved);
-				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
-				if (dispatcher != null) {
-					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					event.data = localSqlStatement.getResult().data;
-					dispatcher.dispatchEvent(event);
-				}
-			}
-			function foodItemRetrievalError(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(SQLEvent.RESULT,allFoodItemsRetrieved);
-				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
-			}
-			
-		}
 
 		/**
 		 * msql query for getting source
@@ -830,9 +805,136 @@ package databaseclasses
 			
 			return isSuccess;			
 		}
-
-		public function getFoodItem(event:EventDispatcher):FoodItem {
+		
+		/**
+		 * msql query for all fooditems in fooditems table
+		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
+		 */
+		public function getAllFoodItems(dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = GET_ALLFOODITEMS;
+			localSqlStatement.addEventListener(SQLEvent.RESULT, allFoodItemsRetrieved);
+			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, foodItemRetrievalError);
+			localSqlStatement.execute();
 			
+			function allFoodItemsRetrieved(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,allFoodItemsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					event.data = localSqlStatement.getResult().data;
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function foodItemRetrievalError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,allFoodItemsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
+
+		public function getFoodItem(fooditemid:int, dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+
+				localSqlStatement.addEventListener(SQLEvent.RESULT,foodItemRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = GET_FOODITEM;
+				localSqlStatement.parameters[":itemid"] = fooditemid;
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function foodItemRetrieved (se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					var unitList:ArrayCollection = new ArrayCollection();
+					unitList.addItem(new Unit("unittest",0,1,2,3,4,5));
+					var foodItem:FoodItem = new FoodItem(localSqlStatement.getResult().data[0].description,unitList);
+					
+					event.data = foodItem;
+					dispatcher.dispatchEvent(event);
+				}
+				
+			}
+			
+			function foodItemRetrievalError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+						
+		}
+		
+		/**
+		 * if aconn is not open then open aconn to dbFile , in asynchronous mode, in UPDATE mode
+		 * returns true if aconn is open
+		 * if aconn is closed then connection will be opened asynchronous mode and an event will be dispatched to the dispatcher after opening the connecion
+		 * so that means if openSQLConnection returns true then there's no need to wait for the dispatcher event to trigger. 
+		 */ 
+		private function openSQLConnection(dispatcher:EventDispatcher):Boolean {
+			// should I first check if there's still a connection open and close if necessary ?
+			if (aConn != null && aConn.connected) { 
+					return true;
+			} else {
+				aConn = new SQLConnection();
+				aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
+				aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
+				aConn.openAsync(dbFile, SQLMode.UPDATE);
+			}
+			
+			return false;
+	
+			function onConnOpen(se:SQLEvent):void
+			{
+				trace("SQL Connection successfully opened in method Database.openSQLConnection");
+				aConn.removeEventListener(SQLEvent.OPEN, onConnOpen);
+				aConn.removeEventListener(SQLErrorEvent.ERROR, onConnError);	
+				if (dispatcher != null) {
+					var event2:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					//var event2:SQLEvent = new SQLEvent(SQLEvent.RESULT);
+					dispatcher.dispatchEvent(event2);
+				}
+			}
+			
+			function onConnError(see:SQLErrorEvent):void
+			{
+				trace("SQL Error while attempting to open database in method Database.openSQLConnection");
+				aConn.removeEventListener(SQLEvent.OPEN, onConnOpen);
+				aConn.removeEventListener(SQLErrorEvent.ERROR, onConnError);
+				if (dispatcher != null) {
+					var event2:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event2);
+				}
+			}
 		}
 	}		
 }

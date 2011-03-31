@@ -239,6 +239,45 @@ package utilities
 			return returnvalue;
 		}
 		
-		
+		/**
+		 * compares the strings according to excel rules 
+		 **/
+		static public function compareStrings ( stringA:String ,stringB:String):int {
+			var returnvalue:int = 0;
+			var index:int = 0;
+			
+			var thisItemDescription:Array = stringToUint(stringA); 
+			var itemDescriptionToCompare:Array = stringToUint(stringB); 
+			
+			while ((index < thisItemDescription.length) && 
+				(index < itemDescriptionToCompare.length)) {
+				if (ExcelSorting.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) != 0) {
+					break;
+				}
+				index++;	
+			}
+			if ((index < stringA.length) && 
+				(index < itemDescriptionToCompare.length)) {
+				if (ExcelSorting.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) < 0)
+					return -1;
+				if (ExcelSorting.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) > 0) 
+					return 1;
+			}
+			//for sure thisItemDescription[index] = ItemDescriptionToCompare[index]
+			//now it could still be that the lengths are different, we much be checked
+			if ((index >= stringA.length) || 
+				(index >= itemDescriptionToCompare.length)) {
+				if (thisItemDescription.length < itemDescriptionToCompare.length) return -1;
+				if (thisItemDescription.length > itemDescriptionToCompare.length) return  1;
+			}
+			return returnvalue;
+		}
+
+		static private function stringToUint(input:String):Array {
+			var returnvalue:Array = new Array();
+			for (var i:int = 0;i < input.length; i++)
+				returnvalue.push(input.charCodeAt(i));
+			return returnvalue;
+		}
 	}
 }

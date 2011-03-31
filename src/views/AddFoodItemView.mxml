@@ -13,6 +13,10 @@
 
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.*;
+			
+			import model.ModelLocator;
+			
 			import mx.core.FlexGlobals;
 			import mx.resources.ResourceBundle;
 			
@@ -24,6 +28,23 @@
 			
 			override public function set data(value:Object):void {
 				super.data=value;
+				var dispatcher:EventDispatcher = new EventDispatcher();
+				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
+				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
+				Database.getInstance().getFoodItem(value as int,dispatcher);
+				
+				function foodItemRetrieved (even:Event):void {
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
+					var rtes:int=0;
+				}
+				
+				function foodItemRetrievalError(event:ErrorEvent):void {
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
+				}
+				
+
 			}
 			
 		]]>

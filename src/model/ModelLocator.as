@@ -38,6 +38,20 @@ package model
 		 */
 		private static var instance:ModelLocator = new ModelLocator();
 		
+		/* foodTables is an array of an array of strings 
+		each row consists of array of strings :
+		- the language field as used by the application, not visible to the user 
+		- the language of the table, for display on screens to the user, language itself should be in the user's language based on locale
+		- a description of the table, for display on screens to the user, should be in the user's language based on locale 
+		The table is read via some public functions 
+		It is initialized in the constructor */
+		private var foodTables:Array;
+		
+		public var maximumSearchStringLength:int = 25;
+		
+		/**** Add bindable application data here ***/
+		[Bindable]
+		public var foodItemList:ArrayCollection = new ArrayCollection(); 
 
 		/**
 		 * constructor
@@ -77,21 +91,6 @@ package model
 		}
 		
 		/** application constants **/
-		
-		/* foodTables is an array of an array of strings 
-		each row consists of array of strings :
-		- the language field as used by the application, not visible to the user 
-		- the language of the table, for display on screens to the user, language itself should be in the user's language based on locale
-		- a description of the table, for display on screens to the user, should be in the user's language based on locale 
-		The table is read via some public functions 
-		It is initialized in the constructor */
-		private var foodTables:Array;
-		
-		public var maximumSearchStringLength:int = 25;
-		
-		/**** Add bindable application data here ***/
-		[Bindable]
-		public var foodItemList:ArrayCollection = new ArrayCollection(); 
 		
 		public function getListOfFoodTableLanguages():Array {
 		

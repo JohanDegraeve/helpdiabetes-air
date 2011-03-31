@@ -45,54 +45,13 @@ package objects
 		 * compares the itemdescriptions according to excel rules 
 		 **/
 		public function compareTo(foodItemToCompare:FoodItem):int {
-			return compareItemDescriptionTo (foodItemToCompare.itemDescription);
+			return ExcelSorting.compareStrings(this.itemDescription,foodItemToCompare.itemDescription);
 		}
 		
-		/**
-		 * compares the strings according to excel rules 
-		 **/
-		public function compareItemDescriptionTo ( itemDescriptionToCompareString:String):int {
-			var returnvalue:int = 0;
-			var index:int = 0;
-			
-			var thisItemDescription:Array = stringToUint(itemDescription); 
-			var itemDescriptionToCompare:Array = stringToUint(itemDescriptionToCompareString); 
-			
-			while ((index < thisItemDescription.length) && 
-				(index < itemDescriptionToCompare.length)) {
-				if (ExcelSorting.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) != 0) {
-					break;
-				}
-				index++;	
-			}
-			if ((index < itemDescription.length) && 
-				(index < itemDescriptionToCompare.length)) {
-				if (ExcelSorting.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) < 0)
-					return -1;
-				if (ExcelSorting.compareToAsInExcel(thisItemDescription[index], itemDescriptionToCompare[index]) > 0) 
-					return 1;
-			}
-			//for sure thisItemDescription[index] = ItemDescriptionToCompare[index]
-			//now it could still be that the lengths are different, we much be checked
-			if ((index >= itemDescription.length) || 
-				(index >= itemDescriptionToCompare.length)) {
-				if (thisItemDescription.length < itemDescriptionToCompare.length) return -1;
-				if (thisItemDescription.length > itemDescriptionToCompare.length) return  1;
-			}
-			return returnvalue;
-		}
 
 		public function getNumberOfUnits():int {
 			return unitList.length;
 		}
-		
-		private function stringToUint(input:String):Array {
-			var returnvalue:Array = new Array();
-			for (var i:int = 0;i < input.length; i++)
-				returnvalue.push(input.charCodeAt(i));
-			return returnvalue;
-		}
-		
 		
 
 	}
