@@ -24,6 +24,9 @@ package model
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
 	
+	import objects.FoodItem;
+	import objects.FoodTableList;
+	
 	import utilities.ExcelSorting;
 
 
@@ -51,7 +54,7 @@ package model
 		
 		/**** Add bindable application data here ***/
 		[Bindable]
-		public var foodItemList:ArrayCollection = new ArrayCollection(); 
+		public var foodItemList:FoodTableList = new FoodTableList(); 
 
 		/**
 		 * constructor

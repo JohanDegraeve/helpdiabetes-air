@@ -14,15 +14,8 @@ package objects
 		 * expects an array of units
 		 */
 		public function FoodItem(foodItemDescription:String, units:ArrayCollection) {
-			unitList = new ArrayCollection();
-
+			unitList = units;
 			this.itemDescription = foodItemDescription;
-			
-			for (var i:int = 0;i < units.length; i++) {
-				var unitToAdd:Unit = units.getItemAt(i) as Unit;
-				unitList.addItem(new Unit(unitToAdd.getDescription(),unitToAdd.getWeight(),unitToAdd.getStandardAmount(),unitToAdd.getKcal(),unitToAdd.getProtein(),unitToAdd.getCarbs(),unitToAdd.getFat()));
-				unitList.addItem(unitToAdd);
-			}
 		}
 		
 		public function getItemDescription():String {

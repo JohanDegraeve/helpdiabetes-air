@@ -122,6 +122,7 @@ package databaseclasses
 		private const GET_FOODITEM:String = "SELECT * FROM fooditems WHERE itemid = :itemid";
 		private const GET_SOURCE:String = "SELECT * FROM source";
 		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
+		private const GET_UNITLIST:String = "SELECT * FROM units WHERE fooditems_itemid = :fooditemid";
 		private const COUNT_ALLFOODITEMS:String = "SELECT itemid FROM fooditems";
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
 		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description) VALUES (:description)";
@@ -841,6 +842,8 @@ package databaseclasses
 		public function getFoodItem(fooditemid:int, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
+			var foodItem:FoodItem;//the fooditem that will be returned by the dispatcher
+			var foodItemDescription:String;//the fooditem description needs to be temporarily stored.
 
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
@@ -872,15 +875,26 @@ package databaseclasses
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
 				if (dispatcher != null) {
-					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					var unitList:ArrayCollection = new ArrayCollection();
-					unitList.addItem(new Unit("unittest",0,1,2,3,4,5));
-					var foodItem:FoodItem = new FoodItem(localSqlStatement.getResult().data[0].description,unitList);
-					
-					event.data = foodItem;
-					dispatcher.dispatchEvent(event);
+					var tempObject:Object = localSqlStatement.getResult().data;
+					if (tempObject != null) {
+						foodItemDescription = 	tempObject[0].description;
+						localSqlStatement  new SQLStatement();
+						localSqlStatement.addEventListener(SQLEvent.RESULT,unitListRetrieved);
+						localSqlStatement.addEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
+						localSqlStatement.sqlConnection = aConn;
+						localSqlStatement.text = GET_UNITLIST;
+						//localSqlStatement.clearParameters();
+						localSqlStatement.parameters[":fooditemid"] = fooditemid;
+						localSqlStatement.execute();
+					} else {
+						var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+						var unitList:ArrayCollection = new ArrayCollection();
+						unitList.addItem(new Unit("dummy value",0,0,0,0,0,0));
+						foodItem = new FoodItem("error while retrieving fooditem " + fooditemid + ".",unitList);
+						event.data = foodItem;
+						dispatcher.dispatchEvent(event);
+					}
 				}
-				
 			}
 			
 			function foodItemRetrievalError(see:SQLErrorEvent):void {
@@ -891,7 +905,33 @@ package databaseclasses
 					dispatcher.dispatchEvent(event);
 				}
 			}
+			
+			function unitListRetrieved(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitListRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
+				if (dispatcher != null) {
+					var tempObject:Object = localSqlStatement.getResult().data;
+					if (tempObject != null) {
 						
+					} else {
+						var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+						var unitList:ArrayCollection = new ArrayCollection();
+						unitList.addItem(new Unit("error while retrieving unitlist for fooditem " + fooditemid + ".",0,0,0,0,0,0));
+						foodItem = new FoodItem(foodItemDescription,unitList);
+						event.data = foodItem;
+						dispatcher.dispatchEvent(event);
+					}
+				}
+			}
+			
+			function unitListRetrievalError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitListRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
+				if (dispatcher != null) {
+					var event3:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event3);
+				}
+			}
 		}
 		
 		/**

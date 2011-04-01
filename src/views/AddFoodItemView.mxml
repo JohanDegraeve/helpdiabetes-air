@@ -31,12 +31,11 @@
 				var dispatcher:EventDispatcher = new EventDispatcher();
 				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
 				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
-				Database.getInstance().getFoodItem(value as int,dispatcher);
+				Database.getInstance().getFoodItem(ModelLocator.getInstance().foodItemList.getFoodItemId(value as int),dispatcher);
 				
-				function foodItemRetrieved (even:Event):void {
+				function foodItemRetrieved (event:Event):void {
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
-					var rtes:int=0;
 				}
 				
 				function foodItemRetrievalError(event:ErrorEvent):void {
