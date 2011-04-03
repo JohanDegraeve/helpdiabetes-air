@@ -7,10 +7,6 @@ package objects
 		 */
 		private var unitDescription:String;
 		
-		/**
-		 * the weight of one unit, < 0 if unitweight is unknown
-		 */
-		private var unitWeight:int;
 		
 		/**
 		 * The amount of units, to which number of kilocalories, proteins, carbs and fat correspond, always > 0
@@ -48,18 +44,12 @@ package objects
 		 * @param fat if fat < 0 then the new Unit will have fat = -1
 		 */
 		public function Unit( unitDescription:String,
-			 unitWeight:int,
 			 standardAmount:int,
 			 kcal:int,
 			 protein:Number,
 			 carbs:Number,
 			 fat:Number) {
 				this.unitDescription = unitDescription;
-				if (unitWeight >= 0) {
-					this.unitWeight = unitWeight; 
-				} else {
-					this.unitWeight = -1;
-				}
 				if (standardAmount > 0) {
 					this.standardAmount = standardAmount; 
 				} else {
@@ -92,13 +82,6 @@ package objects
 		 */
 		public function getDescription():String {
 			return unitDescription;
-		}
-		
-		/**
-		 * @return the unitWeight
-		 */
-		public function getWeight():int {
-			return unitWeight;
 		}
 		
 		/**

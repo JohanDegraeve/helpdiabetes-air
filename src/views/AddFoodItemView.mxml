@@ -20,10 +20,19 @@
 			import mx.core.FlexGlobals;
 			import mx.resources.ResourceBundle;
 			
+			import objects.FoodItem;
+			
+			[Bindable]
+			private var description_textarea_text:String ;
+			[Bindable]
+			private var details_textarea_text:String ;
+
+			
 			private function preInit():void {
-				meal_button.label = resourceManager.getString("addfooditemview","meal_button");
+				meal_textarea.text = resourceManager.getString("addfooditemview","meal_button");
 				add_button.label = resourceManager.getString("addfooditemview","add_button");
 				amount_textarea.text = resourceManager.getString("addfooditemview","amount");
+				
 			}
 			
 			override public function set data(value:Object):void {
@@ -33,14 +42,24 @@
 				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
 				Database.getInstance().getFoodItem(ModelLocator.getInstance().foodItemList.getFoodItemId(value as int),dispatcher);
 				
-				function foodItemRetrieved (event:Event):void {
+				function foodItemRetrieved (event:DatabaseEvent):void {
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
+					description_textarea_text = (event.data as FoodItem).getItemDescription();
+					/* here the details text with the amounts of grams, fat, ... is created */
+					details_textarea.setStyle("fontSize",description_textarea.getStyle("fontSize")*0.8);
+					details_textarea_text = (event.data as FoodItem).getUnit(0).getStandardAmount() + " " +
+						(event.data as FoodItem).getUnit(0).getDescription() + " : " +
+						(event.data as FoodItem).getUnit(0).getCarbs() + " " +  resourceManager.getString("general","gram_of_carbs") + ", " +
+						(event.data as FoodItem).getUnit(0).getFat() + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
+						(event.data as FoodItem).getUnit(0).getProtein() + " " +  resourceManager.getString("general","gram_of_protein") + ", " +
+						(event.data as FoodItem).getUnit(0).getKcal() + " " +  resourceManager.getString("general","kilocalories") + ".";
 				}
 				
 				function foodItemRetrievalError(event:ErrorEvent):void {
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
+			
 				}
 				
 
@@ -49,11 +68,11 @@
 		]]>
 	</fx:Script>
 
-	<s:TextArea id="description_textarea" x="10" y="10" width="460"/>
-	<s:TextArea id="details_textarea" x="10" y="73" width="460"/>
-	<s:TextArea id="amount_textarea" x="10" y="158" width="261"/>
-	<s:TextInput id="amount_textinput" x="325" y="158" width="145"/>
+	<s:TextArea id="description_textarea" x="10" y="10" width="460" text="{description_textarea_text}" editable="false"/>
+	<s:TextArea id="details_textarea" x="10" y="73" width="460" text="{details_textarea_text}" editable="false"/>
+	<s:TextArea id="amount_textarea" x="10" y="158" width="261" editable="false"/>
+	<s:TextInput id="amount_textinput" x="325" y="158" width="145" editable="true"/>
 	<s:Button id="meal_button" x="233" y="221" width="237" height="55" />
-	<s:TextArea id="meal_textarea" x="10" y="221" width="181"/>
+	<s:TextArea id="meal_textarea" x="10" y="221" width="181" editable="false"/>
 	<s:Button id="add_button" x="177" y="331" enabled="true"/>
 </s:View>

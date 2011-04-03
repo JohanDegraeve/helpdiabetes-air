@@ -844,6 +844,7 @@ package databaseclasses
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			var foodItem:FoodItem;//the fooditem that will be returned by the dispatcher
 			var foodItemDescription:String;//the fooditem description needs to be temporarily stored.
+			var unitList:ArrayCollection;
 
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
@@ -878,18 +879,17 @@ package databaseclasses
 					var tempObject:Object = localSqlStatement.getResult().data;
 					if (tempObject != null) {
 						foodItemDescription = 	tempObject[0].description;
-						localSqlStatement  new SQLStatement();
 						localSqlStatement.addEventListener(SQLEvent.RESULT,unitListRetrieved);
 						localSqlStatement.addEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
 						localSqlStatement.sqlConnection = aConn;
 						localSqlStatement.text = GET_UNITLIST;
-						//localSqlStatement.clearParameters();
+						localSqlStatement.clearParameters();
 						localSqlStatement.parameters[":fooditemid"] = fooditemid;
 						localSqlStatement.execute();
 					} else {
 						var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-						var unitList:ArrayCollection = new ArrayCollection();
-						unitList.addItem(new Unit("dummy value",0,0,0,0,0,0));
+						unitList = new ArrayCollection();
+						unitList.addItem(new Unit("dummy value",0,0,0,0,0));
 						foodItem = new FoodItem("error while retrieving fooditem " + fooditemid + ".",unitList);
 						event.data = foodItem;
 						dispatcher.dispatchEvent(event);
@@ -910,13 +910,19 @@ package databaseclasses
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitListRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
 				if (dispatcher != null) {
+					unitList = new ArrayCollection();
 					var tempObject:Object = localSqlStatement.getResult().data;
-					if (tempObject != null) {
-						
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					if (tempObject != null && tempObject is Array) {
+						for each ( var o:Object in tempObject )
+						{
+							unitList.addItem(new Unit(o.description as String,o.standardamount as int,o.kcal as int,o.protein as Number,o.carbs as Number,o.fat as Number));
+						}
+						foodItem = new FoodItem(foodItemDescription,unitList);
+						event.data = foodItem;
+						dispatcher.dispatchEvent(event);
 					} else {
-						var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-						var unitList:ArrayCollection = new ArrayCollection();
-						unitList.addItem(new Unit("error while retrieving unitlist for fooditem " + fooditemid + ".",0,0,0,0,0,0));
+						unitList.addItem(new Unit("error while retrieving unitlist for fooditem " + fooditemid + ".",0,0,0,0,0));
 						foodItem = new FoodItem(foodItemDescription,unitList);
 						event.data = foodItem;
 						dispatcher.dispatchEvent(event);
