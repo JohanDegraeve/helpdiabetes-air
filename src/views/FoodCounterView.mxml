@@ -21,11 +21,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*"
 		title="FoodCounterView"
-		preinitialize="preInit()">
+		preinitialize="preInit()" >
 
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+
 
 	<fx:Metadata>
 		[ResourceBundle("foodcounterview")]
@@ -36,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import model.ModelLocator;
 			
 			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
 			
 			import spark.components.TabbedMobileApplication;
@@ -64,6 +66,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function selectFoodItem(event:IndexChangeEvent):void {
 				var test:int = event.newIndex;
 				navigator.pushView(AddFoodItemView,event.newIndex);
+				//PopUpManager.addPopUp((new SelectUnit(),this,false);
 			}
 			
 			private function toTracking():void { 
@@ -107,6 +110,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<mx:Spacer width="15" height="100%"/>
 	</s:navigationContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0"
-			dataProvider="{ModelLocator.getInstance().foodItemList}"
-			></s:List>
+			dataProvider="{ModelLocator.getInstance().foodItemList}"></s:List>
 </s:View>

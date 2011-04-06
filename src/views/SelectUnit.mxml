@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Panel xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		title="SelectUnit"
+	    creationComplete="panelCreated()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+	<![CDATA[
+		import mx.core.UIComponent;
+		//private var parentwidth:Number;
+		//private var parentheight:Number;
+	
+	private function panelCreated():void {
+		x = ((this.parent.width - width)/2);
+		y =  ((this.parent.height - height)/2);
+	}
+		
+	
+	]]>
+	</fx:Script>
+
+
+</s:Panel>

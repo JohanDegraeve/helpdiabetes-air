@@ -76,3 +76,4 @@
 	<s:TextArea id="meal_textarea" x="10" y="221" width="181" editable="false"/>
 	<s:Button id="add_button" x="177" y="331" enabled="true"/>
 </s:View>
+ 
