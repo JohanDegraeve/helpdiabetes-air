@@ -36,6 +36,8 @@ solved it : static variable popUpIsOpen says if pop up (should be) is open or no
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import model.ModelLocator;
+			
 			import mx.core.IFlexDisplayObject;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
@@ -51,7 +53,6 @@ solved it : static variable popUpIsOpen says if pop up (should be) is open or no
 			//width of longest text item in the drop down list - with default value
 			private var sizeOfLongestText:Number = 50;
 			private var sizeOfLongestTextCalculated:Boolean = false;
-			private static const SIZE_OF_LONGEST_TEXT_OFFSET:Number = 20;
 			
 			public function getSizeOfLongestText():Number {
 				if (sizeOfLongestTextCalculated)
@@ -68,8 +69,8 @@ solved it : static variable popUpIsOpen says if pop up (should be) is open or no
 					label.setStyle("fontFamily",this.getStyle("fontFamily"));
 					
 					var textLineMetricx:TextLineMetrics = label.measureText( dataProvider.getItemAt(i).toString());
-					if (textLineMetricx.width + SIZE_OF_LONGEST_TEXT_OFFSET > sizeOfLongestText)
-						sizeOfLongestText = textLineMetricx.width + SIZE_OF_LONGEST_TEXT_OFFSET;
+					if (textLineMetricx.width + ModelLocator.SIZE_OF_LONGEST_TEXT_OFFSET > sizeOfLongestText)
+						sizeOfLongestText = textLineMetricx.width + ModelLocator.SIZE_OF_LONGEST_TEXT_OFFSET;
 				}
 				return sizeOfLongestText;
 			}

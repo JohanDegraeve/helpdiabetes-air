@@ -50,12 +50,23 @@ package model
 		It is initialized in the constructor */
 		private var foodTables:Array;
 		
+		/* used in some places to calculate the needed width to hold a certain text - offset is the additional space*/
+		public static const SIZE_OF_LONGEST_TEXT_OFFSET:Number = 20;
+
+		
 		public var maximumSearchStringLength:int = 25;
 		
 		/**** Add bindable application data here ***/
 		[Bindable]
 		public var foodItemList:FoodTableList = new FoodTableList(); 
 
+		[Bindable]
+		public var unitList:ArrayCollection; 
+		
+		/* just a variable used when opening the untilist */
+		[Bindable]
+		public var width:int = 300;
+		
 		/**
 		 * constructor
 		 */

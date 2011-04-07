@@ -17,22 +17,44 @@
 			
 			import model.ModelLocator;
 			
+			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
+			import mx.core.IFlexDisplayObject;
+			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
 			
 			import objects.FoodItem;
+			import objects.Unit;
+			
+			import spark.components.Label;
 			
 			[Bindable]
 			private var description_textarea_text:String ;
 			[Bindable]
 			private var details_textarea_text:String ;
+			[Bindable]
+			private var amount_textinput_text:String;
+		
+			private var thisObject:DisplayObject;
+			
+			private var retrievedFoodItem:FoodItem;
+			//private var unitListInRetrievedFoodItem:ArrayCollection;
 
+			
+			private var DEFAULT_SIZE_OF_LONGEST_TEXT:int = 50;
+			
+			//just a selectunit to measure the style and so 
+			private static var aSelectUnit:SelectUnit;
 			
 			private function preInit():void {
 				meal_textarea.text = resourceManager.getString("addfooditemview","meal_button");
 				add_button.label = resourceManager.getString("addfooditemview","add_button");
 				amount_textarea.text = resourceManager.getString("addfooditemview","amount");
-				
+				amount_textinput_text = "0";
+				thisObject = this;
+				ModelLocator.getInstance().unitList = new ArrayCollection();
+				ModelLocator.getInstance().unitList.addItem(new Unit("dummy value",0,0,0,0,0));
+				aSelectUnit = new SelectUnit();
 			}
 			
 			override public function set data(value:Object):void {
@@ -42,28 +64,66 @@
 				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
 				Database.getInstance().getFoodItem(ModelLocator.getInstance().foodItemList.getFoodItemId(value as int),dispatcher);
 				
+				
 				function foodItemRetrieved (event:DatabaseEvent):void {
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
-					description_textarea_text = (event.data as FoodItem).getItemDescription();
+					var popUpForUnitList:SelectUnit;
+					
+					retrievedFoodItem = event.data as FoodItem;
+					description_textarea_text = retrievedFoodItem.getItemDescription();
 					/* here the details text with the amounts of grams, fat, ... is created */
 					details_textarea.setStyle("fontSize",description_textarea.getStyle("fontSize")*0.8);
-					details_textarea_text = (event.data as FoodItem).getUnit(0).getStandardAmount() + " " +
-						(event.data as FoodItem).getUnit(0).getDescription() + " : " +
-						(event.data as FoodItem).getUnit(0).getCarbs() + " " +  resourceManager.getString("general","gram_of_carbs") + ", " +
-						(event.data as FoodItem).getUnit(0).getFat() + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
-						(event.data as FoodItem).getUnit(0).getProtein() + " " +  resourceManager.getString("general","gram_of_protein") + ", " +
-						(event.data as FoodItem).getUnit(0).getKcal() + " " +  resourceManager.getString("general","kilocalories") + ".";
+					details_textarea_text = retrievedFoodItem.getUnit(0).getStandardAmount() + " " +
+						retrievedFoodItem.getUnit(0).getDescription() + " : " +
+						retrievedFoodItem.getUnit(0).getCarbs() + " " +  resourceManager.getString("general","gram_of_carbs") + ", " +
+						retrievedFoodItem.getUnit(0).getFat() + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
+						retrievedFoodItem.getUnit(0).getProtein() + " " +  resourceManager.getString("general","gram_of_protein") + ", " +
+						retrievedFoodItem.getUnit(0).getKcal() + " " +  resourceManager.getString("general","kilocalories") + ".";
+					if (retrievedFoodItem.getUnit(0).getStandardAmount() != 100)
+						amount_textinput_text = retrievedFoodItem.getUnit(0).getStandardAmount().toString();
+					if (retrievedFoodItem.getNumberOfUnits() > 1) {
+						ModelLocator.getInstance().unitList = new ArrayCollection();
+						ModelLocator.getInstance().unitList .addItem((retrievedFoodItem.getUnit(0) as Unit).getDescription());
+						for (var i:int = 1; i < retrievedFoodItem.getNumberOfUnits();i++)
+							ModelLocator.getInstance().unitList.addItem((retrievedFoodItem.getUnit(i) as Unit).getDescription());
+						
+						ModelLocator.getInstance().width = getSizeOfLongestTextInList(ModelLocator.getInstance().unitList);
+						popUpForUnitList = new SelectUnit();
+						PopUpManager.addPopUp(popUpForUnitList,thisObject,true);
+						var xtemp:int = (width - ModelLocator.getInstance().width)/2;
+						if (xtemp < 0)
+							xtemp = width;
+						popUpForUnitList.x = xtemp;
+						/*popUpForUnitList.y = 300;
+						PopUpManager.centerPopUp(popUpForUnitList);*/
+					}
 				}
 				
 				function foodItemRetrievalError(event:ErrorEvent):void {
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
-			
 				}
-				
-
 			}
+			
+			private function getSizeOfLongestTextInList(strings:ArrayCollection):Number {
+				//calculate the length of the longest text, in pixels.
+				var label:Label = new Label();
+				var sizeOfLongestText:int = DEFAULT_SIZE_OF_LONGEST_TEXT;
+				label.regenerateStyleCache(false);
+				label.setStyle("fontSize",aSelectUnit.getStyle("fontSize")) ;
+				label.setStyle("fontStyle",aSelectUnit.getStyle("fontStyle")) ;
+				label.setStyle("fontWeight",aSelectUnit.getStyle("fontWeight"));
+				label.setStyle("fontFamily",aSelectUnit.getStyle("fontFamily"));
+				
+				for (var i:int = 0;i < strings.length; i++) {
+					var textLineMetricx:TextLineMetrics = label.measureText(strings.getItemAt(i).toString());
+					if (textLineMetricx.width + ModelLocator.SIZE_OF_LONGEST_TEXT_OFFSET > sizeOfLongestText)
+						sizeOfLongestText = textLineMetricx.width + ModelLocator.SIZE_OF_LONGEST_TEXT_OFFSET ;
+				}
+				return sizeOfLongestText;
+			}
+
 			
 		]]>
 	</fx:Script>
@@ -71,7 +131,7 @@
 	<s:TextArea id="description_textarea" x="10" y="10" width="460" text="{description_textarea_text}" editable="false"/>
 	<s:TextArea id="details_textarea" x="10" y="73" width="460" text="{details_textarea_text}" editable="false"/>
 	<s:TextArea id="amount_textarea" x="10" y="158" width="261" editable="false"/>
-	<s:TextInput id="amount_textinput" x="325" y="158" width="145" editable="true"/>
+	<s:TextInput id="amount_textinput" x="325" y="158" width="145" editable="true" text="{amount_textinput_text}"/>
 	<s:Button id="meal_button" x="233" y="221" width="237" height="55" />
 	<s:TextArea id="meal_textarea" x="10" y="221" width="181" editable="false"/>
 	<s:Button id="add_button" x="177" y="331" enabled="true"/>

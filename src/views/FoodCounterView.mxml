@@ -37,7 +37,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import model.ModelLocator;
 			
 			import mx.core.FlexGlobals;
-			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
 			
 			import spark.components.TabbedMobileApplication;
