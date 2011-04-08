@@ -4,6 +4,7 @@ package utilities
 	
 	import mx.collections.ArrayCollection;
 	
+	import objects.FoodItem;
 	import objects.FoodTableList;
 
 	public class ExcelSorting
@@ -45,11 +46,11 @@ package utilities
 		 private var previousSearchString:String = null;
 		 private var firstIndex:Array;
 		 private var lastIndex:Array;
-		 private var foodItemList:FoodTableList;
+		 private var foodItemList:ArrayCollection;
 		 
 		 
 
-		public function ExcelSorting(foodItemList:FoodTableList)
+		public function ExcelSorting(foodItemList:ArrayCollection)
 		{
 			firstIndex = new Array(ModelLocator.getInstance().maximumSearchStringLength);
 			lastIndex = new Array(ModelLocator.getInstance().maximumSearchStringLength);
@@ -156,7 +157,7 @@ package utilities
 			temp = high + 1;//this becomes the highest start value
 			while (low < temp) {
 				mid = (low + temp)/2;
-				be = (this.foodItemList.getFoodItemDescriptionAt(mid - 1) as String);
+				be = ((this.foodItemList.getItemAt(mid-1)) as FoodItem).itemDescription;
 				belength = be.length;
 				if (!(belength > index))//b is a string which is shorter than the enteredstring, so definitely before the enteredstring (smaller than)
 				{low = mid+1;}
@@ -175,7 +176,7 @@ package utilities
 			if (low > high) {
 				
 			} else {
-				be = (this.foodItemList.getFoodItemDescriptionAt(low - 1) as String);
+				be = ((this.foodItemList.getItemAt(low-1)) as FoodItem).itemDescription;
 				belength = be.length;
 				if (belength > index) {
 					if ((low < (high + 1)) && (compareToAsInExcel(be.charCodeAt(index), value) == 0))
@@ -211,7 +212,7 @@ package utilities
 			while (high > temp) {
 				if ((high + temp)%2 > 0) {mid = (high+temp)/2+1;}
 				else {mid = (high+temp)/2;}
-				be = (this.foodItemList.getFoodItemDescriptionAt(mid - 1) as String); 
+				be = ((this.foodItemList.getItemAt(mid-1)) as FoodItem).itemDescription;
 				belength = be.length;
 				if (!(belength > index))//be is a string which is shorter than the enteredstring, so definitely before the enteredstring (smaller than)
 				{temp = mid;}
@@ -228,7 +229,7 @@ package utilities
 			if (high < low) {
 				//returnvalue = -1;
 			} else {
-				be = (this.foodItemList.getFoodItemDescriptionAt(high - 1) as String);
+				be = ((this.foodItemList.getItemAt(high-1)) as FoodItem).itemDescription;
 				belength = be.length;
 				if (belength > index) {
 					if (((low-1) < high) && (compareToAsInExcel(be.charCodeAt(index), value) == 0))

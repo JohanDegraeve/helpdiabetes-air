@@ -58,7 +58,7 @@ package model
 		
 		/**** Add bindable application data here ***/
 		[Bindable]
-		public var foodItemList:FoodTableList = new FoodTableList(); 
+		public var foodItemList:ArrayCollection = new ArrayCollection(); 
 
 		[Bindable]
 		public var unitList:ArrayCollection; 

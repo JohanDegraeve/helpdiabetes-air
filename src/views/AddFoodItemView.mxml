@@ -62,7 +62,7 @@
 				var dispatcher:EventDispatcher = new EventDispatcher();
 				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
 				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
-				Database.getInstance().getFoodItem(ModelLocator.getInstance().foodItemList.getFoodItemId(value as int),dispatcher);
+				Database.getInstance().getFoodItem((ModelLocator.getInstance().foodItemList.getItemAt(value as int) as FoodItem).itemid,dispatcher);
 				
 				
 				function foodItemRetrieved (event:DatabaseEvent):void {

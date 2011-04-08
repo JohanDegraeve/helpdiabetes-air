@@ -811,7 +811,7 @@ package databaseclasses
 		 * msql query for all fooditems in fooditems table
 		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
 		 */
-		public function getAllFoodItems(dispatcher:EventDispatcher):void {
+		public function getAllFoodItemDescriptions(dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			localSqlStatement.sqlConnection = aConn;
 			localSqlStatement.text = GET_ALLFOODITEMS;
@@ -844,6 +844,7 @@ package databaseclasses
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			var foodItem:FoodItem;//the fooditem that will be returned by the dispatcher
 			var foodItemDescription:String;//the fooditem description needs to be temporarily stored.
+			var fooditemId:int;
 			var unitList:ArrayCollection;
 
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -879,6 +880,7 @@ package databaseclasses
 					var tempObject:Object = localSqlStatement.getResult().data;
 					if (tempObject != null) {
 						foodItemDescription = 	tempObject[0].description;
+						fooditemId = tempObject[0].itemid;
 						localSqlStatement.addEventListener(SQLEvent.RESULT,unitListRetrieved);
 						localSqlStatement.addEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
 						localSqlStatement.sqlConnection = aConn;
@@ -890,7 +892,7 @@ package databaseclasses
 						var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 						unitList = new ArrayCollection();
 						unitList.addItem(new Unit("dummy value",0,0,0,0,0));
-						foodItem = new FoodItem("error while retrieving fooditem " + fooditemid + ".",unitList);
+						foodItem = new FoodItem("error while retrieving fooditem " + fooditemid + ".",unitList,0);
 						event.data = foodItem;
 						dispatcher.dispatchEvent(event);
 					}
@@ -918,12 +920,12 @@ package databaseclasses
 						{
 							unitList.addItem(new Unit(o.description as String,o.standardamount as int,o.kcal as int,o.protein as Number,o.carbs as Number,o.fat as Number));
 						}
-						foodItem = new FoodItem(foodItemDescription,unitList);
+						foodItem = new FoodItem(foodItemDescription,unitList,fooditemid);
 						event.data = foodItem;
 						dispatcher.dispatchEvent(event);
 					} else {
 						unitList.addItem(new Unit("error while retrieving unitlist for fooditem " + fooditemid + ".",0,0,0,0,0));
-						foodItem = new FoodItem(foodItemDescription,unitList);
+						foodItem = new FoodItem(foodItemDescription,unitList,0);
 						event.data = foodItem;
 						dispatcher.dispatchEvent(event);
 					}

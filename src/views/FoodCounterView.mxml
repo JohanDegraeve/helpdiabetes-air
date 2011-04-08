@@ -86,6 +86,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				fooditemlist.ensureIndexIsVisible(result);
 			}
 			
+			private function displayFoodItem(item:Object):String {
+				return item.itemDescription;
+			}
+			
 		]]>
 	</fx:Script>
 
@@ -109,5 +113,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<mx:Spacer width="15" height="100%"/>
 	</s:navigationContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0"
-			dataProvider="{ModelLocator.getInstance().foodItemList}"></s:List>
+			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem"></s:List>
 </s:View>

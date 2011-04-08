@@ -30,9 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import mx.collections.ArrayCollection;
 			
-			import objects.FoodTableList;
+			import objects.FoodItem;
 			
-			private var  foodItems:FoodTableList;
+			private var  foodItems:ArrayCollection;
 			
 			/**   
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
-					Database.getInstance().getAllFoodItems(dispatcher);
+					Database.getInstance().getAllFoodItemDescriptions(dispatcher);
 				}
 				
 				
@@ -65,7 +65,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function retrieveFoodItemList(de:DatabaseEvent):void {
 					
-					foodItems = new FoodTableList();
+					foodItems = new ArrayCollection();
 
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
@@ -73,7 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					if (de.data && de.data is Array) {
 						for each ( var o:Object in de.data )
 						{
-							foodItems.addItemDescriptionAndItem(o.description as String,o.itemid as int);
+							foodItems.addItem(new FoodItem(o.description as String, new ArrayCollection(), o.itemid as int));
 						}
 						ModelLocator.getInstance().foodItemList = foodItems;
 					} 

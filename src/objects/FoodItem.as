@@ -6,16 +6,21 @@ package objects
 	
 	public class FoodItem
 	{
-		private var itemDescription:String;
+		[Bindable]
+		public var itemDescription:String;
 		
 		private var unitList:ArrayCollection;
 		
+		public var itemid:int;
+		
 		/**
 		 * expects an array of units
+		 * itemid is the id as known in the database
 		 */
-		public function FoodItem(foodItemDescription:String, units:ArrayCollection) {
+		public function FoodItem(foodItemDescription:String, units:ArrayCollection,itemid:int) {
 			unitList = units;
 			this.itemDescription = foodItemDescription;
+			this.itemid = itemid;
 		}
 		
 		public function getItemDescription():String {
