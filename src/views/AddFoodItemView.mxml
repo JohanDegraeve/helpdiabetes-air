@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="AddFoodItemView"
-		preinitialize="preInit()">
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		actionBarVisible="true" 
+		preinitialize="preInit()"
+		tabBarVisible="true"
+		title="AddFoodItemView" xmlns:myComponents="myComponents.*">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -25,26 +28,31 @@
 			
 			import objects.FoodItem;
 			import objects.Unit;
+			import objects.UnitChangedEvent;
 			
 			import spark.components.Label;
 			
 			[Bindable]
 			private var description_textarea_text:String ;
 			[Bindable]
-			private var details_textarea_text:String ;
+			private var details_button_text:String ;
 			[Bindable]
 			private var amount_textinput_text:String;
+			[Bindable]
+			private var meal_textarea_text:String;
 		
 			private var thisObject:DisplayObject;
 			
 			private var retrievedFoodItem:FoodItem;
-			//private var unitListInRetrievedFoodItem:ArrayCollection;
 
+			private var selectedUnit:int;
 			
 			private var DEFAULT_SIZE_OF_LONGEST_TEXT:int = 50;
 			
 			//just a selectunit to measure the style and so 
 			private static var aSelectUnit:SelectUnit;
+			
+			private var popUpForUnitList:SelectUnit;
 			
 			private function preInit():void {
 				meal_textarea.text = resourceManager.getString("addfooditemview","meal_button");
@@ -68,35 +76,18 @@
 				function foodItemRetrieved (event:DatabaseEvent):void {
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
-					var popUpForUnitList:SelectUnit;
+					
 					
 					retrievedFoodItem = event.data as FoodItem;
 					description_textarea_text = retrievedFoodItem.getItemDescription();
 					/* here the details text with the amounts of grams, fat, ... is created */
-					details_textarea.setStyle("fontSize",description_textarea.getStyle("fontSize")*0.8);
-					details_textarea_text = retrievedFoodItem.getUnit(0).getStandardAmount() + " " +
-						retrievedFoodItem.getUnit(0).getDescription() + " : " +
-						retrievedFoodItem.getUnit(0).getCarbs() + " " +  resourceManager.getString("general","gram_of_carbs") + ", " +
-						retrievedFoodItem.getUnit(0).getFat() + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
-						retrievedFoodItem.getUnit(0).getProtein() + " " +  resourceManager.getString("general","gram_of_protein") + ", " +
-						retrievedFoodItem.getUnit(0).getKcal() + " " +  resourceManager.getString("general","kilocalories") + ".";
+					details_button.setStyle("fontSize",description_textarea.getStyle("fontSize")*0.8);
+					details_button_text = createDetailsButtonText(0,-1);
 					if (retrievedFoodItem.getUnit(0).getStandardAmount() != 100)
 						amount_textinput_text = retrievedFoodItem.getUnit(0).getStandardAmount().toString();
+					selectedUnit = 0; 
 					if (retrievedFoodItem.getNumberOfUnits() > 1) {
-						ModelLocator.getInstance().unitList = new ArrayCollection();
-						ModelLocator.getInstance().unitList .addItem((retrievedFoodItem.getUnit(0) as Unit).getDescription());
-						for (var i:int = 1; i < retrievedFoodItem.getNumberOfUnits();i++)
-							ModelLocator.getInstance().unitList.addItem((retrievedFoodItem.getUnit(i) as Unit).getDescription());
-						
-						ModelLocator.getInstance().width = getSizeOfLongestTextInList(ModelLocator.getInstance().unitList);
-						popUpForUnitList = new SelectUnit();
-						PopUpManager.addPopUp(popUpForUnitList,thisObject,true);
-						var xtemp:int = (width - ModelLocator.getInstance().width)/2;
-						if (xtemp < 0)
-							xtemp = width;
-						popUpForUnitList.x = xtemp;
-						/*popUpForUnitList.y = 300;
-						PopUpManager.centerPopUp(popUpForUnitList);*/
+						popUpUnitList();
 					}
 				}
 				
@@ -104,6 +95,7 @@
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemRetrieved);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemRetrievalError);
 				}
+				
 			}
 			
 			private function getSizeOfLongestTextInList(strings:ArrayCollection):Number {
@@ -123,15 +115,60 @@
 				}
 				return sizeOfLongestText;
 			}
+			
+			private function popUpUnitList():void {
+				ModelLocator.getInstance().unitList = new ArrayCollection();
+				ModelLocator.getInstance().unitList .addItem((retrievedFoodItem.getUnit(0) as Unit).getDescription());
+				for (var i:int = 1; i < retrievedFoodItem.getNumberOfUnits();i++)
+					ModelLocator.getInstance().unitList.addItem((retrievedFoodItem.getUnit(i) as Unit).getDescription());
+				
+				ModelLocator.getInstance().width = getSizeOfLongestTextInList(ModelLocator.getInstance().unitList);
+				popUpForUnitList = new SelectUnit();
+				popUpForUnitList.addEventListener(UnitChangedEvent.ITEM_SELECTED, selectedUnitChanged);
+				PopUpManager.addPopUp(popUpForUnitList,thisObject,true);
+				var xtemp:int = (width - ModelLocator.getInstance().width)/2;
+				if (xtemp < 0)
+					xtemp = width;
+				popUpForUnitList.x = xtemp;
 
+				function selectedUnitChanged(event:UnitChangedEvent):void {
+					PopUpManager.removePopUp(popUpForUnitList);
+					details_button_text = createDetailsButtonText(event.index,-1);
+					selectedUnit = event.index;
+					if (retrievedFoodItem.getUnit(event.index).getStandardAmount() != 100)
+						amount_textinput_text = retrievedFoodItem.getUnit(event.index).getStandardAmount().toString();
+					else
+						amount_textinput_text = "0";
+				}
+			}
+			
+			/**
+			 * function to fill in the details_text_area_text for the specified unit and chosenAmount
+			 * if chosenAmount = -1 then standardamount will be used
+			 */ 
+			private function createDetailsButtonText(index:int, chosenAmount:Number):String {
+				var standardAmount:Number = retrievedFoodItem.getUnit(index).getStandardAmount();
+				if (chosenAmount == -1)
+					chosenAmount = standardAmount;
+				return chosenAmount + " " +
+					retrievedFoodItem.getUnit(index).getDescription() + " : " +
+					retrievedFoodItem.getUnit(index).getCarbs()/standardAmount*chosenAmount + " " +  resourceManager.getString("general","gram_of_carbs") + ", " +
+					retrievedFoodItem.getUnit(index).getFat()/standardAmount*chosenAmount + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
+					retrievedFoodItem.getUnit(index).getProtein()/standardAmount*chosenAmount + " " +  resourceManager.getString("general","gram_of_protein") + ", " +
+					retrievedFoodItem.getUnit(index).getKcal()/standardAmount*chosenAmount + " " +  resourceManager.getString("general","kilocalories") + ".";
+			}
+			
+			private function amountTextChanged():void {
+				details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
+			}
 			
 		]]>
 	</fx:Script>
 
 	<s:TextArea id="description_textarea" x="10" y="10" width="460" text="{description_textarea_text}" editable="false"/>
-	<s:TextArea id="details_textarea" x="10" y="73" width="460" text="{details_textarea_text}" editable="false"/>
+	<s:Button id="details_button" x="10" y="73" width="460" label="{details_button_text}" click="popUpUnitList()"/>
 	<s:TextArea id="amount_textarea" x="10" y="158" width="261" editable="false"/>
-	<s:TextInput id="amount_textinput" x="325" y="158" width="145" editable="true" text="{amount_textinput_text}"/>
+	<s:TextInput id="amount_textinput" x="325" y="158" width="145" editable="true" text="@{amount_textinput_text}" restrict="0-9\.," change="amountTextChanged()" />
 	<s:Button id="meal_button" x="233" y="221" width="237" height="55" />
 	<s:TextArea id="meal_textarea" x="10" y="221" width="181" editable="false"/>
 	<s:Button id="add_button" x="177" y="331" enabled="true"/>

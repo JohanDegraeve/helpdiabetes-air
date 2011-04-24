@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*"
-		title="FoodCounterView"
-		preinitialize="preInit()" >
+		actionBarVisible="true" preinitialize="preInit()" title="FoodCounterView"
+		initialize="init()">
 
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -57,15 +57,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					resourceManager.getString("foodcounterview","to_tracking"),
 					resourceManager.getString("foodcounterview","own_food_item"),
 					resourceManager.getString("foodcounterview","templates")];
-				
+			}
+			
+			private function init():void {
 				/* add event listener for clicking item */
 				fooditemlist.addEventListener(Event.CHANGE,selectFoodItem);
 			}
 			
 			private function selectFoodItem(event:IndexChangeEvent):void {
-				var test:int = event.newIndex;
 				navigator.pushView(AddFoodItemView,event.newIndex);
-				//PopUpManager.addPopUp((new SelectUnit(),this,false);
 			}
 			
 			private function toTracking():void { 

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Panel xmlns:fx="http://ns.adobe.com/mxml/2009"
 		xmlns:s="library://ns.adobe.com/flex/spark"
-		title="SelectUnit">
+		title="SelectUnit"
+		initialize="preInit()">
 	
 	
 	<fx:Declarations>
@@ -11,6 +12,22 @@
 	<fx:Script>
 	<![CDATA[
 		import model.ModelLocator;
+		
+		import objects.UnitChangedEvent;
+		
+		import spark.events.IndexChangeEvent;
+		
+		private function preInit():void {
+			unitlist.addEventListener(Event.CHANGE, itemSelected);
+		}
+		
+		private function itemSelected(event:IndexChangeEvent):void {
+			var unitChangedEvent:UnitChangedEvent = new UnitChangedEvent(UnitChangedEvent.ITEM_SELECTED);
+			unitChangedEvent.index = event.newIndex;
+			dispatchEvent(unitChangedEvent);
+		}
+		
+
 	]]>
 	</fx:Script>
 	<s:List id="unitlist" dataProvider="{ModelLocator.getInstance().unitList}"

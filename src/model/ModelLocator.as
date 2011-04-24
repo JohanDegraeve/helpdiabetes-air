@@ -25,7 +25,6 @@ package model
 	import mx.resources.ResourceManager;
 	
 	import objects.FoodItem;
-	import objects.FoodTableList;
 	
 	import utilities.ExcelSorting;
 

@@ -5,7 +5,6 @@ package utilities
 	import mx.collections.ArrayCollection;
 	
 	import objects.FoodItem;
-	import objects.FoodTableList;
 
 	public class ExcelSorting
 	{

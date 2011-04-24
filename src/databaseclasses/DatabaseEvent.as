@@ -2,6 +2,9 @@ package databaseclasses
 {
 	import flash.events.Event;
 	
+	[Event(name="ResultEvent",type="events.DatabaseEvent")]
+	[Event(name="ErrorEvent",type="events.DatabaseEvent")]
+	
 	public class DatabaseEvent extends Event
 	{
 		
@@ -14,7 +17,7 @@ package databaseclasses
 		
 		public function DatabaseEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
-			super(type);
+			super(type, bubbles, cancelable);
 		}
 		
 	}
