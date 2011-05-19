@@ -117,13 +117,26 @@ package databaseclasses
 		private const CREATE_TABLE_TEMPLATES:String = "CREATE TABLE IF NOT EXISTS templates (templateid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																							"name TEXT NOT NULL)";
 		private const CREATE_TABLE_SOURCE:String = "CREATE TABLE IF NOT EXISTS source (source TEXT)";
+		/**
+		 * CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, value TEXT)
+		 */ 
+		private const CREATE_TABLE_SETTINGS:String = "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY," +
+														"value TEXT)";
 
 		
+		/**
+		 * SELECT * FROM settings 
+		 */
+		private const GET_ALL_SETTINGS:String = "SELECT * FROM settings ";
 		private const GET_FOODITEM:String = "SELECT * FROM fooditems WHERE itemid = :itemid";
 		private const GET_SOURCE:String = "SELECT * FROM source";
 		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
 		private const GET_UNITLIST:String = "SELECT * FROM units WHERE fooditems_itemid = :fooditemid";
 		private const COUNT_ALLFOODITEMS:String = "SELECT itemid FROM fooditems";
+		/**
+		 * INSERT INTO settings (id,value) VALUES (:id,:value)
+		 */
+		private const INSERT_SETTING:String = "INSERT INTO settings (id,value) VALUES (:id,:value)";
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
 		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description) VALUES (:description)";
 		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid,"+
@@ -274,7 +287,49 @@ package databaseclasses
 		{						
 			sqlStatement = new SQLStatement();
 			sqlStatement.sqlConnection = aConn;
-			createFoodItemsTable();				
+			createSettingsTable();				
+		}
+		
+		/**
+		 * Creates the settings table
+		 **/
+		private function createSettingsTable():void
+		{
+			sqlStatement.text = CREATE_TABLE_SETTINGS;
+			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
+			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
+			sqlStatement.execute();
+			
+			function tableCreated(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				getAllSettings();
+			}
+
+			function tableCreationError(see:SQLErrorEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+			}
+		}
+		
+		
+		private function getAllSettings():void {
+			sqlStatement.text = GET_ALL_SETTINGS;
+			sqlStatement.addEventListener(SQLEvent.RESULT,settingsRetrieved);
+			sqlStatement.addEventListener(SQLErrorEvent.ERROR,settingsRetrievalFailed);
+			sqlStatement.execute();
+			
+			function settingsRetrieved(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,settingsRetrieved);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrieved);
+				
+			}
+			
+			function settingsRetrievalFailed(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,settingsRetrieved);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrieved);
+				
+			}
 		}
 		
 		/**
@@ -293,7 +348,7 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				createUnitsTable();
 			}
-
+			
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
