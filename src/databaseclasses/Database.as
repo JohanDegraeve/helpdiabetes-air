@@ -33,6 +33,8 @@ package databaseclasses
 	import flash.net.Responder;
 	import flash.xml.XMLDocument;
 	
+	import model.ModelLocator;
+	
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
 	
@@ -318,10 +320,53 @@ package databaseclasses
 			sqlStatement.addEventListener(SQLEvent.RESULT,settingsRetrieved);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,settingsRetrievalFailed);
 			sqlStatement.execute();
+			var retrievalResult:Array = new Array(Settings.getInstance().getAmountOfSettings());
 			
 			function settingsRetrieved(se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingsRetrieved);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrieved);
+				var result:Object = sqlStatement.getResult().data;
+				/* 
+				 * Settings class now has default value 
+				 * any setting which doesn't exist yet in the database needs to be stored in the database with value retrieved from Settings
+				 * any setting which already exists in the database will be stored in Settings class
+				 * so first store getresult.data values in an array of strings just a large as the Settings class, values that don't exist yet get null as value
+				*/
+				for (var i:int = 0;i < retrievalResult.length;i++)
+					retrievalResult[i] = null;
+				if (result != null & result is Array) {
+					for each (var o:Object in result) {
+						retrievalResult[(o.id as int)] = (o.value as String);
+						Settings.getInstance().setSettingWithoutDatabaseUpdate((o.id as int),(o.value as String));
+					}
+				}
+				//now add each missing element in the database, start with the first
+				addMissingElement(0);
+			}
+			
+			function addMissingElement(id:int):void {
+				if (id == Settings.getInstance().getAmountOfSettings()) {
+					//we went through all settings, continue with creating the fooditemstable
+					createFoodItemsTable();
+				} else {
+					if (retrievalResult[id] == null) {
+						sqlStatement.clearParameters();
+						sqlStatement.addEventListener(SQLEvent.RESULT,settingAdded);
+						sqlStatement.addEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
+						sqlStatement.text = INSERT_SETTING;
+						sqlStatement.parameters[":id"] = id;
+						sqlStatement.parameters[":value"] = Settings.getInstance().getSetting(id);
+						sqlStatement.execute();
+						
+					} else {
+						addMissingElement(id + 1);
+					}
+				}
+			}
+			
+			function settingAdded (se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,settingAdded);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
 				
 			}
 			

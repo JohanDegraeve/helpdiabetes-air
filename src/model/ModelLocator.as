@@ -21,6 +21,8 @@
  */
 package model
 {
+	import databaseclasses.Settings;
+	
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
 	
@@ -65,6 +67,8 @@ package model
 		/* just a variable used when opening the untilist */
 		[Bindable]
 		public var width:int = 300;
+		
+		public var settings:Settings = Settings.getInstance();
 		
 		/**
 		 * constructor

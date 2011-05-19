@@ -71,7 +71,7 @@ package databaseclasses
 		 */
 		public function setSetting(settingId:int, newValue:String) {
 			settings[settingId] = newValue;
-			... store in database;
+			//TO BE COMPLETED;
 		}
 		
 		/**
@@ -79,6 +79,14 @@ package databaseclasses
 		 */
 		public function getNumberOfSettings():Number {
 			return settings.length;
+		}
+		
+		function setSettingWithoutDatabaseUpdate(settingId:int, newValue:String):void {
+			//TO BE COMPLETED;
+		}
+		
+		function getAmountOfSettings():int {
+			return settings.length;;
 		}
 	}
 }
