@@ -138,7 +138,7 @@ package databaseclasses
 		/**
 		 * INSERT INTO settings (id,value) VALUES (:id,:value)
 		 */
-		private const INSERT_SETTING:String = "INSERT INTO settings (id,value) VALUES (:id,:value)";
+		private const UPDATE_SETTING:String = "UPDATE settings set id = :id, value = :value WHERE id = :id";
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
 		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description) VALUES (:description)";
 		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid,"+
@@ -319,8 +319,9 @@ package databaseclasses
 			sqlStatement.text = GET_ALL_SETTINGS;
 			sqlStatement.addEventListener(SQLEvent.RESULT,settingsRetrieved);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,settingsRetrievalFailed);
+			var retrievalResult:Array = new Array(Settings.getInstance().getNumberOfSettings());
 			sqlStatement.execute();
-			var retrievalResult:Array = new Array(Settings.getInstance().getAmountOfSettings());
+			
 			
 			function settingsRetrieved(se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingsRetrieved);
@@ -332,20 +333,22 @@ package databaseclasses
 				 * any setting which already exists in the database will be stored in Settings class
 				 * so first store getresult.data values in an array of strings just a large as the Settings class, values that don't exist yet get null as value
 				*/
-				for (var i:int = 0;i < retrievalResult.length;i++)
+				for (var i:int = 0;i < retrievalResult.length;i++) {
 					retrievalResult[i] = null;
-				if (result != null & result is Array) {
+				}
+					
+				if (result != null && result is Array) {
 					for each (var o:Object in result) {
 						retrievalResult[(o.id as int)] = (o.value as String);
 						Settings.getInstance().setSettingWithoutDatabaseUpdate((o.id as int),(o.value as String));
 					}
 				}
 				//now add each missing element in the database, start with the first
-				addMissingElement(0);
+				addMissingSetting(0);
 			}
 			
-			function addMissingElement(id:int):void {
-				if (id == Settings.getInstance().getAmountOfSettings()) {
+			function addMissingSetting(id:int):void {
+				if (id == Settings.getInstance().getNumberOfSettings()) {
 					//we went through all settings, continue with creating the fooditemstable
 					createFoodItemsTable();
 				} else {
@@ -353,13 +356,13 @@ package databaseclasses
 						sqlStatement.clearParameters();
 						sqlStatement.addEventListener(SQLEvent.RESULT,settingAdded);
 						sqlStatement.addEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
-						sqlStatement.text = INSERT_SETTING;
+						sqlStatement.text = UPDATE_SETTING;
 						sqlStatement.parameters[":id"] = id;
 						sqlStatement.parameters[":value"] = Settings.getInstance().getSetting(id);
 						sqlStatement.execute();
 						
 					} else {
-						addMissingElement(id + 1);
+						addMissingSetting(id + 1);
 					}
 				}
 			}
@@ -367,13 +370,17 @@ package databaseclasses
 			function settingAdded (se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingAdded);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
-				
+				addMissingSetting(sqlStatement.parameters[":id"] as int);
+			}
+			
+			function addingSettingFailed (se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,settingAdded);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
 			}
 			
 			function settingsRetrievalFailed(se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingsRetrieved);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrieved);
-				
 			}
 		}
 		
@@ -1083,6 +1090,40 @@ package databaseclasses
 					dispatcher.dispatchEvent(event2);
 				}
 			}
+		}
+		
+		/**
+		 * should only be used by settings class, therefore it's package private
+		 * didn't test with the dispatcher
+		 */
+		internal function updateSetting(id:int,value:String, dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement()
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = UPDATE_SETTING;
+			localSqlStatement.parameters[":id"] = id;
+			localSqlStatement.parameters[":value"] = value;
+			localSqlStatement.addEventListener(SQLEvent.RESULT, settingInserted);
+			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, settingInsertionFailed);
+			localSqlStatement.execute();
+			
+			function settingInserted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInserted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function settingInsertionFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInserted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
 		}
 	}		
 }

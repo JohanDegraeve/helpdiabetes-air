@@ -1,23 +1,26 @@
-	<!--
-	Copyright (C) 2011  hippoandfriends
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
-	
-	-->
+/**
+ Copyright (C) 2011  hippoandfriends
+ 
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+ 
+ */
 
 package databaseclasses
 {
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
+
 	/**
 	 * Each time a new settings is defined, an additional constant should be defined, with default value and the array must be extended.
 	 * The first constant is 0;
@@ -32,16 +35,16 @@ package databaseclasses
 		/**
 		 * the meal id where the last fooditem was stored
 		 */ 
-		public var const SettingLAST_MEAL_ID:int = 0; 
+		public  static const SettingLAST_MEAL_ID:int = 0; 
 		/**
 		 * the time in milliseconds since midnight January 1, 1970, universal time, when the last fooditem was added
 		 */ 
-		public var const SettingTIME_OF_LAST_MEAL_ADDITION = 1;
+		public static const SettingTIME_OF_LAST_MEAL_ADDITION:int = 1;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
 			"none",// initially there will be no meal too which the last  fooditem has been added
-			new Date(0).valueOf().toString();
+			new Date(0).valueOf().toString()
 		];
 		
 		private static var instance:Settings = new Settings();
@@ -69,9 +72,19 @@ package databaseclasses
 		/**
 		 * Set the setting specified by the setting id, database will also be updated asynchronously
 		 */
-		public function setSetting(settingId:int, newValue:String) {
+		public function setSetting(settingId:int, newValue:String):void {
+			var dispatcher:EventDispatcher = new EventDispatcher();
+			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailure);
+			
+			var oldValue:String = settings[settingId];
+			
 			settings[settingId] = newValue;
-			//TO BE COMPLETED;
+			Database.getInstance().updateSetting(settingId,newValue,dispatcher);
+			
+			function settingInsertionFailure(se:Event):void {
+				settings[settingId] = oldValue;
+			}
+			
 		}
 		
 		/**
@@ -81,12 +94,12 @@ package databaseclasses
 			return settings.length;
 		}
 		
-		function setSettingWithoutDatabaseUpdate(settingId:int, newValue:String):void {
-			//TO BE COMPLETED;
+		internal function setSettingWithoutDatabaseUpdate(settingId:int, newValue:String):void {
+			settings[settingId] = newValue;
 		}
 		
-		function getAmountOfSettings():int {
-			return settings.length;;
+		private function getAmountOfSettings():int {
+			return settings.length;
 		}
 	}
 }
