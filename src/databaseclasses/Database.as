@@ -251,6 +251,7 @@ package databaseclasses
 			this.aConn = new SQLConnection();
 			this.aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
 			this.aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
+			trace("Attempting to open database in update mode. Database:0004");
 			this.aConn.openAsync(dbFile, SQLMode.UPDATE);
 			
 			function onConnOpen(se:SQLEvent):void
@@ -276,11 +277,10 @@ package databaseclasses
 				this.aConn = new SQLStatement();
 				aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
 				aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
+				trace("Attempting to open database in creation mode. Database:0003");
 				aConn.openAsync(dbFile, SQLMode.CREATE);
 			}
-			
 		}
-		
 		
 		/**
 		 * Will execute SQL that will either create the tables in a fresh database or return, if they're already creatd.
@@ -309,6 +309,7 @@ package databaseclasses
 			}
 
 			function tableCreationError(see:SQLErrorEvent):void {
+				trace("Failed to create settings table. Database:0005");
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			}
@@ -376,11 +377,13 @@ package databaseclasses
 			function addingSettingFailed (se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingAdded);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
+				trace("Failed to add setting. Database:0006");
 			}
 			
 			function settingsRetrievalFailed(se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingsRetrieved);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrieved);
+				trace("Failed to retrieve settings. Database:0007");
 			}
 		}
 		
@@ -404,6 +407,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0008");
 			}
 		}
 		
@@ -427,6 +431,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0009");
 			}
 		}
 		
@@ -451,6 +456,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database00010");
 			}
 		}
 		
@@ -474,6 +480,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0011");
 			}
 		}
 		
@@ -497,6 +504,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0012");
 			}
 		}
 		
@@ -520,6 +528,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0013");
 			}
 		}
 		
@@ -543,6 +552,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0014");
 			}
 		}
 		
@@ -566,6 +576,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0015");
 			}
 		}
 		
@@ -589,6 +600,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0016");
 			}
 		}
 		
@@ -612,6 +624,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0017");
 			}
 		}
 		
@@ -637,6 +650,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				trace("Failed to create table :" + sqlStatement.text + ". Database0018");
 			}
 		}
 		
@@ -659,6 +673,7 @@ package databaseclasses
 			function checkSourceError(se:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,checkSourceResult);	
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,checkSourceError);	
+				trace("Failed to get the source. Database0019");
 			}
 			
 		}
@@ -683,6 +698,7 @@ package databaseclasses
 			function sourceInsertionError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,sourceInserted);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceInsertionError);
+				trace("Failed to insert the source. Database0020");
 				if (dispatcher != null)
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 			}
@@ -713,6 +729,7 @@ package databaseclasses
 			function foodItemInsertionError(see:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemInserted);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemInsertionError);
+				trace("Failed to insert a food item. Database0021");
 				if (dispatcher != null)
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 			}
@@ -748,6 +765,7 @@ package databaseclasses
 			function unitInsertionError(see:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitInserted);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitInsertionError);
+				trace("Failed to insert a unit. Database0022");
 				if (dispatcher != null)
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 			}
@@ -780,6 +798,7 @@ package databaseclasses
 			function sourceRetrievalError(see:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,sourceRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceRetrievalError);
+				trace("Failed to get the source. Database0023");
 			}
 			
 		}
@@ -824,6 +843,7 @@ package databaseclasses
 			function sourceInsertionError(see:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,sourceInserted);
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,sourceInsertionError);
+				trace("Failed to insert the source. Database0024");
 			}
 			
 			function goOnWithFoodItems():void {
@@ -852,6 +872,7 @@ package databaseclasses
 			function foodItemInsertionError(see:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemInserted);
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemInsertionError);
+				trace("Failed to insert a fooditem. Database0025");
 			}
 			
 			function goOnWithUnits():void {
@@ -883,6 +904,7 @@ package databaseclasses
 			function unitInsertionError(se:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
+				trace("Failed to insert a unit. Database0026");
 			}
 		}
 		
@@ -939,6 +961,7 @@ package databaseclasses
 			function foodItemRetrievalError(see:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,allFoodItemsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
+				trace("Failed to retrieve a fooditem. Database0027");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -974,6 +997,7 @@ package databaseclasses
 			function onOpenError(see:SQLErrorEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0028");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -1009,6 +1033,7 @@ package databaseclasses
 			function foodItemRetrievalError(see:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
+				trace("Failed to retrieve the fooditem. Database0029");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -1042,6 +1067,7 @@ package databaseclasses
 			function unitListRetrievalError(see:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitListRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
+				trace("Failed to retrieve the unitlist. Database0030");
 				if (dispatcher != null) {
 					var event3:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event3);
@@ -1118,6 +1144,7 @@ package databaseclasses
 			function settingInsertionFailed(see:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInserted);
 				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailed);
+				trace("Failed to update a setting. Database0031");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);
