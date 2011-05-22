@@ -59,8 +59,6 @@ package databaseclasses
 		
 		private var globalDispatcher:EventDispatcher;
 		
-		/*private const MG_DL:String = "mg/dL";
-		private const mmol:String = "mmol";*/
 		private var sampleDbFileName:String;
 		private const dbFileName:String = "foodfile.db";
 		private  var dbFile:File  ;
@@ -124,8 +122,6 @@ package databaseclasses
 		 */ 
 		private const CREATE_TABLE_SETTINGS:String = "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY," +
 														"value TEXT)";
-
-		
 		/**
 		 * SELECT * FROM settings 
 		 */
@@ -200,6 +196,7 @@ package databaseclasses
 		public function deleteDatabase():Boolean
 		{
 			var success:Boolean = false;
+			dbFile  = File.applicationStorageDirectory.resolvePath(dbFileName);
 			if ( this.dbFile ) 
 			{				
 				if ( this.aConn && this.aConn.connected )
@@ -245,6 +242,7 @@ package databaseclasses
 		{
 			
 			trace("HelpDiabetes-air : Database.init");
+			
 			this.globalDispatcher = dispatcher;
 			dbFile  = File.applicationStorageDirectory.resolvePath(dbFileName);
 			
@@ -273,7 +271,7 @@ package databaseclasses
 			function reAttempt():void {
 				//attempt to create dbFile based on a sample in assets directory, 
 				//if that fails then dbFile will simply not exist and so will be created later on in openAsync 
-				createDatabaseFromAssets(dbFile);
+				var result:Boolean = createDatabaseFromAssets(dbFile);
 				this.aConn = new SQLStatement();
 				aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
 				aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
@@ -326,7 +324,7 @@ package databaseclasses
 			
 			function settingsRetrieved(se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingsRetrieved);
-				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrieved);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrievalFailed);
 				var result:Object = sqlStatement.getResult().data;
 				/* 
 				 * Settings class now has default value 
@@ -371,18 +369,19 @@ package databaseclasses
 			function settingAdded (se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingAdded);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
-				addMissingSetting(sqlStatement.parameters[":id"] as int);
+				
+				addMissingSetting((sqlStatement.parameters[":id"] as int)+1);
 			}
 			
-			function addingSettingFailed (se:SQLEvent):void {
+			function addingSettingFailed (se:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingAdded);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
 				trace("Failed to add setting. Database:0006");
 			}
 			
-			function settingsRetrievalFailed(se:SQLEvent):void {
+			function settingsRetrievalFailed(se:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingsRetrieved);
-				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrieved);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrievalFailed);
 				trace("Failed to retrieve settings. Database:0007");
 			}
 		}
@@ -394,6 +393,7 @@ package databaseclasses
 		private function createFoodItemsTable():void
 		{
 			sqlStatement.text = CREATE_TABLE_FOODITEMS;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -418,6 +418,7 @@ package databaseclasses
 		private function createUnitsTable():void
 		{
 			sqlStatement.text = CREATE_TABLE_UNITS;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -443,6 +444,7 @@ package databaseclasses
 		private function createEventsTable():void
 		{
 			sqlStatement.text = CREATE_TABLE_EVENTS;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -467,6 +469,7 @@ package databaseclasses
 		private function createExerciseEventsTable():void
 		{
 			sqlStatement.text = CREATE_TABLE_EXERCISE_EVENTS;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -491,6 +494,7 @@ package databaseclasses
 		private function createBloodglucoseEventsTable():void
 		{
 			sqlStatement.text = CREATE_TABLE_BLOODGLUCOSE_EVENTS;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -515,6 +519,7 @@ package databaseclasses
 		private function createMedicinEventsTable():void
 		{
 			sqlStatement.text = CREATE_TABLE_MEDICIN_EVENTS;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -539,6 +544,7 @@ package databaseclasses
 		private function createTableMealEvents():void
 		{
 			sqlStatement.text = CREATE_TABLE_MEAL_EVENTS;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -563,6 +569,7 @@ package databaseclasses
 		private function createTableSelectedFoodItems():void
 		{
 			sqlStatement.text = CREATE_TABLE_SELECTED_FOODITEMS;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -587,6 +594,7 @@ package databaseclasses
 		private function createTableTemplateFoodItems():void
 		{
 			sqlStatement.text = CREATE_TABLE_TEMPLATE_FOODITEMS;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -611,6 +619,7 @@ package databaseclasses
 		private function createTableTemplates():void
 		{
 			sqlStatement.text = CREATE_TABLE_TEMPLATES;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -637,6 +646,7 @@ package databaseclasses
 		private function createTableSource():void
 		{
 			sqlStatement.text = CREATE_TABLE_SOURCE;
+			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
@@ -918,6 +928,7 @@ package databaseclasses
 			if (globalDispatcher != null)
 				globalDispatcher.dispatchEvent(new Event(DatabaseEvent.RESULT_EVENT));
 		}
+		
 		
 		private  function createDatabaseFromAssets(targetFile:File):Boolean 			
 		{

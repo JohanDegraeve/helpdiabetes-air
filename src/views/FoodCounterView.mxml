@@ -97,15 +97,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</s:viewMenuItems>
 
 	<s:titleContent>
-		<s:TextInput id="searchtext" width="249" text="" change="searchTextChanged()" />
-		<mx:Spacer width="15" height="100%"/>
+		<s:TextInput id="searchtext" width="100%" text="" change="searchTextChanged()" />
+		
 	</s:titleContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/search48x48.png')"/>
 	</s:actionContent>
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
-		<mx:Spacer width="15" height="100%"/>
+		
 	</s:navigationContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0"
 			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem"></s:List>
