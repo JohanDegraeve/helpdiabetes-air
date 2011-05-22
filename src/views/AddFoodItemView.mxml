@@ -4,7 +4,8 @@
 		actionBarVisible="true" 
 		preinitialize="preInit()"
 		tabBarVisible="true"
-		title="AddFoodItemView" xmlns:myComponents="myComponents.*" xmlns:mx="library://ns.adobe.com/flex/mx">
+		title="AddFoodItemView" xmlns:myComponents="myComponents.*" xmlns:mx="library://ns.adobe.com/flex/mx"
+		creationComplete="onCreationComplete()">
 	<fx:Declarations>
 		<!--  seperationerror="" makes sure there's no round border even when there's a separator error -->
 		<mx:NumberValidator
@@ -14,9 +15,7 @@
 			allowNegative="false" 
 			domain="real"
 			thousandsSeparator="." 
-			separationError=""
-			invalid="invalidAmount()"
-			>
+			separationError="">
 		</mx:NumberValidator>
 	</fx:Declarations>
 	
@@ -77,9 +76,10 @@
 			
 			private var popUpForUnitList:SelectUnit;
 			
-			/* called when the entered amount has invalid characters in which case a correction can occur */
-			/* although these seems not to be really called, as I didn't have a change attribute specified for the button, but still when removing I get a compile error, so just leave it here */
-			private function invalidAmount():void {
+			private function onCreationComplete():void {
+				//initialize the add meal button
+				//meal_button_text = ...
+					Settings.SettingTIME_OF_LAST_MEAL_ADDITION;
 			}
 			
 			private function preInit():void {
@@ -183,7 +183,7 @@
 					chosenAmount = standardAmount;
 				return chosenAmount + " " +
 					retrievedFoodItem.getUnit(index).getDescription() + " : " +
-					(Math.round(retrievedFoodItem.getUnit(index).getCarbs()/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","gram_of_carbs") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).getCarbs()/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","gram_of_carbs_short") + ", " +
 					(Math.round(retrievedFoodItem.getUnit(index).getFat()/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
 					(Math.round(retrievedFoodItem.getUnit(index).getProtein()/standardAmount*chosenAmount  *100)/100)+ " " +  resourceManager.getString("general","gram_of_protein") + ", " +
 					(Math.round(retrievedFoodItem.getUnit(index).getKcal()/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","kilocalories") + ".";

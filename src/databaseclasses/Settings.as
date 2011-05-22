@@ -40,11 +40,17 @@ package databaseclasses
 		 * the time in milliseconds since midnight January 1, 1970, universal time, when the last fooditem was added
 		 */ 
 		public static const SettingTIME_OF_LAST_MEAL_ADDITION:int = 1;
+		/**
+		 * id to be used when adding a new meal event
+		 * only to be used within the database class therefore package private
+		 */
+		internal static const SettingNEXT_MEAL_ID:int=2;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
 			"none",// initially there will be no meal too which the last  fooditem has been added
-			new Date(0).valueOf().toString()
+			new Date(0).valueOf().toString(), //midnight January 1, 1970, universal time,
+			"1" //the first meal id to be used
 		];
 		
 		private static var instance:Settings = new Settings();

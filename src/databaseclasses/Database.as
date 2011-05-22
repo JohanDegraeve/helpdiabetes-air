@@ -93,9 +93,11 @@ package databaseclasses
 		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (medicineventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																									 "medicinname TEXT NOT NULL, " +
 																									 "amount REAL NOT NULL)";		
-		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
+		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER PRIMARY KEY, " +
 																							   "mealtype TEXT NOT NULL, " +
-																							   "lastmodifiedtimestamp TIMESTAMP NOT NULL)";		
+																							   "lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
+																							   "insulinratio INTEGER," +
+																							   "correctionfactor INTEGER)";		
 		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																											 "mealevents_mealeventid INTEGER NOT NULL, " +
 																											 "itemdescription TEXT NOT NULL, " +
@@ -135,6 +137,7 @@ package databaseclasses
 		 * INSERT INTO settings (id,value) VALUES (:id,:value)
 		 */
 		private const UPDATE_SETTING:String = "UPDATE settings set id = :id, value = :value WHERE id = :id";
+		
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
 		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description) VALUES (:description)";
 		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid,"+
@@ -151,6 +154,11 @@ package databaseclasses
 											":protein," +
 											":carbs," +
 											":fat)";
+		
+		/**
+		 * INSERT INTO mealevents (mealeventid , mealtype , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealtype,:lastmodifiedtimestamp)
+		 */ 
+		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealtype , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealtype,:lastmodifiedtimestamp)";
 
 
 		/**
@@ -175,19 +183,6 @@ package databaseclasses
 		public static function getInstance():Database {
 			if (instance == null) instance = new Database();
 			return instance;
-		}
-		
-		/**
-		 * gets the creation data of the database based on db file creation date
-		 */
-		public function getCreationDateOfDatabase():Date
-		{
-			var d:Date;
-			if ( this.dbFile && this.dbFile.exists )
-			{
-				d = dbFile.creationDate;
-			}
-			return d;
 		}
 		
 		/**
@@ -283,7 +278,7 @@ package databaseclasses
 		/**
 		 * Will execute SQL that will either create the tables in a fresh database or return, if they're already creatd.
 		 **/
-		public function createTables():void
+		private function createTables():void
 		{						
 			sqlStatement = new SQLStatement();
 			sqlStatement.sqlConnection = aConn;
@@ -1161,6 +1156,11 @@ package databaseclasses
 					dispatcher.dispatchEvent(event);
 				}
 			}
+			
+		}
+		
+		
+		internal function createNewMealEvent(mealtype:String,lastmodifiedtimestamp:String,insulinRatio:Number,correctionFactor:Number,dispatcher:EventDispatcher):void {
 			
 		}
 	}		
