@@ -38,9 +38,6 @@ package databaseclasses
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
 	
-	import objects.FoodItem;
-	import objects.Unit;
-	
 	import views.FoodCounterView;
 	
 	
@@ -106,7 +103,8 @@ package databaseclasses
 																					   					     "kcal INTEGER, " +
 																											 "protein REAL, " +
 																											 "carbs REAL NOT NULL, " +
-																											 "fat REAL)";		
+																											 "fat REAL, " +
+																											 "chosenamount REAL NOT NULL)";		
 		private const CREATE_TABLE_TEMPLATE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS templatefooditems (templateitemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																											 "templates_templateid INTEGER NOT NULL, " +
 																											 "itemdescription TEXT NOT NULL, " +
@@ -132,11 +130,14 @@ package databaseclasses
 		private const GET_SOURCE:String = "SELECT * FROM source";
 		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
 		private const GET_UNITLIST:String = "SELECT * FROM units WHERE fooditems_itemid = :fooditemid";
-		private const COUNT_ALLFOODITEMS:String = "SELECT itemid FROM fooditems";
 		/**
 		 * INSERT INTO settings (id,value) VALUES (:id,:value)
 		 */
-		private const UPDATE_SETTING:String = "UPDATE settings set id = :id, value = :value WHERE id = :id";
+		private const INSERT_SETTING:String = "INSERT INTO settings (id,value) VALUES (:id,:value)";
+		/**
+		 * UPDATE settings set value = :value WHERE id = :id
+		 */
+		private const UPDATE_SETTING:String = "UPDATE settings set value = :value WHERE id = :id";
 		
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
 		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description) VALUES (:description)";
@@ -223,14 +224,14 @@ package databaseclasses
 		}
 		
 		/**
-		 * Create the asynchronous connection to the database
-		 * In the complete flow first an attempt will be made to open the database in update mode. 
+		 * Create the asynchronous connection to the database<br>
+		 * In the complete flow first an attempt will be made to open the database in update mode. <br>
 		 * If that fails, it means the database is not existing yet. Then an attempt is made to copy a sample from the assets, the database name searched will be
 		 * language dependent. 
 		 * 
-		 * Independent of the result of the attempt to open the database and to copy from the assets, all tables will be created (if not existing yet).
-		 * At the end, a check will be done to see if a source record exists in the source table, if no then the complete xml foodfile will be loaded into the database
-		 * Otherwise no reloading is done. The foodfile name to be used is again language dependent.
+		 * Independent of the result of the attempt to open the database and to copy from the assets, all tables will be created (if not existing yet).<br>
+		 * At the end, a check will be done to see if a source record exists in the source table, if no then the complete xml foodfile will be loaded into the database<br>
+		 * Otherwise no reloading is done. The foodfile name to be used is again language dependent.<br>
 		 * 
 		 **/
 		public function init(dispatcher:EventDispatcher):void
@@ -350,7 +351,7 @@ package databaseclasses
 						sqlStatement.clearParameters();
 						sqlStatement.addEventListener(SQLEvent.RESULT,settingAdded);
 						sqlStatement.addEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
-						sqlStatement.text = UPDATE_SETTING;
+						sqlStatement.text = INSERT_SETTING;
 						sqlStatement.parameters[":id"] = id;
 						sqlStatement.parameters[":value"] = Settings.getInstance().getSetting(id);
 						sqlStatement.execute();
@@ -634,7 +635,7 @@ package databaseclasses
 		
 		
 		/**
-		 * Creates the sourcre table
+		 * Creates the sourcre table<br>
 		 * The source table should only have one row with the source of the food composition table 
 		 * 
 		 **/
@@ -684,7 +685,7 @@ package databaseclasses
 		}
 		
 		/**
-		 * stores a source name in the database
+		 * stores a source name in the database<br>
 		 * if dispatcher != null then an event will be dispatches when finished
 		 */
 		private function insertSource(source:String, dispatcher:EventDispatcher):void {
@@ -710,7 +711,7 @@ package databaseclasses
 		}
 
 		/**
-		 * stores a food item in the database, obviously only the description, the dispatched databaseevent will have the inserted row id as lastInsertRowID
+		 * stores a food item in the database, obviously only the description, the dispatched databaseevent will have the inserted row id as lastInsertRowID<br>
 		 * if dispatcher != null then an event will be dispatches when finished
 		 */
 		private function insertFoodItem(foodItemDescription:String, dispatcher:EventDispatcher):void {
@@ -741,7 +742,7 @@ package databaseclasses
 		}
 		
 		/**
-		 * stores a unit in the database
+		 * stores a unit in the database<br>
 		 * if dispatcher != null then an event will be dispatches when finished
 		 */
 		private function insertUnit(description:String,standardAmount:int,kcal:int,protein:Number,carbs:Number,fat:Number, fooditems_itemid:int,dispatcher:EventDispatcher):void {
@@ -779,7 +780,7 @@ package databaseclasses
 		
 
 		/**
-		 * msql query for getting source
+		 * msql query for getting source<br>
 		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
 		 */
 		public function getSource(dispatcher:EventDispatcher):void {
@@ -943,7 +944,7 @@ package databaseclasses
 		}
 		
 		/**
-		 * msql query for all fooditems in fooditems table
+		 * msql query for all fooditems in fooditems table<br>
 		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
 		 */
 		public function getAllFoodItemDescriptions(dispatcher:EventDispatcher):void {
@@ -975,6 +976,10 @@ package databaseclasses
 			}
 		}
 
+		/**
+		 * gets the fooditem for the specified fooditemid<br>
+		 * the fooditem will set in the data field of the event that will be dispatched to the specified dispatcher
+		 */ 
 		public function getFoodItem(fooditemid:int, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
@@ -1082,10 +1087,81 @@ package databaseclasses
 		}
 		
 		/**
-		 * if aconn is not open then open aconn to dbFile , in asynchronous mode, in UPDATE mode
-		 * returns true if aconn is open
-		 * if aconn is closed then connection will be opened asynchronous mode and an event will be dispatched to the dispatcher after opening the connecion
-		 * so that means if openSQLConnection returns true then there's no need to wait for the dispatcher event to trigger. 
+		 * gets the list of units as an array collection, for the specified fooditemid<br>
+		 * the fooditem will set in the data field of the event that will be dispatched to the specified dispatcher
+		 */ 
+		public function getUnitList(fooditem:FoodItem, dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			var unitList:ArrayCollection;
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				
+				localSqlStatement.addEventListener(SQLEvent.RESULT,unitListRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = GET_UNITLIST;
+				localSqlStatement.clearParameters();
+				localSqlStatement.parameters[":fooditemid"] = fooditem.itemid;
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0032");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			
+			function unitListRetrieved(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitListRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
+				if (dispatcher != null) {
+					unitList = new ArrayCollection();
+					var tempObject:Object = localSqlStatement.getResult().data;
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					if (tempObject != null && tempObject is Array) {
+						for each ( var o:Object in tempObject )
+						{
+							unitList.addItem(new Unit(o.description as String,o.standardamount as int,o.kcal as int,o.protein as Number,o.carbs as Number,o.fat as Number));
+						}
+						event.data = unitList;
+						dispatcher.dispatchEvent(event);
+					} else {
+						unitList.addItem(new Unit("error while retrieving unitlist for fooditem " + fooditem.itemid + ".",0,0,0,0,0));
+						event.data = unitList;
+						dispatcher.dispatchEvent(event);
+					}
+				}
+			}
+			
+			function unitListRetrievalError(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitListRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
+				trace("Failed to retrieve the unitlist. Database0040");
+				if (dispatcher != null) {
+					var event3:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event3);
+				}
+			}
+		}
+		
+		/**
+		 * if aconn is not open then open aconn to dbFile , in asynchronous mode, in UPDATE mode<br>
+		 * returns true if aconn is open<br>
+		 * if aconn is closed then connection will be opened asynchronous mode and an event will be dispatched to the dispatcher after opening the connecion<br>
+		 * so that means if openSQLConnection returns true then there's no need to wait for the dispatcher event to trigger. <br>
 		 */ 
 		private function openSQLConnection(dispatcher:EventDispatcher):Boolean {
 			// should I first check if there's still a connection open and close if necessary ?
@@ -1107,7 +1183,6 @@ package databaseclasses
 				aConn.removeEventListener(SQLErrorEvent.ERROR, onConnError);	
 				if (dispatcher != null) {
 					var event2:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					//var event2:SQLEvent = new SQLEvent(SQLEvent.RESULT);
 					dispatcher.dispatchEvent(event2);
 				}
 			}
@@ -1130,13 +1205,35 @@ package databaseclasses
 		 */
 		internal function updateSetting(id:int,value:String, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
-			localSqlStatement.sqlConnection = aConn;
-			localSqlStatement.text = UPDATE_SETTING;
-			localSqlStatement.parameters[":id"] = id;
-			localSqlStatement.parameters[":value"] = value;
-			localSqlStatement.addEventListener(SQLEvent.RESULT, settingInserted);
-			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, settingInsertionFailed);
-			localSqlStatement.execute();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = UPDATE_SETTING;
+				localSqlStatement.parameters[":id"] = id;
+				localSqlStatement.parameters[":value"] = value;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, settingInserted);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, settingInsertionFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0041");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+
 			
 			function settingInserted(se:SQLEvent):void {
 				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInserted);
@@ -1159,7 +1256,9 @@ package databaseclasses
 			
 		}
 		
-		
+		/**
+		 * will add the mealevent to the database
+		 */
 		internal function createNewMealEvent(mealtype:String,lastmodifiedtimestamp:String,insulinRatio:Number,correctionFactor:Number,dispatcher:EventDispatcher):void {
 			
 		}

@@ -22,11 +22,11 @@ package databaseclasses
 	import flash.events.EventDispatcher;
 
 	/**
-	 * Each time a new settings is defined, an additional constant should be defined, with default value and the array must be extended.
-	 * The first constant is 0;
-	 * It's a singleton, at first creation, all settings will be intialized with default values.
-	 * Each time a new value is stored, the value will be written to the database. 
-	 * All settings can be set and get , as string representation.
+	 * Each time a new settings is defined, an additional constant should be defined, with default value and the array must be extended.<br>
+	 * The first constant is 0;<br>
+	 * It's a singleton, at first creation, all settings will be intialized with default values.<br>
+	 * Each time a new value is stored, the value will be written to the database. <br>
+	 * All settings can be set and get , as string representation.<br>
 	 */
 	public class Settings
 		

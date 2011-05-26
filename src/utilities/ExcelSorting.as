@@ -4,16 +4,16 @@ package utilities
 	
 	import mx.collections.ArrayCollection;
 	
-	import objects.FoodItem;
+	import databaseclasses.FoodItem;
 
 	public class ExcelSorting
 	{
 		
 		/**
-		 * Array used for comparing char values according to Excel rules.
-		 * Element at index x, has the same value as in column 'Considered Equal to' in the table above, 
+		 * Array used for comparing char values according to Excel rules.<br>
+		 * Element at index x, has the same value as in column 'Considered Equal to' in the table above, <br>
 		 * for the row with Ascii code x.<br>
-		 * The last element has value '256', this is the value that will be used for any character which char-value out of range 
+		 * The last element has value '256', this is the value that will be used for any character which char-value out of range <br>
 		 */
 		 private static var CHARORDER:Array = [  0,   1,  2,  3,  4,  5,  6,  7,  8,  40,
 			41,  42, 43, 44, 9,  10, 11, 12, 13, 14,
@@ -60,13 +60,13 @@ package utilities
 		}
 		
 		/**
-		 * Compares two characters using Excel sorting rules.
-		 * @param characterA the first character to be compared to  
-		 * @param characterB the second character
-		 * @return the value 0 if characterA is equal to characterB; 
-		 * 	a value less than 0 if characterA is numerically less than characterB; 
-		 * 	and a value greater than 0 if characterB is numerically greater than characterA. 
-		 * 	Note that this is a comparison of the value in column 3 (considered equal to) in the table above.
+		 * Compares two characters using Excel sorting rules.<br>
+		 * @param characterA the first character to be compared to  <br>
+		 * @param characterB the second character<br>
+		 * @return the value 0 if characterA is equal to characterB; <br>
+		 * 	a value less than 0 if characterA is numerically less than characterB; <br>
+		 * 	and a value greater than 0 if characterB is numerically greater than characterA.<br> 
+		 * 	Note that this is a comparison of the value in column 3 (considered equal to) in the table above.<br>
 		 * 
 		 */
 		static public  function compareToAsInExcel( characterA:uint,  characterB:uint):int {
@@ -129,10 +129,10 @@ package utilities
 		
 		/**
 		 * Search the index of the first item 'matching' the char value. low is the index
-		 * of the item in de fooditemlist where searching should start, high is the last.
+		 * of the item in de fooditemlist where searching should start, high is the last.<br>
 		 * index is the index to be used in the itemdescription String, in other words it 
 		 * points to the character in the strings (searchstring and itemdescription strings) that
-		 * is compared.
+		 * is compared.<br>
 		 * @param low
 		 * @param high
 		 * @param value

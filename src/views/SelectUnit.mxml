@@ -13,7 +13,7 @@
 	<![CDATA[
 		import model.ModelLocator;
 		
-		import objects.UnitChangedEvent;
+		import databaseclasses.UnitChangedEvent;
 		
 		import spark.events.IndexChangeEvent;
 		

@@ -66,7 +66,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function selectFoodItem(event:IndexChangeEvent):void {
-				navigator.pushView(AddFoodItemView,event.newIndex);
+				navigator.pushView(AddFoodItemView,ModelLocator.getInstance().foodItemList.getItemAt(event.newIndex));
 			}
 			
 			private function toTracking():void { 

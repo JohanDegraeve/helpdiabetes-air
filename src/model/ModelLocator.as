@@ -26,7 +26,7 @@ package model
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
 	
-	import objects.FoodItem;
+	import databaseclasses.FoodItem;
 	
 	import utilities.ExcelSorting;
 

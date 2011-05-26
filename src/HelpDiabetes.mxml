@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import mx.collections.ArrayCollection;
 			
-			import objects.FoodItem;
+			import databaseclasses.FoodItem;
 			
 			private var  foodItems:ArrayCollection;
 			
