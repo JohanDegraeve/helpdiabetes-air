@@ -41,16 +41,62 @@ package databaseclasses
 		 */ 
 		public static const SettingTIME_OF_LAST_MEAL_ADDITION:int = 1;
 		/**
-		 * id to be used when adding a new meal event
+		 * id to be used when adding a new meal event<br>
 		 * only to be used within the database class therefore package private
 		 */
-		internal static const SettingNEXT_MEAL_ID:int=2;
+		internal static const SettingNEXT_MEALEVENT_ID:int=2;
+		/**
+		 * id to be used when adding a new selected item<br>
+		 * only to be used within the database class therefore package private
+		 */
+		internal static const SettingNEXT_SELECTEDITEM_ID:int=3;
+		/**
+		 * insulinratio breakfast, amount of carbs per unit of insulin
+		 */ 
+		public static const SettingINSULIN_RATIO_BREKFAST:int=4;
+		/**
+		 * insulinratio lunch, amount of carbs per unit of insulin
+		 */ 
+		public static const SettingINSULIN_RATIO_LUNCH:int=5;
+		/**
+		 * insulinratio snack, amount of carbs per unit of insulin
+		 */ 
+		public static const SettingINSULIN_RATIO_SNACK:int=6;
+		/**
+		 * insulinratio supper, amount of carbs per unit of insulin
+		 */ 
+		public static const SettingINSULIN_RATIO_SUPPER:int=7;
+		/**
+		 * switch time breakfast to lunch
+		 */
+		public static const SettingBREAKFAST_UNTIL: int =  8;
+		/**
+		 * switch time lunch to snack
+		 */
+		public static const SettingLUNCH_UNTIL:int = 9;
+		/**
+		 * switch time snack to supper 
+		 */
+		public static const SettingSNACK_UNTIL:int = 10;
+		/**
+		 * correction factor to be used when calculating insulindose
+		 */
+		public static const SettingCORRECTION_FACTOR:int=11;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
 			"none",// initially there will be no meal too which the last  fooditem has been added
 			new Date(0).valueOf().toString(), //midnight January 1, 1970, universal time,
-			"1" //the first meal id to be used
+			"1", //the first meal id to be used
+			"1", //first selected item id to be used
+			"0", //insulin ratio breakfast
+			"0", //lunch
+			"0", //snack
+			"0", //supper
+			"32400000", // January 1, 1970, 9 Hr in ms
+			"50400000", // January 1, 1970, 14 Hr in ms
+			"61200000", // January 1, 1970, 17 Hr in ms
+			"0" //correction factor
 		];
 		
 		private static var instance:Settings = new Settings();

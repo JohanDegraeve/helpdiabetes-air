@@ -1,20 +1,20 @@
 /**
-	Copyright (C) 2011  hippoandfriends
-	
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
-	
-*/
+ Copyright (C) 2011  hippoandfriends
+ 
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+ 
+ */
 package databaseclasses
 {
 	
@@ -91,11 +91,12 @@ package databaseclasses
 																									 "medicinname TEXT NOT NULL, " +
 																									 "amount REAL NOT NULL)";		
 		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER PRIMARY KEY, " +
-																							   "mealtype TEXT NOT NULL, " +
+																							   "mealname TEXT NOT NULL, " +
 																							   "lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
 																							   "insulinratio INTEGER," +
-																							   "correctionfactor INTEGER)";		
-		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
+																							   "correctionfactor INTEGER," +
+																							   "previousBGlevel INTEGER)";		
+		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER PRIMARY KEY , " +
 																											 "mealevents_mealeventid INTEGER NOT NULL, " +
 																											 "itemdescription TEXT NOT NULL, " +
 																											 "unitdescription TEXT, " +
@@ -157,10 +158,11 @@ package databaseclasses
 											":fat)";
 		
 		/**
-		 * INSERT INTO mealevents (mealeventid , mealtype , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealtype,:lastmodifiedtimestamp)
+		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
 		 */ 
-		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealtype , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealtype,:lastmodifiedtimestamp)";
+		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp, insulinratio, correctionfactor, previousBGlevel ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp,:insulinratio,:correctionfactor,:previousBGlevel)";
 
+		private const INSERT_SELECTEDITEM:String = "INSERT INTO selectedfooditems (selectedfooditemid, mealevents_mealeventid,itemdescription ,unitdescription,standardamount,kcal,protein,carbs,fat,chosenamount ) VALUES (:selectedfooditemid,:mealevents_mealeventid,:itemdescription ,:unitdescription,:standardamount,:kcal,:protein,:carbs,:fat,:chosenamount)";
 
 		/**
 		 * constructor, should not be used, use getInstance()
@@ -1259,8 +1261,145 @@ package databaseclasses
 		/**
 		 * will add the mealevent to the database
 		 */
-		internal function createNewMealEvent(mealtype:String,lastmodifiedtimestamp:String,insulinRatio:Number,correctionFactor:Number,dispatcher:EventDispatcher):void {
+		internal function createNewMealEvent(
+				mealEventId:int,
+				mealname:String,
+				lastmodifiedtimestamp:String,
+				insulinRatio:Number,
+				correctionFactor:Number,
+				previousBGlevel:int,
+				dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement()
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = INSERT_MEALEVENT;
+				localSqlStatement.parameters[":mealeventid"] = mealEventId;
+				localSqlStatement.parameters[":mealname"] = mealname;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = lastmodifiedtimestamp;
+				localSqlStatement.parameters[":insulinratio"] = insulinRatio;
+				localSqlStatement.parameters[":correctionfactor"] = correctionFactor;
+				localSqlStatement.parameters[":previousBGlevel"] = previousBGlevel;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, mealEventCreated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, mealEventCreationFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0050");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			
+			function mealEventCreated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function mealEventCreationFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
+				trace("Failed to create a mealEvent. Database0051");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
 			
 		}
+		
+		/**
+		 * will add the Selected Item to the database
+		 */
+		internal function createNewSelectedItem(
+			selectedItemId:int,
+			mealEventId:int,
+			itemDescription:String,
+			unitDescription:String,
+			standardAmount:int,
+			kcal:int,
+			protein:Number,
+			carbs:Number,
+			fat:Number,
+			chosenAmount:Number,
+			dispatcher:EventDispatcher):void {
+			
+			var localSqlStatement:SQLStatement = new SQLStatement()
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = INSERT_SELECTEDITEM;
+				localSqlStatement.parameters[":selectedfooditemid"] = selectedItemId;
+				localSqlStatement.parameters[":mealevents_mealeventid"] = mealEventId;
+				localSqlStatement.parameters[":itemdescription"] = itemDescription;
+				localSqlStatement.parameters[":unitdescription"] = unitDescription;
+				localSqlStatement.parameters[":standardamount"] = standardAmount;
+				localSqlStatement.parameters[":kcal"] = kcal;
+				localSqlStatement.parameters[":protein"] = protein;
+				localSqlStatement.parameters[":carbs"] = carbs;
+				localSqlStatement.parameters[":fat"] = fat;
+				localSqlStatement.parameters[":chosenamount"] = chosenAmount;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, selectedItemCreated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, selectedItemCreationFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0050");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			
+			function selectedItemCreated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function selectedItemCreationFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
+				trace("Failed to create a selectedItem. Database0052");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+		}
+
 	}		
 }

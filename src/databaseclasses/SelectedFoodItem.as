@@ -1,15 +1,37 @@
+/**
+ Copyright (C) 2011  hippoandfriends
+ 
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+ 
+ */
 package databaseclasses
 {
 
+	/**
+	 * a fooditem with one unit, and a chosen amount<br>
+	 * 
+	*/
 	public class SelectedFoodItem
 	{
 		private var _itemDescription:String;
 		private var _unit:Unit;
 		private var _chosenAmount:Number;
+		internal var _selectedItemId:int;
 
 		public function SelectedFoodItem(description:String, unit:Unit,chosenAmount:Number):void
 		{
-			this._unit = new Unit(description,unit.;
+			this._unit = new Unit(description,unit.standardAmount,unit.kcal,unit.protein,unit.carbs,unit.fat);
 			this._itemDescription = description;
 			this._chosenAmount = chosenAmount;
 		}
@@ -43,6 +65,16 @@ package databaseclasses
 		public function set chosenAmount(value:Number):void
 		{
 			_chosenAmount = value;
+		}
+
+		internal function get selectedItemId():int
+		{
+			return _selectedItemId;
+		}
+
+		internal function set selectedItemId(value:int):void
+		{
+			_selectedItemId = value;
 		}
 
 

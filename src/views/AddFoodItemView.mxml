@@ -216,6 +216,13 @@
 				}
 			}
 			
+			/**
+			 * will create a mealevent, called when addButton is clicked
+			 */ 
+			private function addButtonClicked():void {
+				new MealEvent("test",Settings.SettingINSULIN_RATIO_BREKFAST
+			}
+			
 		]]>
 	</fx:Script>
 
@@ -244,9 +251,9 @@
 				<!-- the button to select another meal, and showing the currently selected meal -->
 				<s:Button id="meal_button" width = "50%"  label="{meal_button_text}"/>
 			</s:HGroup>
-			<!-- the button the add the fooditem to the currently selected meal -->
+			<!-- the button to add the fooditem to the currently selected meal -->
 			<s:HGroup  gap="6" width="100%" horizontalAlign="center">
-				<s:Button id="add_button" label="{add_button_text}" enabled="true" />
+				<s:Button id="add_button" label="{add_button_text}" enabled="true" click="addButtonClicked()"/>
 			</s:HGroup>
 		</s:Group>
 	
