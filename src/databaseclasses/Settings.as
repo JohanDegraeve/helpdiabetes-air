@@ -82,6 +82,15 @@ package databaseclasses
 		 * correction factor to be used when calculating insulindose
 		 */
 		public static const SettingCORRECTION_FACTOR:int=11;
+		/**
+		 * id of last bloodglucose event
+		 */
+		public static const SettingLAST_BLOODGLUCOSE_EVENT_ID:int = 12;
+		/**
+		 * maximum time difference between a meal and the last bloodglucose event for calculating the correction factor<br>
+		 * in seconds 
+		 */
+		public static const SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL:int= 13;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -96,7 +105,9 @@ package databaseclasses
 			"32400000", // January 1, 1970, 9 Hr in ms
 			"50400000", // January 1, 1970, 14 Hr in ms
 			"61200000", // January 1, 1970, 17 Hr in ms
-			"0" //correction factor
+			"0", //correction factor
+			"0", //the first blood glucose event id to be used
+			"999999"// a high value for maximum time difference last bloodglucose event and meal
 		];
 		
 		private static var instance:Settings = new Settings();

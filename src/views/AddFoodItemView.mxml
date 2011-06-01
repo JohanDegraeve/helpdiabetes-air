@@ -78,7 +78,12 @@
 			private function onCreationComplete():void {
 				//initialize the add meal button
 				//meal_button_text = ...
-					Settings.SettingTIME_OF_LAST_MEAL_ADDITION;
+				if ((new Date()).valueOf() - Settings.SettingTIME_OF_LAST_MEAL_ADDITION < 15*60*1000) {
+					//it's less than 15 minutes since the last meal addition
+					
+				} else {
+					
+				}
 			}
 			
 			private function preInit():void {
@@ -220,7 +225,7 @@
 			 * will create a mealevent, called when addButton is clicked
 			 */ 
 			private function addButtonClicked():void {
-				new MealEvent("test",Settings.SettingINSULIN_RATIO_BREKFAST
+				
 			}
 			
 		]]>

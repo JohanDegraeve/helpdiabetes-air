@@ -74,27 +74,24 @@ package databaseclasses
 																					"protein REAL, " +
 																					"carbs REAL NOT NULL, " +
 																					"fat REAL)";
-		private const CREATE_TABLE_EVENTS:String = "CREATE TABLE IF NOT EXISTS events (eventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																					  "exerciseevents_exerciseeventid INTEGER," +
-																					  "medicinevents_medicineventid INTEGER, " +
-																					  "bloodglucoseevents_bloodglucoseeventid INTEGER, " +
-																					  "mealevents_mealeventid INTEGER, " +
-																					  "creationtimestamp TIMESTAMP " +
-																					  ")";
 		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (exerciseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																									   "level TEXT, " +
+																									   "creationtimestamp TIMESTAMP NOT NULL," +
 																									   "comment_2 TEXT)";
 		private const CREATE_TABLE_BLOODGLUCOSE_EVENTS:String = "CREATE TABLE IF NOT EXISTS bloodglucoseevents (bloodglucoseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																											   "unit TEXT NOT NULL, " +
+																											   "creationtimestamp TIMESTAMP NOT NULL," +
 																											   "value INTEGER NOT NULL)";
 		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (medicineventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																									 "medicinname TEXT NOT NULL, " +
+																									 "creationtimestamp TIMESTAMP NOT NULL," +
 																									 "amount REAL NOT NULL)";		
 		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER PRIMARY KEY, " +
 																							   "mealname TEXT NOT NULL, " +
 																							   "lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
 																							   "insulinratio INTEGER," +
 																							   "correctionfactor INTEGER," +
+																							   "creationtimestamp TIMESTAMP NOT NULL," +
 																							   "previousBGlevel INTEGER)";		
 		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER PRIMARY KEY , " +
 																											 "mealevents_mealeventid INTEGER NOT NULL, " +
@@ -139,7 +136,7 @@ package databaseclasses
 		 * UPDATE settings set value = :value WHERE id = :id
 		 */
 		private const UPDATE_SETTING:String = "UPDATE settings set value = :value WHERE id = :id";
-		
+		private const UPDATE_MEALEVENT_LASTMODIFIEDTIMESTAMP = "UPDATE mealevents SET lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE mealeventid = :mealeventid";
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
 		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description) VALUES (:description)";
 		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid,"+
@@ -160,7 +157,7 @@ package databaseclasses
 		/**
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
 		 */ 
-		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp, insulinratio, correctionfactor, previousBGlevel ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp,:insulinratio,:correctionfactor,:previousBGlevel)";
+		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp, insulinratio, correctionfactor, previousBGlevel, creationtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp,:insulinratio,:correctionfactor,:previousBGlevel,:creationtimestamp)";
 
 		private const INSERT_SELECTEDITEM:String = "INSERT INTO selectedfooditems (selectedfooditemid, mealevents_mealeventid,itemdescription ,unitdescription,standardamount,kcal,protein,carbs,fat,chosenamount ) VALUES (:selectedfooditemid,:mealevents_mealeventid,:itemdescription ,:unitdescription,:standardamount,:kcal,:protein,:carbs,:fat,:chosenamount)";
 
@@ -424,7 +421,7 @@ package databaseclasses
 			function tableCreated(se:SQLEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
-				createEventsTable();
+				createExerciseEventsTable();
 			}
 			
 			function tableCreationError(see:SQLErrorEvent):void {
@@ -435,30 +432,6 @@ package databaseclasses
 		}
 		
 		
-		/**
-		 * Creates the events table
-		 * 
-		 **/
-		private function createEventsTable():void
-		{
-			sqlStatement.text = CREATE_TABLE_EVENTS;
-			sqlStatement.clearParameters();
-			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
-			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
-			sqlStatement.execute();
-			
-			function tableCreated(se:SQLEvent):void {
-				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
-				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
-				createExerciseEventsTable();
-			}
-			
-			function tableCreationError(see:SQLErrorEvent):void {
-				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
-				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
-				trace("Failed to create table :" + sqlStatement.text + ". Database00010");
-			}
-		}
 		
 		/**
 		 * Creates the create exerciseevents table table
@@ -1268,6 +1241,7 @@ package databaseclasses
 				insulinRatio:Number,
 				correctionFactor:Number,
 				previousBGlevel:int,
+				creationtimestamp:Number,
 				dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
@@ -1288,6 +1262,7 @@ package databaseclasses
 				localSqlStatement.parameters[":insulinratio"] = insulinRatio;
 				localSqlStatement.parameters[":correctionfactor"] = correctionFactor;
 				localSqlStatement.parameters[":previousBGlevel"] = previousBGlevel;
+				localSqlStatement.parameters[":creationtimestamp"] = creationtimestamp;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, mealEventCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, mealEventCreationFailed);
 				localSqlStatement.execute();
@@ -1307,8 +1282,10 @@ package databaseclasses
 			function mealEventCreated(se:SQLEvent):void {
 				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
+				
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					event.lastInsertRowID = localSqlStatement.getResult().lastInsertRowID;
 					dispatcher.dispatchEvent(event);
 				}
 			}
@@ -1400,6 +1377,41 @@ package databaseclasses
 			}
 			
 		}
+		
+	
+		internal function updateMealEventLastModifiedTimeStamp(lastModifiedTimeStamp:Number,mealEventId:int,dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement()
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,timeStampModified);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,timeStampModificationFailed);
+			
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = UPDATE_MEALEVENT_LASTMODIFIEDTIMESTAMP;
+			localSqlStatement.parameters[":lastmodifiedtimestamp"] = lastModifiedTimeStamp;
+			localSqlStatement.parameters[":mealeventid"] = mealEventId;
+			localSqlStatement.execute();
+
+			function timeStampModified(result:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,timeStampModified);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,timeStampModificationFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+
+			function timeStampModificationFailed(error:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,timeStampModified);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,timeStampModificationFailed);
+				trace("Failed to create a selectedItem. Database0053");
+			}
+
+			
+		}
+		
+		internal function getPreviousGlucoseEvent
+			make sure that the event is assigned to data in the dispatcher
 
 	}		
 }

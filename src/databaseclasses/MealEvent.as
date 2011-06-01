@@ -39,11 +39,11 @@ package databaseclasses
 		 */ 
 		private var insulineRatio:Number;
 		/**
-		 * the correction factor, if null then there was no correction factor for the period in which the meal was created or modified
+		 * the correction factor, if null then correction will be applied
 		 */ 
 		private var correctionFactor:Number;
 		/**
-		 * previous bloodglucose level
+		 * previous bloodglucose level, if null then no correction will be applied
 		 */ 
 		private var _previousBGlevel:int;
 		/**
@@ -61,7 +61,7 @@ package databaseclasses
 		 * mealEvent will be created and automatically inserted into the database<br>
 		 * insulinRatio, previousBGlevel and correctionFactor can be null which means there's no settings for the defined period
 		 */
-		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number) {
+		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,dispatcher:EventDispatcher) {
 			this._mealName = mealName;
 			this.insulineRatio = insulinRatio;
 			this._previousBGlevel = previousBGlevel;
@@ -69,10 +69,11 @@ package databaseclasses
 			selectedFoodItems = new ArrayCollection();
 			lastModifiedTimestamp = new Date();
 			
-			var dispatcher:EventDispatcher = new EventDispatcher();
-			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
-			Database.getInstance().createNewMealEvent(mealName,lastModifiedTimestamp.valueOf().toString(),insulinRatio,correctionFactor,previousBGlevel,dispatcher);
+			var localDispatcher:EventDispatcher = new EventDispatcher();
+			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
+			Database.getInstance().createNewMealEvent(mealName,lastModifiedTimestamp.valueOf().toString(),insulinRatio,correctionFactor,previousBGlevel,localDispatcher);
 			Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, mealeventId + 1);
+			
 			
 			function mealEventCreationFailed (errorEvent:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
@@ -85,9 +86,9 @@ package databaseclasses
 			selectedFoodItems.addItem(selectedFoodItem);
 			selectedFoodItem.selectedItemId = Settings.getInstance().getSetting(Settings.SettingNEXT_SELECTEDITEM_ID);
 			
-			var dispatcher:EventDispatcher = new EventDispatcher();
-			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
-			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
+			var localDispatcher:EventDispatcher = new EventDispatcher();
+			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
+			localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
 			
 			Database.getInstance().createNewSelectedItem(
 				selectedFoodItem._selectedItemId,
@@ -100,21 +101,46 @@ package databaseclasses
 				selectedFoodItem.unit.carbs,
 				selectedFoodItem.unit.fat,
 				selectedFoodItem.chosenAmount,
-				dispatcher);
+				localDispatcher);
 			Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, selectedFoodItem.selectedItemId +1 );
 			
 			function selectedItemCreated(event:DatabaseEvent):void {
-				update the timestamp	
-				and dispatch even timestampupdate is successful
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
+				localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,timeStampUpdateFailed);
+				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,timeStampUpdated);
+				lastModifiedTimestamp = (new Date()).valueOf();
+				Database.getInstance().updateMealEventLastModifiedTimeStamp(lastModifiedTimestamp,mealeventId,localDispatcher);	
+			}
+				
+			function timeStampUpdated(event:DatabaseEvent):void {
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,timeStampUpdateFailed);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,timeStampUpdated);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
 			}
 			
-			function selectedItemCreationFailed (errorEvent:DatabaseEvent):void {
-				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
-				Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, selectedFoodItem.selectedItemId );
-				trace("Error while storing selected food Item in database. MealEvent.as 0002");
+			function timeStampUpdateFailed(event:DatabaseEvent):void {
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,timeStampUpdateFailed);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,timeStampUpdated);
+				trace("Error while updating itmestamp. MealEvent.as 0003");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function selectedItemCreationFailed (errorEvent:DatabaseEvent):void {
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
+				Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, selectedFoodItem.selectedItemId );
+				trace("Error while creation selected item. MealEvent.as 0002");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
 			}
 		}
 
@@ -129,7 +155,12 @@ package databaseclasses
 		/**
 		 * @private
 		 */
-		internal function set 
+		internal function set mealName(value:String):void
+		{
+			_mealName = value;
+		}
+		
+
 		internal function get previousBGlevel():int
 		{
 			return _previousBGlevel;
@@ -138,11 +169,6 @@ package databaseclasses
 		internal function set previousBGlevel(value:int):void
 		{
 			_previousBGlevel = value;
-		}
-
-mealName(value:String):void
-		{
-			_mealName = value;
 		}
 
 
