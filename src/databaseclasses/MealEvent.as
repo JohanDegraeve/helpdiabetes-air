@@ -22,6 +22,8 @@ package databaseclasses
 	
 	import mx.collections.ArrayCollection;
 	
+	import myComponents.Itimestamp;
+	
 
 	/**
 	 * this is a meal event,<br>
@@ -31,7 +33,7 @@ package databaseclasses
 	 * <br>
 	 * Also the selected Food Items are stored in here.<br>
 	 */ 
-	public class MealEvent
+	public class MealEvent implements Itimestamp
 	{
 		private var _mealName:String;
 		/**
@@ -57,6 +59,8 @@ package databaseclasses
 		
 		private var selectedFoodItems:ArrayCollection;
 		
+		private var _timeStamp:Number;
+		
 		/**
 		 * mealEvent will be created and automatically inserted into the database<br>
 		 * insulinRatio, previousBGlevel and correctionFactor can be null which means there's no settings for the defined period
@@ -68,10 +72,16 @@ package databaseclasses
 			mealeventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
 			selectedFoodItems = new ArrayCollection();
 			lastModifiedTimestamp = new Date();
+			timeStamp = lastModifiedTimestamp;//this is actually the creationTimeStamp
 			
 			var localDispatcher:EventDispatcher = new EventDispatcher();
 			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
-			Database.getInstance().createNewMealEvent(mealName,lastModifiedTimestamp.valueOf().toString(),insulinRatio,correctionFactor,previousBGlevel,localDispatcher);
+			Database.getInstance().createNewMealEvent(mealName,
+														lastModifiedTimestamp.valueOf().toString(),
+														insulinRatio,correctionFactor,
+														previousBGlevel,
+														timeStamp.valueOf().toString(),
+														localDispatcher);
 			Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, mealeventId + 1);
 			
 			
@@ -82,6 +92,15 @@ package databaseclasses
 			}
 		}
 		
+		/**
+		 * as MealEvent implements Itimestamp, it shoud have a timestamp<br>
+		 * the value will be assigned at creation, 
+		 */
+		public function get timeStamp():Number
+		{
+			return _timeStamp;
+		}
+
 		internal function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,dispatcher:EventDispatcher = null):void {
 			selectedFoodItems.addItem(selectedFoodItem);
 			selectedFoodItem.selectedItemId = Settings.getInstance().getSetting(Settings.SettingNEXT_SELECTEDITEM_ID);
@@ -170,6 +189,25 @@ package databaseclasses
 		{
 			_previousBGlevel = value;
 		}
+
+		/**
+		 * as MealEvent implements Itimestamp, it shoud have a timestamp<br>
+		 * the value will be assigned at creation, 
+		 */
+		public function get timeStamp():Number
+		{
+			return _timeStamp;
+		}
+		
+		/**
+		 * as MealEvent implements Itimestamp, it shoud have a timestamp<br>
+		 * the value will be assigned at creation, 
+		 */
+		private function set timeStamp():Number
+		{
+			return _timeStamp;
+		}
+		
 
 
 	}

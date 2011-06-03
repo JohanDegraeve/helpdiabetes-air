@@ -80,7 +80,7 @@
 				//meal_button_text = ...
 				if ((new Date()).valueOf() - Settings.SettingTIME_OF_LAST_MEAL_ADDITION < 15*60*1000) {
 					//it's less than 15 minutes since the last meal addition
-					
+					...select meal
 				} else {
 					
 				}
@@ -225,7 +225,8 @@
 			 * will create a mealevent, called when addButton is clicked
 			 */ 
 			private function addButtonClicked():void {
-				
+			- get the selected meal (which may or may not already include a mealevent
+			- create a selectedfooditem and add it
 			}
 			
 		]]>

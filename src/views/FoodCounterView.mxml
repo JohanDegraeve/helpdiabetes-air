@@ -108,5 +108,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		
 	</s:navigationContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0"
-			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem"></s:List>
+			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem">
+	</s:List>
 </s:View>

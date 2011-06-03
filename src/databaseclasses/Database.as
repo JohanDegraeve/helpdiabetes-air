@@ -127,6 +127,7 @@ package databaseclasses
 		private const GET_FOODITEM:String = "SELECT * FROM fooditems WHERE itemid = :itemid";
 		private const GET_SOURCE:String = "SELECT * FROM source";
 		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
+		private const GET_ALLMEALEVENTS:String = "SELECT * FROM mealevents";
 		private const GET_UNITLIST:String = "SELECT * FROM units WHERE fooditems_itemid = :fooditemid";
 		/**
 		 * INSERT INTO settings (id,value) VALUES (:id,:value)
@@ -894,10 +895,10 @@ package databaseclasses
 		 * if globalDispatcher not null then dispatches a result event
 		 */
 		private function finishedCreatingTables():void {
-			//xml laden in fooditemxmllist
-			//..source stockeren en verder gaan
 			if (globalDispatcher != null)
 				globalDispatcher.dispatchEvent(new Event(DatabaseEvent.RESULT_EVENT));
+			//now continue prepopulating other stuff, like the tracking arraycollection, in the background
+			getAllMealEvents();
 		}
 		
 		
@@ -1408,6 +1409,33 @@ package databaseclasses
 			}
 
 			
+		}
+		
+		/**
+		 * get all mealevents and store them in the arraycollection in the modellocator
+		 */
+		private function getAllMealEvents():void {
+			var localSqlStatement:SQLStatement = new SQLStatement()
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
+			
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = GET_ALLMEALEVENTS;
+			localSqlStatement.execute();
+			
+			function mealEventsRetrieved(result:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
+				.. store them in the arraycollection
+				ModelLocator.getInstance().trackingList.refresh();
+			}
+			function mealEventRetrievalFailed(error:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
+				trace("Failed to get all mealevents. Database0060");
+			}
 		}
 		
 		internal function getPreviousGlucoseEvent

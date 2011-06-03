@@ -21,12 +21,14 @@
  */
 package model
 {
+	import databaseclasses.FoodItem;
 	import databaseclasses.Settings;
 	
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
 	
-	import databaseclasses.FoodItem;
+	import spark.collections.Sort;
+	import spark.collections.SortField;
 	
 	import utilities.ExcelSorting;
 
@@ -42,33 +44,52 @@ package model
 		 */
 		private static var instance:ModelLocator = new ModelLocator();
 		
-		/* foodTables is an array of an array of strings 
-		each row consists of array of strings :
-		- the language field as used by the application, not visible to the user 
-		- the language of the table, for display on screens to the user, language itself should be in the user's language based on locale
-		- a description of the table, for display on screens to the user, should be in the user's language based on locale 
-		The table is read via some public functions 
-		It is initialized in the constructor */
+		/**
+		 *  foodTables is an array of an array of strings <br>
+		* each row consists of array of strings :<br>
+		* - the language field as used by the application, not visible to the user <br>
+		* - the language of the table, for display on screens to the user, language itself should be in the user's language based on locale<br>
+		* - a description of the table, for display on screens to the user, should be in the user's language based on locale <br>
+		* The table is read via some public functions <br>
+		* It is initialized in the constructor <br>
+		*/
 		private var foodTables:Array;
 		
-		/* used in some places to calculate the needed width to hold a certain text - offset is the additional space*/
+		/**
+		 *  used in some places to calculate the needed width to hold a certain text - offset is the additional space
+		 */
 		public static const SIZE_OF_LONGEST_TEXT_OFFSET:Number = 20;
 
 		
 		public var maximumSearchStringLength:int = 25;
 		
 		/**** Add bindable application data here ***/
+		/**
+		 * list of fooditems used throughout the application<br>
+		 * in the first place used in foodcounterview 
+		 */
 		[Bindable]
 		public var foodItemList:ArrayCollection = new ArrayCollection(); 
 
+		/**
+		 * unitlist used in popup in addfooditemview 
+		 */
 		[Bindable]
 		public var unitList:ArrayCollection; 
 		
-		/* just a variable used when opening the untilist */
+		/** 
+		 * just a variable used when opening the untilist 
+		 */
 		[Bindable]
 		public var width:int = 300;
 		
-		public var settings:Settings = Settings.getInstance();
+		/**
+		 * the arraycollection used as list in trackingview<br>
+		 * It us declared here because it will be used in other classes as well, eg during intialization of the application it will already be created and initialized<br>
+		 * The trackingList contains all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents. Sorted by timestamp.<br>
+		 */ 
+		[Bindable]
+		public var trackingList:ArrayCollection = new ArrayCollection();
 		
 		/**
 		 * constructor
@@ -76,13 +97,16 @@ package model
 		public function ModelLocator()
 		{
 			
+			if (instance != null) throw new Error('Cannot create a new instance. Must use ModelLocator.getInstance().');
 
-			/* foodTables is an array of an array of strings 
-			each row consists of array of strings :
-			- the language field as used by the application, not visible to the user 
-			- the language of the table, for display on screens to the user, language itself should be in the user's language based on locale
-			- a description of the table, for display on screens to the user, should be in the user's language based on locale 
-			The table is read via some public functions */
+			/**
+			 *  foodTables is an array of an array of strings <br>
+			 * each row consists of array of strings :<br>
+			 * - the language field as used by the application, not visible to the user <br>
+			 * - the language of the table, for display on screens to the user, language itself should be in the user's language based on locale<br>
+			 * - a description of the table, for display on screens to the user, should be in the user's language based on locale <br>
+			 * The table is read via some public functions <br>
+			 */
 			foodTables = new Array(
 				new Array("nl",
 					ResourceManager.getInstance().getString("general","dutch"),
@@ -91,11 +115,16 @@ package model
 					ResourceManager.getInstance().getString("general","english"),
 					ResourceManager.getInstance().getString("general","NorwegianTableInEnglish"))
 			);
-
-			if (instance != null) throw new Error('Cannot create a new instance. Must use ModelLocator.getInstance().');
-			instance = this;
+            
+			//create the sort for the trackinglist
+			var dataSortField:SortField = new SortField();
+			dataSortField.name="timeStamp";
+			dataSortField.numeric = true;
+			var dataSort:Sort = new Sort();
+			dataSort.fields = [dataSortField];
+			trackingList.sort = dataSort;
 			
-			var test:ExcelSorting;
+			instance = this;
 			
 		}
 		
