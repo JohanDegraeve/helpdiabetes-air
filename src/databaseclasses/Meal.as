@@ -78,13 +78,15 @@ package databaseclasses
 		/**
 		 * adds a selected food item, if there's no mealevent yet then it will be created here<br>
 		 * It is here also that the insulinratio to be used is defined,  this will be redefined each time a selectedfooditem is added<br>
-		 * Also the previous blood glucose event is checked, if any. If the time difference is less than Settings.
+		 * Also the previous blood glucose event is checked, if any. If the time difference is less than Settings.<br>
+		 * And the selectedFoodItem.
 		 */
 		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem):void {
 			var now:Date = new Date();
 			var previousBGlevel:Number = null;
 			var insulinRatio:Number;
 			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
 
 			now.setFullYear(1970,1,1);
 			if ( now.getTime() < Settings.SettingBREAKFAST_UNTIL) {

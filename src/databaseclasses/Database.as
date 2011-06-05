@@ -129,6 +129,7 @@ package databaseclasses
 		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
 		private const GET_ALLMEALEVENTS:String = "SELECT * FROM mealevents";
 		private const GET_UNITLIST:String = "SELECT * FROM units WHERE fooditems_itemid = :fooditemid";
+		private const GET_ALLSELECTEDFOODITEMS:String="SELECT * FROM selectedfooditems";
 		/**
 		 * INSERT INTO settings (id,value) VALUES (:id,:value)
 		 */
@@ -1412,25 +1413,83 @@ package databaseclasses
 		}
 		
 		/**
-		 * get all mealevents and store them in the arraycollection in the modellocator
+		 * get all mealevents and store them in the arraycollection in the modellocator as MealEvent objects<br>
+		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects
 		 */
 		private function getAllMealEvents():void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
+			var selectedFoodItems:ArrayCollection = new ArrayCollection();
+			var currentMealEventID:int;//used in the filterfunction for the selectedfooditems
+			
+			selectedFoodItems.filterFunction = filterByMealEventId;
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsRetrieved);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,failedGettingSelectedFoodItems);
 			
 			localSqlStatement.sqlConnection = aConn;
-			localSqlStatement.text = GET_ALLMEALEVENTS;
+			localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
 			localSqlStatement.execute();
+			
+			function selectedFoodItemsRetrieved(result:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsRetrieved);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,failedGettingSelectedFoodItems);
+				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
+				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
+				var tempObject:Object = localSqlStatement.getResult().data;
+				if (tempObject != null && tempObject is Array) {
+					for each ( var o:Object in tempObject ) {
+						var newSelectedFoodItem:SelectedFoodItem = new SelectedFoodItem(
+							o.itemdescription as String,
+							new Unit(o.unitdescription as String,o.standardamount as int,o.kcal as int,o.protein as Number,o.carbs as Number,o.fat as Number),
+							o.chosenamount);
+						newSelectedFoodItem.selectedItemId = o.selectedfooditemid as int;
+						newSelectedFoodItem.mealEventId = o.mealevents_mealeventid as int;
+						selectedFoodItems.addItem(newSelectedFoodItem);
+					}
+				}
+				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
+				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = GET_ALLMEALEVENTS;
+				localSqlStatement.execute();
+			}
+			
+			function failedGettingSelectedFoodItems(error:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsRetrieved);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,failedGettingSelectedFoodItems);
+				trace("Failed to get all selectedFoodItems. Database0061");
+			}
 			
 			function mealEventsRetrieved(result:SQLEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
-				.. store them in the arraycollection
+
+				var tempObject:Object = localSqlStatement.getResult().data;
+				if (tempObject != null && tempObject is Array) {
+					for each ( var o:Object in tempObject ) {
+						currentMealEventID = o.mealeventid as int;
+						selectedFoodItems.refresh();
+						var temp:MealEvent = MealEvent.createMealEventWithoutDBStorage(
+							o.mealname as String,
+							o.mealeventid as Number,
+							o.lastmodifiedtimestamp as Number,
+							o.creationtimestamp as Number,
+							o.insulinratio as Number,
+							o.correctionfactor as Number,
+							o.previousBGlevel as Number,
+							new ArrayCollection(selectedFoodItems));
+							
+					}
 				ModelLocator.getInstance().trackingList.refresh();
+				}
 			}
+			
+			function filterByMealEventId(item:Object):Boolean {
+				return (item.mealevents_mealeventid == currentMealEventID);
+			}
+			
 			function mealEventRetrievalFailed(error:SQLErrorEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);

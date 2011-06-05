@@ -28,7 +28,11 @@ package databaseclasses
 		private var _unit:Unit;
 		private var _chosenAmount:Number;
 		internal var _selectedItemId:int;
+		private var _mealEventId:int;
 
+		/**
+		 * constructor taking description, unit and chosenamount as parameter
+		 */
 		public function SelectedFoodItem(description:String, unit:Unit,chosenAmount:Number):void
 		{
 			this._unit = new Unit(description,unit.standardAmount,unit.kcal,unit.protein,unit.carbs,unit.fat);
@@ -75,6 +79,16 @@ package databaseclasses
 		internal function set selectedItemId(value:int):void
 		{
 			_selectedItemId = value;
+		}
+
+		internal function get mealEventId():int
+		{
+			return _mealEventId;
+		}
+
+		internal function set mealEventId(value:int):void
+		{
+			_mealEventId = value;
 		}
 
 
