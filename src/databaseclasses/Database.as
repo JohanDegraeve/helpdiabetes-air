@@ -1471,7 +1471,7 @@ package databaseclasses
 					for each ( var o:Object in tempObject ) {
 						currentMealEventID = o.mealeventid as int;
 						selectedFoodItems.refresh();
-						var temp:MealEvent = MealEvent.createMealEventWithoutDBStorage(
+						var newMealEvent:MealEvent = MealEvent.createMealEventWithoutDBStorage(
 							o.mealname as String,
 							o.mealeventid as Number,
 							o.lastmodifiedtimestamp as Number,
@@ -1480,7 +1480,7 @@ package databaseclasses
 							o.correctionfactor as Number,
 							o.previousBGlevel as Number,
 							new ArrayCollection(selectedFoodItems));
-							
+						ModelLocator.getInstance().trackingList.addItem(newMealEvent);
 					}
 				ModelLocator.getInstance().trackingList.refresh();
 				}

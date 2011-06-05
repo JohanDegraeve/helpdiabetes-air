@@ -23,7 +23,8 @@ package databaseclasses
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
 	
-	import myComponents.Itimestamp;
+	import myComponents.ITrackingElement;
+	import myComponents.MealEventItemRenderer;
 	
 
 	/**
@@ -34,7 +35,7 @@ package databaseclasses
 	 * <br>
 	 * Also the selected Food Items are stored in here.<br>
 	 */ 
-	public class MealEvent implements Itimestamp
+	public class MealEvent implements ITrackingElement
 	{
 		private var _mealName:String;
 		/**
@@ -241,7 +242,12 @@ package databaseclasses
 			return creator.newInstance();	
 			
 		}
-
+		
+		public function trackingItemRendererFunction():ClassFactory
+		{
+			return new ClassFactory(MealEventItemRenderer);
+		}
+		
 
 	}
 }
