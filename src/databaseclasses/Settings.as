@@ -91,6 +91,11 @@ package databaseclasses
 		 * in seconds 
 		 */
 		public static const SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL:int= 13;
+		/**
+		 * unit to use for bloodglucose values<br>
+		 * initial value = mg/dl 
+		 */
+		public static const SettingsBLOODGLUCOSE_UNIT:String = 14;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -107,7 +112,8 @@ package databaseclasses
 			"61200000", // January 1, 1970, 17 Hr in ms
 			"0", //correction factor
 			"0", //the first blood glucose event id to be used
-			"999999"// a high value for maximum time difference last bloodglucose event and meal
+			"999999", // a high value for maximum time difference last bloodglucose event and meal
+			"mg/dL"
 		];
 		
 		private static var instance:Settings = new Settings();

@@ -38,13 +38,7 @@ package databaseclasses
 	public class MealEvent implements ITrackingElement
 	{
 		private var _mealName:String;
-		/**
-		 * the insulineratio, if null then there was no insuline ratio for the period in which the meal was created or modified
-		 */ 
 		private var _insulinRatio:Number;
-		/**
-		 * the correction factor, if null then correction will be applied
-		 */ 
 		private var _correctionFactor:Number;
 		/**
 		 * previous bloodglucose level, if null then no correction will be applied
@@ -59,9 +53,21 @@ package databaseclasses
 		 */ 
 		private var _lastModifiedTimeStamp:Number;
 		
+		/**
+		 * the selected fooditems
+		 */
 		private var _selectedFoodItems:ArrayCollection;
 		
+		/**
+		 * value will be creationtimestamp
+		 */
 		private var _timeStamp:Number;
+		
+		private var _totalFat:Number;
+		private var _totalKilocalories:Number;
+		private var _totalProtein:Number;
+		private var _totalCarbs:Number;
+		
 		
 		/**
 		 * mealEvent will be created and automatically inserted into the database<br>
@@ -71,6 +77,11 @@ package databaseclasses
 			this._mealName = mealName;
 			this._insulinRatio = insulinRatio;
 			this._previousBGlevel = previousBGlevel;
+			this._totalFat = 0;
+			this._totalProtein = 0;
+			this._totalCarbs = 0;
+			this._totalKilocalories = 0;
+			
 			_mealEventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
 			_selectedFoodItems = new ArrayCollection();
 			_lastModifiedTimeStamp = new Date();
@@ -134,6 +145,13 @@ package databaseclasses
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
 				localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,timeStampUpdateFailed);
 				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,timeStampUpdated);
+				
+				/* recalculate totals */
+				_totalCarbs += selectedFoodItem.unit.carbs/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+				_totalKilocalories += selectedFoodItem.unit.kcal/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+				_totalProtein += selectedFoodItem.unit.protein/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+				_totalFat += selectedFoodItem.unit.fat/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+				
 				_lastModifiedTimeStamp = (new Date()).valueOf();
 				Database.getInstance().updateMealEventLastModifiedTimeStamp(_lastModifiedTimeStamp,_mealEventId,localDispatcher);	
 			}
@@ -172,7 +190,7 @@ package databaseclasses
 		/**
 		 * the mealType
 		 */
-		internal function get mealName():String
+		public function get mealName():String
 		{
 			return _mealName;
 		}
@@ -239,13 +257,77 @@ package databaseclasses
 				_selectedFoodItems:selectedFoodItems,
 				_timeStamp:creationTimeStamp
 			};
-			return creator.newInstance();	
+			var returnvalue:MealEvent = creator.newInstance();
+			
+			for (var i:int = 0;i < returnvalue._selectedFoodItems.length;i++)	{
+				
+				returnvalue._totalCarbs += selectedFoodItems.getItemAt(i).unit.carbs/selectedFoodItems.getItemAt(i).unit.standardAmount*selectedFoodItems.getItemAt(i).chosenAmount;
+				returnvalue._totalKilocalories += selectedFoodItems.getItemAt(i).unit.kcal/selectedFoodItems.getItemAt(i).unit.standardAmount*selectedFoodItems.getItemAt(i).chosenAmount;
+				returnvalue._totalProtein += selectedFoodItems.getItemAt(i).unit.protein/selectedFoodItems.getItemAt(i).unit.standardAmount*selectedFoodItems.getItemAt(i).chosenAmount;
+				returnvalue._totalFat += selectedFoodItems.getItemAt(i).unit.fat/selectedFoodItems.getItemAt(i).unit.standardAmount*selectedFoodItems.getItemAt(i).chosenAmount;
+			}
 			
 		}
 		
 		public function trackingItemRendererFunction():ClassFactory
 		{
 			return new ClassFactory(MealEventItemRenderer);
+		}
+
+		/**
+		 * total number of fat,<br>
+		 * calculated during creation of the mealevent and/or adding selectedfooditems<br>
+		 * not stored in the database
+		 */
+		public function get totalFat():Number
+		{
+			return _totalFat;
+		}
+
+		/**
+		 * total number of kilocalories,<br>
+		 * calculated during creation of the mealevent and/or adding selectedfooditems<br>
+		 * not stored in the database
+		 */
+		public function get totalKilocalories():Number
+		{
+			return _totalKilocalories;
+		}
+
+		/**
+		 * total number of protein,<br>
+		 * calculated during creation of the mealevent and/or adding selectedfooditems<br>
+		 * not stored in the database
+		 */
+		public function get totalProtein():Number
+		{
+			return _totalProtein;
+		}
+
+		/**
+		 * total number of carbs,<br>
+		 * calculated during creation of the mealevent and/or adding selectedfooditems<br>
+		 * not stored in the database
+		 */
+		public function get totalCarbs():Number
+		{
+			return _totalCarbs;
+		}
+
+		/**
+		 * the insulineratio, if null then there was no insuline ratio for the period in which the meal was created or modified
+		 */
+		public function get insulinRatio():Number
+		{
+			return _insulinRatio;
+		}
+
+		/**
+		 * the correction factor, if null then correction will be applied
+		 */
+		public function get correctionFactor():Number
+		{
+			return _correctionFactor;
 		}
 		
 
