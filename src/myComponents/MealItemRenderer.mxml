@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!--
+itemrenderer for showing meals, which are just a name and maybe also a time.
+-->
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark"  
+				labelField=""
+				name="MealItemRenderer">
+	<fx:Script>
+		<![CDATA[
+			import databaseclasses.Meal;
+			//import mx.core.mx_internal;
+			/**
+			 * the text to display in the meal_name text area<br>
+			 */
+			[Bindable]
+			private var meal_name_textarea_text = "meal";
+
+			
+			override public function set data(value:Object):void {
+				super.data = value;
+				meal_name_textarea_text = (value as Meal).mealName;
+			}
+		]]>
+	</fx:Script>
+	<s:Group y="0" x="0" width="100%" height = "100%" >
+		<s:layout>
+			<s:VerticalLayout>
+			</s:VerticalLayout>
+		</s:layout>
+		<s:TextArea id="meal_name"  width="100%" text="{meal_name_textarea_text}>
+					<!-- the time and type of meal -->
+					
+		</s:TextArea>
+	</s:Group>
+</s:ItemRenderer>

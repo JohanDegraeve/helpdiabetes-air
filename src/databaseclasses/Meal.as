@@ -22,6 +22,8 @@ package databaseclasses
 	import flashx.textLayout.tlf_internal;
 	
 	import mx.core.mx_internal;
+	
+	import myComponents.IListElement;
 
 	/**
 	 * a name for the meal and a mealevent that can be null<br>
@@ -34,24 +36,34 @@ package databaseclasses
 	 * if the time between creating the meal, and adding the first selectedfooditem is too long, due to which the period changes<br>
 	 * 
 	 */
-	public class Meal
+	public class Meal implements IListElement
 	{
 		private var _mealName:String;//normally it will be dinner, lunch, ...
 		private var _mealEvent:MealEvent;
+		private var _timeStamp:Number;//needed because it implements IListElement
 		
 		/**
 		 * A meal can be created either with mealName - in which case MealEvent should be null - or with a MealEvent - in which case mealName should be null<br>
-		 * At least one parameter should be null, at least one should not be null
+		 * At least one parameter should be null, at least one should not be null<br>
+		 * <br>
+		 * timeStamp will only be used if mealEvent = null, otherwise _timeStamp is set to mealEvent.timestamp<br>
+		 * if mealEvent = null, and if also timeStamp = null, then _timeStamp is set to now - but in fact, timeStamp should then not be null
 		 */
-		public function Meal(mealName:String = null,mealEvent:MealEvent)
+		public function Meal(mealName:String = null,mealEvent:MealEvent = null,timeStamp:Number = null)
 		{
 			if ((mealName == null) && (mealEvent == null) || (mealName != null) && (mealEvent != null))
 			 	throw new Error("Meal must be craeted with either mealName or MealEvent equal to null. At least one parameter must be not null");	
-            if (mealName != null) 
+            if (mealName != null) {
 				_mealName = mealName;
+				if (timeStamp != null)
+					_timeStamp = timeStamp;
+				else
+					_timeStamp = (new Date()).valueOf();
+			}
 			if (mealEvent != null) {
 				_mealName = mealEvent.mealName;
 				_mealEvent = mealEvent;
+				_timeStamp = mealEvent.timeStamp;
 			}
 		}
 
@@ -79,13 +91,21 @@ package databaseclasses
 		 * adds a selected food item, if there's no mealevent yet then it will be created here<br>
 		 * It is here also that the insulinratio to be used is defined,  this will be redefined each time a selectedfooditem is added<br>
 		 * Also the previous blood glucose event is checked, if any. If the time difference is less than Settings.<br>
-		 * And the selectedFoodItem.
+		 * <br>
+		 * timeStamp is optional<br>
+		 * if timeStamp is not null, then this meal.timeStamp and also if a new mealevent is created, the mealevent's timestamp is set to the timestamp value
+		 * 
 		 */
-		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem):void {
+		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,timeStamp:Number = null):void {
 			var now:Date = new Date();
 			var previousBGlevel:Number = null;
 			var insulinRatio:Number;
 			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			if (timeStamp != null)
+				this._timeStamp = timeStamp;
+			else ;//no need to set or change the timestamp because it's already been set during meal creation
+			
 			
 
 			now.setFullYear(1970,1,1);
@@ -122,7 +142,7 @@ package databaseclasses
 					if (mealEvent == null) {
 						localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 						localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-						mealEvent = new mealEvent(mealName,insulinRatio,Settings.SettingCORRECTION_FACTOR, previousBGlevel,localdispatcher);
+						mealEvent = new mealEvent(mealName,insulinRatio,Settings.SettingCORRECTION_FACTOR, previousBGlevel,timeStamp,localdispatcher);
 					}
 				} 
 			}
@@ -148,6 +168,15 @@ package databaseclasses
 			}
 			
 		}
+
+		/**
+		 * as Meal implements IListElement, it shoud have a timestamp<br>
+		 */
+		public function get timeStamp():Number
+		{
+			return _timeStamp;
+		}
+		
 
 
 	}

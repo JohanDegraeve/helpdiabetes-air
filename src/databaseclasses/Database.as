@@ -36,17 +36,21 @@ package databaseclasses
 	import model.ModelLocator;
 	
 	import mx.collections.ArrayCollection;
+	import mx.resources.ResourceBundle;
 	import mx.resources.ResourceManager;
 	
 	import views.FoodCounterView;
 	
+	[ResourceBundle("general")];
 	
 	/**
 	 * Database class is a singleton
 	 */ 
 	public final class Database 
 	{
-		[ResourceBundle("general")]
+		import mx.core.FlexGlobals;
+		import mx.resources.ResourceBundle;
+	
 
 		private static var instance:Database = new Database();
 		
@@ -899,7 +903,7 @@ package databaseclasses
 			if (globalDispatcher != null)
 				globalDispatcher.dispatchEvent(new Event(DatabaseEvent.RESULT_EVENT));
 			//now continue prepopulating other stuff, like the tracking arraycollection, in the background
-			getAllMealEvents();
+			getAllMealEventsAndFillUpMeals();
 		}
 		
 		
@@ -1416,7 +1420,7 @@ package databaseclasses
 		 * get all mealevents and store them in the arraycollection in the modellocator as MealEvent objects<br>
 		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects
 		 */
-		private function getAllMealEvents():void {
+		private function getAllMealEventsAndFillUpMeals():void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -1483,22 +1487,34 @@ package databaseclasses
 						ModelLocator.getInstance().trackingList.addItem(newMealEvent);
 					}
 				ModelLocator.getInstance().trackingList.refresh();
-				// no populate ModelLocator.getInstance().meals
+				// now populate ModelLocator.getInstance().meals
 				
-				ModelLocator.getInstance().meals
-					a meal will also implement an iTracking element
-					change name of itrackingelement so that it's clear that it's not only used for tracking events
-					add timestamp in meal, always gets value of creationtimestamp in mealevent , or if there's nomealevent, ' +
-						'start time of corresonding meal according to settings
-					create also a class for a date line, to be used in meals and trackinglist
-					create the day of today, go 7 days back, and create a date line for that date
-					that's the first object to add' +
-						add meal with name breakfast, lunch, snack, dinner, 
-					add a date
-					go on till today + 7 days is reached
-						then go through mealevent list, start with first, as soon as a meal is reached , if it's a breakfast, lunch, snack or supper
+				var todayAsDate:Date = new Date();//that's the actual time
+				var todayAtMidNight:Number = (new Date(todayAsDate.fullYear,todayAsDate.month,todayAsDate.date)).valueOf();//today at 00:00
+				
+				//to avoid having to get the resource each time, we'll do it once here
+				var breakfast:String = ResourceManager.getInstance().getString('general','breakfast');
+				var lunch:String = ResourceManager.getInstance().getString('general','lunch');
+				var snack:String = ResourceManager.getInstance().getString('general','snack');
+				var supper:String = ResourceManager.getInstance().getString('general','supper');
+				
+				//the first meal to add, is the  supper from yesterday
+				//then will fill up with all meals from today till 7 days after
+				//then we'll check, based on actual time, and on what's already in the mealevents, which of the first need to be removed
+				//goal is to end up with : if a mealevent already exists for now, this will be the first meal, if not, then the first meal will be
+				//one meal before now
+				ModelLocator.getInstance().meals.addItem(new Meal(supper,null,todayAsDate + Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL);
+				
+				for (var i:int = 0;i++;i < 8) {//so we shall fill up the meals as of now till 7 days after
+					ModelLocator.getInstance().meals.addItem(new Meal(breakfast,null,todayAsDate + i * 86400000);
+					ModelLocator.getInstance().meals.addItem(new Meal(lunch,null,todayAsDate + i * 86400000 + Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL);
+					ModelLocator.getInstance().meals.addItem(new Meal(snack,null,todayAsDate + i * 86400000 + Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL);
+					ModelLocator.getInstance().meals.addItem(new Meal(supper,null,todayAsDate + i * 86400000 + Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL);
+				}
+				then go through mealevent list, start with first, as soon as a meal is reached , if it's a breakfast, lunch, snack or supper
 						replace the existing meal, otherwise add it
 						go on go on... that should do it
+					create also a class for a date line, to be used in meals and trackinglist
 				}
 			}
 			

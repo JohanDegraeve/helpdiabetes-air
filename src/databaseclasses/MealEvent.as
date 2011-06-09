@@ -82,9 +82,10 @@ package databaseclasses
 		/**
 		 * mealEvent will be created and automatically inserted into the database<br>
 		 * insulinRatio,  correctionFactor can be null which means there's no settings for the defined period<br>
-		 * previousBGlevel can also be null meaning theres no bloodglucose event within the predefined timeframe
+		 * previousBGlevel can also be null meaning theres no bloodglucose event within the predefined timeframe<br>
+		 * if timeStamp = null then current time is used as timeStamp for the mealevent, otherwise the supplied timeStamp is used.
 		 */
-		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,dispatcher:EventDispatcher) {
+		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,timeStamp:Number,dispatcher:EventDispatcher) {
 			this._mealName = mealName;
 			this._insulinRatio = insulinRatio;
 			this._previousBGlevel = previousBGlevel;
@@ -99,7 +100,10 @@ package databaseclasses
 			_mealEventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
 			_selectedFoodItems = new ArrayCollection();
 			_lastModifiedTimeStamp = new Date();
-			timeStamp = _lastModifiedTimeStamp;//this is actually the creationTimeStamp
+			if (timeStamp != null)
+				this._timeStamp = timeStamp
+			else
+				this._timeStamp = _lastModifiedTimeStamp;//this is actually the creationTimeStamp
 			
 			var localDispatcher:EventDispatcher = new EventDispatcher();
 			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
@@ -123,7 +127,7 @@ package databaseclasses
 		}
 		
 		/**
-		 * as MealEvent implements Itimestamp, it shoud have a timestamp<br>
+		 * as MealEvent implements IListElement, it shoud have a timestamp<br>
 		 * the value will be assigned at creation, 
 		 */
 		public function get timeStamp():Number

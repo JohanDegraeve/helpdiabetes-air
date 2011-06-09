@@ -20,7 +20,7 @@ package myComponents
 	import mx.core.ClassFactory;
 
 	/**
-	 * elements that are on the tracking view should implement that interface<br>
+	 * elements that are on the tracking view or on a meal list should implement that interface<br>
 	 * it has a timeStamp, which will allow correct sorting in chronological order<br>
 	 * and a an itemRenderer function, which will allow to correctly present the element in the tracking view<br>
 	 * It can be used for any element, eg a bar that indicates a daty
