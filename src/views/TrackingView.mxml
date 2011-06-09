@@ -6,9 +6,9 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import myComponents.ITrackingElement;
+			import myComponents.IListElement;
 			private function getItemRenderer(item:Object):ClassFactory {
-				return (item as ITrackingElement).trackingItemRendererFunction();
+				return (item as IListElement).trackingItemRendererFunction();
 			}
 		]]>
 	</fx:Script>

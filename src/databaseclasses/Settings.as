@@ -97,6 +97,11 @@ package databaseclasses
 		 */
 		public static const SettingsBLOODGLUCOSE_UNIT:String = 14;
 		
+		/**
+		 * the target bloodglucoselevel to use for applying the correction factor
+		 */
+		public static const SettingsTARGET_BLOODGLUCOSELEVEL:String = 15;
+		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
 			"none",// initially there will be no meal too which the last  fooditem has been added
@@ -113,7 +118,8 @@ package databaseclasses
 			"0", //correction factor
 			"0", //the first blood glucose event id to be used
 			"999999", // a high value for maximum time difference last bloodglucose event and meal
-			"mg/dL"
+			"mg/dL",
+			"120"
 		];
 		
 		private static var instance:Settings = new Settings();

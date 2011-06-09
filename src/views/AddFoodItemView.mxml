@@ -34,6 +34,7 @@
 			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
 			import mx.core.FlexGlobals;
 			import mx.core.IFlexDisplayObject;
 			import mx.events.ValidationResultEvent;
@@ -61,6 +62,8 @@
 			[Bindable]
 			private var details_button_fontsize:int;
 			
+			[Bindable]
+			private var meals:ArrayCollection;
 		
 			private var thisObject:DisplayObject;
 			
@@ -78,9 +81,13 @@
 			private function onCreationComplete():void {
 				//initialize the add meal button
 				//meal_button_text = ...
-				if ((new Date()).valueOf() - Settings.SettingTIME_OF_LAST_MEAL_ADDITION < 15*60*1000) {
+
+				
+				
+				if ((new Date()).valueOf() - Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION) < 15*60*1000) {
 					//it's less than 15 minutes since the last meal addition
-					...select meal
+					ModelLocator.getInstance().getMealEventFromTrackingList(Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID));
+					..
 				} else {
 					
 				}
@@ -225,8 +232,8 @@
 			 * will create a mealevent, called when addButton is clicked
 			 */ 
 			private function addButtonClicked():void {
-			- get the selected meal (which may or may not already include a mealevent
-			- create a selectedfooditem and add it
+			//- get the selected meal (which may or may not already include a mealevent
+			//- create a selectedfooditem and add it
 			}
 			
 		]]>

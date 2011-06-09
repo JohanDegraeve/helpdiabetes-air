@@ -22,6 +22,7 @@
 package model
 {
 	import databaseclasses.FoodItem;
+	import databaseclasses.MealEvent;
 	import databaseclasses.Settings;
 	
 	import mx.collections.ArrayCollection;
@@ -76,6 +77,13 @@ package model
 		 */
 		[Bindable]
 		public var unitList:ArrayCollection; 
+		
+		/**
+		 * list of meals, initialized by database initiation<br>
+		 * to be used when selecting a meal in addfooditemview.
+		 */
+		[Bindable]
+		public var meals = new ArrayCollection();
 		
 		/** 
 		 * just a variable used when opening the untilist 
@@ -161,6 +169,18 @@ package model
 				}
 			}
 			return returnValue;
+		}
+		
+		/**
+		 * reads from the trackingList the mealevent with identified mealeventid<br>
+		 * returns null if not found
+		 */
+		public function getMealEventFromTrackingList(mealEventId:Number):MealEvent {
+			for (var i:int = trackingList.length - 1;i--;i >= 0) {
+				if (((trackingList.getItemAt(i)) as MealEvent).mealEventId == mealEventId)
+					return trackingList.getItemAt(i)) as MealEvent;
+			}
+			return null;
 		}
 	}
 }

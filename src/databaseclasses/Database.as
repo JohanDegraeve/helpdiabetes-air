@@ -1483,6 +1483,22 @@ package databaseclasses
 						ModelLocator.getInstance().trackingList.addItem(newMealEvent);
 					}
 				ModelLocator.getInstance().trackingList.refresh();
+				// no populate ModelLocator.getInstance().meals
+				
+				ModelLocator.getInstance().meals
+					a meal will also implement an iTracking element
+					change name of itrackingelement so that it's clear that it's not only used for tracking events
+					add timestamp in meal, always gets value of creationtimestamp in mealevent , or if there's nomealevent, ' +
+						'start time of corresonding meal according to settings
+					create also a class for a date line, to be used in meals and trackinglist
+					create the day of today, go 7 days back, and create a date line for that date
+					that's the first object to add' +
+						add meal with name breakfast, lunch, snack, dinner, 
+					add a date
+					go on till today + 7 days is reached
+						then go through mealevent list, start with first, as soon as a meal is reached , if it's a breakfast, lunch, snack or supper
+						replace the existing meal, otherwise add it
+						go on go on... that should do it
 				}
 			}
 			

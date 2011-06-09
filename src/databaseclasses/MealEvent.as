@@ -23,7 +23,7 @@ package databaseclasses
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
 	
-	import myComponents.ITrackingElement;
+	import myComponents.IListElement;
 	import myComponents.MealEventItemRenderer;
 	
 
@@ -35,13 +35,17 @@ package databaseclasses
 	 * <br>
 	 * Also the selected Food Items are stored in here.<br>
 	 */ 
-	public class MealEvent implements ITrackingElement
+	public class MealEvent implements IListElement
 	{
 		private var _mealName:String;
 		private var _insulinRatio:Number;
 		private var _correctionFactor:Number;
 		/**
-		 * previous bloodglucose level, if null then no correction will be applied
+		 * previous bloodglucose level, if null then no correction will be applied<br>
+		 * this value needs to be assigned :<br>
+		 * - during creation of the mealevent, if there's a bg event withint the predefined timeframe, then assign previousBGlevel to the previoius bloodglucoseevent level<br>
+		 * - each time that a bloodglucoseevent is created, it needs to be checked if there's a mealevent after, within the predefined timeframe, and if so assign<br>
+		 * - the most recent bloodglucsoeevent before the mealevent is used
 		 */ 
 		private var _previousBGlevel:int;
 		/**
@@ -63,6 +67,12 @@ package databaseclasses
 		 */
 		private var _timeStamp:Number;
 		
+		/**
+		 * the calculated amount, in fact a redundant value because it can be derived from other values here<br>
+		 * null if no calculation is possible eg because no insulinratio defined
+		 */
+		private var _calculatedInsulinAmount:Number;
+		
 		private var _totalFat:Number;
 		private var _totalKilocalories:Number;
 		private var _totalProtein:Number;
@@ -71,7 +81,8 @@ package databaseclasses
 		
 		/**
 		 * mealEvent will be created and automatically inserted into the database<br>
-		 * insulinRatio, previousBGlevel and correctionFactor can be null which means there's no settings for the defined period
+		 * insulinRatio,  correctionFactor can be null which means there's no settings for the defined period<br>
+		 * previousBGlevel can also be null meaning theres no bloodglucose event within the predefined timeframe
 		 */
 		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,dispatcher:EventDispatcher) {
 			this._mealName = mealName;
@@ -81,6 +92,9 @@ package databaseclasses
 			this._totalProtein = 0;
 			this._totalCarbs = 0;
 			this._totalKilocalories = 0;
+			this._correctionFactor = correctionFactor;
+			
+			recalculateInsulinAmount();
 			
 			_mealEventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
 			_selectedFoodItems = new ArrayCollection();
@@ -212,6 +226,7 @@ package databaseclasses
 		internal function set previousBGlevel(value:int):void
 		{
 			_previousBGlevel = value;
+			recalculateInsulinAmount();
 		}
 
 		/**
@@ -328,6 +343,50 @@ package databaseclasses
 		public function get correctionFactor():Number
 		{
 			return _correctionFactor;
+		}
+		
+		private function recalculateInsulinAmount():void {
+			this._calculatedInsulinAmount = null;
+			if (insulinRatio != null)
+				if (insulinRatio != 0) {
+					this._calculatedInsulinAmount = this._totalCarbs/this._insulinRatio;
+					if (correctionFactor != null)
+						if (correctionFactor != 0)
+							if (previousBGlevel != null)
+								if (previousBGlevel != 0)
+									this._calculatedInsulinAmount += (this._previousBGlevel - Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL))/this._correctionFactor;
+				}
+			
+
+		}
+
+		private function set insulinRatio(value:Number):void
+		{
+			_insulinRatio = value;
+			recalculateInsulinAmount();
+		}
+
+		private function set correctionFactor(value:Number):void
+		{
+			_correctionFactor = value;
+			recalculateInsulinAmount();
+		}
+
+		/**
+		 * the calculated amount, in fact a redundant value because it can be derived from other values here<br>
+		 * null if no calculation is possible eg because no insulinratio defined
+		 */
+		public function get calculatedInsulinAmount():Number
+		{
+			return _calculatedInsulinAmount;
+		}
+
+		/**
+		 * the mealeventid
+		 */
+		public function get mealEventId():Number
+		{
+			return _mealEventId;
 		}
 		
 
