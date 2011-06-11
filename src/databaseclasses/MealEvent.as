@@ -288,7 +288,7 @@ package databaseclasses
 			
 		}
 		
-		public function trackingItemRendererFunction():ClassFactory
+		public function listElementRendererFunction():ClassFactory
 		{
 			return new ClassFactory(MealEventItemRenderer);
 		}

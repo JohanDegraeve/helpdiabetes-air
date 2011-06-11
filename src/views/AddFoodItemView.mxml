@@ -96,18 +96,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var popUpForUnitList:SelectUnit;
 			
 			private function onCreationComplete():void {
-				//initialize the add meal button
-				//meal_button_text = ...
-
+				//this is to know hen selectedMealChanged, in that case also the text shown in the meal button needs to change
+				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+	
+				//initialize the add meal button if it's already a valid value
+				if (ModelLocator.getInstance().selectedMeal >= 0)
+					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				
 				
 				if ((new Date()).valueOf() - Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION) < 15*60*1000) {
 					//it's less than 15 minutes since the last meal addition
 					ModelLocator.getInstance().getMealEventFromTrackingList(Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID));
-					..
+					
 				} else {
 					
 				}
+			}
+			
+			private function onSelectedMealChanged(e:flash.events.Event):void {
+				meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 			}
 			
 			private function preInit():void {

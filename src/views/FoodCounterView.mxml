@@ -22,7 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:myComponents="myComponents.*"
 		actionBarVisible="true" 
 		title="FoodCounterView"
-		initialize="init()" viewActivate="viewActivateHandler(event)">
+		initialize="init()" 
+		viewActivate="viewActivateHandler(event)">
 
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->

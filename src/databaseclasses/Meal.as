@@ -125,7 +125,7 @@ package databaseclasses
 				var dispatcher:EventDispatcher = new EventDispatcher();
 				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
 				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
-				Database.getInstance().getPreviousGlucoseEvent(Settings.SettingLAST_BLOODGLUCOSE_EVENT_ID,now,dispatcher);
+				Database.getInstance().getPreviousGlucoseEvent(dispatcher);
 			} else 
 				previousBloodGlucoseEventRetrieved(null);
 			
@@ -135,16 +135,18 @@ package databaseclasses
 			
 				var previousBGEvent:BloodGlucoseEvent = null;
 				if (de != null) {
-					previousBGEvent = (de.data as BloodGlucoseEvent);
-					if (now.date.valueOf() - previousBGEvent.creationTimeStamp < Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL) {
-						previousBGlevel = previousBGEvent.bloodGlucoseLevel;
-					}
-					if (mealEvent == null) {
-						localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
-						localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-						mealEvent = new mealEvent(mealName,insulinRatio,Settings.SettingCORRECTION_FACTOR, previousBGlevel,timeStamp,localdispatcher);
+					if (de.data != null) {
+						previousBGEvent = (de.data as BloodGlucoseEvent);
+						if (now.date.valueOf() - previousBGEvent.creationTimeStamp < Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL) {
+							previousBGlevel = previousBGEvent.bloodGlucoseLevel;
+						}
 					}
 				} 
+				if (mealEvent == null) {
+					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
+					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
+					mealEvent = new mealEvent(mealName,insulinRatio,Settings.SettingCORRECTION_FACTOR, previousBGlevel,timeStamp,localdispatcher);
+				}
 			}
 			
 			function mealEventCreated(de:DatabaseEvent):void {
@@ -176,8 +178,5 @@ package databaseclasses
 		{
 			return _timeStamp;
 		}
-		
-
-
 	}
 }

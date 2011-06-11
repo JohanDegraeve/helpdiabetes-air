@@ -1536,6 +1536,8 @@ package databaseclasses
 					ModelLocator.getInstance().meals.addItem(new Meal(supper,null,todayAtMidNight + i * 86400000 + Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL)));
 				}
 				
+				..initiailize ModelLocator.getInstance().selectedMeal
+				
 				
 				//now check for each mealevent, if it needs to replace a meal or if it needs to be added, replace if the name corresponds to one of the mealnames
 				var mealEventTimeStamp:Date;
@@ -1585,8 +1587,13 @@ package databaseclasses
 		
 			
 		
-		internal function getPreviousGlucoseEvent():void {
-		//	//make sure that the event is assigned to data in the dispatcher
+		/**
+		 * 
+		 */
+		internal function getPreviousGlucoseEvent(dispatcher:EventDispatcher):void {
+			var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+			event.data = null;
+			dispatcher.dispatchEvent(event);
 		}
 			
 	} //class

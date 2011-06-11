@@ -25,6 +25,9 @@ package model
 	import databaseclasses.MealEvent;
 	import databaseclasses.Settings;
 	
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
 	
@@ -34,7 +37,7 @@ package model
 	import utilities.ExcelSorting;
 
 
-	public class ModelLocator
+	public class ModelLocator extends EventDispatcher
 		
 		
 	{
@@ -83,7 +86,17 @@ package model
 		 * to be used when selecting a meal in addfooditemview.
 		 */
 		[Bindable]
-		public var meals = new ArrayCollection();
+		public var meals:ArrayCollection = new ArrayCollection();
+
+		/**
+		 * index to the currently selected meal in meals<br>
+		 * initialized to -1 which means invalid value, it's the database initialization that will set it to a valid value
+		 */
+		private var _selectedMeal:int = -1;
+		/**
+		 * used for event dispatching, when selectedMeal changes
+		 */
+		public static const SELECTEDMEAL_CHANGED:String="selected_meal_changed";
 		
 		/** 
 		 * just a variable used when opening the untilist 
@@ -178,9 +191,26 @@ package model
 		public function getMealEventFromTrackingList(mealEventId:Number):MealEvent {
 			for (var i:int = trackingList.length - 1;i--;i >= 0) {
 				if (((trackingList.getItemAt(i)) as MealEvent).mealEventId == mealEventId)
-					return trackingList.getItemAt(i)) as MealEvent;
+					return (trackingList.getItemAt(i)) as MealEvent);
 			}
 			return null;
+		}
+
+		/**
+		 * index to the currently selected meal in meals
+		 */
+		public function get selectedMeal():int
+		{
+			return _selectedMeal;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set selectedMeal(value:int):void
+		{
+			_selectedMeal = value;
+			this.dispatchEvent(new Event(this.SELECTEDMEAL_CHANGED));
 		}
 	}
 }

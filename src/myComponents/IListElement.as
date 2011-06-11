@@ -29,6 +29,6 @@ package myComponents
 	{
 		function get timeStamp():Number;
 		
-		function trackingItemRendererFunction ():ClassFactory;
+		function listElementRendererFunction ():ClassFactory;
 	}
 }

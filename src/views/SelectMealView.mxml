@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="SelectMealView"
+		creationComplete="onCreationComplete()" 
+		>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import model.ModelLocator;
+			
+			import myComponents.IListElement;
+			
+			import spark.events.IndexChangeEvent;
+
+			private function getItemRenderer(item:Object):ClassFactory {
+				return (item as IListElement).listElementRendererFunction();
+			}
+			
+			private function onCreationComplete():void {
+				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
+				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
+				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+			}
+			
+			private function mealselected(event:IndexChangeEvent):void {
+				ModelLocator.getInstance().selectedMeal = event.newIndex;
+				navigator.popView();
+			}
+			
+			private function onSelectedMealChanged(e:Event):void {
+				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
+				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
+			}
+
+		]]>
+	</fx:Script>
+	<s:List id="meallist" left="0" right="0" top="0" bottom="0"
+			dataProvider="{ModelLocator.getInstance().meals}" 
+			itemRendererFunction="getItemRenderer" change="mealselected">
+	</s:List>
+</s:View>

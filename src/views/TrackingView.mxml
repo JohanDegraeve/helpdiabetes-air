@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<![CDATA[
 			import myComponents.IListElement;
 			private function getItemRenderer(item:Object):ClassFactory {
-				return (item as IListElement).trackingItemRendererFunction();
+				return (item as IListElement).listElementRendererFunction();
 			}
 		]]>
 	</fx:Script>
