@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import model.ModelLocator;
+			
 			import myComponents.IListElement;
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();

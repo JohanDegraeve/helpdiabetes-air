@@ -98,22 +98,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function onCreationComplete():void {
 				//this is to know hen selectedMealChanged, in that case also the text shown in the meal button needs to change
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
-	
-				//initialize the add meal button if it's already a valid value
-				if (ModelLocator.getInstance().selectedMeal >= 0)
-					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
-				
-				
-				if ((new Date()).valueOf() - Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION) < 15*60*1000) {
-					//it's less than 15 minutes since the last meal addition
-					ModelLocator.getInstance().getMealEventFromTrackingList(Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID));
-					
-				} else {
-					
-				}
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
+				
+				//selected meal may have changed due to finishing database init for instance or refresh of the meallist , so we'll check here if we need to change the value
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				if ((new Date()).valueOf() - new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION)) < 15*60*1000) {
+					//it's less than 15 minutes since the last meal addition
+					//..try to find the meal with corresponding mealeventid
+					for (var l:int = 0;l < ModelLocator.getInstance().meals.length; l++) {
+						if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).hasMealEvent()) {
+							if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).mealEvent.mealEventId == new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION))) {
+								ModelLocator.getInstance().selectedMeal = l;
+								l = ModelLocator.getInstance().meals.length;
+							}
+						}
+					}
+				} else {
+					ModelLocator.getInstance().selectedMeal = 1;					
+				}
+				
+				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 			}
 			

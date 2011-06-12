@@ -95,12 +95,12 @@ package databaseclasses
 		 * unit to use for bloodglucose values<br>
 		 * initial value = mg/dl 
 		 */
-		public static const SettingsBLOODGLUCOSE_UNIT:String = 14;
+		public static const SettingsBLOODGLUCOSE_UNIT:int = 14;
 		
 		/**
 		 * the target bloodglucoselevel to use for applying the correction factor
 		 */
-		public static const SettingsTARGET_BLOODGLUCOSELEVEL:String = 15;
+		public static const SettingsTARGET_BLOODGLUCOSELEVEL:int = 15;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -118,7 +118,7 @@ package databaseclasses
 			"0", //correction factor
 			"0", //the first blood glucose event id to be used
 			"999999", // a high value for maximum time difference last bloodglucose event and meal
-			"mg/dL",
+			"mg/dL", //unit for bloodglucose metering
 			"120"
 		];
 		

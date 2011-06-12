@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 -->
 <s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				xmlns:s="library://ns.adobe.com/flex/spark"  
-				labelField=""
 				name="MealEventItemRenderer">
 	
 	<fx:Script>
@@ -31,12 +30,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * the text to display in the time and mealtype field, eg 04:56<br>
 			 */
 			[Bindable]
-			private var time_and_mealtype_textarea_text = "08:00 Breakfast";
+			private var time_and_mealtype_textarea_text:String = "08:00 Breakfast";
 			/**
 			 * the text to display in the details field, eg Carbs: 80 gr, Ratio  19,5, ...<br>
 			 */
 			[Bindable]
-			private var mealdetails_textarea_text = "details";
+			private var mealdetails_textarea_text:String = "details";
 			
 			override public function set data(value:Object):void {
 				super.data = value;
@@ -68,11 +67,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:TextArea id="time_and_mealtype"  width="100%" text="{time_and_mealtype_textarea_text}>
+		<s:TextArea id="time_and_mealtype"  width="100%" text="{time_and_mealtype_textarea_text}">
 			<!-- the time and type of meal -->
 						
 		</s:TextArea>
-		<s:TextArea id="mealdetails"  width="100%" text="{mealdetails_textarea_text}>
+		<s:TextArea id="mealdetails"  width="100%" text="{mealdetails_textarea_text}">
 			<!-- carbs, ratio, insulin, ... -->
 		</s:TextArea>
 			

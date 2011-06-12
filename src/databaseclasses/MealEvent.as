@@ -99,26 +99,28 @@ package databaseclasses
 			
 			_mealEventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
 			_selectedFoodItems = new ArrayCollection();
-			_lastModifiedTimeStamp = new Date();
-			if (timeStamp != null)
+			_lastModifiedTimeStamp = (new Date()).valueOf();
+			if (!isNaN(timeStamp))
 				this._timeStamp = timeStamp
 			else
 				this._timeStamp = _lastModifiedTimeStamp;//this is actually the creationTimeStamp
 			
 			var localDispatcher:EventDispatcher = new EventDispatcher();
 			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
-			Database.getInstance().createNewMealEvent(mealName,
+			Database.getInstance().createNewMealEvent(_mealEventId,
+														mealName,
 														_lastModifiedTimeStamp.valueOf().toString(),
-														insulinRatio,correctionFactor,
+														insulinRatio,
+														correctionFactor,
 														previousBGlevel,
-														timeStamp.valueOf().toString(),
+														timeStamp.valueOf(),
 														localDispatcher);
-			Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, _mealEventId + 1);
+			Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, (_mealEventId + 1).toString());
 			
 			
 			function mealEventCreationFailed (errorEvent:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
-				Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, _mealEventId);
+				Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, _mealEventId.toString());
 				trace("Error while storing mealevent in database. MealEvent.as 0001");
 				if (dispatcher != null) {
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.RESULT_EVENT));
@@ -126,18 +128,9 @@ package databaseclasses
 			}
 		}
 		
-		/**
-		 * as MealEvent implements IListElement, it shoud have a timestamp<br>
-		 * the value will be assigned at creation, 
-		 */
-		public function get timeStamp():Number
-		{
-			return _timeStamp;
-		}
-
 		internal function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,dispatcher:EventDispatcher = null):void {
 			_selectedFoodItems.addItem(selectedFoodItem);
-			selectedFoodItem.selectedItemId = Settings.getInstance().getSetting(Settings.SettingNEXT_SELECTEDITEM_ID);
+			selectedFoodItem.selectedItemId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_SELECTEDITEM_ID));
 			selectedFoodItem.mealEventId = this._mealEventId;
 			
 			var localDispatcher:EventDispatcher = new EventDispatcher();
@@ -156,7 +149,7 @@ package databaseclasses
 				selectedFoodItem.unit.fat,
 				selectedFoodItem.chosenAmount,
 				localDispatcher);
-			Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, selectedFoodItem.selectedItemId +1 );
+			Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, (selectedFoodItem.selectedItemId +1).toString() );
 			
 			function selectedItemCreated(event:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
@@ -196,7 +189,7 @@ package databaseclasses
 			function selectedItemCreationFailed (errorEvent:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
-				Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, selectedFoodItem.selectedItemId );
+				Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, selectedFoodItem.selectedItemId.toString() );
 				trace("Error while creation selected item. MealEvent.as 0002");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -246,9 +239,9 @@ package databaseclasses
 		 * as MealEvent implements Itimestamp, it shoud have a timestamp<br>
 		 * the value will be assigned at creation, 
 		 */
-		private function set timeStamp():Number
+		private function set timeStamp(timeStamp:Number):void
 		{
-			return _timeStamp;
+			this._timeStamp = timeStamp;
 		}
 		
 		/**
@@ -285,6 +278,7 @@ package databaseclasses
 				returnvalue._totalProtein += selectedFoodItems.getItemAt(i).unit.protein/selectedFoodItems.getItemAt(i).unit.standardAmount*selectedFoodItems.getItemAt(i).chosenAmount;
 				returnvalue._totalFat += selectedFoodItems.getItemAt(i).unit.fat/selectedFoodItems.getItemAt(i).unit.standardAmount*selectedFoodItems.getItemAt(i).chosenAmount;
 			}
+			return returnvalue;
 			
 		}
 		
@@ -350,16 +344,20 @@ package databaseclasses
 		}
 		
 		private function recalculateInsulinAmount():void {
-			this._calculatedInsulinAmount = null;
-			if (insulinRatio != null)
-				if (insulinRatio != 0) {
+			this._calculatedInsulinAmount = Number.NaN;
+			if (!isNaN(_insulinRatio))
+				if (!isNaN(_insulinRatio)) {
 					this._calculatedInsulinAmount = this._totalCarbs/this._insulinRatio;
-					if (correctionFactor != null)
-						if (correctionFactor != 0)
-							if (previousBGlevel != null)
+					if (!isNaN(_correctionFactor))
+						if (_correctionFactor != 0)
+							if (!isNaN(previousBGlevel))
 								if (previousBGlevel != 0)
-									this._calculatedInsulinAmount += (this._previousBGlevel - Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL))/this._correctionFactor;
+									this._calculatedInsulinAmount += (this._previousBGlevel - parseInt(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)))/this._correctionFactor;
 				}
+				else
+					this._calculatedInsulinAmount = 0;
+			else
+				this._calculatedInsulinAmount = 0;
 			
 
 		}

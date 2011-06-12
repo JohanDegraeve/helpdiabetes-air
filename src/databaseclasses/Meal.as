@@ -21,9 +21,11 @@ package databaseclasses
 	
 	import flashx.textLayout.tlf_internal;
 	
+	import mx.core.ClassFactory;
 	import mx.core.mx_internal;
 	
 	import myComponents.IListElement;
+	import myComponents.MealEventItemRenderer;
 
 	/**
 	 * a name for the meal and a mealevent that can be null<br>
@@ -49,21 +51,21 @@ package databaseclasses
 		 * timeStamp will only be used if mealEvent = null, otherwise _timeStamp is set to mealEvent.timestamp<br>
 		 * if mealEvent = null, and if also timeStamp = null, then _timeStamp is set to now - but in fact, timeStamp should then not be null
 		 */
-		public function Meal(mealName:String = null,mealEvent:MealEvent = null,timeStamp:Number = null)
+		public function Meal(mealName:String = null,mealEvent:MealEvent = null,timeStamp:Number = Number.NaN)
 		{
-			if ((mealName == null) && (mealEvent == null) || (mealName != null) && (mealEvent != null))
+			if (((mealName == null) && (mealEvent == null)) || ((mealName != null) && (mealEvent != null)))
 			 	throw new Error("Meal must be craeted with either mealName or MealEvent equal to null. At least one parameter must be not null");	
             if (mealName != null) {
 				_mealName = mealName;
-				if (timeStamp != null)
+				if (!isNaN(timeStamp))
 					_timeStamp = timeStamp;
 				else
 					_timeStamp = (new Date()).valueOf();
 			}
 			if (mealEvent != null) {
-				_mealName = mealEvent.mealName;
-				_mealEvent = mealEvent;
-				_timeStamp = mealEvent.timeStamp;
+				//this._mealName = mealEvent.mealName;
+				this._mealEvent = mealEvent;
+				this._timeStamp = mealEvent.timeStamp;
 			}
 		}
 
@@ -77,7 +79,7 @@ package databaseclasses
 			_mealName = value;
 		}
 
-		internal function get mealEvent():MealEvent
+		public function get mealEvent():MealEvent
 		{
 			return _mealEvent;
 		}
@@ -96,13 +98,13 @@ package databaseclasses
 		 * if timeStamp is not null, then this meal.timeStamp and also if a new mealevent is created, the mealevent's timestamp is set to the timestamp value
 		 * 
 		 */
-		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,timeStamp:Number = null):void {
+		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,timeStamp:Number = Number.NaN):void {
 			var now:Date = new Date();
-			var previousBGlevel:Number = null;
+			var previousBGlevel:Number = Number.NaN;
 			var insulinRatio:Number;
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			if (timeStamp != null)
+			if (!isNaN(timeStamp))
 				this._timeStamp = timeStamp;
 			else ;//no need to set or change the timestamp because it's already been set during meal creation
 			
@@ -142,10 +144,10 @@ package databaseclasses
 						}
 					}
 				} 
-				if (mealEvent == null) {
+				if (_mealEvent == null) {
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-					mealEvent = new mealEvent(mealName,insulinRatio,Settings.SettingCORRECTION_FACTOR, previousBGlevel,timeStamp,localdispatcher);
+					_mealEvent = new MealEvent(mealName,insulinRatio,Settings.SettingCORRECTION_FACTOR, previousBGlevel,timeStamp,localdispatcher);
 				}
 			}
 			
@@ -153,8 +155,8 @@ package databaseclasses
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
 				//de.lastInsertRowID - not interested
-				mealEvent.addSelectedFoodItem(selectedFoodItem,null);
-				Settings.SettingTIME_OF_LAST_MEAL_ADDITION = (new Date()).valueOf();
+				_mealEvent.addSelectedFoodItem(selectedFoodItem,null);
+				Settings.getInstance().setSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION, (new Date()).valueOf().toString());
 			}
 				
 		    function mealEventCreationError(de:DatabaseEvent):void {
@@ -178,5 +180,22 @@ package databaseclasses
 		{
 			return _timeStamp;
 		}
+		
+		/**
+		 * returns true of this meal has a mealevent
+		 */
+		public function hasMealEvent():Boolean {
+			return (_mealEvent != null);
+		}
+		
+		/**
+		 * function defined in IListElement<br>
+		 * here it will return a ClassFactory with MealEventItemRenderer
+		 */
+		public function listElementRendererFunction():ClassFactory
+		{
+			return new ClassFactory(MealEventItemRenderer);
+		}
+
 	}
 }
