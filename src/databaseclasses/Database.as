@@ -23,6 +23,7 @@ package databaseclasses
 	import flash.data.SQLMode;
 	import flash.data.SQLResult;
 	import flash.data.SQLStatement;
+	import flash.errors.SQLError;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.SQLErrorEvent;
@@ -1389,19 +1390,35 @@ package databaseclasses
 		internal function updateMealEventLastModifiedTimeStamp(lastModifiedTimeStamp:Number,mealEventId:int,dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
+
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,timeStampModified);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,timeStampModificationFailed);
-			
-			localSqlStatement.sqlConnection = aConn;
-			localSqlStatement.text = UPDATE_MEALEVENT_LASTMODIFIEDTIMESTAMP;
-			localSqlStatement.parameters[":lastmodifiedtimestamp"] = lastModifiedTimeStamp;
-			localSqlStatement.parameters[":mealeventid"] = mealEventId;
-			localSqlStatement.execute();
+
+			function onOpenError(e:SQLError):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				
+			}
+			function onOpenResult(e:SQLError):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.addEventListener(SQLEvent.RESULT,timeStampModified);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,timeStampModificationFailed);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = UPDATE_MEALEVENT_LASTMODIFIEDTIMESTAMP;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = lastModifiedTimeStamp;
+				localSqlStatement.parameters[":mealeventid"] = mealEventId;
+				localSqlStatement.execute();
+				
+			}
 
 			function timeStampModified(result:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,timeStampModified);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,timeStampModificationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,timeStampModified);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,timeStampModificationFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -1409,8 +1426,12 @@ package databaseclasses
 			}
 
 			function timeStampModificationFailed(error:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,timeStampModified);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,timeStampModificationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,timeStampModified);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,timeStampModificationFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
 				trace("Failed to create a selectedItem. Database0053");
 			}
 
@@ -1430,18 +1451,32 @@ package databaseclasses
 			
 			selectedFoodItems.filterFunction = filterByMealEventId;
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsRetrieved);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,failedGettingSelectedFoodItems);
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
 			
-			localSqlStatement.sqlConnection = aConn;
-			localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
-			localSqlStatement.execute();
 			
+			function onOpenError(e:SQLError):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			}
+			function onOpenResult(e:SQLError):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+
+				localSqlStatement.addEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
+				localSqlStatement.execute();
+			}
+
 			function selectedFoodItemsRetrieved(result:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsRetrieved);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,failedGettingSelectedFoodItems);
-				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
-				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
+				localSqlStatement.addEventListener(SQLEvent.RESULT,mealEventsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
 				var tempObject:Object = localSqlStatement.getResult().data;
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
@@ -1454,22 +1489,20 @@ package databaseclasses
 						selectedFoodItems.addItem(newSelectedFoodItem);
 					}
 				}
-				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
-				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = GET_ALLMEALEVENTS;
 				localSqlStatement.execute();
 			}
 			
 			function failedGettingSelectedFoodItems(error:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsRetrieved);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,failedGettingSelectedFoodItems);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
 				trace("Failed to get all selectedFoodItems. Database0061");
 			}
 			
 			function mealEventsRetrieved(result:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
 
 				var tempObject:Object = localSqlStatement.getResult().data;
 				if (tempObject != null && tempObject is Array) {

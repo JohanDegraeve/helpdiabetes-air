@@ -26,6 +26,7 @@ package databaseclasses
 	
 	import myComponents.IListElement;
 	import myComponents.MealEventItemRenderer;
+	import databaseclasses.MealEvent;
 
 	/**
 	 * a name for the meal and a mealevent that can be null<br>
@@ -51,21 +52,23 @@ package databaseclasses
 		 * timeStamp will only be used if mealEvent = null, otherwise _timeStamp is set to mealEvent.timestamp<br>
 		 * if mealEvent = null, and if also timeStamp = null, then _timeStamp is set to now - but in fact, timeStamp should then not be null
 		 */
-		public function Meal(mealName:String = null,mealEvent:MealEvent = null,timeStamp:Number = Number.NaN)
+		public function Meal(newMealName:String = null,newMealEvent:MealEvent = null,newTimeStamp:Number = Number.NaN)
 		{
-			if (((mealName == null) && (mealEvent == null)) || ((mealName != null) && (mealEvent != null)))
+			if (((newMealName == null) && (newMealEvent == null)) || ((newMealName != null) && (newMealEvent != null)))
 			 	throw new Error("Meal must be craeted with either mealName or MealEvent equal to null. At least one parameter must be not null");	
-            if (mealName != null) {
-				_mealName = mealName;
-				if (!isNaN(timeStamp))
-					_timeStamp = timeStamp;
-				else
+            if (newMealName != null) {
+				_mealName = newMealName;
+				if (!isNaN(newTimeStamp)) {
+					_timeStamp = newTimeStamp;
+				}
+				else {
 					_timeStamp = (new Date()).valueOf();
+				}
 			}
-			if (mealEvent != null) {
-				//this._mealName = mealEvent.mealName;
-				this._mealEvent = mealEvent;
-				this._timeStamp = mealEvent.timeStamp;
+			if (newMealEvent != null) {
+				_mealEvent = newMealEvent;
+				_timeStamp = _mealEvent.timeStamp;
+				_mealName = _mealEvent._mealName;
 			}
 		}
 

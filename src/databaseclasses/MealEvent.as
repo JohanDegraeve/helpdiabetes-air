@@ -37,7 +37,7 @@ package databaseclasses
 	 */ 
 	public class MealEvent implements IListElement
 	{
-		private var _mealName:String;
+		internal var _mealName:String;//made internal because meal.as failed to use mealName - no explanation
 		private var _insulinRatio:Number;
 		private var _correctionFactor:Number;
 		/**

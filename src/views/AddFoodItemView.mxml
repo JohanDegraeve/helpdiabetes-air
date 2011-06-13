@@ -96,8 +96,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var popUpForUnitList:SelectUnit;
 			
 			private function onCreationComplete():void {
-				//this is to know hen selectedMealChanged, in that case also the text shown in the meal button needs to change
+				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				
+				//here's the set the correct initial value for meal_button_text
+				if (ModelLocator.getInstance().selectedMeal >= 0) {
+					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+				}
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
