@@ -17,6 +17,8 @@
  */
 package databaseclasses
 {
+	import databaseclasses.MealEvent;
+	
 	import flash.events.EventDispatcher;
 	
 	import flashx.textLayout.tlf_internal;
@@ -26,7 +28,7 @@ package databaseclasses
 	
 	import myComponents.IListElement;
 	import myComponents.MealEventItemRenderer;
-	import databaseclasses.MealEvent;
+	import myComponents.MealItemRenderer;
 
 	/**
 	 * a name for the meal and a mealevent that can be null<br>
@@ -197,7 +199,7 @@ package databaseclasses
 		 */
 		public function listElementRendererFunction():ClassFactory
 		{
-			return new ClassFactory(MealEventItemRenderer);
+			return new ClassFactory(MealItemRenderer);
 		}
 
 	}

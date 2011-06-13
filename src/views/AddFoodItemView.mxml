@@ -271,6 +271,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			//- create a selectedfooditem and add it
 			}
 			
+			/**
+			 * called when mealbutton clicked
+			 */
+			private function mealButtonClicked():void {
+				navigator.pushView(SelectMealView,null);
+			}
+			
 		]]>
 	</fx:Script>
 
@@ -297,7 +304,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<!-- just the text "Meal:" -->
 				<s:TextArea id="meal_textarea"  width = "50%" editable="false" text="{meal_textarea_text}"/>
 				<!-- the button to select another meal, and showing the currently selected meal -->
-				<s:Button id="meal_button" width = "50%"  label="{meal_button_text}"/>
+				<s:Button id="meal_button" width = "50%"  label="{meal_button_text}" click="mealButtonClicked()"/>
 			</s:HGroup>
 			<!-- the button to add the fooditem to the currently selected meal -->
 			<s:HGroup  gap="6" width="100%" horizontalAlign="center">

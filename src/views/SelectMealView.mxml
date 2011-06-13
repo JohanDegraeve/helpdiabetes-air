@@ -39,6 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
 				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				meallist.addEventListener(Event.CHANGE,mealselected);
 			}
 			
 			private function mealselected(event:IndexChangeEvent):void {
@@ -55,6 +56,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Script>
 	<s:List id="meallist" left="0" right="0" top="0" bottom="0"
 			dataProvider="{ModelLocator.getInstance().meals}" 
-			itemRendererFunction="getItemRenderer" change="mealselected">
+			itemRendererFunction="getItemRenderer">
 	</s:List>
 </s:View>
