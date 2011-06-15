@@ -86,6 +86,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var retrievedFoodItem:FoodItem;
 
+			/**
+			 * the chosen unit from the list of units in retrievedFoodItem
+			 */
 			private var selectedUnit:int;
 			
 			private var DEFAULT_SIZE_OF_LONGEST_TEXT:int = 50;
@@ -98,14 +101,59 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function onCreationComplete():void {
 				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 				
 				//here's the set the correct initial value for meal_button_text
 				if (ModelLocator.getInstance().selectedMeal >= 0) {
 					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				}
+
+				if (data is FoodItem) {
+					//addfoditemview has been created vi afoodcounter view, so initial setup is necessary
+					var dispatcher:EventDispatcher = new EventDispatcher();
+					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
+					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
+					Database.getInstance().getUnitList((data as FoodItem) ,dispatcher);
+					
+					
+					function unitListRetrieved (event:DatabaseEvent):void {
+						dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
+						dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
+						
+						//retrieved fooditem does not have a valid itemid, meaning it can not be used to manage the database
+						retrievedFoodItem = new FoodItem((data as FoodItem).itemDescription,event.data as ArrayCollection,0);
+						description_textarea_text = retrievedFoodItem.itemDescription;
+						/* here the details text with the amounts of grams, fat, ... is created */
+						//details_button_fontsize = description_textarea.getStyle("fontSize")*0.8;
+						details_button_text = createDetailsButtonText(0,-1);
+						if (retrievedFoodItem.getUnit(0).standardAmount != 100)
+							amount_textinput_text = retrievedFoodItem.getUnit(0).standardAmount.toString();
+						selectedUnit = 0; 
+						if (retrievedFoodItem.getNumberOfUnits() > 1) {
+							popUpUnitList();
+						}
+						
+					}
+					
+					function unitListRetrievelError(event:DatabaseEvent):void {
+						dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
+						dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
+					}
+				} else {
+					//addfooditem recreated after having pushed meal button and returning from selectedmealview
+					retrievedFoodItem = (data.retrievedFoodItem as FoodItem);
+					description_textarea_text = retrievedFoodItem.itemDescription;
+					selectedUnit = data.selectedUnit;
+					amount_textinput_text = data.amount_textinput_text;
+					details_button_text = createDetailsButtonText(selectedUnit,new Number(amount_textinput_text));
+				}
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
+				meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+			}
+			
+			private function onSelectedMealInitialized(e:flash.events.Event):void {
 				
 				//selected meal may have changed due to finishing database init for instance or refresh of the meallist , so we'll check here if we need to change the value
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
@@ -137,39 +185,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().unitList = new ArrayCollection();
 				ModelLocator.getInstance().unitList.addItem(new Unit("dummy value",0,0,0,0,0));
 				aSelectUnit = new SelectUnit();
-			}
-			
-			override public function set data(value:Object):void {
-				super.data=value;
-				var dispatcher:EventDispatcher = new EventDispatcher();
-				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
-				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
-				Database.getInstance().getUnitList((value as FoodItem) ,dispatcher);
-				
-				
-				function unitListRetrieved (event:DatabaseEvent):void {
-					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
-					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
-					
-					//retrieved fooditem does not have a valid itemid, meaning it can not be used to manage the database
-					retrievedFoodItem = new FoodItem((value as FoodItem).itemDescription,event.data as ArrayCollection,0);
-					description_textarea_text = retrievedFoodItem.itemDescription;
-					/* here the details text with the amounts of grams, fat, ... is created */
-					//details_button_fontsize = description_textarea.getStyle("fontSize")*0.8;
-					details_button_text = createDetailsButtonText(0,-1);
-					if (retrievedFoodItem.getUnit(0).standardAmount != 100)
-						amount_textinput_text = retrievedFoodItem.getUnit(0).standardAmount.toString();
-					selectedUnit = 0; 
-					if (retrievedFoodItem.getNumberOfUnits() > 1) {
-						popUpUnitList();
-					}
-				}
-				
-				function unitListRetrievelError(event:DatabaseEvent):void {
-					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
-					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
-				}
-				
 			}
 			
 			private function getSizeOfLongestTextInList(strings:ArrayCollection):Number {
@@ -275,6 +290,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * called when mealbutton clicked
 			 */
 			private function mealButtonClicked():void {
+				data = new Object();
+				data.retrievedFoodItem = retrievedFoodItem;
+				data.selectedUnit = selectedUnit;
+				data.amount_textinput_text = amount_textinput_text;
 				navigator.pushView(SelectMealView,null);
 			}
 			

@@ -39,11 +39,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
 				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
 				meallist.addEventListener(Event.CHANGE,mealselected);
 			}
 			
 			private function mealselected(event:IndexChangeEvent):void {
 				ModelLocator.getInstance().selectedMeal = event.newIndex;
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
 				navigator.popView();
 			}
 			

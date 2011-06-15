@@ -1070,8 +1070,8 @@ package databaseclasses
 		}
 		
 		/**
-		 * gets the list of units as an array collection, for the specified fooditemid<br>
-		 * the fooditem will set in the data field of the event that will be dispatched to the specified dispatcher
+		 * gets the list of units as an array collection, for the specified fooditem<br>
+		 * the unitlist will be set in the data field of the event that will be dispatched to the specified dispatcher
 		 */ 
 		public function getUnitList(fooditem:FoodItem, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();

@@ -38,6 +38,10 @@ package model
 	import utilities.ExcelSorting;
 
 
+	/**
+	 * has some data fields used throughout the application<br>
+	 * - 
+	 */
 	public class ModelLocator extends EventDispatcher
 		
 		
@@ -95,9 +99,13 @@ package model
 		 */
 		private var _selectedMeal:int = -1;
 		/**
-		 * used for event dispatching, when selectedMeal changes
+		 * used for event dispatching, when selectedMeal changes, except when chaning from value -1<br>
 		 */
 		public static const SELECTEDMEAL_CHANGED:String="selected_meal_changed";
+		/**
+		 * used for event dispatching, when selectedMeal initialized, meaning changed form value -1 to value > 0<br>
+		 */
+		public static const SELECTEDMEAL_INITIALIZED:String="selected_meal_initialized";
 		
 		/** 
 		 * just a variable used when opening the untilist 
@@ -207,12 +215,20 @@ package model
 		}
 
 		/**
-		 * @private
+		 * index to the currently selected meal in meals<br>
+		 * initialized to -1 which means invalid value, it's the database initialization that will set it to a valid value<br>
+		 * When the value is initialized by database.init (ie change from value -1), then an event will be dispatched ModelLocator.SELECTEDMEAL_INITIALIZED<br>
+		 * When the value is changed (ie change from value different from -1), then an event will be dispatched ModelLocator.SELECTEDMEAL_CHANGED
 		 */
 		public function set selectedMeal(value:int):void
 		{
-			_selectedMeal = value;
-			this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_CHANGED));
+			if (_selectedMeal == -1) {
+				_selectedMeal = value;
+				this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_INITIALIZED));
+			} else {
+				_selectedMeal = value;
+				this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_CHANGED));
+			}
 		}
 		
 		/**
