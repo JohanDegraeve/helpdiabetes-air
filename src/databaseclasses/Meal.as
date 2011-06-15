@@ -23,6 +23,8 @@ package databaseclasses
 	
 	import flashx.textLayout.tlf_internal;
 	
+	import model.ModelLocator;
+	
 	import mx.core.ClassFactory;
 	import mx.core.mx_internal;
 	
@@ -116,35 +118,34 @@ package databaseclasses
 			
 
 			now.setFullYear(1970,1,1);
-			if ( now.getTime() < Settings.SettingBREAKFAST_UNTIL) {
-				insulinRatio = Settings.SettingINSULIN_RATIO_BREKFAST;
-			} else if ( now.getTime() < Settings.SettingLUNCH_UNTIL) {
-				insulinRatio = Settings.SettingINSULIN_RATIO_LUNCH;
-			} else if ( now.getTime() < Settings.SettingSNACK_UNTIL) {
-				insulinRatio = Settings.SettingINSULIN_RATIO_SNACK;
+			if (now.getTime() < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
+				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST));
+			} else if (now.getTime() < new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))) {
+				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_LUNCH));
+			} else if (now.getTime() < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))) {
+				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SNACK));
 			} else {
-				insulinRatio = Settings.SettingINSULIN_RATIO_SUPPER;
+				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SUPPER));
 			}
 			now = new Date();
 			
 			//let's find the last blood glucose event
-			if (Settings.SettingLAST_BLOODGLUCOSE_EVENT_ID > 0) {
-				var dispatcher:EventDispatcher = new EventDispatcher();
-				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
-				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
-				Database.getInstance().getPreviousGlucoseEvent(dispatcher);
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingLAST_BLOODGLUCOSE_EVENT_ID)) > 0) {
+				Database.getInstance().getPreviousGlucoseEvent(localdispatcher);
 			} else 
 				previousBloodGlucoseEventRetrieved(null);
 			
 			function previousBloodGlucoseEventRetrieved(de:DatabaseEvent):void {
-				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
-				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
 			
 				var previousBGEvent:BloodGlucoseEvent = null;
 				if (de != null) {
 					if (de.data != null) {
 						previousBGEvent = (de.data as BloodGlucoseEvent);
-						if (now.date.valueOf() - previousBGEvent.creationTimeStamp < Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL) {
+						if (now.date.valueOf() - previousBGEvent.creationTimeStamp < new Number(Settings.getInstance().getSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL))) {
 							previousBGlevel = previousBGEvent.bloodGlucoseLevel;
 						}
 					}
@@ -152,15 +153,22 @@ package databaseclasses
 				if (_mealEvent == null) {
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-					_mealEvent = new MealEvent(mealName,insulinRatio,Settings.SettingCORRECTION_FACTOR, previousBGlevel,timeStamp,localdispatcher);
-				}
+					_mealEvent = new MealEvent(mealName,insulinRatio,new Number(Settings.getInstance().getSetting(Settings.SettingCORRECTION_FACTOR)), previousBGlevel,timeStamp,localdispatcher);
+				} else
+					mealEventCreated(null);
 			}
 			
 			function mealEventCreated(de:DatabaseEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-				//de.lastInsertRowID - not interested
 				_mealEvent.addSelectedFoodItem(selectedFoodItem,null);
+				
+				//if de not null, then mealEventCreated as called after having created a new mealevent, that needs to be 
+				//added in the trackinglist.
+				if (de != null) {
+					ModelLocator.getInstance().trackingList.addItem(_mealEvent);
+					ModelLocator.getInstance().trackingList.refresh();
+				}
 				Settings.getInstance().setSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION, (new Date()).valueOf().toString());
 			}
 				
@@ -171,8 +179,8 @@ package databaseclasses
 			}
 			
 			function previousBloodGlucoseEventRetrievalFailed(de:DatabaseEvent):void {
-				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
-				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
 				trace("Error while getting bloodglucoseevent. Meal.as 0001");
 			}
 			

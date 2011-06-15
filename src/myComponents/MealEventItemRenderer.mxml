@@ -43,10 +43,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				var date:Date = new Date(((value as MealEvent).timeStamp));
 				time_and_mealtype_textarea_text = 
 					(date.hours.toString().length == 1 ? "0":"") + 	date.hours 
-					+ ":" + 
-					date.minutes 
-					+ (date.minutes.toString().length == 1 ? "0":"") + " " + 
-					(value as MealEvent).mealName;
+					+ ":"  
+					+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes 
+					+ " " 
+					+ (value as MealEvent).mealName;
 				mealdetails_textarea_text = 
 					resourceManager.getString('general','carbs') + " : " +
 					(value as MealEvent).totalCarbs + " " + resourceManager.getString('general','gram_short') + "; " +

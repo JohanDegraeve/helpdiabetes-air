@@ -109,7 +109,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 
 				if (data is FoodItem) {
-					//addfoditemview has been created vi afoodcounter view, so initial setup is necessary
+					//addfooditemview has been created vi afoodcounter view, so initial setup is necessary
 					var dispatcher:EventDispatcher = new EventDispatcher();
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
@@ -279,11 +279,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			/**
-			 * will create a mealevent, called when addButton is clicked
+			 * will add a selectedFoodItem to the selected meal, called when addButton is clicked
 			 */ 
 			private function addButtonClicked():void {
 			//- get the selected meal (which may or may not already include a mealevent
 			//- create a selectedfooditem and add it
+				(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
+				    .addSelectedFoodItem(
+						new SelectedFoodItem(retrievedFoodItem.itemDescription,
+						retrievedFoodItem.getUnit(selectedUnit),
+						new Number(amount_textinput.text)));
+					navigator.popView();
 			}
 			
 			/**
