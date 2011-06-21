@@ -109,7 +109,7 @@ package databaseclasses
 																											 "carbs REAL NOT NULL, " +
 																											 "fat REAL, " +
 																											 "chosenamount REAL NOT NULL)";		
-		private const CREATE_TABLE_TEMPLATE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS templatefooditems (templateitemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
+		private const CREATE_TABLE_TEMPLATE_FOODITEMS:String = "CREATE TABLE   IF NOT EXISTS  templatefooditems (templateitemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 																											 "templates_templateid INTEGER NOT NULL, " +
 																											 "itemdescription TEXT NOT NULL, " +
 																											 "unitdescription TEXT, " +
@@ -167,7 +167,7 @@ package databaseclasses
 		 */ 
 		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp, insulinratio, correctionfactor, previousBGlevel, creationtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp,:insulinratio,:correctionfactor,:previousBGlevel,:creationtimestamp)";
 
-		private const INSERT_SELECTEDITEM:String = "INSERT INTO selectedfooditems (selectedfooditemid, mealevents_mealeventid,itemdescription ,unitdescription,standardamount,kcal,protein,carbs,fat,chosenamount ) VALUES (:selectedfooditemid,:mealevents_mealeventid,:itemdescription ,:unitdescription,:standardamount,:kcal,:protein,:carbs,:fat,:chosenamount)";
+		private const INSERT_SELECTEDITEM:String = "INSERT INTO selectedfooditems (selectedfooditemid, mealevents_mealeventid,itemdescription ,unitdescription,standardamount,kcal,protein,carbs, fat, chosenamount ) VALUES (:selectedfooditemid,:mealevents_mealeventid,:itemdescription ,:unitdescription,:standardamount,:kcal,:protein,:carbs,:fat,:chosenamount)";
 
 		/**
 		 * constructor, should not be used, use getInstance()
@@ -562,7 +562,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
-				trace("Failed to create table :" + sqlStatement.text + ". Database0015");
+				trace("Failed to create table :" + sqlStatement.text + ". Database0015" + "error = " + see.toString());
 			}
 		}
 		
@@ -587,7 +587,7 @@ package databaseclasses
 			function tableCreationError(see:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
-				trace("Failed to create table :" + sqlStatement.text + ". Database0016");
+				trace("Failed to create table :" + sqlStatement.text + ". Database0016" + "error = " + see.toString());
 			}
 		}
 		
@@ -836,7 +836,6 @@ package databaseclasses
 			}
 			
 			function goOnWithFoodItems():void {
-				
 				if (foodItemListCounter == foodItemListSize) {
 					finishedCreatingTables();					
 				} else {
@@ -1475,8 +1474,6 @@ package databaseclasses
 			function selectedFoodItemsRetrieved(result:SQLEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
-				localSqlStatement.addEventListener(SQLEvent.RESULT,mealEventsRetrieved);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
 				var tempObject:Object = localSqlStatement.getResult().data;
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
@@ -1489,6 +1486,9 @@ package databaseclasses
 						selectedFoodItems.addItem(newSelectedFoodItem);
 					}
 				}
+
+				localSqlStatement.addEventListener(SQLEvent.RESULT,mealEventsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = GET_ALLMEALEVENTS;
 				localSqlStatement.execute();
