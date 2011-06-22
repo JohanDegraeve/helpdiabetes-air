@@ -22,7 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		preinitialize="preInit()"
 		tabBarVisible="true"
 		title="AddFoodItemView" xmlns:myComponents="myComponents.*" xmlns:mx="library://ns.adobe.com/flex/mx"
-		creationComplete="onCreationComplete()">
+		creationComplete="onCreationComplete()"
+		remove="onRemove()">
 	<fx:Declarations>
 		<!--  seperationerror="" makes sure there's no round border even when there's a separator error -->
 		<mx:NumberValidator
@@ -145,7 +146,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					description_textarea_text = retrievedFoodItem.itemDescription;
 					selectedUnit = data.selectedUnit;
 					amount_textinput_text = data.amount_textinput_text;
-					details_button_text = createDetailsButtonText(selectedUnit,new Number(amount_textinput_text));
+					details_button_text = createDetailsButtonText(selectedUnit,(new Number(amount_textinput_text)) == 0 ? -1: new Number(amount_textinput_text));
 				}
 			}
 			
@@ -224,6 +225,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				popUpForUnitList.x = xtemp;
 
 				function selectedUnitChanged(event:UnitChangedEvent):void {
+					popUpForUnitList.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
 					PopUpManager.removePopUp(popUpForUnitList);
 					details_button_text = createDetailsButtonText(event.index,-1);
 					selectedUnit = event.index;
@@ -301,6 +303,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				data.selectedUnit = selectedUnit;
 				data.amount_textinput_text = amount_textinput_text;
 				navigator.pushView(SelectMealView,null);
+			}
+			
+			private function onRemove():void {
+				if (popUpForUnitList != null)
+					PopUpManager.removePopUp(popUpForUnitList);
 			}
 			
 		]]>

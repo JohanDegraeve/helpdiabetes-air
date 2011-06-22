@@ -178,7 +178,6 @@ package databaseclasses
 			sampleDbFileName = foodFileName + "-sample.db";
 			xmlFileName = foodFileName + ".xml";
 
-
 			if (instance != null) {
 				throw new Error("Database class can only be accessed through Database.getInstance()");	
 			}
@@ -1529,7 +1528,7 @@ package databaseclasses
 			}
 			
 			function filterByMealEventId(item:Object):Boolean {
-				return (item.mealevents_mealeventid == currentMealEventID);
+				return ((item  as SelectedFoodItem).mealEventId == currentMealEventID);
 			}
 			
 			function mealEventRetrievalFailed(error:SQLErrorEvent):void {

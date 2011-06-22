@@ -47,18 +47,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes 
 					+ " " 
 					+ (value as MealEvent).mealName;
+				
 				mealdetails_textarea_text = 
 					resourceManager.getString('general','carbs') + " : " +
 					(value as MealEvent).totalCarbs + " " + resourceManager.getString('general','gram_short') + "; " +
+
+					(isNaN((value as MealEvent).calculatedInsulinAmount) ?
+						"":
+						resourceManager.getString('general','ratio') + " : " +
+						(value as MealEvent).insulinRatio +   "; " +
+						
+						resourceManager.getString('general','correctionfactor_short') + " : " +
+						(value as MealEvent).correctionFactor + " " +  resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT)) + "; " +
 					
-					resourceManager.getString('general','ratio') + " : " +
-					(value as MealEvent).insulinRatio +   "; " +
-					
-					resourceManager.getString('general','CF') + " : " +
-					(value as MealEvent).correctionFactor + " " + resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT)) + "; " +
-					
-					resourceManager.getString('general','insulin') + " : " +
-					(value as MealEvent).calculatedInsulinAmount + " " + resourceManager.getString('general','units');
+						resourceManager.getString('general','insulin') + " : " +
+						(value as MealEvent).calculatedInsulinAmount + " " + resourceManager.getString('general','units')
+						);
 			}
 		]]>
 	</fx:Script>

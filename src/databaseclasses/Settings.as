@@ -93,7 +93,7 @@ package databaseclasses
 		public static const SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL:int= 13;
 		/**
 		 * unit to use for bloodglucose values<br>
-		 * initial value = mg/dl 
+		 * initial value = mgperdl 
 		 */
 		public static const SettingsBLOODGLUCOSE_UNIT:int = 14;
 		
@@ -118,7 +118,7 @@ package databaseclasses
 			"0", //correction factor
 			"0", //the first blood glucose event id to be used
 			"999999", // a high value for maximum time difference last bloodglucose event and meal
-			"mg/dL", //unit for bloodglucose metering
+			"mgperdl", //unit for bloodglucose metering, this value must be known in locale/general.properties
 			"120"
 		];
 		

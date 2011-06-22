@@ -113,7 +113,7 @@ package databaseclasses
 														insulinRatio,
 														correctionFactor,
 														previousBGlevel,
-														timeStamp.valueOf(),
+														_timeStamp.valueOf(),
 														localDispatcher);
 			Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, (_mealEventId + 1).toString());
 			
