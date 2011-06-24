@@ -153,7 +153,7 @@ package databaseclasses
 				if (_mealEvent == null) {
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-					_mealEvent = new MealEvent(mealName,insulinRatio,new Number(Settings.getInstance().getSetting(Settings.SettingCORRECTION_FACTOR)), previousBGlevel,timeStamp,localdispatcher);
+					_mealEvent = new MealEvent(mealName,insulinRatio,new Number(Settings.getInstance().getSetting(Settings.SettingCORRECTION_FACTOR)), previousBGlevel,_timeStamp,localdispatcher);
 				} else
 					mealEventCreated(null);
 			}
