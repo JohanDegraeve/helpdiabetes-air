@@ -117,6 +117,8 @@ package databaseclasses
 			if (!databaseStorage) {
 				this._mealEventId = mealEventId;
 				this._selectedFoodItems = selectedFoodItems;
+				recalculateTotals();
+				recalculateInsulinAmount();
 			}
 			else  {
 				_mealEventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
@@ -126,6 +128,7 @@ package databaseclasses
 				var localDispatcher:EventDispatcher = new EventDispatcher();
 				localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
 				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
+				Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, (_mealEventId + 1).toString());
 				Database.getInstance().createNewMealEvent(_mealEventId,
 					mealName,
 					_lastModifiedTimeStamp.valueOf().toString(),
@@ -135,8 +138,6 @@ package databaseclasses
 					_timeStamp.valueOf(),
 					localDispatcher);
 			}
-			
-			recalculateInsulinAmount();
 			
 			function mealEventCreated(successEvent:DatabaseEvent):void  {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
@@ -365,7 +366,7 @@ package databaseclasses
 			recalculateInsulinAmount();
 		}
 
-		/**
+		/**f
 		 * the calculated amount, in fact a redundant value because it can be derived from other values here<br>
 		 * null if no calculation is possible eg because no insulinratio defined
 		 */
@@ -380,6 +381,16 @@ package databaseclasses
 		public function get mealEventId():Number
 		{
 			return _mealEventId;
+		}
+		
+		private function recalculateTotals():void {
+			for (var i:int = 0;i < _selectedFoodItems.length; i++) {
+				var selectedFoodItem:SelectedFoodItem = (_selectedFoodItems.getItemAt(i) as SelectedFoodItem);
+				_totalCarbs += selectedFoodItem.unit.carbs/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+				_totalKilocalories += selectedFoodItem.unit.kcal/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+				_totalProtein += selectedFoodItem.unit.protein/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+				_totalFat += selectedFoodItem.unit.fat/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+			}
 		}
 		
 
