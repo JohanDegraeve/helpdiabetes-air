@@ -50,8 +50,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				mealdetails_textarea_text = 
 					resourceManager.getString('general','carbs') + " : " +
-					(value as MealEvent).totalCarbs + " " + resourceManager.getString('general','gram_short') + "; " +
-
+					Math.round((value as MealEvent).totalCarbs) + " " + resourceManager.getString('general','gram_short') + "; " +
+					
 					(isNaN((value as MealEvent).calculatedInsulinAmount) ?
 						"":
 						resourceManager.getString('general','ratio') + " : " +
@@ -61,7 +61,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						(value as MealEvent).correctionFactor + " " +  resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT)) + "; " +
 					
 						resourceManager.getString('general','insulin') + " : " +
-						(value as MealEvent).calculatedInsulinAmount + " " + resourceManager.getString('general','units')
+						(Math.round((value as MealEvent).calculatedInsulinAmount*10)/10) + " " + resourceManager.getString('general','units')
 						);
 			}
 		]]>
@@ -71,11 +71,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:TextArea id="time_and_mealtype"  width="100%" text="{time_and_mealtype_textarea_text}">
+		<s:TextArea editable="false" id="time_and_mealtype"  width="100%" text="{time_and_mealtype_textarea_text}">
 			<!-- the time and type of meal -->
 						
 		</s:TextArea>
-		<s:TextArea id="mealdetails"  width="100%" text="{mealdetails_textarea_text}">
+		<s:TextArea editable="false" id="mealdetails"  width="100%" text="{mealdetails_textarea_text}">
 			<!-- carbs, ratio, insulin, ... -->
 		</s:TextArea>
 			

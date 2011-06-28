@@ -223,7 +223,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (xtemp < 0)
 					xtemp = width;
 				popUpForUnitList.x = xtemp;
-
+				
 				function selectedUnitChanged(event:UnitChangedEvent):void {
 					popUpForUnitList.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
 					PopUpManager.removePopUp(popUpForUnitList);
@@ -330,7 +330,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<!-- just the text "Amount:" -->
 				<s:TextArea id="amount_textarea"   width="50%" editable="false" text="{amount_textarea_text}"/>
 				<!-- where the user can enter the chosen amount -->
-				<s:TextInput id="amount_textinput"  width="50%" editable="true" text="@{amount_textinput_text}" change="amountTextChanged()" />
+				<s:TextInput  id="amount_textinput"  width="50%" editable="true" text="@{amount_textinput_text}" change="amountTextChanged()" />
 			</s:HGroup>
 			<s:HGroup gap="6" width="100%">
 				<!-- just the text "Meal:" -->

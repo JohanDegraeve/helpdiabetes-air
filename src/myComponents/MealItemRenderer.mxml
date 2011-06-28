@@ -44,7 +44,7 @@ itemrenderer for showing meals, which are just a name and maybe also a time.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:TextArea id="meal_name"  width="100%" text="{meal_name_textarea_text}">
+		<s:TextArea editable="false" id="meal_name"  width="100%" text="{meal_name_textarea_text}">
 		</s:TextArea>
 	</s:Group>
 </s:ItemRenderer>
