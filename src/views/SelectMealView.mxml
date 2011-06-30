@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
+<!---
+view to show ModelLocator.getInstance().meals in a list
+
+-->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title="SelectMealView"
 		creationComplete="onCreationComplete()" 
@@ -25,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.Meal;
+			
 			import model.ModelLocator;
 			
 			import myComponents.IListElement;
@@ -44,10 +50,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function mealselected(event:IndexChangeEvent):void {
-				ModelLocator.getInstance().selectedMeal = event.newIndex;
-				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
-				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
-				navigator.popView();
+				//if it's a future meal without mealevent, we'll ask to user to enter start date and time of the meal
+				var theMeal:Meal = ModelLocator.getInstance().meals.getItemAt(event.newIndex) as Meal;
+				if (theMeal.hasMealEvent() || (theMeal.timeStamp < (new Date()).valueOf())) {
+					ModelLocator.getInstance().selectedMeal = event.newIndex;
+					ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+					ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
+					navigator.popView();
+				} else {
+					navigator.pushView(ChangeMealDateAndTimeView,{
+						mealname:theMeal.mealName,timeStamp:theMeal.timeStamp
+					});
+				}
 			}
 			
 			private function onSelectedMealChanged(e:Event):void {

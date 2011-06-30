@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!---
+view to modify a meal's date and time
+When creating a ChangeMealDateAndTimeView with navigator.pushView, the second parameter in pushView should contain an array with meal name as String and timeStamp as Number, example
+{mealname:"any name",timeStamp:aNumberThatRepresentsATimeStamp}
+-->
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		preinitialize="preInit()"
+		creationComplete="onCreationComplete()"
+		title="ChangeMealDateAndTime" >
+	<fx:Declarations>
+		<s:DateTimeFormatter id="dateformatter" dateTimePattern="EEEE dd MMMM yyyy" useUTC="false">
+			
+		</s:DateTimeFormatter>
+		<s:DateTimeFormatter id ="timeformatter" dateTimePattern="hh:mm">
+			
+		</s:DateTimeFormatter>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			[Bindable]
+			private var mealname_textarea_text:String;
+			[Bindable]
+			private var date_button_text:String;
+			[Bindable]
+			private var time_button_text:String;
+			[Bindable]
+			private var ok_button_text:String;
+
+			private function preInit():void {
+				ok_button_text = resourceManager.getString('general','ok');
+			}
+			
+			private function onCreationComplete():void {
+				mealname_textarea_text = data.mealname as String;
+				date_button_text = dateformatter.format(new Date(data.timeStamp as Number));
+				time_button_text = timeformatter.format(new Date(data.timeStamp as Number));
+			}
+			
+			private function dateClicked():void {
+				
+			}
+
+			private function timeClicked():void {
+				
+			}
+			
+			private function okClicked():void {
+				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Group y="0" x="0" width="100%" height = "100%" >
+		<s:layout>
+			<s:VerticalLayout>
+			</s:VerticalLayout>
+		</s:layout>
+		
+		<!-- the mealname -->
+		<s:TextArea id="meal_name"  width="100%" text="{mealname_textarea_text}" editable="false" />
+		
+		<!-- the date -->
+		<s:Button id="date_button" width="100%" label="{date_button_text}" click="dateClicked()" />
+		
+		<!-- the time -->
+		<s:Button id="time_button" width="100%" label="{time_button_text}" click="timeClicked()" />
+		
+		<!-- Ok button -->
+		<s:Button id="ok_button" width="100%" label="{ok_button_text}" click="okClicked()" />
+		
+	</s:Group>
+	
+
+</s:View>

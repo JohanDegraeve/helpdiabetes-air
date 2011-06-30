@@ -44,7 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
 				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
 				/********* DELETE THIS**********/
-				Database.getInstance().deleteDatabase();
+				//Database.getInstance().deleteDatabase();
 				/********* DELETE THIS**********/
 
 				Database.getInstance().init(dispatcher);

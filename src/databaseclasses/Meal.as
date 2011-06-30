@@ -192,6 +192,7 @@ package databaseclasses
 
 		/**
 		 * as Meal implements IListElement, it shoud have a timestamp<br>
+		 * it doesn't necessarly be to be equal to the time of creation, it can also be created as future meal, in which case the value will be entered by the user
 		 */
 		public function get timeStamp():Number
 		{
