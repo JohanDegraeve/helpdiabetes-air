@@ -1,6 +1,7 @@
 	/*
 	copied from franto.com
 	*/										  
+package myComponents
 {
 	import flash.events.Event;
 	

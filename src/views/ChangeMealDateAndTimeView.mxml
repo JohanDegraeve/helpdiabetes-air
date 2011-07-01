@@ -27,16 +27,21 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 		creationComplete="onCreationComplete()"
 		title="ChangeMealDateAndTime" >
 	<fx:Declarations>
-		<s:DateTimeFormatter id="dateformatter" dateTimePattern="EEEE dd MMMM yyyy" useUTC="false">
+		<s:DateTimeFormatter id="dateformatter" dateTimePattern="EEEE dd MMMM yyyy" useUTC="false" locale="{Capabilities.language.substr(0,2)}">
 			
 		</s:DateTimeFormatter>
-		<s:DateTimeFormatter id ="timeformatter" dateTimePattern="hh:mm">
+		<s:DateTimeFormatter id ="timeformatter" dateTimePattern="HH:mm" useUTC="false">
 			
 		</s:DateTimeFormatter>
 	</fx:Declarations>
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.managers.PopUpManager;
+			import mx.resources.Locale;
+			
+			import myComponents.DatePicker;
+			import myComponents.DatePickerEvent;
 			[Bindable]
 			private var mealname_textarea_text:String;
 			[Bindable]
@@ -57,8 +62,27 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			}
 			
 			private function dateClicked():void {
-				
+				var datePicker: DatePicker = new DatePicker();
+				datePicker.currentDate = new Date(data.timeStamp as Number);
+				datePicker.addEventListener(DatePickerEvent.DATE_PICKER_SET, onDateSet);
+				datePicker.addEventListener(DatePickerEvent.DATE_PICKER_CANCEL, onDateCancel);
+				PopUpManager.addPopUp(datePicker, this, true);
+				PopUpManager.centerPopUp(datePicker);
+
+				function onDateCancel(event: DatePickerEvent): void
+				{
+					datePicker.removeEventListener(DatePickerEvent.DATE_PICKER_SET, onDateSet);
+					datePicker.removeEventListener(DatePickerEvent.DATE_PICKER_CANCEL, onDateCancel);
+				}
+				function onDateSet(event: DatePickerEvent): void
+				{
+					datePicker.removeEventListener(DatePickerEvent.DATE_PICKER_SET, onDateSet);
+					datePicker.removeEventListener(DatePickerEvent.DATE_PICKER_CANCEL, onDateCancel);
+					data.timeStamp = event.date.valueOf();
+					date_button_text = dateformatter.format(new Date(data.timeStamp as Number));
+				}
 			}
+
 
 			private function timeClicked():void {
 				

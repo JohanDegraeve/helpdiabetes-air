@@ -112,8 +112,8 @@ package databaseclasses
 			"0", //lunch
 			"0", //snack
 			"0", //supper
-			"32400000", // January 1, 1970, 9 Hr in ms
-			"50400000", // January 1, 1970, 14 Hr in ms
+			"37800000", // January 1, 1970, 10h30 Hr in ms
+			"55800000", // January 1, 1970, 15h30 Hr in ms
 			"61200000", // January 1, 1970, 17 Hr in ms
 			"0", //correction factor
 			"0", //the first blood glucose event id to be used

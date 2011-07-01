@@ -1,48 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 copied from franto.com
 -->										  
-<?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="init()"
-		 width="420"
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
 		 >
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<s:BorderContainer backgroundColor="0x444444" width="100%" borderColor="0xcccccc" borderWeight="4" cornerRadius="10">
-		
-		<s:VGroup width="100%" gap="10" paddingBottom="15" paddingLeft="15" paddingRight="15" paddingTop="15">
-			<s:Label text="{currentDate.toDateString()}" width="100%" fontSize="40"/>
-			<s:Line width="100%">
-				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="2"/>
-				</s:stroke>
-			</s:Line>
-			<s:HGroup width="100%">
-				<s:VGroup gap="10" width="90">
-					<s:Button label="+" click="incrementDate('day')" width="100%"/>
-					<s:Label text="{day}" width="100%" textAlign="center" fontSize="40"/>
-					<s:Button label="-" click="decrementDate('day')" width="100%"/>
-				</s:VGroup>
-				<s:VGroup gap="10" width="90">
-					<s:Button label="+" click="incrementDate('month')" width="100%"/>
-					<s:Label text="{month+1}" width="100%" textAlign="center" fontSize="40"/>
-					<s:Button label="-" click="decrementDate('month')" width="100%"/>
-				</s:VGroup>
-				<s:VGroup gap="10" width="190">
-					<s:Button label="+" click="incrementDate('year')" width="100%"/>
-					<s:Label text="{year}" width="100%" textAlign="center" fontSize="40"/>
-					<s:Button label="-" click="decrementDate('year')" width="100%"/>
-				</s:VGroup>
-			</s:HGroup>
-			<s:BorderContainer backgroundColor="0xcccccc" width="100%">
-				<s:HGroup width="100%" verticalAlign="middle" paddingTop="15" paddingBottom="15" paddingLeft="10" paddingRight="10">
-					<s:Button width="100%" label="Set" click="setDate()"/>
-					<s:Button width="100%" label="Cancel" click="cancelDate()"/>
-				</s:HGroup>
-			</s:BorderContainer>
-		</s:VGroup>
-	</s:BorderContainer>
 	
 	<fx:Script>
 		<![CDATA[
@@ -117,4 +82,38 @@ copied from franto.com
 			}
 		]]>
 	</fx:Script>
+	<s:BorderContainer backgroundColor="0x444444" width="100%" borderColor="0xcccccc" borderWeight="4" cornerRadius="10">
+		
+		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+			<s:Label text="{currentDate.toDateString()}" width="100%" />
+			<s:Line width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="2"/>
+				</s:stroke>
+			</s:Line>
+			<s:HGroup width="100%">
+				<s:VGroup gap="10" >
+					<s:Button label="+" click="incrementDate('day')" width="100%"/>
+					<s:Label text="{day}" width="100%" textAlign="center" />
+					<s:Button label="-" click="decrementDate('day')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup gap="10" >
+					<s:Button label="+" click="incrementDate('month')" width="100%"/>
+					<s:Label text="{month+1}" width="100%" textAlign="center" />
+					<s:Button label="-" click="decrementDate('month')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup gap="10" >
+					<s:Button label="+" click="incrementDate('year')" width="100%"/>
+					<s:Label text="{year}" width="100%" textAlign="center" />
+					<s:Button label="-" click="decrementDate('year')" width="100%"/>
+				</s:VGroup>
+			</s:HGroup>
+			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
+				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
+					<s:Button width="100%" height="50%" label="Set" click="setDate()"/>
+					<s:Button width="100%" height="50%" label="Cancel" click="cancelDate()"/>
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:VGroup>
+	</s:BorderContainer>
 </s:Group>
