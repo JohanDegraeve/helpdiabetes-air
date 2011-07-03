@@ -6,10 +6,15 @@ copied from franto.com
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
 		 >
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:DateTimeFormatter id="dayformatter" dateTimePattern="EEEE" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
+		<s:DateTimeFormatter id ="monthformatter" dateTimePattern="MMM" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
 	</fx:Declarations>
-	
-	<fx:Script>
+ 	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace components "spark.components.*";
+		
+	</fx:Style>
+<fx:Script>
 		<![CDATA[
 			import mx.managers.PopUpManager;
 			private var _currentDate: Date;
@@ -80,12 +85,14 @@ copied from franto.com
 				dispatchEvent(dpe);
 				PopUpManager.removePopUp(this);
 			}
+			
+			 
 		]]>
 	</fx:Script>
 	<s:BorderContainer backgroundColor="0x444444" width="100%" borderColor="0xcccccc" borderWeight="4" cornerRadius="10">
 		
 		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
-			<s:Label text="{currentDate.toDateString()}" width="100%" />
+			<s:Label text="{dayformatter.format(currentDate)}" width="100%" />
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0xcccccc" weight="2"/>
@@ -93,25 +100,25 @@ copied from franto.com
 			</s:Line>
 			<s:HGroup width="100%">
 				<s:VGroup gap="10" >
-					<s:Button label="+" click="incrementDate('day')" width="100%"/>
+					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('day')" width="100%"/>
 					<s:Label text="{day}" width="100%" textAlign="center" />
-					<s:Button label="-" click="decrementDate('day')" width="100%"/>
+					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('day')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup gap="10" >
-					<s:Button label="+" click="incrementDate('month')" width="100%"/>
-					<s:Label text="{month+1}" width="100%" textAlign="center" />
-					<s:Button label="-" click="decrementDate('month')" width="100%"/>
+					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('month')" width="100%"/>
+					<s:Label text="{monthformatter.format(currentDate)}" width="100%" textAlign="center" />
+					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('month')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup gap="10" >
-					<s:Button label="+" click="incrementDate('year')" width="100%"/>
+					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('year')" width="100%"/>
 					<s:Label text="{year}" width="100%" textAlign="center" />
-					<s:Button label="-" click="decrementDate('year')" width="100%"/>
+					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('year')" width="100%"/>
 				</s:VGroup>
 			</s:HGroup>
 			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
 				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
-					<s:Button width="100%" height="50%" label="Set" click="setDate()"/>
-					<s:Button width="100%" height="50%" label="Cancel" click="cancelDate()"/>
+					<s:Button width="100%" height="50%" minHeight="60" label="Set" click="setDate()"/>
+					<s:Button width="100%" height="50%" minHeight="60" label="Cancel" click="cancelDate()"/>
 				</s:VGroup>
 			</s:BorderContainer>
 		</s:VGroup>
