@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 width="420"
+		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
+		 >
+	<fx:Declarations>
+		<s:DateTimeFormatter id="timeFormatter" dateStyle="none" dateTimePattern="hh:mm a"/>
+		<s:DateTimeFormatter id="timeFormatter2" dateStyle="none" dateTimePattern="hh"/>
+	</fx:Declarations>
+	<s:BorderContainer backgroundColor="0x444444" width="100%" borderColor="0xcccccc" borderWeight="4" cornerRadius="10">
+		
+		<s:VGroup width="100%" gap="10" paddingBottom="15" paddingLeft="15" paddingRight="15" paddingTop="15">
+			<s:Label text="{timeFormatter.format(currentTime)}" width="100%" fontSize="40"/>
+			<s:Line width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="2"/>
+				</s:stroke>
+			</s:Line>
+			<s:HGroup width="100%">
+				<s:VGroup gap="10" width="90">
+					<s:Button label="+" click="incrementTime('hour')" width="100%"/>
+					<s:Label text="{timeFormatter2.format(currentTime)}" width="100%" textAlign="center" fontSize="40"/>
+					<s:Button label="-" click="decrementTime('hour')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup gap="10" width="90">
+					<s:Button label="+" click="incrementTime('minute')" width="100%"/>
+					<s:Label text="{minute}" width="100%" textAlign="center" fontSize="40"/>
+					<s:Button label="-" click="decrementTime('minute')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup gap="10" width="90">
+					<s:Button label="+" click="incrementTime('second')" width="100%"/>
+					<s:Label text="{second}" width="100%" textAlign="center" fontSize="40"/>
+					<s:Button label="-" click="decrementTime('second')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup gap="10" width="90" visible="{!fullDayMode}" includeInLayout="{!fullDayMode}" verticalAlign="middle" height="100%">
+					<s:Button label="{timeMode}" click="changeMode()" width="100%"/>
+				</s:VGroup>
+			</s:HGroup>
+			<s:BorderContainer backgroundColor="0xcccccc" width="100%">
+				<s:HGroup width="100%" verticalAlign="middle" paddingTop="15" paddingBottom="15" paddingLeft="10" paddingRight="10">
+					<s:Button width="100%" label="Set" click="setTime()"/>
+					<s:Button width="100%" label="Cancel" click="cancelTime()"/>
+				</s:HGroup>
+			</s:BorderContainer>
+		</s:VGroup>
+	</s:BorderContainer>
+	
+	<fx:Script>
+		<![CDATA[
+			import myComponents.TimePickerEvent;
+			
+			import mx.managers.PopUpManager;
+			private var _currentTime: Date;
+			[Bindable]
+			public function get currentTime(): Date
+			{
+				return _currentTime;
+			}
+			public function set currentTime(value: Date): void
+			{
+				_currentTime = value;
+				updateTimeParts();
+			}
+			
+			[Bindable]
+			public var timeMode: String = 'AM';
+			private var _fullDayMode: Boolean;
+			[Bindable]
+			public function get fullDayMode(): Boolean
+			{
+				return _fullDayMode;
+			}
+			public function set fullDayMode(value: Boolean): void
+			{
+				if (_fullDayMode != value)
+				{
+					_fullDayMode = value;
+					if (_fullDayMode)
+					{
+						timeFormatter.dateTimePattern = 'HH:mm';
+						timeFormatter2.dateTimePattern = 'HH';
+					} else {
+						timeFormatter.dateTimePattern = 'hh:mm a';
+						timeFormatter2.dateTimePattern = 'hh';
+					}
+				}
+			}
+			
+			[Bindable]
+			public var hour: int;
+			[Bindable]
+			public var minute: int;
+			[Bindable]
+			public var second: int;
+			private var year:int;
+			private var month:int;
+			private var date:int;
+			
+			
+			private function changeMode(): void
+			{
+				if (timeMode == 'AM')
+				{
+					currentTime.setHours(currentTime.getHours() + 12);
+				} else {
+					currentTime.setHours(currentTime.getHours() - 12);
+				}
+				updateTimeParts();
+				
+				currentTime = new Date(year, month, date, hour, minute, second);
+				
+			}
+			private function updateTimeParts(): void
+			{
+				hour = currentTime.hours;
+				minute = currentTime.minutes;
+				second = currentTime.seconds;
+				year = currentTime.fullYear;
+				month = currentTime.month;
+				date = currentTime.date;
+				
+				if (hour >= 12)
+					timeMode = 'PM';
+				else {
+					timeMode = 'AM';
+				}
+			}
+			private function incrementTime(type: String): void
+			{
+				updateTime(type, 1);
+			}
+			private function decrementTime(type: String): void
+			{
+				updateTime(type, -1);
+			}
+			private function updateTime(type: String, value: int): void
+			{
+				switch(type)
+				{
+					case 'hour':
+						hour += value;
+						break;
+					case 'minute':
+						minute += value;
+						break;
+					case 'second':
+						second += value;
+						break;
+				}
+				currentTime = new Date(year, month, date, hour, minute, second);
+			}
+			
+			private function setTime(): void
+			{
+				var tpe: TimePickerEvent = new TimePickerEvent(TimePickerEvent.TIME_PICKER_SET);
+				tpe.time = currentTime;
+				dispatchEvent(tpe);
+				PopUpManager.removePopUp(this);
+			}
+			private function cancelTime(): void
+			{
+				var tpe: TimePickerEvent = new TimePickerEvent(TimePickerEvent.TIME_PICKER_CANCEL);
+				dispatchEvent(tpe);
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</fx:Script>
+</s:Group>

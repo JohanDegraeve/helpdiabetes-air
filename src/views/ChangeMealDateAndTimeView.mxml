@@ -42,6 +42,9 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			
 			import myComponents.DatePicker;
 			import myComponents.DatePickerEvent;
+			import myComponents.TimePicker;
+			import myComponents.TimePickerEvent;
+			
 			[Bindable]
 			private var mealname_textarea_text:String;
 			[Bindable]
@@ -85,7 +88,26 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 
 
 			private function timeClicked():void {
+				var timePicker:TimePicker = new TimePicker();
+				timePicker.currentTime = new Date(data.timeStamp as Number);
+				timePicker.addEventListener(TimePickerEvent.TIME_PICKER_SET, onTimeSet);
+				timePicker.addEventListener(TimePickerEvent.TIME_PICKER_CANCEL, onTimeCancel);
+				PopUpManager.addPopUp(timePicker, this, true);
+				PopUpManager.centerPopUp(timePicker);
 				
+				function onTimeCancel(event: TimePickerEvent): void
+				{
+					timePicker.removeEventListener(TimePickerEvent.TIME_PICKER_SET, onTimeSet);
+					timePicker.removeEventListener(TimePickerEvent.TIME_PICKER_CANCEL, onTimeCancel);
+				}
+				
+				function onTimeSet(event: TimePickerEvent): void
+				{
+					timePicker.removeEventListener(TimePickerEvent.TIME_PICKER_SET, onTimeSet);
+					timePicker.removeEventListener(TimePickerEvent.TIME_PICKER_CANCEL, onTimeCancel);
+					data.timeStamp = event.time.valueOf();
+
+				}
 			}
 			
 			private function okClicked():void {

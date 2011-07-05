@@ -35,6 +35,9 @@ copied from franto.com
 			public var month: int;
 			[Bindable]
 			public var year: int;
+			private var hour:int;
+			private var minute:int;
+			private var second:int;
 			
 			
 			private function init(): void
@@ -45,6 +48,9 @@ copied from franto.com
 				day = currentDate.date;
 				month = currentDate.month;
 				year = currentDate.fullYear;
+				hour = currentDate.hours;
+				minute = currentDate.minutes;
+				second = currentDate.seconds;
 			}
 			private function incrementDate(type: String): void
 			{
@@ -56,7 +62,6 @@ copied from franto.com
 			}
 			private function updateDate(type: String, value: int): void
 			{
-				currentDate = new Date(year, month, day);
 				switch(type)
 				{
 					case 'day':
@@ -69,7 +74,7 @@ copied from franto.com
 						year += value;
 						break;
 				}
-				currentDate = new Date(year, month, day);
+				currentDate = new Date(year, month, day,hour,minute,second);
 			}
 			
 			private function setDate(): void
@@ -92,7 +97,7 @@ copied from franto.com
 	<s:BorderContainer backgroundColor="0x444444" width="100%" borderColor="0xcccccc" borderWeight="4" cornerRadius="10">
 		
 		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
-			<s:Label text="{dayformatter.format(currentDate)}" width="100%" />
+			<s:Label text="{dayformatter.format(currentDate)}" width="100%" styleName="textColorInDatePickerOnDarkBackground"/>
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0xcccccc" weight="2"/>
@@ -101,17 +106,17 @@ copied from franto.com
 			<s:HGroup width="100%">
 				<s:VGroup gap="10" >
 					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('day')" width="100%"/>
-					<s:Label text="{day}" width="100%" textAlign="center" />
+					<s:Label text="{day}" width="100%" textAlign="center" styleName="textColorInDatePickerOnDarkBackground"/>
 					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('day')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup gap="10" >
 					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('month')" width="100%"/>
-					<s:Label text="{monthformatter.format(currentDate)}" width="100%" textAlign="center" />
+					<s:Label text="{monthformatter.format(currentDate)}" width="100%" textAlign="center" styleName="textColorInDatePickerOnDarkBackground"/>
 					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('month')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup gap="10" >
 					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('year')" width="100%"/>
-					<s:Label text="{year}" width="100%" textAlign="center" />
+					<s:Label text="{year}" width="100%" textAlign="center" styleName="textColorInDatePickerOnDarkBackground"/>
 					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('year')" width="100%"/>
 				</s:VGroup>
 			</s:HGroup>
