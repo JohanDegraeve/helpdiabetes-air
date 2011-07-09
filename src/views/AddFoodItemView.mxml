@@ -106,6 +106,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				//here's the set the correct initial value for meal_button_text
 				if (ModelLocator.getInstance().selectedMeal >= 0) {
+					var test:Object = ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal);
 					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				}
 
@@ -170,7 +171,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 					}
 				} else {
-					ModelLocator.getInstance().selectedMeal = 1;					
+					//find the second meal, because the list of meals starts with dayline, and if it's today breakfast time, then the third line is also dayline
+					var mealCounter:int = 0;
+					for (var m:int = 0;m < ModelLocator.getInstance().meals.length;m++) {
+						if (ModelLocator.getInstance().meals.getItemAt(m) is Meal) {
+							mealCounter++;
+							if (mealCounter == 2) {
+								ModelLocator.getInstance().selectedMeal = m;
+							}
+						}
+					}
 				}
 				
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);

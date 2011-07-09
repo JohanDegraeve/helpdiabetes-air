@@ -199,6 +199,12 @@ package databaseclasses
 			return _timeStamp;
 		}
 		
+		public function set timeStamp(timeStamp:Number):void {
+			this._timeStamp = timeStamp;
+			if (_mealEvent != null)
+				_mealEvent.timeStamp = timeStamp;
+		}
+		
 		/**
 		 * returns true of this meal has a mealevent
 		 */

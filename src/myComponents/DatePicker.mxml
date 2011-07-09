@@ -9,11 +9,6 @@ copied from franto.com
 		<s:DateTimeFormatter id="dayformatter" dateTimePattern="EEEE" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
 		<s:DateTimeFormatter id ="monthformatter" dateTimePattern="MMM" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
 	</fx:Declarations>
- 	<fx:Style>
-		@namespace s "library://ns.adobe.com/flex/spark";
-		@namespace components "spark.components.*";
-		
-	</fx:Style>
 <fx:Script>
 		<![CDATA[
 			import mx.managers.PopUpManager;

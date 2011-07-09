@@ -239,7 +239,7 @@ package databaseclasses
 		/**
 		 * @private
 		 */
-		internal function set mealName(value:String):void
+		public function set mealName(value:String):void
 		{
 			_mealName = value;
 		}
@@ -269,7 +269,7 @@ package databaseclasses
 		 * as MealEvent implements Itimestamp, it shoud have a timestamp<br>
 		 * the value will be assigned at creation, 
 		 */
-		private function set timeStamp(timeStamp:Number):void
+		public function set timeStamp(timeStamp:Number):void
 		{
 			this._timeStamp = timeStamp;
 		}

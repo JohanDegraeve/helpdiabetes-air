@@ -7,3 +7,8 @@ s|Application {fontSize:20pt}
 .textColorInDatePickerOnDarkBackground {
 	color:white
 }
+
+/* typically for text that should be smaller than normal text */
+.fontSizeForSubElements {
+	fontSize:16pt
+}

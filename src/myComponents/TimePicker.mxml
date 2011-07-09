@@ -1,49 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 width="420"
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
 		 >
 	<fx:Declarations>
 		<s:DateTimeFormatter id="timeFormatter" dateStyle="none" dateTimePattern="hh:mm a"/>
 		<s:DateTimeFormatter id="timeFormatter2" dateStyle="none" dateTimePattern="hh"/>
 	</fx:Declarations>
-	<s:BorderContainer backgroundColor="0x444444" width="100%" borderColor="0xcccccc" borderWeight="4" cornerRadius="10">
-		
-		<s:VGroup width="100%" gap="10" paddingBottom="15" paddingLeft="15" paddingRight="15" paddingTop="15">
-			<s:Label text="{timeFormatter.format(currentTime)}" width="100%" fontSize="40"/>
-			<s:Line width="100%">
-				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="2"/>
-				</s:stroke>
-			</s:Line>
-			<s:HGroup width="100%">
-				<s:VGroup gap="10" width="90">
-					<s:Button label="+" click="incrementTime('hour')" width="100%"/>
-					<s:Label text="{timeFormatter2.format(currentTime)}" width="100%" textAlign="center" fontSize="40"/>
-					<s:Button label="-" click="decrementTime('hour')" width="100%"/>
-				</s:VGroup>
-				<s:VGroup gap="10" width="90">
-					<s:Button label="+" click="incrementTime('minute')" width="100%"/>
-					<s:Label text="{minute}" width="100%" textAlign="center" fontSize="40"/>
-					<s:Button label="-" click="decrementTime('minute')" width="100%"/>
-				</s:VGroup>
-				<s:VGroup gap="10" width="90">
-					<s:Button label="+" click="incrementTime('second')" width="100%"/>
-					<s:Label text="{second}" width="100%" textAlign="center" fontSize="40"/>
-					<s:Button label="-" click="decrementTime('second')" width="100%"/>
-				</s:VGroup>
-				<s:VGroup gap="10" width="90" visible="{!fullDayMode}" includeInLayout="{!fullDayMode}" verticalAlign="middle" height="100%">
-					<s:Button label="{timeMode}" click="changeMode()" width="100%"/>
-				</s:VGroup>
-			</s:HGroup>
-			<s:BorderContainer backgroundColor="0xcccccc" width="100%">
-				<s:HGroup width="100%" verticalAlign="middle" paddingTop="15" paddingBottom="15" paddingLeft="10" paddingRight="10">
-					<s:Button width="100%" label="Set" click="setTime()"/>
-					<s:Button width="100%" label="Cancel" click="cancelTime()"/>
-				</s:HGroup>
-			</s:BorderContainer>
-		</s:VGroup>
-	</s:BorderContainer>
 	
 	<fx:Script>
 		<![CDATA[
@@ -165,4 +127,36 @@
 			}
 		]]>
 	</fx:Script>
+	<s:BorderContainer backgroundColor="0x444444" width="100%" borderColor="0xcccccc" borderWeight="4" cornerRadius="10">
+		
+		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+			<s:Label text="{timeFormatter.format(currentTime)}" width="100%" styleName="textColorInDatePickerOnDarkBackground"/>
+			<s:Line width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="2"/>
+				</s:stroke>
+			</s:Line>
+			<s:HGroup width="100%">
+				<s:VGroup gap="10">
+					<s:Button label="+" minWidth="60" minHeight="60" click="incrementTime('hour')" width="100%"/>
+					<s:Label text="{timeFormatter2.format(currentTime)}" width="100%" textAlign="center" styleName="textColorInDatePickerOnDarkBackground"/>
+					<s:Button label="-" minWidth="60" minHeight="60" click="decrementTime('hour')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup gap="10" >
+					<s:Button label="+" minWidth="60" minHeight="60" click="incrementTime('minute')" width="100%"/>
+					<s:Label text="{minute}" width="100%" textAlign="center" styleName="textColorInDatePickerOnDarkBackground"/>
+					<s:Button label="-" minWidth="60" minHeight="60" click="decrementTime('minute')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup gap="10" visible="{!fullDayMode}" includeInLayout="{!fullDayMode}" verticalAlign="middle" height="100%">
+					<s:Button label="{timeMode}" click="changeMode()" width="100%"/>
+				</s:VGroup>
+			</s:HGroup>
+			<s:BorderContainer backgroundColor="0xcccccc" width="100%">
+				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
+					<s:Button height="50%" width="100%" minHeight="60" label="Set" click="setTime()"/>
+					<s:Button height="50%" width="100%" minHeight="60" label="Cancel" click="cancelTime()"/>
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:VGroup>
+	</s:BorderContainer>
 </s:Group>

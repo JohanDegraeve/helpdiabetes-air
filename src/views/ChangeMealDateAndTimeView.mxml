@@ -18,14 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 -->
 <!---
 view to modify a meal's date and time
-When creating a ChangeMealDateAndTimeView with navigator.pushView, the second parameter in pushView should contain an array with meal name as String and timeStamp as Number, example
-{mealname:"any name",timeStamp:aNumberThatRepresentsATimeStamp}
+When creating a ChangeMealDateAndTimeView with navigator.pushView, the second parameter in pushView should contain the meal, example
+{meal:aMealObject}
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		preinitialize="preInit()"
 		creationComplete="onCreationComplete()"
-		title="ChangeMealDateAndTime" >
+		title="ChangeMealDateAndTime">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}">
 			
@@ -37,6 +37,11 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 	
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.Meal;
+			
+			import model.ModelLocator;
+			
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			import mx.resources.Locale;
 			
@@ -53,20 +58,22 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			private var time_button_text:String;
 			[Bindable]
 			private var ok_button_text:String;
+			private var previousTimeStamp:Number;
 
 			private function preInit():void {
 				ok_button_text = resourceManager.getString('general','ok');
 			}
 			
 			private function onCreationComplete():void {
-				mealname_textarea_text = data.mealname as String;
-				date_button_text = dateformatter.format(new Date(data.timeStamp as Number));
-				time_button_text = timeformatter.format(new Date(data.timeStamp as Number));
+				mealname_textarea_text = (data.meal as Meal).mealName ;
+				date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
+				time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
+				previousTimeStamp = (data.meal as Meal).timeStamp ;
 			}
 			
 			private function dateClicked():void {
 				var datePicker: DatePicker = new DatePicker();
-				datePicker.currentDate = new Date(data.timeStamp as Number);
+				datePicker.currentDate = new Date((data.meal as Meal).timeStamp);
 				datePicker.addEventListener(DatePickerEvent.DATE_PICKER_SET, onDateSet);
 				datePicker.addEventListener(DatePickerEvent.DATE_PICKER_CANCEL, onDateCancel);
 				PopUpManager.addPopUp(datePicker, this, true);
@@ -81,15 +88,15 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				{
 					datePicker.removeEventListener(DatePickerEvent.DATE_PICKER_SET, onDateSet);
 					datePicker.removeEventListener(DatePickerEvent.DATE_PICKER_CANCEL, onDateCancel);
-					data.timeStamp = event.date.valueOf();
-					date_button_text = dateformatter.format(new Date(data.timeStamp as Number));
+					(data.meal as Meal).timeStamp = event.date.valueOf();
+					date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
 				}
 			}
 
 
 			private function timeClicked():void {
 				var timePicker:TimePicker = new TimePicker();
-				timePicker.currentTime = new Date(data.timeStamp as Number);
+				timePicker.currentTime = new Date((data.meal as Meal).timeStamp);
 				timePicker.addEventListener(TimePickerEvent.TIME_PICKER_SET, onTimeSet);
 				timePicker.addEventListener(TimePickerEvent.TIME_PICKER_CANCEL, onTimeCancel);
 				PopUpManager.addPopUp(timePicker, this, true);
@@ -99,19 +106,31 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				{
 					timePicker.removeEventListener(TimePickerEvent.TIME_PICKER_SET, onTimeSet);
 					timePicker.removeEventListener(TimePickerEvent.TIME_PICKER_CANCEL, onTimeCancel);
+					(data.meal as Meal).timeStamp = previousTimeStamp;
 				}
 				
 				function onTimeSet(event: TimePickerEvent): void
 				{
 					timePicker.removeEventListener(TimePickerEvent.TIME_PICKER_SET, onTimeSet);
 					timePicker.removeEventListener(TimePickerEvent.TIME_PICKER_CANCEL, onTimeCancel);
-					data.timeStamp = event.time.valueOf();
-
+					(data.meal as Meal).timeStamp = event.time.valueOf();
+					time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
 				}
 			}
 			
+			/**
+			 * refresh the meals list, and pop two views so that we return back to addfooditemview
+			 */
 			private function okClicked():void {
-				
+				ModelLocator.getInstance().meals.refresh();
+				navigator.popView();
+			}
+			
+			/**
+			 * will return navigator.context
+			 */
+			override public function createReturnObject():Object {
+				return navigator.context;
 			}
 			
 		]]>

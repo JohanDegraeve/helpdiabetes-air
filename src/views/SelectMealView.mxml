@@ -23,7 +23,7 @@ view to show ModelLocator.getInstance().meals in a list
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title="SelectMealView"
 		creationComplete="onCreationComplete()" 
-		>
+		add="addHandler()">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -33,6 +33,8 @@ view to show ModelLocator.getInstance().meals in a list
 			
 			import model.ModelLocator;
 			
+			import mx.events.FlexEvent;
+			
 			import myComponents.IListElement;
 			
 			import spark.events.IndexChangeEvent;
@@ -40,6 +42,12 @@ view to show ModelLocator.getInstance().meals in a list
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();
 			}
+			
+			/**
+			 * used as context value when pushing the view ChangeMealDateAndTimeView<br>
+			 * when addHandler is called, the value of the return object will be check, if equal to SELECT_MEAL then view is popped
+			 */
+			private static const SELECT_MEAL:int = 1;
 			
 			private function onCreationComplete():void {
 				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
@@ -59,7 +67,9 @@ view to show ModelLocator.getInstance().meals in a list
 					navigator.popView();
 				} else {
 					navigator.pushView(ChangeMealDateAndTimeView,{
-						mealname:theMeal.mealName,timeStamp:theMeal.timeStamp
+						meal:theMeal
+					},{
+						context:SELECT_MEAL
 					});
 				}
 			}
@@ -68,7 +78,18 @@ view to show ModelLocator.getInstance().meals in a list
 				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
 				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
 			}
-
+			
+			/**
+			 * will check if navigator.poppedViewReturnedObject is not null and if so, checks the value<br>
+			 * if equal to SELECT_MEAL then view is popped.
+			 */
+			private function addHandler():void {
+				if (navigator.poppedViewReturnedObject != null) {
+					if (navigator.poppedViewReturnedObject.object.context == SELECT_MEAL)
+						navigator.popView();
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	<s:List id="meallist" left="0" right="0" top="0" bottom="0"
