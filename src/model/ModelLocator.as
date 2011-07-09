@@ -357,8 +357,6 @@ package model
 				}
 			}
 			meals.refresh();
-			var temp:Object = meals;
-			var temp2:int = ModelLocator.getInstance().selectedMeal;
 		}
 	}
 }

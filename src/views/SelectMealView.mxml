@@ -23,7 +23,7 @@ view to show ModelLocator.getInstance().meals in a list
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title="SelectMealView"
 		creationComplete="onCreationComplete()" 
-		add="addHandler()">
+		add="addHandler()" >
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -58,14 +58,21 @@ view to show ModelLocator.getInstance().meals in a list
 			}
 			
 			private function mealselected(event:IndexChangeEvent):void {
+				
+				//should we not do that also when ui is closed via back key ?
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
+				
 				//if it's a future meal without mealevent, we'll ask to user to enter start date and time of the meal
 				var theMeal:Meal = ModelLocator.getInstance().meals.getItemAt(event.newIndex) as Meal;
 				if (theMeal.hasMealEvent() || (theMeal.timeStamp < (new Date()).valueOf())) {
 					ModelLocator.getInstance().selectedMeal = event.newIndex;
-					ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
-					ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
 					navigator.popView();
 				} else {
+					
+					//saving event.newIndex in data, so that we still know it when return from changemealdateandtime
+					data = new Object();
+					data.tempSelection = event.newIndex;
 					navigator.pushView(ChangeMealDateAndTimeView,{
 						meal:theMeal
 					},{
@@ -85,8 +92,10 @@ view to show ModelLocator.getInstance().meals in a list
 			 */
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
-					if (navigator.poppedViewReturnedObject.object.context == SELECT_MEAL)
+					if (navigator.poppedViewReturnedObject.object.context == SELECT_MEAL) {
+						ModelLocator.getInstance().selectedMeal = data.tempSelection;
 						navigator.popView();
+					}
 				}
 			}
 			
