@@ -47,10 +47,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					+ " " 
 					+ (value as MealEvent).mealName;
 				
+				var temp:MealEvent = value as MealEvent;
+				
 				mealdetails_textarea_text = 
 					resourceManager.getString('general','carbs') + " : " +
 					Math.round((value as MealEvent).totalCarbs) + " " + resourceManager.getString('general','gram_short') + "; " +
-					
+				
 					(isNaN((value as MealEvent).calculatedInsulinAmount) ?
 						"":
 						resourceManager.getString('general','ratio') + " : " +

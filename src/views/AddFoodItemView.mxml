@@ -106,7 +106,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				//here's the set the correct initial value for meal_button_text
 				if (ModelLocator.getInstance().selectedMeal >= 0) {
-					var test:Object = ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal);
 					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				}
 

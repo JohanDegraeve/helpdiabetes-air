@@ -312,17 +312,6 @@ package model
 				ModelLocator.getInstance().meals.addItem(new Meal(supper,null,todayAtMidNight + i * 86400000 + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
 			}
 			
-			//initiailize ModelLocator.getInstance().selectedMeal
-			var mealCounter:int = 0;
-			for (var m:int = 0;m < ModelLocator.getInstance().meals.length;m++) {
-				if (ModelLocator.getInstance().meals.getItemAt(m) is Meal) {
-					mealCounter++;
-					if (mealCounter == 2) {
-						ModelLocator.getInstance().selectedMeal = m;
-					}
-				}
-			}			
-			
 			//now check for each mealevent, if it needs to replace a meal or if it needs to be added, replace if the name corresponds to one of the mealnames
 			var mealEventTimeStamp:Date;
 			var mealEventTimeStampAtMidNight:Number;
@@ -340,13 +329,15 @@ package model
 						//now go through all meals, find one with the same timeAtMidNight, then check if it's a breakfast, lunch, snack or supper
 						var mealFound:Boolean = false;
 						for (var k:int = 0; k < ModelLocator.getInstance().meals.length ;k++) {
-							mealTimeStamp = new Date((ModelLocator.getInstance().meals.getItemAt(k) as Meal).timeStamp);			
-							mealTimeStampAtMidNight = (new Date(mealTimeStamp.fullYear,mealTimeStamp.month,mealTimeStamp.date)).valueOf();
-							if (mealTimeStampAtMidNight == mealEventTimeStampAtMidNight) {
-								if ((ModelLocator.getInstance().meals.getItemAt(k) as Meal).mealName.toUpperCase() == 
-									(ModelLocator.getInstance().trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
-									mealFound = true;
-									ModelLocator.getInstance().meals.setItemAt(new Meal(null,(ModelLocator.getInstance().trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
+							if (ModelLocator.getInstance().meals.getItemAt(k) is Meal) {
+								mealTimeStamp = new Date((ModelLocator.getInstance().meals.getItemAt(k) as Meal).timeStamp);			
+								mealTimeStampAtMidNight = (new Date(mealTimeStamp.fullYear,mealTimeStamp.month,mealTimeStamp.date)).valueOf();
+								if (mealTimeStampAtMidNight == mealEventTimeStampAtMidNight) {
+									if ((ModelLocator.getInstance().meals.getItemAt(k) as Meal).mealName.toUpperCase() == 
+										(ModelLocator.getInstance().trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
+										mealFound = true;
+										ModelLocator.getInstance().meals.setItemAt(new Meal(null,(ModelLocator.getInstance().trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
+									}
 								}
 							}
 						}
@@ -356,7 +347,26 @@ package model
 					}
 				}
 			}
+			
 			meals.refresh();
+			
+			//initiailize ModelLocator.getInstance().selectedMeal to the second meal that is one of the standards meal
+			var mealCounter:int = 0;
+			
+			for (var m:int = 0;m < ModelLocator.getInstance().meals.length;m++) {
+				if (ModelLocator.getInstance().meals.getItemAt(m) is Meal) {
+					if (((ModelLocator.getInstance().meals.getItemAt(m) as Meal).mealName == breakfast) ||
+						((ModelLocator.getInstance().meals.getItemAt(m) as Meal).mealName == lunch) || 
+						((ModelLocator.getInstance().meals.getItemAt(m) as Meal).mealName == snack) ||
+						((ModelLocator.getInstance().meals.getItemAt(m) as Meal).mealName == supper))
+						mealCounter++;
+					if (mealCounter == 2) {
+						ModelLocator.getInstance().selectedMeal = m;
+					}
+				}
+			}			
+			
+
 		}
 	}
 }

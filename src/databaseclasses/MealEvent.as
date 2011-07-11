@@ -338,7 +338,7 @@ package databaseclasses
 		private function recalculateInsulinAmount():void {
 			this._calculatedInsulinAmount = Number.NaN;
 			if (!isNaN(_insulinRatio))
-				if (!isNaN(_insulinRatio)) {
+				if (!(_insulinRatio == 0)) {
 					this._calculatedInsulinAmount = this._totalCarbs/this._insulinRatio;
 					if (!isNaN(_correctionFactor))
 						if (_correctionFactor != 0)
@@ -346,10 +346,6 @@ package databaseclasses
 								if (previousBGlevel != 0)
 									this._calculatedInsulinAmount += (this._previousBGlevel - parseInt(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)))/this._correctionFactor;
 				}
-				else
-					this._calculatedInsulinAmount = 0;
-			else
-				this._calculatedInsulinAmount = 0;
 			
 
 		}
