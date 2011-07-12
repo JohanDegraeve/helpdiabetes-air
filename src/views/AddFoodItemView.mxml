@@ -337,7 +337,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
-					if (navigator.poppedViewReturnedObject.object.context != SELECT_MEAL)
+					if (navigator.poppedViewReturnedObject.object.context == SELECT_MEAL)
 						checkLastMealUpdateRequired = false;
 				}
 			}
