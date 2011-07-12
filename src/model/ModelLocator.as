@@ -361,7 +361,7 @@ package model
 						((ModelLocator.getInstance().meals.getItemAt(m) as Meal).mealName == supper))
 						mealCounter++;
 					if (mealCounter == 2) {
-						ModelLocator.getInstance().selectedMeal = m;
+						selectedMeal = m;
 					}
 				}
 			}			

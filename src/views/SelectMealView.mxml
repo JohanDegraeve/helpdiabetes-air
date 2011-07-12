@@ -45,9 +45,9 @@ view to show ModelLocator.getInstance().meals in a list
 			
 			/**
 			 * used as context value when pushing the view ChangeMealDateAndTimeView<br>
-			 * when addHandler is called, the value of the return object will be check, if equal to SELECT_MEAL then view is popped
+			 * when addHandler is called, the value of the return object will be check, if equal to CHANGE_MEAL_DATE_AND_TIME then view is popped
 			 */
-			private static const SELECT_MEAL:int = 1;
+			private static const CHANGE_MEAL_DATE_AND_TIME:int = 1;
 			
 			private function onCreationComplete():void {
 				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
@@ -76,7 +76,7 @@ view to show ModelLocator.getInstance().meals in a list
 					navigator.pushView(ChangeMealDateAndTimeView,{
 						meal:theMeal
 					},{
-						context:SELECT_MEAL
+						context:CHANGE_MEAL_DATE_AND_TIME
 					});
 				}
 			}
@@ -88,16 +88,25 @@ view to show ModelLocator.getInstance().meals in a list
 			
 			/**
 			 * will check if navigator.poppedViewReturnedObject is not null and if so, checks the value<br>
-			 * if equal to SELECT_MEAL then view is popped.
+			 * if equal to CHANGE_MEAL_DATE_AND_TIME then view is popped.
 			 */
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
-					if (navigator.poppedViewReturnedObject.object.context == SELECT_MEAL) {
+					if (navigator.poppedViewReturnedObject.object.context == CHANGE_MEAL_DATE_AND_TIME) {
 						ModelLocator.getInstance().selectedMeal = data.tempSelection;
 						navigator.popView();
 					}
 				}
 			}
+			
+			/**
+			 * will return navigator.context
+			 */
+			override public function createReturnObject():Object {
+				return navigator.context;
+			}
+			
+
 			
 		]]>
 	</fx:Script>

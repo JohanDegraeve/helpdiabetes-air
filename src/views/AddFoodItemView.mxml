@@ -23,7 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		tabBarVisible="true"
 		title="AddFoodItemView" xmlns:myComponents="myComponents.*" xmlns:mx="library://ns.adobe.com/flex/mx"
 		creationComplete="onCreationComplete()"
-		remove="onRemove()">
+		remove="onRemove()"
+		add="addHandler()">
 	<fx:Declarations>
 		<!--  seperationerror="" makes sure there's no round border even when there's a separator error -->
 		<mx:NumberValidator
@@ -86,6 +87,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var thisObject:DisplayObject;
 			
 			private var retrievedFoodItem:FoodItem;
+			
+			private var checkLastMealUpdateRequired:Boolean = true;
 
 			/**
 			 * the chosen unit from the list of units in retrievedFoodItem
@@ -99,6 +102,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var popUpForUnitList:SelectUnit;
 			
+			/**
+			 * used as context value when pushing the view SelectMealView<br>
+			 * when addHandler is called, the value of the return object will be check, if equal to CHANGE_MEAL_DATE_AND_TIME then not allowed to call checkLastMealUpdate
+			 */
+			private static const SELECT_MEAL:int = 1;
+			
+
+			
 			private function onCreationComplete():void {
 				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
@@ -106,6 +117,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				//here's the set the correct initial value for meal_button_text
 				if (ModelLocator.getInstance().selectedMeal >= 0) {
+					if (checkLastMealUpdateRequired)
+						checkLastMealUpdate();
 					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				}
 
@@ -155,35 +168,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onSelectedMealInitialized(e:flash.events.Event):void {
-				
+				checkLastMealUpdate();
+				meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+			}
+			
+			/**
+			 * will check if last meal entry was less than x minutes ago, and if so, that meal will be shown again.
+			 */
+			private function checkLastMealUpdate(): void {
 				//selected meal may have changed due to finishing database init for instance or refresh of the meallist , so we'll check here if we need to change the value
+				
+				//first remove the eventlistener
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
-				if ((new Date()).valueOf() - new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION)) < 15*60*1000) {
+				
+				//now check the time difference
+				if (((new Date()).valueOf() - new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION))) < 15*60*1000) {
 					//it's less than 15 minutes since the last meal addition
 					//..try to find the meal with corresponding mealeventid
 					for (var l:int = 0;l < ModelLocator.getInstance().meals.length; l++) {
-						if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).hasMealEvent()) {
-							if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).mealEvent.mealEventId == new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION))) {
-								ModelLocator.getInstance().selectedMeal = l;
-								l = ModelLocator.getInstance().meals.length;
+						if (ModelLocator.getInstance().meals.getItemAt(l) is Meal) {
+							if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).hasMealEvent()) {
+								if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).mealEvent.mealEventId == new Number(Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID))) {
+									ModelLocator.getInstance().selectedMeal = l;
+									l = ModelLocator.getInstance().meals.length;
+								}
 							}
 						}
 					}
-				} else {
-					//find the second meal, because the list of meals starts with dayline, and if it's today breakfast time, then the third line is also dayline
-					var mealCounter:int = 0;
-					for (var m:int = 0;m < ModelLocator.getInstance().meals.length;m++) {
-						if (ModelLocator.getInstance().meals.getItemAt(m) is Meal) {
-							mealCounter++;
-							if (mealCounter == 2) {
-								ModelLocator.getInstance().selectedMeal = m;
-							}
-						}
-					}
-				}
-				
+				} 
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
-				meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+				
 			}
 			
 			private function preInit():void {
@@ -311,12 +325,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				data.retrievedFoodItem = retrievedFoodItem;
 				data.selectedUnit = selectedUnit;
 				data.amount_textinput_text = amount_textinput_text;
-				navigator.pushView(SelectMealView,null);
+				navigator.pushView(SelectMealView,null,{
+					context:SELECT_MEAL
+				});
 			}
 			
 			private function onRemove():void {
 				if (popUpForUnitList != null)
 					PopUpManager.removePopUp(popUpForUnitList);
+			}
+			
+			private function addHandler():void {
+				if (navigator.poppedViewReturnedObject != null) {
+					if (navigator.poppedViewReturnedObject.object.context != SELECT_MEAL)
+						checkLastMealUpdateRequired = false;
+				}
 			}
 			
 		]]>

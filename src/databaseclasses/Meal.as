@@ -102,8 +102,9 @@ package databaseclasses
 		 * Also the previous blood glucose event is checked, if any. If the time difference is less than Settings.<br>
 		 * <br>
 		 * timeStamp is optional<br>
-		 * if timeStamp is not null, then this meal.timeStamp and also if a new mealevent is created, the mealevent's timestamp is set to the timestamp value
-		 * 
+		 * if timeStamp is not null, then this meal.timeStamp and also if a new mealevent is created, the mealevent's timestamp is set to the timestamp value<br>
+		 * if timeStamp is null, then default value is NaN, then in the method, if it's the first selectedfooditem being added, and if it's not a future meal, then the timestamp is set to current timestamp.<br>
+		 * (note : it looks as if the timeStamp parameter is never used, ie always the default value - maybe this can be delted)
 		 */
 		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,timeStamp:Number = Number.NaN):void {
 			var now:Date = new Date();
@@ -151,9 +152,11 @@ package databaseclasses
 					}
 				} 
 				if (_mealEvent == null) {
-					//it's the first selectedfooditem, and if no timestamp was supplied , then set _timestamp to current time
+					//it's the first selectedfooditem, and if no timestamp was supplied , and if it's not a future meal then set _timestamp to current time
 					if (isNaN(timeStamp)) {
-						_timeStamp = (new Date()).valueOf();
+						if (((new Date()).valueOf() - _timeStamp) > 0) {
+							_timeStamp = (new Date()).valueOf();
+						}
 					}
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
@@ -165,15 +168,18 @@ package databaseclasses
 			function mealEventCreated(de:DatabaseEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
+				
+				//just adding the selectedfooditem without waiting for the result
 				_mealEvent.addSelectedFoodItem(selectedFoodItem,null);
 				
-				//if de not null, then mealEventCreated as called after having created a new mealevent, that needs to be 
+				//if de not null, then mealEventCreated was called after having created a new mealevent, that needs to be 
 				//added in the trackinglist.
 				if (de != null) {
 					ModelLocator.getInstance().trackingList.addItem(_mealEvent);
 					ModelLocator.getInstance().trackingList.refresh();
 				}
 				Settings.getInstance().setSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION, (new Date()).valueOf().toString());
+				Settings.getInstance().setSetting(Settings.SettingLAST_MEAL_ID,_mealEvent.mealEventId.toString());
 			}
 				
 		    function mealEventCreationError(de:DatabaseEvent):void {

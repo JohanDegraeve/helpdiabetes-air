@@ -1512,12 +1512,12 @@ package databaseclasses
 							o.insulinratio as Number,
 							o.correctionfactor as Number,
 							o.prevousBGlevel as Number,
-							o.lastmodifiedtimestamp as Number,
+							o.creationtimestamp as Number,
 							null,
 							false,
 							new ArrayCollection(selectedFoodItems.toArray()),
 							o.mealeventid as Number,
-							o.creationtimestamp as Number);
+							o.lastmodifiedtimestamp  as Number);
 						ModelLocator.getInstance().trackingList.addItem(newMealEvent);
 					}
 				}
