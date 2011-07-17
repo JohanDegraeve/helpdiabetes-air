@@ -115,10 +115,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 				
+				//refresh the meals - checkLastMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
+				//no need to update ModelLocator.selectedMeal
+				var temp:Number = ModelLocator.getInstance().selectedMeal;
+				ModelLocator.getInstance().refreshMeals(checkLastMealUpdateRequired);
+				temp = ModelLocator.getInstance().selectedMeal;
+				
 				//here's the set the correct initial value for meal_button_text
 				if (ModelLocator.getInstance().selectedMeal >= 0) {
 					if (checkLastMealUpdateRequired)
 						checkLastMealUpdate();
+					temp = ModelLocator.getInstance().selectedMeal;
 					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				}
 

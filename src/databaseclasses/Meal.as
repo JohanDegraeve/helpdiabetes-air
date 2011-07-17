@@ -31,7 +31,7 @@ package databaseclasses
 	import myComponents.IListElement;
 	import myComponents.MealEventItemRenderer;
 	import myComponents.MealItemRenderer;
-
+	
 	/**
 	 * a name for the meal and a mealevent that can be null<br>
 	 * This class is in the first place created to hold the meals from which the user can chose when adding an item<br>

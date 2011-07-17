@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="HomeView"
+		initialize="init()" >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.resources.ResourceManager;
+			
+			import spark.events.IndexChangeEvent;
+			private var menuList:ArrayCollection = 	new ArrayCollection([
+				ResourceManager.getInstance().getString("general","foodcounter"),
+				ResourceManager.getInstance().getString("general","tracking"),
+				ResourceManager.getInstance().getString("general","foodtable"),
+				ResourceManager.getInstance().getString("general","settings"),
+				ResourceManager.getInstance().getString("general","infoabout")
+			]);	
+			
+			private function init():void {
+				/* add event listener for clicking item */
+				homeScreenList.addEventListener(Event.CHANGE,selectedElementChanged);
+			}
+			
+
+			
+			/**
+			 * will popup a view corresponding to the selected menu
+			 */
+			private function selectedElementChanged(event:IndexChangeEvent):void {
+				switch (event.newIndex) {
+					case 0:
+						navigator.pushView(FoodCounterView);
+						break;
+					case 1:
+						navigator.pushView(TrackingView);
+						break;
+					case 2:
+						navigator.pushView(FoodTableView);
+						break;
+					case 3:
+						navigator.pushView(SettingsView);
+						break;
+					case 4:
+						navigator.pushView(InfoAndHelpView);
+						break;
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<s:List id="homeScreenList" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.HomeScreenElementItemRenderer"
+			dataProvider="{menuList}">
+ 
+	</s:List>
+</s:View>
