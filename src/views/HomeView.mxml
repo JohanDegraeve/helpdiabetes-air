@@ -52,7 +52,7 @@
 		]]>
 	</fx:Script>
 	
-	<s:List id="homeScreenList" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.HomeScreenElementItemRenderer"
+	<s:List id="homeScreenList" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.MenuElementItemRenderer"
 			dataProvider="{menuList}">
  
 	</s:List>
