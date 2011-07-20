@@ -227,7 +227,7 @@ package model
 		 * index to the currently selected meal in meals<br>
 		 * initialized to -1 which means invalid value, it's the database initialization that will set it to a valid value<br>
 		 * When the value is initialized by database.init (ie change from value -1), then an event will be dispatched ModelLocator.SELECTEDMEAL_INITIALIZED<br>
-		 * When the value is changed (ie change from value different from -1), then an event will be dispatched ModelLocator.SELECTEDMEAL_CHANGED
+		 * When the value is changed (ie change from value different from -1), then an event will be dispatched ModelLocator.SELECTEDMEAL_CHANGED<br>
 		 */
 		public function set selectedMeal(value:int):void
 		{
@@ -243,8 +243,10 @@ package model
 		/**
 		 * reinitializes and populates ModelLocator.meals <br>
 		 * if updateSelectedMeal is true then it will also set the selected meal (selectedMeal) according to current time, ie the second meal (first meal is always previous meal)<br>
-		 * als DayLine items are added<br>
-		 * at the end meals.refresh is called and so sorted by timeStamp
+		 * also DayLine items are added<br>
+		 * at the end meals.refresh is called and so sorted by timeStamp<br>
+		 * <br>
+		 * Comment added later on - 20/07/2011: probably never used with updateSelectedMeal = false, I had to change something in AddFoodItemView.mxlm, in the creationComplete method, see comment over there
 		 */
 		public function refreshMeals(updateSelectedMeal:Boolean = true):void {
 			_meals = new ArrayCollection();

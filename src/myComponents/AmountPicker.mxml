@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!--
+user will enter an amount for something, could be amount of insulin for a specific type of meal
+needs to be shown as popup
+after creation and before showing set labelText and amount
+-->
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			
+			private var _amount: Number;
+			[Bindable]
+			public function get amount(): Date
+			{
+				return _amount;
+			}
+			public function set amount(value: Number): void
+			{
+				_amount = value;
+			}
+			
+			private var _labelText:String;
+			public function get labelText():String
+			{
+				return _labelText;
+			}
+			public function set labelText(value:String):void
+			{
+				_labelText = value;
+			}
+			
+			public override function set data(value:Object):void {
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer>
+		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+			<s:Label text="{labelText}" width="100%" styleName="textColorInPickerOnDarkBackground"/>
+			<s:TextInput text="{amount}" width="100%" styleName="textColorInPickerOnDarkBackground"/>
+		</s:VGroup>
+	</s:BorderContainer>
+</s:Group>
