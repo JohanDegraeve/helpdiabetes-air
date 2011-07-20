@@ -117,15 +117,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				//refresh the meals - checkLastMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
 				//no need to update ModelLocator.selectedMeal
-				var temp:Number = ModelLocator.getInstance().selectedMeal;
+				var temp:Object = ModelLocator.getInstance().meals;
 				ModelLocator.getInstance().refreshMeals(checkLastMealUpdateRequired);
-				temp = ModelLocator.getInstance().selectedMeal;
+				temp = ModelLocator.getInstance().meals;
 				
 				//here's the set the correct initial value for meal_button_text
 				if (ModelLocator.getInstance().selectedMeal >= 0) {
 					if (checkLastMealUpdateRequired)
 						checkLastMealUpdate();
-					temp = ModelLocator.getInstance().selectedMeal;
 					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				}
 
@@ -328,6 +327,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * called when mealbutton clicked
 			 */
 			private function mealButtonClicked():void {
+				var temp:Object = ModelLocator.getInstance().meals;
 				data = new Object();
 				data.retrievedFoodItem = retrievedFoodItem;
 				data.selectedUnit = selectedUnit;
@@ -344,8 +344,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
-					if (navigator.poppedViewReturnedObject.object.context == SELECT_MEAL)
+					if (navigator.poppedViewReturnedObject.object.context == SELECT_MEAL) {
 						checkLastMealUpdateRequired = false;
+						var temp:Object = ModelLocator.getInstance().meals;
+					}
 				}
 			}
 			

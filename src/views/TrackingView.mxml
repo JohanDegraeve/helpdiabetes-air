@@ -31,6 +31,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 		]]>
 	</fx:Script>
+	<s:navigationContent>
+		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
+	</s:navigationContent>
 	<s:List id = "trackinglist" 
 			dataProvider="{ModelLocator.getInstance().trackingList}"
 			itemRendererFunction="getItemRenderer">

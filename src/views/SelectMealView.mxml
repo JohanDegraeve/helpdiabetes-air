@@ -110,6 +110,9 @@ view to show ModelLocator.getInstance().meals in a list
 			
 		]]>
 	</fx:Script>
+	<s:navigationContent>
+		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
+	</s:navigationContent>
 	<s:List id="meallist" left="0" right="0" top="0" bottom="0"
 			dataProvider="{ModelLocator.getInstance().meals}" 
 			itemRendererFunction="getItemRenderer">

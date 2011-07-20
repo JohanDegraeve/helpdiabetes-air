@@ -4,11 +4,20 @@
 
 s|Application {fontSize:20pt} 
 
-.textColorInDatePickerOnDarkBackground {
+/* picker is for instance datepicker, timepicker, amountpicker */
+.textColorInPickerOnDarkBackground {
 	color:white
 }
 
 /* typically for text that should be smaller than normal text */
 .fontSizeForSubElements {
 	fontSize:16pt
+}
+
+s|BorderContainer {
+	/* used here for example in timepicker, datepicker, insulinamountbicker*/
+	backgroundColor:#444444;
+	borderColor:#cccccc; 
+	borderWeight:4;
+	cornerRadius:10
 }

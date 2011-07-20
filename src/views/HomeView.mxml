@@ -5,11 +5,16 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<fx:Metadata>
+		[ResourceBundle("general")]
+	</fx:Metadata>
+	
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			import mx.resources.ResourceManager;
+			
 			
 			import spark.events.IndexChangeEvent;
 			private var menuList:ArrayCollection = 	new ArrayCollection([

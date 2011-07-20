@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+copied from franto.com
+-->										  
+<!--
+user wil enter a time
+-->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
 		 >
@@ -9,7 +15,7 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import myComponents.TimePickerEvent;
+			import myComponents.PickerEvent;
 			
 			import mx.managers.PopUpManager;
 			private var _currentTime: Date;
@@ -114,23 +120,23 @@
 			
 			private function setTime(): void
 			{
-				var tpe: TimePickerEvent = new TimePickerEvent(TimePickerEvent.TIME_PICKER_SET);
-				tpe.time = currentTime;
+				var tpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
+				tpe.newValue = currentTime;
 				dispatchEvent(tpe);
 				PopUpManager.removePopUp(this);
 			}
 			private function cancelTime(): void
 			{
-				var tpe: TimePickerEvent = new TimePickerEvent(TimePickerEvent.TIME_PICKER_CANCEL);
+				var tpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_CANCEL);
 				dispatchEvent(tpe);
 				PopUpManager.removePopUp(this);
 			}
 		]]>
 	</fx:Script>
-	<s:BorderContainer backgroundColor="0x444444" width="100%" borderColor="0xcccccc" borderWeight="4" cornerRadius="10">
+	<s:BorderContainer >
 		
 		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
-			<s:Label text="{timeFormatter.format(currentTime)}" width="100%" styleName="textColorInDatePickerOnDarkBackground"/>
+			<s:Label text="{timeFormatter.format(currentTime)}" width="100%" styleName="textColorInPickerOnDarkBackground"/>
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0xcccccc" weight="2"/>
@@ -139,12 +145,12 @@
 			<s:HGroup width="100%">
 				<s:VGroup gap="10">
 					<s:Button label="+" minWidth="60" minHeight="60" click="incrementTime('hour')" width="100%"/>
-					<s:Label text="{timeFormatter2.format(currentTime)}" width="100%" textAlign="center" styleName="textColorInDatePickerOnDarkBackground"/>
+					<s:Label text="{timeFormatter2.format(currentTime)}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
 					<s:Button label="-" minWidth="60" minHeight="60" click="decrementTime('hour')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup gap="10" >
 					<s:Button label="+" minWidth="60" minHeight="60" click="incrementTime('minute')" width="100%"/>
-					<s:Label text="{minute}" width="100%" textAlign="center" styleName="textColorInDatePickerOnDarkBackground"/>
+					<s:Label text="{minute}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
 					<s:Button label="-" minWidth="60" minHeight="60" click="decrementTime('minute')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup gap="10" visible="{!fullDayMode}" includeInLayout="{!fullDayMode}" verticalAlign="middle" height="100%">
