@@ -21,10 +21,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<fx:Metadata>
+		[ResourceBundle("settingsview")]
+		[ResourceBundle("general")]
+	</fx:Metadata>
+	
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.Settings;
+			
+			import model.ModelLocator;
+			
+			import mx.managers.PopUpManager;
+			
+			import myComponents.AmountPicker;
+			import myComponents.PickerEvent;
+			
 			private function breakfastSettingClicked(event:Event):void  {
-				var test:int=0;
+				var amountPicker:AmountPicker = new AmountPicker();
+				amountPicker.labelText = "hello";
+				amountPicker.amount = parseFloat(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST));
+				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
+				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
+				PopUpManager.addPopUp(amountPicker, this, true);
+				PopUpManager.centerPopUp(amountPicker);
+				
+				function onAmountCancel(event: PickerEvent): void
+				{
+					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
+					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
+				}
+				
+				function onAmountSet(event: PickerEvent): void
+				{
+					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
+					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
+					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_BREKFAST,(event.newValue as Number).toString());
+					breakfastRatio.text = (event.newValue as Number).toString();
+				}
 			}
 		]]>
 	</fx:Script>
@@ -37,9 +71,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			</s:VerticalLayout>
 		</s:layout>
 		<s:Group id="breakfastSetting" y="0" x="0" width="100%" height = "100%" click="breakfastSettingClicked(event)">
-			<s:TextArea text="test">
-				
-			</s:TextArea>	
+			<s:layout>
+				<s:HorizontalLayout>
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:TextArea width="60%" text="{resourceManager.getString('general','breakfast') + ' :'}" editable="false"/>
+			<s:TextArea id="breakfastRatio" width="40%" text="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST)}" editable="false"/>
 		</s:Group>
 	</s:Group>
 </s:View>
