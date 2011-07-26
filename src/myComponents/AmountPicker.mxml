@@ -22,12 +22,18 @@ needs to be shown as popup
 after creation and before showing set labelText and amount
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark">
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 implements="mx.managers.IFocusManagerContainer">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<fx:Metadata>
+		[ResourceBundle("general")]
+	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import mx.core.IFlexDisplayObject;
+			import mx.managers.PopUpManager;
 			
 			private var _amount: Number;
 			[Bindable]
@@ -40,23 +46,88 @@ after creation and before showing set labelText and amount
 				_amount = value;
 			}
 			
-			private var _labelText:String;
-			public function get labelText():String
+			/**
+			 * two labels will be shown this is the second label 
+			 */
+			private var _labelText1:String;
+			public function get labelText1():String
 			{
-				return _labelText;
+				return _labelText1;
 			}
 			
-			public function set labelText(value:String):void
+			public function set labelText1(value:String):void
 			{
-				_labelText = value;
+				_labelText1 = value;
 			}
 			
+			/**
+			 * two labels will be shown this is the second label 
+			 */
+			private var _labelText2:String;
+			public function get labelText2():String
+			{
+				return _labelText2;
+			}
+			
+			public function set labelText2(value:String):void
+			{
+				_labelText2 = value;
+			}
+
+			// **************//
+			// see http://flex4examples.wordpress.com/2011/05/05/skinnabletextbase-focusmanager-runtime-error-popup/
+				            public function get defaultButton():IFlexDisplayObject
+				            {
+				                //TODO:
+				                return null;
+				            }
+				 
+				            public function set defaultButton(value:IFlexDisplayObject):void
+				            {
+				                //TODO:
+				            }
+			// **************//
+			
+			private function setAmount():void {
+				//first replace "," by ".", because flex doesn't seem to work correctly when using "," as decimal seperator
+				var temp:String;
+				temp = enteredRatio.text.split(",").join(".");
+				//applying a trick here to get rid of too many ".", first replacing the first "." by "{", hoping the user will never type this character
+				//then replacing all remaining "." by "", then rereplacing "{" by "."
+				temp = temp.split(".",2).join("{");
+				temp = temp.split(".").join("");
+				temp = temp.split("{",2).join(".");
+
+				var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
+				dpe.newValue = parseFloat(temp);
+				dispatchEvent(dpe);
+				PopUpManager.removePopUp(this);
+			}
+			
+			private function cancel():void  {
+				PopUpManager.removePopUp(this);
+			}
+				
 		]]>
 	</fx:Script>
 	<s:BorderContainer>
-		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
-			<s:Label text="{labelText}" width="100%" styleName="textColorInPickerOnDarkBackground"/>
-			<s:TextInput text="{amount}" width="100%" styleName="textColorInPickerOnDarkBackground"/>
+		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+			<s:Label text="{labelText1}" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<s:Label text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<s:Line width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="2"/>
+				</s:stroke>
+			</s:Line>
+			<s:TextInput id="enteredRatio" text="{amount}" width="100%" maxWidth="{vgroup.width - 20}" restrict="0123456789.,"  />
+			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
+				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
+					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="setAmount()"/>
+					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','cancel')}" click="cancel()"/>
+				</s:VGroup>
+			</s:BorderContainer>
 		</s:VGroup>
+
+		
 	</s:BorderContainer>
 </s:Group>

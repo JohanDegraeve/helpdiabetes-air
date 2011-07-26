@@ -12,7 +12,9 @@ user wil enter a time
 		<s:DateTimeFormatter id="timeFormatter" dateStyle="none" dateTimePattern="hh:mm a"/>
 		<s:DateTimeFormatter id="timeFormatter2" dateStyle="none" dateTimePattern="hh"/>
 	</fx:Declarations>
-	
+	<fx:Metadata>
+		[ResourceBundle("general")]
+	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
 			import myComponents.PickerEvent;
@@ -159,8 +161,8 @@ user wil enter a time
 			</s:HGroup>
 			<s:BorderContainer backgroundColor="0xcccccc" width="100%">
 				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
-					<s:Button height="50%" width="100%" minHeight="60" label="Set" click="setTime()"/>
-					<s:Button height="50%" width="100%" minHeight="60" label="Cancel" click="cancelTime()"/>
+					<s:Button height="50%" width="100%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="setTime()"/>
+					<s:Button height="50%" width="100%" minHeight="60" label="{resourceManager.getStringArray('general','cancel')}" click="cancelTime()"/>
 				</s:VGroup>
 			</s:BorderContainer>
 		</s:VGroup>

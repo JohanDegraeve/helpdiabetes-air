@@ -35,6 +35,12 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 		</s:DateTimeFormatter>
 	</fx:Declarations>
 	
+	<fx:Metadata>
+		[ResourceBundle("general")]
+	</fx:Metadata>
+	
+
+	
 	<fx:Script>
 		<![CDATA[
 			import databaseclasses.Meal;

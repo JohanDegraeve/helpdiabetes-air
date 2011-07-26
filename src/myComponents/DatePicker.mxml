@@ -12,9 +12,13 @@ user wil enter a date
 		<s:DateTimeFormatter id="dayformatter" dateTimePattern="EEEE" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
 		<s:DateTimeFormatter id ="monthformatter" dateTimePattern="MMM" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
 	</fx:Declarations>
+	<fx:Metadata>
+		[ResourceBundle("general")]
+	</fx:Metadata>
 <fx:Script>
 		<![CDATA[
 			import mx.managers.PopUpManager;
+			import mx.resources.ResourceManager;
 			private var _currentDate: Date;
 			[Bindable]
 			public function get currentDate(): Date
@@ -120,8 +124,8 @@ user wil enter a date
 			</s:HGroup>
 			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
 				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
-					<s:Button width="100%" height="50%" minHeight="60" label="Set" click="setDate()"/>
-					<s:Button width="100%" height="50%" minHeight="60" label="Cancel" click="cancelDate()"/>
+					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="setDate()"/>
+					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','cancel')}" click="cancelDate()"/>
 				</s:VGroup>
 			</s:BorderContainer>
 		</s:VGroup>
