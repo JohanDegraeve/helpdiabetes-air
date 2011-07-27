@@ -118,7 +118,6 @@ package databaseclasses
 				this._mealEventId = mealEventId;
 				this._selectedFoodItems = selectedFoodItems;
 				recalculateTotals();
-				recalculateInsulinAmount();
 			}
 			else  {
 				_mealEventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
@@ -138,6 +137,8 @@ package databaseclasses
 					_timeStamp.valueOf(),
 					localDispatcher);
 			}
+			
+			recalculateInsulinAmount();
 			
 			function mealEventCreated(successEvent:DatabaseEvent):void  {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
