@@ -118,12 +118,12 @@ package databaseclasses
 				this._mealEventId = mealEventId;
 				this._selectedFoodItems = selectedFoodItems;
 				recalculateTotals();
+				recalculateInsulinAmount();
 			}
 			else  {
 				_mealEventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
 				_selectedFoodItems = new ArrayCollection();
-				
-				
+								
 				var localDispatcher:EventDispatcher = new EventDispatcher();
 				localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
 				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
@@ -137,8 +137,6 @@ package databaseclasses
 					_timeStamp.valueOf(),
 					localDispatcher);
 			}
-			
-			recalculateInsulinAmount();
 			
 			function mealEventCreated(successEvent:DatabaseEvent):void  {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
@@ -189,10 +187,13 @@ package databaseclasses
 				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,timeStampUpdated);
 				
 				/* recalculate totals */
-				_totalCarbs += selectedFoodItem.unit.carbs/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+				/*_totalCarbs += selectedFoodItem.unit.carbs/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
 				_totalKilocalories += selectedFoodItem.unit.kcal/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
 				_totalProtein += selectedFoodItem.unit.protein/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
 				_totalFat += selectedFoodItem.unit.fat/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+				*/
+				recalculateTotals();
+				recalculateInsulinAmount();
 				
 				_lastModifiedTimeStamp = (new Date()).valueOf();
 				Database.getInstance().updateMealEventLastModifiedTimeStamp(_lastModifiedTimeStamp,_mealEventId,localDispatcher);	
