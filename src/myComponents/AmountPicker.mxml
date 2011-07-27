@@ -23,7 +23,8 @@ after creation and before showing set labelText and amount
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark"
-		 implements="mx.managers.IFocusManagerContainer">
+		 implements="mx.managers.IFocusManagerContainer"
+		 creationComplete="onCreationComplete()">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -33,17 +34,22 @@ after creation and before showing set labelText and amount
 	<fx:Script>
 		<![CDATA[
 			import mx.core.IFlexDisplayObject;
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
-			private var _amount: Number;
 			[Bindable]
-			public function get amount(): Number
+			private var _amount: String;
+			
+			public function get amount(): String
 			{
-				return _amount;
+				return (_amount == "" ? "0":_amount);
 			}
-			public function set amount(value: Number): void
+			
+			public function set amount(value: String): void
 			{
 				_amount = value;
+				if (_amount == "0")
+					_amount = "";
 			}
 			
 			/**
@@ -91,7 +97,7 @@ after creation and before showing set labelText and amount
 			private function setAmount():void {
 				//first replace "," by ".", because flex doesn't seem to work correctly when using "," as decimal seperator
 				var temp:String;
-				temp = enteredRatio.text.split(",").join(".");
+				temp = amount.split(",").join(".");
 				//applying a trick here to get rid of too many ".", first replacing the first "." by "{", hoping the user will never type this character
 				//then replacing all remaining "." by "", then rereplacing "{" by "."
 				temp = temp.split(".",2).join("{");
@@ -107,7 +113,18 @@ after creation and before showing set labelText and amount
 			private function cancel():void  {
 				PopUpManager.removePopUp(this);
 			}
-				
+			
+			private function onCreationComplete():void {
+				//set focus to amount field, on android this immediately shows up the keyboard
+				this.focusManager.setFocus(enteredRatio);
+				//we'll add an eventlistener for pressing enter when editing the amount
+				enteredRatio.addEventListener(FlexEvent.ENTER,onPressEnter);
+			}
+
+			private function onPressEnter(event:FlexEvent):void {
+				setAmount();
+			}
+
 		]]>
 	</fx:Script>
 	<s:BorderContainer>
@@ -119,7 +136,7 @@ after creation and before showing set labelText and amount
 					<s:SolidColorStroke color="0xcccccc" weight="2"/>
 				</s:stroke>
 			</s:Line>
-			<s:TextInput id="enteredRatio" text="{amount}" width="100%" maxWidth="{vgroup.width - 20}" restrict="0123456789.,"  />
+			<s:TextInput id="enteredRatio" text="@{_amount}" width="100%" maxWidth="{vgroup.width - 20}" restrict="0123456789.,"  />
 			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
 				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
 					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="setAmount()"/>

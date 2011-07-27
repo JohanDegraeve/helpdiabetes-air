@@ -56,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.collections.ArrayList;
 			import mx.core.FlexGlobals;
 			import mx.core.IFlexDisplayObject;
+			import mx.events.FlexEvent;
 			import mx.events.ValidationResultEvent;
 			import mx.geom.RoundedRectangle;
 			import mx.managers.PopUpManager;
@@ -111,6 +112,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			
 			private function onCreationComplete():void {
+				//we'll add an eventlistener for pressing enter when editing the amount
+				amount_textinput.addEventListener(FlexEvent.ENTER,onPressEnter);
+				
+				
 				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
@@ -150,6 +155,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						if (retrievedFoodItem.getUnit(0).standardAmount != 100)
 							amount_textinput_text = retrievedFoodItem.getUnit(0).standardAmount.toString();
 						selectedUnit = 0; 
+						
+						//if amountfield = "0" then set it to empty string, this allows the user to immediately start typing an amount
+						//do this again in popupunitlist 
+						if (amount_textinput_text =="0")
+							amount_textinput_text = "";
+						
+						
 						if (retrievedFoodItem.getNumberOfUnits() > 1) {
 							popUpUnitList();
 						}
@@ -168,6 +180,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					amount_textinput_text = data.amount_textinput_text;
 					details_button_text = createDetailsButtonText(selectedUnit,(new Number(amount_textinput_text)) == 0 ? -1: new Number(amount_textinput_text));
 				}
+				
+				//set focus to amount field, on android this immediately shows up the keyboard
+				this.focusManager.setFocus(amount_textinput);
+				
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
@@ -262,7 +278,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					if (retrievedFoodItem.getUnit(event.index).standardAmount != 100)
 						amount_textinput_text = retrievedFoodItem.getUnit(event.index).standardAmount.toString();
 					else
-						amount_textinput_text = "0";
+						//set it to empty string, this allows the user to immediately start typing an amount
+						amount_textinput_text = "";
 				}
 			}
 			
@@ -291,6 +308,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				temp = temp.split(".",2).join("{");
 				temp = temp.split(".").join("");
 				amount_textinput_text = temp.split("{",2).join(".");
+				
+				//now if amount = "" (ie empty string) set it to 0
+				//this means user has not entered any amount
+				if (amount_textinput_text == "")
+					amount_textinput_text = "0";
 
 				
 				var validationResultEvent:ValidationResultEvent = amountValidator.validate(null,true);
@@ -314,6 +336,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * will add a selectedFoodItem to the selected meal, called when addButton is clicked
 			 */ 
 			private function addButtonClicked():void {
+				//first of all when amount = "", set it to 0
+				if (amount_textinput_text =="")
+					amount_textinput_text ="0";
+				
 			//- get the selected meal (which may or may not already include a mealevent
 			//- create a selectedfooditem and add it
 				(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
@@ -348,6 +374,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						checkLastMealUpdateRequired = false;
 					}
 				}
+			}
+			
+			private function onPressEnter(event:FlexEvent):void {
+				addButtonClicked();
 			}
 			
 		]]>

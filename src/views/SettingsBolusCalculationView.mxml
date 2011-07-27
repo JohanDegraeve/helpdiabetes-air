@@ -59,7 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function prepareAmountPicker(amount:Number, mealName:String, settingId:int, textArea:TextArea):void {
 				amountPicker = new AmountPicker();
-				amountPicker.amount = amount;
+				amountPicker.amount = amount.toString();
 				amountPicker.labelText1 = resourceManager.getString('settingsview','insulinratio_for');
 				amountPicker.labelText2 = mealName;
 				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
@@ -79,6 +79,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					Settings.getInstance().setSetting(settingId,(event.newValue as Number).toString());
 					textArea.text = (event.newValue as Number).toString();
+					
 				}
 }
 			
