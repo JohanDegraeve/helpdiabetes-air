@@ -17,7 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsBolusCalculationView">
+		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsBolusCalculationView" removed="onRemoved(event)"
+		>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -38,8 +39,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import myComponents.AmountPicker;
 			import myComponents.PickerEvent;
+			import myComponents.RequestConfirmation;
 			
 			private var amountPicker:AmountPicker;
+			private var confirmationPicker:RequestConfirmation;
+			
+			/**
+			 * if true then no ratio value has been changed yet since the first time the view was created<br>
+			 * then false means ... yes the opposite
+			 */
+			private var firstTime:Boolean = true;
 			
 			private function breakfastSettingClicked(event:Event):void  {
 				prepareAmountPicker(parseFloat(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST)),resourceManager.getString('general','breakfast'),Settings.SettingINSULIN_RATIO_BREKFAST,breakfastRatio);
@@ -65,7 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
 				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 				PopUpManager.addPopUp(amountPicker, this, true);
-				PopUpManager.centerPopUp(amountPicker);
+				
 				
 				function onAmountCancel(event: PickerEvent): void
 				{
@@ -79,9 +88,56 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					Settings.getInstance().setSetting(settingId,(event.newValue as Number).toString());
 					textArea.text = (event.newValue as Number).toString();
-					
+					if (!firstTime) {
+					} else {
+						checkOtherSettings(event.newValue as Number);
+					}
 				}
-}
+				
+
+			}
+			
+			
+			private function checkOtherSettings(newValue:Number):void {
+				firstTime = false;
+				confirmationPicker = new RequestConfirmation();
+				confirmationPicker.labelText1 = resourceManager.getString('settingsview','change_ratio_part_1');
+				confirmationPicker.labelText2 = resourceManager.getString('settingsview','change_ratio_part_2');
+				confirmationPicker.addEventListener(PickerEvent.PICKER_SET, onYesClicked);
+				confirmationPicker.addEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+				
+				PopUpManager.addPopUp(confirmationPicker, this, true);
+				PopUpManager.centerPopUp(confirmationPicker);
+				function onYesClicked(event: PickerEvent): void
+				{
+					firstTime = true;//suppose user changes a next time, then again we'll ask to change all values
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+					
+					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_BREKFAST,newValue .toString());
+					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_LUNCH,newValue.toString());
+					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_SNACK,newValue.toString());
+					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_SUPPER,newValue.toString());
+					breakfastRatio.text = (newValue as Number).toString();
+					lunchRatio.text = (newValue as Number).toString();
+					snackRatio.text = (newValue as Number).toString();
+					supperRatio.text = (newValue as Number).toString();
+				}
+				
+				function onNoClicked(event: PickerEvent): void
+				{
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+				}
+				
+				
+			}
+			
+			private function onRemoved(event:Event):void
+			{
+				if (amountPicker != null)
+					PopUpManager.removePopUp(amountPicker);
+			}
 			
 		]]>
 	</fx:Script>

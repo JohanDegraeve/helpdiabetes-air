@@ -249,7 +249,7 @@ package model
 		 * Comment added later on - 20/07/2011: probably never used with updateSelectedMeal = false, I had to change something in AddFoodItemView.mxlm, in the creationComplete method, see comment over there
 		 */
 		public function refreshMeals(updateSelectedMeal:Boolean = true):void {
-			_meals = new ArrayCollection();
+			meals = new ArrayCollection();
 			
 			var todayAsDate:Date = new Date();//that's the actual time
 			var todayAtMidNight:Number = (new Date(todayAsDate.fullYear,todayAsDate.month,todayAsDate.date)).valueOf();//today at 00:00

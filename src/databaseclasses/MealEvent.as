@@ -382,6 +382,10 @@ package databaseclasses
 		}
 		
 		private function recalculateTotals():void {
+			_totalCarbs = 0;
+			_totalKilocalories = 0;
+			_totalProtein = 0;
+			_totalFat = 0;
 			for (var i:int = 0;i < _selectedFoodItems.length; i++) {
 				var selectedFoodItem:SelectedFoodItem = (_selectedFoodItems.getItemAt(i) as SelectedFoodItem);
 				_totalCarbs += selectedFoodItem.unit.carbs/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;

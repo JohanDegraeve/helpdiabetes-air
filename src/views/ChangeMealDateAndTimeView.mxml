@@ -25,7 +25,8 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		preinitialize="preInit()"
 		creationComplete="onCreationComplete()"
-		title="ChangeMealDateAndTime">
+		title="ChangeMealDateAndTime"
+		removed="onRemoved(event)">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}">
 			
@@ -64,6 +65,14 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			[Bindable]
 			private var ok_button_text:String;
 			private var previousTimeStamp:Number;
+			
+			private var timePicker:TimePicker;
+			private var datePicker:DatePicker;
+			
+			/**
+			 * if false then user has clicked cancel or back button in some place, means meal should not be changed
+			 */
+			private var mealChosen:Boolean = false;
 
 			private function preInit():void {
 				ok_button_text = resourceManager.getString('general','ok');
@@ -77,7 +86,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			}
 			
 			private function dateClicked():void {
-				var datePicker: DatePicker = new DatePicker();
+				datePicker = new DatePicker();
 				datePicker.currentDate = new Date((data.meal as Meal).timeStamp);
 				datePicker.addEventListener(PickerEvent.PICKER_SET, onDateSet);
 				datePicker.addEventListener(PickerEvent.PICKER_CANCEL, onDateCancel);
@@ -100,7 +109,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 
 
 			private function timeClicked():void {
-				var timePicker:TimePicker = new TimePicker();
+				timePicker = new TimePicker();
 				timePicker.currentTime = new Date((data.meal as Meal).timeStamp);
 				timePicker.addEventListener(PickerEvent.PICKER_SET, onTimeSet);
 				timePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
@@ -128,14 +137,25 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			 */
 			private function okClicked():void {
 				ModelLocator.getInstance().meals.refresh();
+				mealChosen = true;
 				navigator.popView();
 			}
 			
 			/**
-			 * will return navigator.context
+			 * will return navigator.context if mealChosen is true
 			 */
 			override public function createReturnObject():Object {
-				return navigator.context;
+				if (mealChosen)
+					return navigator.context;
+				else return null;
+			}
+			
+			private function onRemoved(event:Event):void
+			{
+				if (timePicker != null)
+					PopUpManager.removePopUp(timePicker);
+				if (datePicker != null)
+					PopUpManager.removePopUp(datePicker);
 			}
 			
 		]]>

@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		title="FoodCounterView"
 		initialize="init()" 
 		viewActivate="viewActivateHandler(event)"
-		
+		creationComplete="onCreationComplete()" 
 		>
 
 	<fx:Declarations>
@@ -52,6 +52,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			public var listOfOptionsArray:Array ;
 			
+			[Bindable]
+			private var searchtext_text:String;
+			
 			private var excelSorting:ExcelSorting;
 			
 			protected function viewActivateHandler(event:ViewNavigatorEvent):void
@@ -69,6 +72,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function selectFoodItem(event:IndexChangeEvent):void {
+				data = new Object();
+				data.searchtext = searchtext.text;
 				navigator.pushView(AddFoodItemView,ModelLocator.getInstance().foodItemList.getItemAt(event.newIndex));
 			}
 			
@@ -88,6 +93,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				return item.itemDescription;
 			}
 			
+			private function onCreationComplete():void {
+				if (data != null)
+					if (data.searchtext != null) {
+						searchtext_text =  data.searchtext;
+					}
+					else
+						searchtext_text = "";
+				searchTextChanged();
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -100,7 +115,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</s:viewMenuItems>
 
 	<s:titleContent>
-		<s:TextInput id="searchtext" width="100%" text="" change="searchTextChanged()" />
+		<s:TextInput id="searchtext" text="{searchtext_text}" width="100%" change="searchTextChanged()" />
 		
 	</s:titleContent>
 	<s:actionContent>

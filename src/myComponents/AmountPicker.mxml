@@ -104,10 +104,11 @@ after creation and before showing set labelText and amount
 				temp = temp.split(".").join("");
 				temp = temp.split("{",2).join(".");
 
+				PopUpManager.removePopUp(this);
+
 				var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
 				dpe.newValue = parseFloat(temp);
 				dispatchEvent(dpe);
-				PopUpManager.removePopUp(this);
 			}
 			
 			private function cancel():void  {
