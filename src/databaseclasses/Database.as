@@ -161,6 +161,7 @@ package databaseclasses
 											":protein," +
 											":carbs," +
 											":fat)";
+		private const UPDATE_INSULINRATIO_IN_MEAL_EVENT:String = "UPDATE mealevents set insulinratio = :=value WHERE mealeventid = :id";
 		
 		/**
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
@@ -1139,6 +1140,65 @@ package databaseclasses
 		}
 		
 		/**
+		 * will update a mealevent in the database, updates the insulinratio<br>
+		 * mealEventId = the mealevent to be updated<br>
+		 * newInsulinRatioValue = the new insulinratio to be 	assigned<br>
+		 * dispatcher = a DatabaseEvent will be dispatched when finished
+		 */
+		internal function updateInsulineRatio(mealEventId:Number, newInsulinRatioValue:Number, dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = UPDATE_INSULINRATIO_IN_MEAL_EVENT;
+				localSqlStatement.parameters[":id"] = mealEventId;
+				localSqlStatement.parameters[":value"] = newInsulinRatioValue;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, insulinRatioUpdated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, insulinRatioUpdateFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0071");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			
+			function insulinRatioUpdated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,insulinRatioUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,insulinRatioUpdateFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function insulinRatioUpdateFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,insulinRatioUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,insulinRatioUpdateFailed);
+				trace("Failed to update a insulinratio. Database0070");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+		}
+		
+		/**
 		 * if aconn is not open then open aconn to dbFile , in asynchronous mode, in UPDATE mode<br>
 		 * returns true if aconn is open<br>
 		 * if aconn is closed then connection will be opened asynchronous mode and an event will be dispatched to the dispatcher after opening the connecion<br>
@@ -1200,8 +1260,8 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_SETTING;
 				localSqlStatement.parameters[":id"] = id;
 				localSqlStatement.parameters[":value"] = value;
-				localSqlStatement.addEventListener(SQLEvent.RESULT, settingInserted);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, settingInsertionFailed);
+				localSqlStatement.addEventListener(SQLEvent.RESULT, settingUpdated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, settingUpdateFailed);
 				localSqlStatement.execute();
 			}
 			
@@ -1216,18 +1276,18 @@ package databaseclasses
 			}
 
 			
-			function settingInserted(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInserted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailed);
+			function settingUpdated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,settingUpdateFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
 				}
 			}
 			
-			function settingInsertionFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInserted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailed);
+			function settingUpdateFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,settingUpdateFailed);
 				trace("Failed to update a setting. Database0031");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);

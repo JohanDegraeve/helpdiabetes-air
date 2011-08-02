@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.Meal;
 			import databaseclasses.Settings;
 			
 			import flashx.textLayout.formats.Float;
@@ -87,7 +88,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					Settings.getInstance().setSetting(settingId,(event.newValue as Number).toString());
-					textArea.text = (event.newValue as Number).toString();
+
+					//selectedmeal might still point to a previous meal which is finished by now,
+					//check if it's more than 15 minutes ago that a meal has been added, if so reset selectedmeal
+					if (((new Date()).valueOf() - new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION))) > 15*60*1000) {
+						ModelLocator.getInstance().resetSelectedMeal();
+					}
+					
+					//now it could also be that the meal where the last addition was done, is one  in the future, and it's less than 15 minutes ago
+					//so we need to assure we'll update also as of the current meal which is..
+					var secondMeal:int = ModelLocator.getInstance().getRefreshedSelectedMeal();
+					//get from and totime
+					var fromTime:Number;
+					var toTime:Number;
+					if (settingId == Settings.SettingINSULIN_RATIO_BREKFAST) {
+						fromTime = 0;
+						toTime = new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL));
+					} else if (settingId == Settings.SettingINSULIN_RATIO_LUNCH) {
+						fromTime = new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL));
+						toTime = new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL));
+					} else if (settingId == Settings.SettingINSULIN_RATIO_SNACK) {
+						fromTime = new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL));
+						toTime = new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL));
+					} else {
+						fromTime = new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL));
+						toTime = 86400000;
+					}  
+					//now update all mealevents in trackinglist						
+					ModelLocator.getInstance().updateInsulinRatiosInTrackingList(
+						(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp < ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp ? 
+						(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp : ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp,
+						(event.newValue as Number),
+						fromTime,
+						toTime);
+					
+						textArea.text = (event.newValue as Number).toString();
 					if (!firstTime) {
 					} else {
 						checkOtherSettings(event.newValue as Number);
@@ -114,7 +149,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					
-					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_BREKFAST,newValue .toString());
+					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_BREKFAST,newValue.toString());
 					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_LUNCH,newValue.toString());
 					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_SNACK,newValue.toString());
 					Settings.getInstance().setSetting(Settings.SettingINSULIN_RATIO_SUPPER,newValue.toString());
@@ -122,6 +157,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					lunchRatio.text = (newValue as Number).toString();
 					snackRatio.text = (newValue as Number).toString();
 					supperRatio.text = (newValue as Number).toString();
+
+					//do almost the same as already done above :
+					//it could also be that the meal where the last addition was done, is one  in the future, and it's less than 15 minutes ago
+					//so we need to assure we'll update also as of the current meal which is..
+					var secondMeal:int = ModelLocator.getInstance().getRefreshedSelectedMeal();
+					//now update all mealevents in trackinglist					
+					ModelLocator.getInstance().updateInsulinRatiosInTrackingList(
+						(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp < ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp ? 
+						(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp : ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp,
+						(event.newValue as Number),
+						0,
+						86400000);
 				}
 				
 				function onNoClicked(event: PickerEvent): void
@@ -129,8 +176,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 				}
-				
-				
 			}
 			
 			private function onRemoved(event:Event):void

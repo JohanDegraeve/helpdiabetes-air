@@ -112,8 +112,8 @@ package model
 		
 		/**
 		 * the arraycollection used as list in trackingview<br>
-		 * It us declared here because it will be used in other classes as well, eg during intialization of the application it will already be created and initialized<br>
-		 * The trackingList contai ns all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents. Sorted by timestamp.<br>
+		 * It is declared here because it will be used in other classes as well, eg during intialization of the application it will already be created and initialized<br>
+		 * The trackingList contains all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents and also DayLine objects are stored here. Sorted by timestamp.<br>
 		 */ 
 		[Bindable]
 		public var trackingList:ArrayCollection = new ArrayCollection();
@@ -359,23 +359,68 @@ package model
 			meals.refresh();
 			
 			if (updateSelectedMeal) {
-				//initiailize ModelLocator.getInstance().selectedMeal to the second meal that is one of the standards meal
-				var mealCounter:int = 0;
-				
-				for (var m:int = 0;m < ModelLocator.getInstance()._meals.length;m++) {
-					if (ModelLocator.getInstance()._meals.getItemAt(m) is Meal) {
-						if (((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == breakfast) ||
-							((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == lunch) || 
-							((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == snack) ||
-							((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == supper))
-							mealCounter++;
-						if (mealCounter == 2) {
-							selectedMeal = m;
-						}
-					}
-				}			
+				resetSelectedMeal();
 			}
+		}
+		
+		/**
+		 * gets in the meals, the second meal that is one of the standards meals, and assigns it to _selectedMeal
+		 */
+		public function resetSelectedMeal():void {
+			//initiailize ModelLocator.getInstance().selectedMeal to the second meal that is one of the standards meal
+			selectedMeal = getRefreshedSelectedMeal();
+		}
+		
+		public function getCurrentlySelectedMeal():Meal {
+			return _meals.getItemAt(selectedMeal) as Meal;
+		}
+		
+		/**
+		 * this function gets the id of the second meal in the _meals, that is a standard meal
+		 */
+		public function getRefreshedSelectedMeal():int {
+			var breakfast:String = ResourceManager.getInstance().getString('general','breakfast');
+			var lunch:String = ResourceManager.getInstance().getString('general','lunch');
+			var snack:String = ResourceManager.getInstance().getString('general','snack');
+			var supper:String = ResourceManager.getInstance().getString('general','supper');
 
+			var mealCounter:int = 0;
+			
+			for (var m:int = 0;m < ModelLocator.getInstance()._meals.length;m++) {
+				if (ModelLocator.getInstance()._meals.getItemAt(m) is Meal) {
+					if (((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == breakfast) ||
+						((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == lunch) || 
+						((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == snack) ||
+						((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == supper))
+						mealCounter++;
+					if (mealCounter == 2) {
+						return  m;
+					}
+				}
+			}			
+			
+			//code should never get here
+			return 0;
+		}
+		
+		/**
+		 * updates insulinratio for all mealevents in trackinglist, with timeStamp > asOfDateAndTime and time of day  between fromTime and toTime<br>
+		 * Also database will be updated.<br>
+		 */
+		public function updateInsulinRatiosInTrackingList(asOfDateAndTime:Number,newInsulinRatio:Number,fromTime:Number,toTime:Number):void {
+		   for (var i:int = 0; i <  ModelLocator.getInstance().trackingList.length	;i++)  {
+			   if (ModelLocator.getInstance().trackingList.getItemAt(i) is MealEvent) {
+				   var mealEvent:MealEvent = ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent;
+				   if (mealEvent.timeStamp >= asOfDateAndTime)	{
+					   var mealEventTimeStampAsDate:Date = new Date(mealEvent.timeStamp);
+					   //the timestamp but only the hours, minutes and seconds
+					   var mealEventTimeStampHourMinute:Number = (new Date(0,0,0,mealEventTimeStampAsDate.hoursUTC,mealEventTimeStampAsDate.minutesUTC,mealEventTimeStampAsDate.secondsUTC)).valueOf();
+						if (mealEventTimeStampHourMinute >= fromTime)
+							if (mealEventTimeStampHourMinute <= toTime)
+								mealEvent.insulineRatio = newInsulinRatio;
+				   }
+			   }
+		   }
 		}
 
 		[Bindable]

@@ -352,12 +352,6 @@ package databaseclasses
 
 		}
 
-		private function set insulinRatio(value:Number):void
-		{
-			_insulinRatio = value;
-			recalculateInsulinAmount();
-		}
-
 		private function set correctionFactor(value:Number):void
 		{
 			_correctionFactor = value;
@@ -395,6 +389,15 @@ package databaseclasses
 			}
 		}
 		
-
+		/**
+		 * will update a mealevent , updates the insulinratio, also the corresponding database element will be updated<br>
+		 * also the database will be updated<br><br>
+		 * newInsulinRatioValue = the new insulinratio to be 	assigned<br>
+		 * 
+		 */
+		public function set  insulineRatio(value:Number):void {
+			_insulinRatio = value;
+			Database.getInstance().updateInsulineRatio(this.mealEventId,value,null);
+		}
 	}
 }

@@ -94,9 +94,7 @@ view to show ModelLocator.getInstance().meals in a list
 				if (navigator.poppedViewReturnedObject != null) {
 					if (navigator.poppedViewReturnedObject.object.context == CHANGE_MEAL_DATE_AND_TIME) {
 						ModelLocator.getInstance().selectedMeal = data.tempSelection;
-						var meals:Object = ModelLocator.getInstance().meals;
 						ModelLocator.getInstance().meals.refresh();
-						var meals:Object = ModelLocator.getInstance().meals;
 						navigator.popView();
 					}
 				}

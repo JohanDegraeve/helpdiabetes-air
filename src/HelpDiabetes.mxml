@@ -29,14 +29,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Script>
 		<![CDATA[
 			import databaseclasses.*;
+			import databaseclasses.FoodItem;
 			
 			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
 			
-			import databaseclasses.FoodItem;
-			
 			private var  foodItems:ArrayCollection;
+			
+			/**
+			 * just here to make sure an instance off the modellocator is held throughout the existance of the application, so it's intialized only once<br>
+			 * It doesn't necessarily need to be used, you can also use modelLocator.getInstance()
+			 */
+			public var modelLocator:ModelLocator = ModelLocator.getInstance();
 			
 			/**   
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
