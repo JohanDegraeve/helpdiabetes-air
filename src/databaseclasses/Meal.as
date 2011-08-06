@@ -29,7 +29,7 @@ package databaseclasses
 	import mx.core.mx_internal;
 	
 	import myComponents.IListElement;
-	import myComponents.MealEventItemRenderer;
+	import myComponents.MealEventItemRendererTemp;
 	import myComponents.MealItemRenderer;
 	
 	/**

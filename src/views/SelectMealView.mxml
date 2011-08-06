@@ -20,10 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 view to show ModelLocator.getInstance().meals in a list
 
 -->
-<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="SelectMealView"
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:myComponents="myComponents.*"
+		title="SelectMealView"
 		creationComplete="onCreationComplete()" 
 		add="addHandler()" >
+	
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -114,7 +118,7 @@ view to show ModelLocator.getInstance().meals in a list
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
-	<s:List id="meallist" left="0" right="0" top="0" bottom="0"
+	<s:List id="meallist" left="0" right="0" top="0" bottom="0" width="100%"
 			dataProvider="{ModelLocator.getInstance().meals}" 
 			itemRendererFunction="getItemRenderer">
 	</s:List>
