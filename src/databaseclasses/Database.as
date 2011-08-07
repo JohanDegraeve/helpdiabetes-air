@@ -40,6 +40,8 @@ package databaseclasses
 	import mx.resources.ResourceBundle;
 	import mx.resources.ResourceManager;
 	
+	import myComponents.DayLine;
+	
 	import views.FoodCounterView;
 	
 
@@ -1559,11 +1561,16 @@ package databaseclasses
 				trace("Failed to get all selectedFoodItems. Database0061");
 			}
 			
+			/**
+			 * adds all mealevents retrieved from the database to the trackinglist<br>
+			 * at the same time will add daylines
+			 */
 			function mealEventsRetrieved(result:SQLEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
 
 				var tempObject:Object = localSqlStatement.getResult().data;
+				
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
 						currentMealEventID = o.mealeventid as int;
@@ -1579,8 +1586,26 @@ package databaseclasses
 							o.mealeventid as Number,
 							o.lastmodifiedtimestamp  as Number);
 						ModelLocator.getInstance().trackingList.addItem(newMealEvent);
+						var creationTimeStampAsDate:Date = new Date(newMealEvent.timeStamp);
+						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYear,creationTimeStampAsDate.month,creationTimeStampAsDate.date,0,0,0,0)).valueOf();
+						if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
+							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+							ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						}
 					}
 				}
+				
+				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
+				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
+				//Now add list of daylines
+				for (var counter:Number = youngest;counter - 1 < oldest;counter = counter + 86400000)
+					ModelLocator.getInstance().trackingList.addItem(new DayLine(counter));
+				
 				ModelLocator.getInstance().trackingList.refresh();
 				
 				// now populate ModelLocator.getInstance().meals

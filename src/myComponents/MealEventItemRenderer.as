@@ -20,11 +20,13 @@ package myComponents
 	import databaseclasses.MealEvent;
 	
 	import flash.system.Capabilities;
+	import flash.text.TextLineMetrics;
 	
 	import mx.collections.ArrayList;
 	
 	import spark.components.Application;
 	import spark.components.IconItemRenderer;
+	import spark.components.Label;
 	import spark.components.LabelItemRenderer;
 	import spark.components.supportClasses.StyleableTextField;
 	
@@ -91,11 +93,11 @@ package myComponents
 		/**
 		 * padding left 
 		 */
-		private static const PADDING_LEFT:int = 10;
+		private static const PADDING_LEFT:int = 5;
 		/**
 		 * padding right 
 		 */
-		private static const PADDING_RIGHT:int = 10;
+		private static const PADDING_RIGHT:int = 5;
 		/**
 		 * padding top for item
 		 */
@@ -104,6 +106,14 @@ package myComponents
 		 * minimum gap between two elements, horizontal
 		 */
 		private static const GAP_HORIZONTAL_MINIMUM:int = 5;
+		
+		/**
+		 * this is the width we would minimally need to represent 3 digits + 3 dots, because that's I assume the maximum number of digits we'll need to represent 
+		 * the amount value.<br>
+		 * Ideally this value should be calculated somewhere, eg based on style, calculate size for 3 times the largest digit + 3 dots<br>
+		 * this is done in createchildren but seems not fully correct
+		 */
+		private var MINIMUM_CARB_AMOUNT_WIDTH:int = 100;
 
 		/**
 		 * default constructor 
@@ -147,6 +157,10 @@ package myComponents
 				carbAmountDisplay.wordWrap = false;
 				addChild(carbAmountDisplay);
 			}
+
+			// calculate MINIMUM_CARB_AMOUNT_WIDTH
+			var textLineMetricx:TextLineMetrics = this.measureText("9999 ...");
+			MINIMUM_CARB_AMOUNT_WIDTH = textLineMetricx.width;
 		}
 		
 		// Override styleChanged() to proopgate style changes to compLabelDisplay.
@@ -189,23 +203,29 @@ package myComponents
 			labelDisplay.commitStyles();
 			carbAmountDisplay.commitStyles();
 			
-			var carbAmountDisplayWidth:Number = getElementPreferredWidth(carbAmountDisplay);
-			var carbAmountDisplayHeight:Number = 0;
-			var labelDisplayWidth:Number = getElementPreferredWidth(labelDisplay);
+			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
+			//and then we'll extend carbamount if still possible
+			var carbAmountDisplayWidth:Number = Math.max(getElementPreferredWidth(carbAmountDisplay), MINIMUM_CARB_AMOUNT_WIDTH);
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth);
+			carbAmountDisplay.text = carbAmount + " " + resourceManager.getString('general','gram_of_carbs_short');
+			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
+			
+			var carbAmountDisplayHeight:Number = getElementPreferredHeight(carbAmountDisplay);
 			var labelDisplayHeight:Number = getElementPreferredHeight(labelDisplay);
 
 			
-			if (carbAmount != null) {
+			/*if (carbAmount != null) {
 				carbAmountDisplay.commitStyles();
 				if (carbAmountDisplay.isTruncated)
 					carbAmountDisplay.text == carbAmount;
-				carbAmountDisplayHeight = getElementPreferredHeight(carbAmountDisplay);
-			}
+				carbAmountDisplayHeight = ;
+			}*/
 			setElementSize(labelDisplay,labelDisplayWidth,labelDisplayHeight);
 			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,carbAmountDisplayHeight);
+			labelDisplay.truncateToFit();
+			carbAmountDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,PADDING_TOP);
-			labelDisplay.truncateToFit();
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,PADDING_TOP);
 		}
 	}

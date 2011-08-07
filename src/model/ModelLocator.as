@@ -104,6 +104,15 @@ package model
 		 */
 		public static const SELECTEDMEAL_INITIALIZED:String="selected_meal_initialized";
 		
+		/**
+		 * no comment 
+		 */
+		private var _oldestDayLineStoredInTrackingList:Number;
+		/**
+		 * no comment 
+		 */
+		private var _youngestDayLineStoredInTrackingList:Number;
+		
 		/** 
 		 * just a variable used when opening the untilist 
 		 */
@@ -165,6 +174,11 @@ package model
 			trackingList.sort = dataSort;
 			
 			instance = this;
+			
+			// at initialization, there's no dayline existing in the tracking, so initialize to 0
+			oldestDayLineStoredInTrackingList = 0;
+			// at initialization, there's no dayline existing in the tracking, so initialize to something very big
+			youngestDayLineStoredInTrackingList = 5000000000000;;
 		}
 		
 		/** 
@@ -443,6 +457,39 @@ package model
 			_meals.sort = dataSort;
 
 		}
+
+		/**
+		 * no comment 
+		 */
+		public function get oldestDayLineStoredInTrackingList():Number
+		{
+			return _oldestDayLineStoredInTrackingList;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set oldestDayLineStoredInTrackingList(value:Number):void
+		{
+			_oldestDayLineStoredInTrackingList = value;
+		}
+
+		/**
+		 * no comment 
+		 */
+		public function get youngestDayLineStoredInTrackingList():Number
+		{
+			return _youngestDayLineStoredInTrackingList;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set youngestDayLineStoredInTrackingList(value:Number):void
+		{
+			_youngestDayLineStoredInTrackingList = value;
+		}
+
 
 	}
 }
