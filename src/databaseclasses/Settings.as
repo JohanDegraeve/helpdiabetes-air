@@ -101,6 +101,10 @@ package databaseclasses
 		 * the target bloodglucoselevel to use for applying the correction factor
 		 */
 		public static const SettingsTARGET_BLOODGLUCOSELEVEL:int = 15;
+		/**
+		 * what is the important value for the user : carbs, kilocalories, fat or protein
+		 */
+		public static const SettingsIMPORTANT_VALUE_FOR_USER:int = 16;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -119,7 +123,8 @@ package databaseclasses
 			"0", //the first blood glucose event id to be used
 			"999999", // a high value for maximum time difference last bloodglucose event and meal
 			"mgperdl", //unit for bloodglucose metering, this value must be known in locale/general.properties
-			"120"
+			"120",
+			"carbs"//possible values are "carbs", "protein", "fat", "kilocalories"
 		];
 		
 		private static var instance:Settings = new Settings();

@@ -14,6 +14,14 @@ s|Application {fontSize:20pt}
 	fontSize:16pt
 }
 
+.backGroundColorInLists {/* colors used in background of list elements, there's always a light and a dark side for each color , used in gradneiint fill*/
+	darkBlueLight:#3333FF;
+	darkBlueDark:#333399;
+ 	lightBlueLight:#0CD9F8;
+	lightBlueDark:#5C939B;
+	
+}	
+
 s|BorderContainer {
 	/* used here for example in timepicker, datepicker, insulinamountbicker*/
 	backgroundColor:#444444;

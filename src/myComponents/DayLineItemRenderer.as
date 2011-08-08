@@ -18,6 +18,8 @@
 package myComponents
 {
 	
+	import flash.display.GradientType;
+	import flash.geom.Matrix;
 	import flash.globalization.LocaleID;
 	import flash.system.Capabilities;
 	
@@ -49,40 +51,36 @@ package myComponents
 		}
 		
 		/**
-		 * override createChildren to create the StyleableTextfield control
-		 */
-		/*override protected function createChildren():void {
-			super.createChildren();
-			
-			//make sure it does not already exist
-			if (!labelDisplay) {
-				dayLineDisplay = new StyleableTextField();
-				
-				//add the child as a child of the item renderer
-				
-				addChild(dayLineDisplay);
-				label
-			}
-		}*/
-		
-		
-		
-		/**
 		 * override the data property to initialize dayLineDisplay
 		 */
-		
 		override public function set data(value:Object):void {
 			super.data = value;
 			labelDisplay.text = dateFormatter.format((value as DayLine).timeStamp);
 		}
 		
-		override protected function createLabelDisplay():void {
-			super.createLabelDisplay();
+		/**
+		 * Draw a blue background depending of it's sunday or weekday
+		 */
+		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
+		{
+			var darkBlueLight:* = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("darkBlueLight");
+			var darkBlueDark:* = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("darkBlueDark");
+			var lightBlueLight:* = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("lightBlueLight");
+			var lightBlueDark:* = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("lightBlueDark");
 			
+			var darkBackGroundColors:Array = [darkBlueDark, darkBlueLight];
+			var lightBackGroundColors:Array = [lightBlueDark, lightBlueLight];
+			var alphas:Array = [1, 1];
+			var ratios:Array = [0, 255];
+			var matrix:Matrix = new Matrix();
+			
+			// draw the heading gradient first
+			matrix.createGradientBox(unscaledWidth, unscaledHeight, Math.PI / 2, 0, 0);
+			graphics.beginGradientFill(GradientType.LINEAR, lightBackGroundColors, alphas, ratios, matrix);
+			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+			graphics.endFill();
 		}
+
 		
-		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void {
-			
-		}
 	}
 }

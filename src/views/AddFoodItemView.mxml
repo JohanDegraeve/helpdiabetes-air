@@ -63,6 +63,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.resources.ResourceBundle;
 			import mx.validators.ValidationResult;
 			
+			import myComponents.DayLine;
+			import myComponents.DayLineWithTotalAmount;
+			
 			import spark.components.Label;
 			
 			[Bindable]
@@ -336,18 +339,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * will add a selectedFoodItem to the selected meal, called when addButton is clicked
 			 */ 
 			private function addButtonClicked():void {
+	
+				navigator.popView();
+				
 				//first of all when amount = "", set it to 0
 				if (amount_textinput_text =="")
 					amount_textinput_text ="0";
 				
-			//- get the selected meal (which may or may not already include a mealevent
-			//- create a selectedfooditem and add it
+				//- get the selected meal (which may or may not already include a mealevent
+				//- create a selectedfooditem and add it
 				(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
-				    .addSelectedFoodItem(
-						new SelectedFoodItem(retrievedFoodItem.itemDescription,
+				.addSelectedFoodItem(
+					new SelectedFoodItem(retrievedFoodItem.itemDescription,
 						retrievedFoodItem.getUnit(selectedUnit),
 						new Number(amount_textinput.text)));
-					navigator.popView();
+				
+				var creationTimeStampAsDate:Date = new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp);
+				var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYear,creationTimeStampAsDate.month,creationTimeStampAsDate.date,0,0,0,0)).valueOf();
+				if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList)
+					ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(creationTimeStampAsDate.valueOf()))
+				else
+					if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList)
+						ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(creationTimeStampAsDate.valueOf()))
 			}
 			
 			/**
