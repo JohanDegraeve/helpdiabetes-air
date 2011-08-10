@@ -88,6 +88,9 @@ package model
 		[Bindable]
 		public var unitList:ArrayCollection; 
 		
+		/**
+		 * list of meals, mainly used in addfooditem, and also somewhere else, being reset each time addfooditem is opened
+		 */
 		private var _meals:ArrayCollection ;
 
 		/**
@@ -148,7 +151,7 @@ package model
 		public function ModelLocator()
 		{
 			
-			if (instance != null) throw new Error('Cannot create a new instance. Must use ModelLocator.getInstance().');
+			if (instance != null) throw new Error('Cannot create a new instance. Must use ');
 
 			/**
 			 *  foodTables is an array of an array of strings <br>
@@ -255,7 +258,8 @@ package model
 		}
 		
 		/**
-		 * reinitializes and populates ModelLocator.meals <br>
+		 * reinitializes and populates ModelLocator.meals, from now, inclusive the meal before now, till 7 days after, a meal wil be created<br>
+		 * Then all tracking events are checked, each mealevent in there that falls within the start and end of this list of meals, is added, or, in case it's a standard meal, the meal event is added to the meal 
 		 * if updateSelectedMeal is true then it will also set the selected meal (selectedMeal) according to current time, ie the second meal (first meal is always previous meal)<br>
 		 * also DayLine items are added<br>
 		 * at the end meals.refresh is called and so sorted by timeStamp<br>
@@ -282,55 +286,55 @@ package model
 			
 			if (todayHourMinute < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
 				//first add add a dayline for yesterday
-				ModelLocator.getInstance()._meals.addItem(new DayLine(todayAtMidNight - 86400000 ));
+				_meals.addItem(new DayLine(todayAtMidNight - 86400000 ));
 					
-				ModelLocator.getInstance()._meals.addItem(new Meal(supper,null,todayAtMidNight - 86400000 + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
+				_meals.addItem(new Meal(supper,null,todayAtMidNight - 86400000 + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
 				
 				//now add a dayline for today
-				ModelLocator.getInstance()._meals.addItem(new DayLine(todayAtMidNight ));
+				_meals.addItem(new DayLine(todayAtMidNight ));
 				
-				ModelLocator.getInstance()._meals.addItem(new Meal(breakfast,null,todayAtMidNight  + SMALL_OFFSET));
-				ModelLocator.getInstance()._meals.addItem(new Meal(lunch,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL  ) )));
-				ModelLocator.getInstance()._meals.addItem(new Meal(snack,null,todayAtMidNight +  new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
-				ModelLocator.getInstance()._meals.addItem(new Meal(supper,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
+				_meals.addItem(new Meal(breakfast,null,todayAtMidNight  + SMALL_OFFSET));
+				_meals.addItem(new Meal(lunch,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL  ) )));
+				_meals.addItem(new Meal(snack,null,todayAtMidNight +  new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
+				_meals.addItem(new Meal(supper,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
 				
 			} 
 			else  if (todayHourMinute < new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))) 
 			{
 				//now add a dayline for today
-				ModelLocator.getInstance()._meals.addItem(new DayLine(todayAtMidNight ));
+				_meals.addItem(new DayLine(todayAtMidNight ));
 				
-				ModelLocator.getInstance()._meals.addItem(new Meal(breakfast,null,todayAtMidNight + SMALL_OFFSET));
-				ModelLocator.getInstance()._meals.addItem(new Meal(lunch,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL ))));
-				ModelLocator.getInstance()._meals.addItem(new Meal(snack,null,todayAtMidNight +  new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
-				ModelLocator.getInstance()._meals.addItem(new Meal(supper,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
+				_meals.addItem(new Meal(breakfast,null,todayAtMidNight + SMALL_OFFSET));
+				_meals.addItem(new Meal(lunch,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL ))));
+				_meals.addItem(new Meal(snack,null,todayAtMidNight +  new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
+				_meals.addItem(new Meal(supper,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
 			} 
 			else if (todayHourMinute < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))) 
 			{
 				//now add a dayline for today
-				ModelLocator.getInstance()._meals.addItem(new DayLine(todayAtMidNight ));
+				_meals.addItem(new DayLine(todayAtMidNight ));
 				
-				ModelLocator.getInstance()._meals.addItem(new Meal(lunch,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL ))));
-				ModelLocator.getInstance()._meals.addItem(new Meal(snack,null,todayAtMidNight +  new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
-				ModelLocator.getInstance()._meals.addItem(new Meal(supper,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
+				_meals.addItem(new Meal(lunch,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL ))));
+				_meals.addItem(new Meal(snack,null,todayAtMidNight +  new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
+				_meals.addItem(new Meal(supper,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
 			} 
 			else 
 			{
 				//now add a dayline for today
-				ModelLocator.getInstance()._meals.addItem(new DayLine(todayAtMidNight ));
+				_meals.addItem(new DayLine(todayAtMidNight ));
 				
-				ModelLocator.getInstance()._meals.addItem(new Meal(snack,null,todayAtMidNight +  new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
-				ModelLocator.getInstance()._meals.addItem(new Meal(supper,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
+				_meals.addItem(new Meal(snack,null,todayAtMidNight +  new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
+				_meals.addItem(new Meal(supper,null,todayAtMidNight + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
 			}
 			
 			//so we shall fill up the meals as of now till 7 days after
 			for (var i:int = 1;i < 8;i++) {
-				ModelLocator.getInstance()._meals.addItem(new DayLine(todayAtMidNight + i * 86400000));
+				_meals.addItem(new DayLine(todayAtMidNight + i * 86400000));
 				
-				ModelLocator.getInstance()._meals.addItem(new Meal(breakfast,null,todayAtMidNight + i * 86400000 + SMALL_OFFSET));
-				ModelLocator.getInstance()._meals.addItem(new Meal(lunch,null,todayAtMidNight + i * 86400000 + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL ))));
-				ModelLocator.getInstance()._meals.addItem(new Meal(snack,null,todayAtMidNight + i * 86400000 + new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
-				ModelLocator.getInstance()._meals.addItem(new Meal(supper,null,todayAtMidNight + i * 86400000 + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
+				_meals.addItem(new Meal(breakfast,null,todayAtMidNight + i * 86400000 + SMALL_OFFSET));
+				_meals.addItem(new Meal(lunch,null,todayAtMidNight + i * 86400000 + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL ))));
+				_meals.addItem(new Meal(snack,null,todayAtMidNight + i * 86400000 + new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL ))));
+				_meals.addItem(new Meal(supper,null,todayAtMidNight + i * 86400000 + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL ))));
 			}
 			
 			//now check for each mealevent, if it needs to replace a meal or if it needs to be added, replace if the name corresponds to one of the mealnames
@@ -339,31 +343,37 @@ package model
 			var mealTimeStamp:Date;
 			var mealTimeStampAtMidNight:Number;
 			
-			if (ModelLocator.getInstance().trackingList.length > 0) {
-				for (var j:int = ModelLocator.getInstance().trackingList.length - 1; i >= 0  ; i--) {
-					mealEventTimeStamp = new Date((ModelLocator.getInstance().trackingList.getItemAt(j) as MealEvent).timeStamp);
+			if (trackingList.length > 0) {
+				for (var j:int = trackingList.length - 1; i >= 0  ; i--) {
+					mealEventTimeStamp = new Date((trackingList.getItemAt(j) as MealEvent).timeStamp);
 					mealEventTimeStampAtMidNight = (new Date(mealEventTimeStamp.fullYear,mealEventTimeStamp.month,mealEventTimeStamp.date)).valueOf();
 					
 					//check if timestamp is within -1 day or maximum + 7 days
 					if ((mealEventTimeStampAtMidNight -  todayAtMidNight < 8 * 86400000 + 1) && (todayAtMidNight - mealEventTimeStampAtMidNight < 86400001)) {
-						//seems like we'll have to add the mealevent
-						//now go through all meals, find one with the same timeAtMidNight, then check if it's a breakfast, lunch, snack or supper
-						var mealFound:Boolean = false;
-						for (var k:int = 0; k < ModelLocator.getInstance()._meals.length ;k++) {
-							if (ModelLocator.getInstance()._meals.getItemAt(k) is Meal) {
-								mealTimeStamp = new Date((ModelLocator.getInstance()._meals.getItemAt(k) as Meal).timeStamp);			
-								mealTimeStampAtMidNight = (new Date(mealTimeStamp.fullYear,mealTimeStamp.month,mealTimeStamp.date)).valueOf();
-								if (mealTimeStampAtMidNight == mealEventTimeStampAtMidNight) {
-									if ((ModelLocator.getInstance()._meals.getItemAt(k) as Meal).mealName.toUpperCase() == 
-										(ModelLocator.getInstance().trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
-										mealFound = true;
-										ModelLocator.getInstance()._meals.setItemAt(new Meal(null,(ModelLocator.getInstance().trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
+						//check if mealeven timestamp is not smaller than first meal timestamp, because then we would simply stop
+						if (mealEventTimeStamp.valueOf() < (_meals.getItemAt(1) as Meal).timeStamp) {
+							//don't add the mealevent, and stop going through the tracking list
+							i = 0;
+						} else {
+							//seems like we'll have to add the mealevent
+							//now go through all meals, find one with the same timeAtMidNight, then check if it's a breakfast, lunch, snack or supper
+							var mealFound:Boolean = false;
+							for (var k:int = 0; k < _meals.length ;k++) {
+								if (_meals.getItemAt(k) is Meal) {
+									mealTimeStamp = new Date((_meals.getItemAt(k) as Meal).timeStamp);			
+									mealTimeStampAtMidNight = (new Date(mealTimeStamp.fullYear,mealTimeStamp.month,mealTimeStamp.date)).valueOf();
+									if (mealTimeStampAtMidNight == mealEventTimeStampAtMidNight) {
+										if ((_meals.getItemAt(k) as Meal).mealName.toUpperCase() == 
+											(trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
+											mealFound = true;
+											_meals.setItemAt(new Meal(null,(trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
+										}
 									}
 								}
 							}
-						}
-						if (!mealFound) {
-							ModelLocator.getInstance()._meals.addItem(new Meal(null,(ModelLocator.getInstance().trackingList.getItemAt(j) as MealEvent),Number.NaN));
+							if (!mealFound) {
+								_meals.addItem(new Meal(null,(trackingList.getItemAt(j) as MealEvent),Number.NaN));
+							}
 						}
 					}
 				}
@@ -381,7 +391,7 @@ package model
 		 * gets in the meals, the second meal that is one of the standards meals, and assigns it to _selectedMeal
 		 */
 		public function resetSelectedMeal():void {
-			//initiailize ModelLocator.getInstance().selectedMeal to the second meal that is one of the standards meal
+			//initiailize selectedMeal to the second meal that is one of the standards meal
 			selectedMeal = getRefreshedSelectedMeal();
 		}
 		
@@ -400,12 +410,14 @@ package model
 
 			var mealCounter:int = 0;
 			
-			for (var m:int = 0;m < ModelLocator.getInstance()._meals.length;m++) {
-				if (ModelLocator.getInstance()._meals.getItemAt(m) is Meal) {
-					if (((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == breakfast) ||
-						((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == lunch) || 
-						((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == snack) ||
-						((ModelLocator.getInstance()._meals.getItemAt(m) as Meal).mealName == supper))
+			for (var m:int = 0;m < _meals.length;m++) {
+				var temp:Object = _meals.getItemAt(m) ;
+				var temp2:Object = _meals;
+				if ((_meals.getItemAt(m) is Meal) || (_meals.getItemAt(m) is MealEvent)) {
+					if (((_meals.getItemAt(m) as Meal).mealName == breakfast) ||
+						((_meals.getItemAt(m) as Meal).mealName == lunch) || 
+						((_meals.getItemAt(m) as Meal).mealName == snack) ||
+						((_meals.getItemAt(m) as Meal).mealName == supper))
 						mealCounter++;
 					if (mealCounter == 2) {
 						return  m;
@@ -422,9 +434,9 @@ package model
 		 * Also database will be updated.<br>
 		 */
 		public function updateInsulinRatiosInTrackingList(asOfDateAndTime:Number,newInsulinRatio:Number,fromTime:Number,toTime:Number):void {
-		   for (var i:int = 0; i <  ModelLocator.getInstance().trackingList.length	;i++)  {
-			   if (ModelLocator.getInstance().trackingList.getItemAt(i) is MealEvent) {
-				   var mealEvent:MealEvent = ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent;
+		   for (var i:int = 0; i <  trackingList.length	;i++)  {
+			   if (trackingList.getItemAt(i) is MealEvent) {
+				   var mealEvent:MealEvent = trackingList.getItemAt(i) as MealEvent;
 				   if (mealEvent.timeStamp >= asOfDateAndTime)	{
 					   var mealEventTimeStampAsDate:Date = new Date(mealEvent.timeStamp);
 					   //the timestamp but only the hours, minutes and seconds
