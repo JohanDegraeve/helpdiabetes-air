@@ -33,7 +33,7 @@ package myComponents
 			
 			_totalAmount = value;
 			if (carbAmountDisplay) {
-				carbAmountDisplay.text = _totalAmount;
+				carbAmountDisplay.text = Math.round(new Number(_totalAmount)).toString();
 				invalidateSize();
 			}
 		}
@@ -46,10 +46,6 @@ package myComponents
 		 * padding right 
 		 */
 		private static const PADDING_RIGHT:int = 5;
-		/**
-		 * padding top for item
-		 */
-		private static const PADDING_TOP:int=5;
 		/**
 		 * minimum gap between two elements, horizontal
 		 */
@@ -140,7 +136,7 @@ package myComponents
 			// predefined labelDisplay component and the new 
 			// carbAmount component, you do not have to call
 			// super.layoutContents().
-			
+
 			// Commit the styles changes to labelDisplay and compLabelDisplay. 
 			labelDisplay.commitStyles();
 			carbAmountDisplay.commitStyles();
@@ -149,6 +145,7 @@ package myComponents
 			//and then we'll extend carbamount if still possible
 			var carbAmountDisplayWidth:Number = Math.max(getElementPreferredWidth(carbAmountDisplay), MINIMUM_AMOUNT_WIDTH);
 			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth);
+			
 			carbAmountDisplay.text = Math.round(new Number(totalAmount)) + " " + resourceManager.getString('general','gram_of_carbs_short');
 			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
 			
@@ -160,8 +157,8 @@ package myComponents
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,PADDING_TOP);
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,PADDING_TOP);
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,getStyle("paddingTop"));
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,getStyle("paddingTop"));
 		}
 		
 	}

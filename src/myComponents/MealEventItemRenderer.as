@@ -33,14 +33,14 @@ package myComponents
 	/**
 	 * an itemrenderer for a mealevent<br>
 	 * What shall it show<br>
-	 * - a timestamp (hh:mm) and mealname - the amount of carbs<br>
+	 * - a timestamp (hh:mm) and mealname - the amount of carbs, protein, fat or kilocalories, depending on user preferences<br>
 	 * - if  the mealevent is extended :<br>
 	 * &nbsp;&nbsp;&nbsp;- the insulin ratio used to calculate the insulin amount if not 0, the correction factor if not zero, the calculated insulin amount<br>
 	 * &nbsp;&nbsp;&nbsp;- all the selected meals one by one<br>
 	 * <br>
 	 * When is a mealevent extended ?<br>
-	 * if the allMealsExtended flag is true, then all mealeventss are extended<br>
-	 * if allMealsExtended flag is false, then only the mealevent with id ModellOcator.selectedMeal
+	 * if the allMealsExtended flag is true, then all mealevents are extended<br>
+	 * if allMealsExtended flag is false, then only the mealevent with id ModelLocator.selectedMeal
 	 */
 	public class MealEventItemRenderer extends LabelItemRenderer
 	{
@@ -79,6 +79,7 @@ package myComponents
 		 * the second line, optional, with insulin ratio, insulin amount, cf
 		 */
 		private var insulinField:StyleableTextField;
+
 		/**
 		 * arraylist of styleabletextfields with the selected meals
 		 */
@@ -98,10 +99,6 @@ package myComponents
 		 * padding right 
 		 */
 		private static const PADDING_RIGHT:int = 5;
-		/**
-		 * padding top for item
-		 */
-		private static const PADDING_TOP:int=5;
 		/**
 		 * minimum gap between two elements, horizontal
 		 */
@@ -225,8 +222,8 @@ package myComponents
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,PADDING_TOP);
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,PADDING_TOP);
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,getStyle("paddingTop"));
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,getStyle("paddingTop"));
 		}
 	}
 }
