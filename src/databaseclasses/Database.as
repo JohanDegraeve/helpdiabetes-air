@@ -1588,7 +1588,7 @@ package databaseclasses
 							o.lastmodifiedtimestamp  as Number);
 						ModelLocator.getInstance().trackingList.addItem(newMealEvent);
 						var creationTimeStampAsDate:Date = new Date(newMealEvent.timeStamp);
-						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYear,creationTimeStampAsDate.month,creationTimeStampAsDate.date,0,0,0,0)).valueOf();
+						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
 						if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
 							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 							if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)

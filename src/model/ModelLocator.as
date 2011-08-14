@@ -225,8 +225,9 @@ package model
 		 */
 		public function getMealEventFromTrackingList(mealEventId:Number):MealEvent {
 			for (var i:int = trackingList.length - 1;i >= 0; i--) {
-				if (((trackingList.getItemAt(i)) as MealEvent).mealEventId == mealEventId)
-					return (trackingList.getItemAt(i) as MealEvent);
+				if (trackingList.getItemAt(i) is MealEvent)
+					if (((trackingList.getItemAt(i)) as MealEvent).mealEventId == mealEventId)
+						return (trackingList.getItemAt(i) as MealEvent);
 			}
 			return null;
 		}
@@ -269,9 +270,11 @@ package model
 		public function refreshMeals(updateSelectedMeal:Boolean = true):void {
 			meals = new ArrayCollection();
 			
-			var todayAsDate:Date = new Date();//that's the actual time
-			var todayAtMidNight:Number = (new Date(todayAsDate.fullYear,todayAsDate.month,todayAsDate.date)).valueOf();//today at 00:00
-			var todayHourMinute:Number = todayAsDate.valueOf() - todayAtMidNight;
+			var todayAsDate:Date = new Date();//that's the actual time, in milliseconds since 1970
+			var todayAtMidNight:Number = (new Date(todayAsDate.fullYear,todayAsDate.month,todayAsDate.date)).valueOf();//today at 00:00 - well understood local time,
+			//so if we are here GMT +2 , it's the number of milliseconds since 1970 till this morning at 00:00 - 2 Hrs, in other words it's yesterday evening at 22:00
+			
+			var todayHourMinute:Number = todayAsDate.valueOf() - todayAtMidNight;//number of milliseconds since 00:00 in the morning, 
 			
 			//to avoid having to get the resource each time, we'll do it once here
 			var breakfast:String = ResourceManager.getInstance().getString('general','breakfast');
@@ -344,35 +347,37 @@ package model
 			var mealTimeStampAtMidNight:Number;
 			
 			if (trackingList.length > 0) {
-				for (var j:int = trackingList.length - 1; i >= 0  ; i--) {
-					mealEventTimeStamp = new Date((trackingList.getItemAt(j) as MealEvent).timeStamp);
-					mealEventTimeStampAtMidNight = (new Date(mealEventTimeStamp.fullYear,mealEventTimeStamp.month,mealEventTimeStamp.date)).valueOf();
-					
-					//check if timestamp is within -1 day or maximum + 7 days
-					if ((mealEventTimeStampAtMidNight -  todayAtMidNight < 8 * 86400000 + 1) && (todayAtMidNight - mealEventTimeStampAtMidNight < 86400001)) {
-						//check if mealeven timestamp is not smaller than first meal timestamp, because then we would simply stop
-						if (mealEventTimeStamp.valueOf() < (_meals.getItemAt(1) as Meal).timeStamp) {
-							//don't add the mealevent, and stop going through the tracking list
-							i = 0;
-						} else {
-							//seems like we'll have to add the mealevent
-							//now go through all meals, find one with the same timeAtMidNight, then check if it's a breakfast, lunch, snack or supper
-							var mealFound:Boolean = false;
-							for (var k:int = 0; k < _meals.length ;k++) {
-								if (_meals.getItemAt(k) is Meal) {
-									mealTimeStamp = new Date((_meals.getItemAt(k) as Meal).timeStamp);			
-									mealTimeStampAtMidNight = (new Date(mealTimeStamp.fullYear,mealTimeStamp.month,mealTimeStamp.date)).valueOf();
-									if (mealTimeStampAtMidNight == mealEventTimeStampAtMidNight) {
-										if ((_meals.getItemAt(k) as Meal).mealName.toUpperCase() == 
-											(trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
-											mealFound = true;
-											_meals.setItemAt(new Meal(null,(trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
+				for (var j:int = trackingList.length - 1; j >= 0  ; j--) {
+					if (trackingList.getItemAt(j) is MealEvent) {
+						mealEventTimeStamp = new Date((trackingList.getItemAt(j) as MealEvent).timeStamp);
+						mealEventTimeStampAtMidNight = (new Date(mealEventTimeStamp.fullYear,mealEventTimeStamp.month,mealEventTimeStamp.date)).valueOf();//this is again local time, so if it's here GMT+2, then this is actually time in ms - 2 hours
+						
+						//check if timestamp is within -1 day or maximum + 7 days
+						if ((mealEventTimeStampAtMidNight -  todayAtMidNight < 8 * 86400000 + 1) && (todayAtMidNight - mealEventTimeStampAtMidNight < 86400001)) {
+							//check if mealeven timestamp is not smaller than first meal timestamp, because then we would simply stop
+							if (mealEventTimeStamp.valueOf() < (_meals.getItemAt(1) as Meal).timeStamp) {
+								//don't add the mealevent, and stop going through the tracking list
+								j = -1;
+							} else {
+								//seems like we'll have to add the mealevent
+								//now go through all meals, find one with the same timeAtMidNight, then check if it's a breakfast, lunch, snack or supper
+								var mealFound:Boolean = false;
+								for (var k:int = 0; k < _meals.length ;k++) {
+									if (_meals.getItemAt(k) is Meal) {
+										mealTimeStamp = new Date((_meals.getItemAt(k) as Meal).timeStamp);			
+										mealTimeStampAtMidNight = (new Date(mealTimeStamp.fullYear,mealTimeStamp.month,mealTimeStamp.date)).valueOf();
+										if (mealTimeStampAtMidNight == mealEventTimeStampAtMidNight) {
+											if ((_meals.getItemAt(k) as Meal).mealName.toUpperCase() == 
+												(trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
+												mealFound = true;
+												_meals.setItemAt(new Meal(null,(trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
+											}
 										}
 									}
 								}
-							}
-							if (!mealFound) {
-								_meals.addItem(new Meal(null,(trackingList.getItemAt(j) as MealEvent),Number.NaN));
+								if (!mealFound) {
+									_meals.addItem(new Meal(null,(trackingList.getItemAt(j) as MealEvent),Number.NaN));
+								}
 							}
 						}
 					}
@@ -471,7 +476,7 @@ package model
 		}
 
 		/**
-		 * no comment 
+		 * the oldest dayline in the tracking list represented as Number, this is the UTC time  in ms, since 1970...
 		 */
 		public function get oldestDayLineStoredInTrackingList():Number
 		{
@@ -487,7 +492,7 @@ package model
 		}
 
 		/**
-		 * no comment 
+		 * the youngest dayline in the tracking list represented as Number, this is the UTC time  in ms, since 1970...
 		 */
 		public function get youngestDayLineStoredInTrackingList():Number
 		{

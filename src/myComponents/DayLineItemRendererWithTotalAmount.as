@@ -32,8 +32,8 @@ package myComponents
 				return;
 			
 			_totalAmount = value;
-			if (amountDisplay) {
-				amountDisplay.text = _totalAmount;
+			if (carbAmountDisplay) {
+				carbAmountDisplay.text = _totalAmount;
 				invalidateSize();
 			}
 		}
@@ -66,7 +66,7 @@ package myComponents
 		/**
 		 * the calculated amount for the day
 		 */
-		private var amountDisplay:StyleableTextField;
+		private var carbAmountDisplay:StyleableTextField;
 		
 		/**
 		 * constructor 
@@ -111,13 +111,13 @@ package myComponents
 		override protected function createChildren():void {
 			super.createChildren();
 			
-			if (!amountDisplay) {
-				amountDisplay = new StyleableTextField();
-				amountDisplay.styleName = this;
-				amountDisplay.editable = false;
-				amountDisplay.multiline = false;
-				amountDisplay.wordWrap = false;
-				addChild(amountDisplay);
+			if (!carbAmountDisplay) {
+				carbAmountDisplay = new StyleableTextField();
+				carbAmountDisplay.styleName = this;
+				carbAmountDisplay.editable = false;
+				carbAmountDisplay.multiline = false;
+				carbAmountDisplay.wordWrap = false;
+				addChild(carbAmountDisplay);
 			}
 			
 			// calculate MINIMUM_CARB_AMOUNT_WIDTH
@@ -130,8 +130,8 @@ package myComponents
 			super.styleChanged(styleName);
 			
 			// Pass any style changes to compLabelDisplay. 
-			if (amountDisplay)
-				amountDisplay.styleChanged(styleName);
+			if (carbAmountDisplay)
+				carbAmountDisplay.styleChanged(styleName);
 		}
 		
 		// Override layoutContents() to lay out the item renderer.
@@ -143,25 +143,25 @@ package myComponents
 			
 			// Commit the styles changes to labelDisplay and compLabelDisplay. 
 			labelDisplay.commitStyles();
-			amountDisplay.commitStyles();
+			carbAmountDisplay.commitStyles();
 			
 			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
 			//and then we'll extend carbamount if still possible
-			var carbAmountDisplayWidth:Number = Math.max(getElementPreferredWidth(amountDisplay), MINIMUM_AMOUNT_WIDTH);
+			var carbAmountDisplayWidth:Number = Math.max(getElementPreferredWidth(carbAmountDisplay), MINIMUM_AMOUNT_WIDTH);
 			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth);
-			amountDisplay.text = totalAmount + " " + "bla";//resourceManager.getString('general','gram_of_carbs_short');
-			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(amountDisplay));
+			carbAmountDisplay.text = Math.round(new Number(totalAmount)) + " " + resourceManager.getString('general','gram_of_carbs_short');
+			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
 			
-			var carbAmountDisplayHeight:Number = getElementPreferredHeight(amountDisplay);
+			var carbAmountDisplayHeight:Number = getElementPreferredHeight(carbAmountDisplay);
 			var labelDisplayHeight:Number = getElementPreferredHeight(labelDisplay);
 			
 			setElementSize(labelDisplay,labelDisplayWidth,labelDisplayHeight);
-			setElementSize(amountDisplay,carbAmountDisplayWidth,carbAmountDisplayHeight);
+			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,carbAmountDisplayHeight);
 			labelDisplay.truncateToFit();
-			amountDisplay.truncateToFit();
+			carbAmountDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,PADDING_TOP);
-			setElementPosition(amountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,PADDING_TOP);
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,PADDING_TOP);
 		}
 		
 	}
