@@ -11,7 +11,9 @@ s|Application {fontSize:20pt}
 
 /* typically for text that should be smaller than normal text */
 .fontSizeForSubElements {
-	fontSize:16pt
+	fontSize:16pt;
+	paddingTop:4pt;	
+    paddingBottom:4pt
 }
 
 .backGroundColorInLists {/* colors used in background of list elements, there's always a light and a dark side for each color , used in gradneiint fill*/

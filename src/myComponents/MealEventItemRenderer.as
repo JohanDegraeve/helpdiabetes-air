@@ -30,6 +30,8 @@ package myComponents
 	import spark.components.LabelItemRenderer;
 	import spark.components.supportClasses.StyleableTextField;
 	
+	import views.TemplatesView;
+	
 	/**
 	 * an itemrenderer for a mealevent<br>
 	 * What shall it show<br>
@@ -48,12 +50,12 @@ package myComponents
 		// the display fields //
 		// labelDisplay will be used to shown the first field with timestamp and meal name on the left and amount on the right
 		/**
-		 * the calculated amount of carbs
+		 * the field for the calculated amount of carbs - will be put on the right side of the first line, 
 		 */
 		private var carbAmountDisplay:StyleableTextField;
 		
 		/**
-		 * the carbamount
+		 * the carbamount in string
 		 */
 		private var _carbAmount:String;
 
@@ -62,28 +64,25 @@ package myComponents
 			return _carbAmount;
 		}
 
+		/**
+		 * sets _carbAmount, if carbAmountDisplay not null then also invalidateSize() is called
+		 */
 		private function set carbAmount(value:String):void
 		{
 			if (value == _carbAmount)
 				return;
 				
 			_carbAmount = value;
-			if (carbAmountDisplay) {
+			if (carbAmountDisplay != null) {
 				carbAmountDisplay.text = _carbAmount;
 				invalidateSize();
 			}
 		}
 
-		
 		/**
-		 * the second line, optional, with insulin ratio, insulin amount, cf
+		 * styleabletextfield with the calculated insulinamount, selected food elements and all the rest<br>
 		 */
-		private var insulinField:StyleableTextField;
-
-		/**
-		 * arraylist of styleabletextfields with the selected meals
-		 */
-		private var selectedMeals:ArrayList;
+		private var otherDetails:StyleableTextField;
 		
 		//*****************//
 		/**
@@ -121,7 +120,7 @@ package myComponents
 		}
 
 		/**
-		 * override the data property to initialize MealEventItemRenderer<br>
+		 * override the data property to initialize MealEventItemRenderer fields<br>
 		 * value needs to be a mealevent
 		 */
 		override public function set data(value:Object):void {
@@ -137,7 +136,7 @@ package myComponents
 				+ " " 
 				+ (value as MealEvent).mealName;
 
-				carbAmount = Math.round((value as MealEvent).totalCarbs).toString();
+			carbAmount = Math.round((value as MealEvent).totalCarbs).toString();
 		}
 		
 		/**
@@ -158,6 +157,16 @@ package myComponents
 			// calculate MINIMUM_CARB_AMOUNT_WIDTH
 			var textLineMetricx:TextLineMetrics = this.measureText("9999 ...");
 			MINIMUM_CARB_AMOUNT_WIDTH = textLineMetricx.width;
+			
+			if (!otherDetails) {
+				otherDetails = new StyleableTextField();
+				otherDetails.styleName = this;
+				otherDetails.editable = false;
+				otherDetails.multiline = false;//i find it strange, text is longer than one line, but it works even with multiline and wordwrap equal to false
+				otherDetails.wordWrap = false;
+				otherDetails.setStyle("fontSize",styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));//other details is written a bit smaller, fontsize defined in style.css
+				addChild(otherDetails);
+			}
 		}
 		
 		// Override styleChanged() to proopgate style changes to compLabelDisplay.
@@ -167,9 +176,11 @@ package myComponents
 			// Pass any style changes to compLabelDisplay. 
 			if (carbAmountDisplay)
 				carbAmountDisplay.styleChanged(styleName);
+			if (otherDetails)
+				otherDetails.styleChanged(styleName);
 		}
 		
-		/*// Override measure() to calculate the size required by the item renderer.
+		// Override measure() to calculate the size required by the item renderer.
 		override protected function measure():void {
 			super.measure();
 				
@@ -178,16 +189,15 @@ package myComponents
 			// and any time the styles have changed. 
 			// This method does nothing if the styles have already been committed. 
 			labelDisplay.commitStyles();
-			
-			if (carbAmountDisplay) {
-				if (carbAmountDisplay.isTruncated)
-					carbAmountDisplay.text = carbAmount;
-				carbAmountDisplay.commitStyles();
-				measuredWidth = PADDING_LEFT + getElementPreferredWidth(labelDisplay) + GAP_HORIZONTAL_MINIMUM +  getElementPreferredWidth(carbAmountDisplay) + PADDING_RIGHT;
-				measuredHeight = Math.max(getElementPreferredHeight(labelDisplay), getElementPreferredHeight(carbAmountDisplay)) + PADDING_TOP; 
-			}
-		}*/
-		
+			carbAmountDisplay.commitStyles();
+			if (otherDetails)
+				otherDetails.commitStyles();
+
+			//the needed height = sum of hights of different text fields + paddings..
+			measuredHeight = 
+				/* the height needed for the first line */ labelDisplay.textHeight + getStyle("paddingTop") +  getStyle("paddingBottom") + 
+				/* hight needed for other details field */ (otherDetails == null ? 0:otherDetails.textHeight);
+		}
 		
 		// Override layoutContents() to lay out the item renderer.
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -196,9 +206,11 @@ package myComponents
 			// carbAmount component, you do not have to call
 			// super.layoutContents().
 			
-			// Commit the styles changes to labelDisplay and compLabelDisplay. 
+			// Commit the styles changes to labelDisplay and compLabelDisplay and others
 			labelDisplay.commitStyles();
 			carbAmountDisplay.commitStyles();
+			if (otherDetails)
+				otherDetails.commitStyles();
 			
 			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
 			//and then we'll extend carbamount if still possible
@@ -209,14 +221,7 @@ package myComponents
 			
 			var carbAmountDisplayHeight:Number = getElementPreferredHeight(carbAmountDisplay);
 			var labelDisplayHeight:Number = getElementPreferredHeight(labelDisplay);
-
 			
-			/*if (carbAmount != null) {
-				carbAmountDisplay.commitStyles();
-				if (carbAmountDisplay.isTruncated)
-					carbAmountDisplay.text == carbAmount;
-				carbAmountDisplayHeight = ;
-			}*/
 			setElementSize(labelDisplay,labelDisplayWidth,labelDisplayHeight);
 			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,carbAmountDisplayHeight);
 			labelDisplay.truncateToFit();
@@ -224,6 +229,11 @@ package myComponents
 			
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,getStyle("paddingTop"));
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,getStyle("paddingTop"));
+			
+		    otherDetails.text = "qldkfjqlksjfldksjf mqlsjdf  \nqmljsdf q qdfgqdfgqdsgdfsfm q s i i i   fdsj i i i i i i i i i i i qshjdkf qsldkfjl mqsfmlkqsdjflkm qsdjmlkf dsfeinde tweede lijn\nqsdfdsqfdqsfdsf\neinde ";//resourceManager.getString('general','calculated_insulin_amount');
+			setElementSize(otherDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,getElementPreferredHeight(otherDetails));
+			setElementPosition(otherDetails,0 + PADDING_LEFT,labelDisplayHeight + getStyle("paddingTop") + styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));
+			invalidateSize();
 		}
 	}
 }
