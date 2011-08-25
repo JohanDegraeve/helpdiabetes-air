@@ -35,7 +35,7 @@ package databaseclasses
 		 */
 		public function SelectedFoodItem(description:String, unit:Unit,chosenAmount:Number):void
 		{
-			this._unit = new Unit(description,unit.standardAmount,unit.kcal,unit.protein,unit.carbs,unit.fat);
+			this._unit = new Unit(unit.unitDescription,unit.standardAmount,unit.kcal,unit.protein,unit.carbs,unit.fat);
 			this._itemDescription = description;
 			this._chosenAmount = chosenAmount;
 		}

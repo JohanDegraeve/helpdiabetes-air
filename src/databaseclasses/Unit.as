@@ -26,7 +26,6 @@ package databaseclasses
 	{
 		private var _unitDescription:String;
 		
-		
 		private var _standardAmount:int;
 		
 		private var _kcal:int;

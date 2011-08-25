@@ -448,7 +448,7 @@ package model
 					   var mealEventTimeStampHourMinute:Number = (new Date(0,0,0,mealEventTimeStampAsDate.hoursUTC,mealEventTimeStampAsDate.minutesUTC,mealEventTimeStampAsDate.secondsUTC)).valueOf();
 						if (mealEventTimeStampHourMinute >= fromTime)
 							if (mealEventTimeStampHourMinute <= toTime)
-								mealEvent.insulineRatio = newInsulinRatio;
+								mealEvent.insulinRatio = newInsulinRatio;
 				   }
 			   }
 		   }

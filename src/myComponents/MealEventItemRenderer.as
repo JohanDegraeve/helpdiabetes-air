@@ -18,6 +18,7 @@
 package myComponents
 {
 	import databaseclasses.MealEvent;
+	import databaseclasses.SelectedFoodItem;
 	
 	import flash.system.Capabilities;
 	import flash.text.TextLineMetrics;
@@ -55,6 +56,11 @@ package myComponents
 		private var carbAmountDisplay:StyleableTextField;
 		
 		/**
+		 * the field for the calculated insulinAmount 
+		 */
+		private var insulinAmountDisplay:StyleableTextField;
+		
+		/**
 		 * the carbamount in string
 		 */
 		private var _carbAmount:String;
@@ -63,7 +69,7 @@ package myComponents
 		{
 			return _carbAmount;
 		}
-
+		
 		/**
 		 * sets _carbAmount, if carbAmountDisplay not null then also invalidateSize() is called
 		 */
@@ -80,9 +86,46 @@ package myComponents
 		}
 
 		/**
-		 * styleabletextfield with the calculated insulinamount, selected food elements and all the rest<br>
+		 * the insulinAmount as string
 		 */
-		private var otherDetails:StyleableTextField;
+		private var _insulinAmount:String;
+		/**
+		 * get the insulinAmount 
+		 */
+		private function get insulinAmount():String
+		{
+			return _insulinAmount;
+		}
+		
+		/**
+		 * sets _insulinAmount, if insulinAmountDisplay not null then also invalidateSize() is called
+		 */
+		private function set insulinAmount(value:String):void
+		{
+			if (value == _insulinAmount)
+				return;
+			
+			_insulinAmount = value;
+			if (insulinAmountDisplay != null) {
+				insulinAmountDisplay.text = _insulinAmount;
+				invalidateSize();
+			}
+		}
+		
+		
+		/**
+		 * the selectedmeals in string  
+		 */
+		private var selectedMeals:String;
+		/**
+		 * styleabletextfield with the calculated insulinamount<br>
+		 */
+		private var insulinDetails:StyleableTextField;
+		
+		/**
+		 *  styleabletextfield for showing the selected fooditems.
+		 */
+		private var selectedMealItems:StyleableTextField;
 		
 		//*****************//
 		/**
@@ -104,6 +147,11 @@ package myComponents
 		private static const GAP_HORIZONTAL_MINIMUM:int = 5;
 		
 		/**
+		 * helper variable 
+		 */
+		var gramkh:String;
+		
+		/**
 		 * this is the width we would minimally need to represent 3 digits + 3 dots, because that's I assume the maximum number of digits we'll need to represent 
 		 * the amount value.<br>
 		 * Ideally this value should be calculated somewhere, eg based on style, calculate size for 3 times the largest digit + 3 dots<br>
@@ -112,11 +160,15 @@ package myComponents
 		private var MINIMUM_CARB_AMOUNT_WIDTH:int = 100;
 
 		/**
-		 * default constructor 
+		 * default constructor <br>
+		 * calls super and sets insulinAmount to null<br>
 		 */
 		public function MealEventItemRenderer()
 		{
 			super();
+			insulinAmount = null;
+			selectedMeals = null;
+			gramkh = resourceManager.getString('general','gram_of_carbs_short');
 		}
 
 		/**
@@ -137,6 +189,26 @@ package myComponents
 				+ (value as MealEvent).mealName;
 
 			carbAmount = Math.round((value as MealEvent).totalCarbs).toString();
+			
+			if ((value as MealEvent).insulinRatio != 0) {
+				insulinAmount = ((Math.round((value as MealEvent).calculatedInsulinAmount * 10))/10).toString();
+			}
+			
+			if ((value as MealEvent).selectedFoodItems != null) 
+				if ((value as MealEvent).selectedFoodItems.length > 0) {
+					var selectedFoodItem:SelectedFoodItem = ((value as MealEvent).selectedFoodItems.getItemAt(0) as SelectedFoodItem);
+					selectedMeals = (Math.round(selectedFoodItem.chosenAmount * 10))/10 + " " + 
+						selectedFoodItem.unit.unitDescription + " " + 
+						selectedFoodItem.itemDescription + " (" + (Math.round(selectedFoodItem.chosenAmount * selectedFoodItem.unit.carbs / selectedFoodItem.unit.standardAmount * 10))/10 + " " +
+						gramkh + ")";
+					for (var i:int = 1 ; i < (value as MealEvent).selectedFoodItems.length ; i++) {
+						selectedFoodItem = ((value as MealEvent).selectedFoodItems.getItemAt(i) as SelectedFoodItem);
+						selectedMeals += "\n" + (Math.round(selectedFoodItem.chosenAmount * 10))/10 + " " + 
+							selectedFoodItem.unit.unitDescription + " " + 
+							selectedFoodItem.itemDescription + " (" + (Math.round(selectedFoodItem.chosenAmount * selectedFoodItem.unit.carbs / selectedFoodItem.unit.standardAmount * 10))/10 + " " +
+							gramkh + ")";
+					}
+				}
 		}
 		
 		/**
@@ -158,14 +230,14 @@ package myComponents
 			var textLineMetricx:TextLineMetrics = this.measureText("9999 ...");
 			MINIMUM_CARB_AMOUNT_WIDTH = textLineMetricx.width;
 			
-			if (!otherDetails) {
-				otherDetails = new StyleableTextField();
-				otherDetails.styleName = this;
-				otherDetails.editable = false;
-				otherDetails.multiline = false;//i find it strange, text is longer than one line, but it works even with multiline and wordwrap equal to false
-				otherDetails.wordWrap = false;
-				otherDetails.setStyle("fontSize",styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));//other details is written a bit smaller, fontsize defined in style.css
-				addChild(otherDetails);
+			if (!insulinDetails) {
+				insulinDetails = new StyleableTextField();
+				insulinDetails.styleName = this;
+				insulinDetails.editable = false;
+				insulinDetails.multiline = false;
+				insulinDetails.wordWrap = false;
+				insulinDetails.setStyle("fontSize",styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));//other details is written a bit smaller, fontsize defined in style.css
+				addChild(insulinDetails);
 			}
 		}
 		
@@ -176,8 +248,8 @@ package myComponents
 			// Pass any style changes to compLabelDisplay. 
 			if (carbAmountDisplay)
 				carbAmountDisplay.styleChanged(styleName);
-			if (otherDetails)
-				otherDetails.styleChanged(styleName);
+			if (insulinDetails)
+				insulinDetails.styleChanged(styleName);
 		}
 		
 		// Override measure() to calculate the size required by the item renderer.
@@ -190,13 +262,16 @@ package myComponents
 			// This method does nothing if the styles have already been committed. 
 			labelDisplay.commitStyles();
 			carbAmountDisplay.commitStyles();
-			if (otherDetails)
-				otherDetails.commitStyles();
+			if (insulinDetails)
+				insulinDetails.commitStyles();
 
 			//the needed height = sum of hights of different text fields + paddings..
 			measuredHeight = 
-				/* the height needed for the first line */ labelDisplay.textHeight + getStyle("paddingTop") +  getStyle("paddingBottom") + 
-				/* hight needed for other details field */ (otherDetails == null ? 0:otherDetails.textHeight);
+				/* the height needed for the first line */ labelDisplay.textHeight + getStyle("paddingTop")  + /* getStyle("paddingBottom") +*/ 
+				/* hight needed for other details field */ (insulinDetails == null ? 0:insulinDetails.textHeight);
+			var temp:Object = getStyle("paddingBottom");
+			if (insulinDetails != null)
+				var temp2:Object = insulinDetails.textHeight;
 		}
 		
 		// Override layoutContents() to lay out the item renderer.
@@ -206,34 +281,48 @@ package myComponents
 			// carbAmount component, you do not have to call
 			// super.layoutContents().
 			
+			//tells us where the next elements needs to be positioned
+			var currentY:Number = 0;
+			
+			//used frequently
+			var paddingTop:Number = getStyle("paddingTop");
+			
 			// Commit the styles changes to labelDisplay and compLabelDisplay and others
 			labelDisplay.commitStyles();
 			carbAmountDisplay.commitStyles();
-			if (otherDetails)
-				otherDetails.commitStyles();
+			if (insulinDetails)
+				insulinDetails.commitStyles();
 			
 			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
 			//and then we'll extend carbamount if still possible
 			var carbAmountDisplayWidth:Number = Math.max(getElementPreferredWidth(carbAmountDisplay), MINIMUM_CARB_AMOUNT_WIDTH);
 			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth);
-			carbAmountDisplay.text = carbAmount + " " + resourceManager.getString('general','gram_of_carbs_short');
+			carbAmountDisplay.text = carbAmount + " " + gramkh;
 			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
 			
-			var carbAmountDisplayHeight:Number = getElementPreferredHeight(carbAmountDisplay);
-			var labelDisplayHeight:Number = getElementPreferredHeight(labelDisplay);
+			var carbAmountAndLabelDisplayHeight:Number = getElementPreferredHeight(carbAmountDisplay);
 			
-			setElementSize(labelDisplay,labelDisplayWidth,labelDisplayHeight);
-			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,carbAmountDisplayHeight);
+			setElementSize(labelDisplay,labelDisplayWidth,carbAmountAndLabelDisplayHeight);
+			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,carbAmountAndLabelDisplayHeight);
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,getStyle("paddingTop"));
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,getStyle("paddingTop"));
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,paddingTop);
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,paddingTop);
+			currentY = currentY + carbAmountAndLabelDisplayHeight + labelDisplay.y;
 			
-		    otherDetails.text = "qldkfjqlksjfldksjf mqlsjdf  \nqmljsdf q qdfgqdfgqdsgdfsfm q s i i i   fdsj i i i i i i i i i i i qshjdkf qsldkfjl mqsfmlkqsdjflkm qsdjmlkf dsfeinde tweede lijn\nqsdfdsqfdqsfdsf\neinde ";//resourceManager.getString('general','calculated_insulin_amount');
-			setElementSize(otherDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,getElementPreferredHeight(otherDetails));
-			setElementPosition(otherDetails,0 + PADDING_LEFT,labelDisplayHeight + getStyle("paddingTop") + styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));
-			invalidateSize();
+		    if (insulinAmount != null && insulinDetails != null) {
+				insulinDetails.text = resourceManager.getString('general','calculated_insulin_amount') + " " + insulinAmount;
+				setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,getElementPreferredHeight(insulinDetails));
+				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY + styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));
+				currentY += insulinDetails.y + insulinDetails.height;
+				invalidateSize();
+			} else {
+				setElementSize(insulinDetails,0,0);
+			}
+			
+			//if 
+			
 		}
 	}
 }

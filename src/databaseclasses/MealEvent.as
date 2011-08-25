@@ -38,6 +38,9 @@ package databaseclasses
 	public class MealEvent implements IListElement
 	{
 		internal var _mealName:String;//made internal because meal.as failed to use mealName - no explanation
+		/**
+		 * the insulinratio used in this mealevent, if 0 then not used<br>
+		 */
 		private var _insulinRatio:Number;
 		private var _correctionFactor:Number;
 		/**
@@ -57,10 +60,16 @@ package databaseclasses
 		 */ 
 		private var _lastModifiedTimeStamp:Number;
 		
+		private var _selectedFoodItems:ArrayCollection;
+
 		/**
 		 * the selected fooditems
 		 */
-		private var _selectedFoodItems:ArrayCollection;
+		public function get selectedFoodItems():ArrayCollection
+		{
+			return _selectedFoodItems;
+		}
+
 		
 		/**
 		 * value will be creationtimestamp, must be named _timeStamp because the class implements IListElement
@@ -81,7 +90,7 @@ package databaseclasses
 		
 		/**
 		 * mealEvent will be created and automatically inserted into the database if databaseStorage = true<br>
-		 * insulinRatio,  correctionFactor can be null which means there's no settings for the defined period<br>
+		 * insulinRatio,  correctionFactor can Number.NAN which means there's no settings for the defined period<br>
 		 * previousBGlevel can also be null meaning theres no bloodglucose event within the predefined timeframe<br>
 		 * if timeStamp = null then current time is used as timeStamp for the mealevent, otherwise the supplied timeStamp is used.<br>
 		 * 
@@ -94,7 +103,10 @@ package databaseclasses
 		 */
 		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,timeStamp:Number,dispatcher:EventDispatcher, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null, mealEventId:Number = Number.NaN,  lastModifiedTimeStamp:Number = Number.NaN) {
 			this._mealName = mealName;
-			this._insulinRatio = insulinRatio;
+			if (insulinRatio == Number.NaN)
+				this._insulinRatio = 0;
+			else
+				this._insulinRatio = insulinRatio;
 			this._previousBGlevel = previousBGlevel;
 			this._totalFat = 0;
 			this._totalProtein = 0;
@@ -330,6 +342,22 @@ package databaseclasses
 		}
 
 		/**
+		 * insulinratio =  used in this mealevent, if 0 then not used<br><br>
+		 * set will update a mealevent , updates the insulinratio, also the corresponding database element will be updated<br>
+		 * also the database will be updated<br><br>
+		 * newInsulinRatioValue = the new insulinratio to be 	assigned<br>
+		 * if value == null or value == Number.NaN then insulinratio is set to 0
+		 * 
+		 */
+		public function set  insulinRatio(value:Number):void {
+			if (insulinRatio == Number.NaN)
+				this._insulinRatio = 0;
+			else
+				this._insulinRatio = value;
+			Database.getInstance().updateInsulineRatio(this.mealEventId,value,null);
+		}
+
+		/**
 		 * the correction factor, if null then correction will be applied
 		 */
 		public function get correctionFactor():Number
@@ -348,8 +376,6 @@ package databaseclasses
 								if (previousBGlevel != 0)
 									this._calculatedInsulinAmount += (this._previousBGlevel - parseInt(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)))/this._correctionFactor;
 				}
-			
-
 		}
 
 		private function set correctionFactor(value:Number):void
@@ -389,15 +415,5 @@ package databaseclasses
 			}
 		}
 		
-		/**
-		 * will update a mealevent , updates the insulinratio, also the corresponding database element will be updated<br>
-		 * also the database will be updated<br><br>
-		 * newInsulinRatioValue = the new insulinratio to be 	assigned<br>
-		 * 
-		 */
-		public function set  insulineRatio(value:Number):void {
-			_insulinRatio = value;
-			Database.getInstance().updateInsulineRatio(this.mealEventId,value,null);
-		}
 	}
 }
