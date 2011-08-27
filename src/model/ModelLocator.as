@@ -116,6 +116,43 @@ package model
 		 */
 		private var _youngestDayLineStoredInTrackingList:Number;
 		
+		private var _initializeTrackingView:Boolean;
+
+		/**
+		 * used in tracking view, if true, then ensureindexvisible will be set to value initializeTrackingViewTo 
+		 */
+		public function get initializeTrackingView():Boolean
+		{
+			return _initializeTrackingView;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set initializeTrackingView(value:Boolean):void
+		{
+			_initializeTrackingView = value;
+		}
+
+		private var _initializeTrackingViewTo:Number;
+
+		/**
+		 * used in tracking view, if _initializeTrackingView, then ensureindexvisible will be set to value initializeTrackingViewTo 
+		 */
+		public function get initializeTrackingViewTo():Number
+		{
+			return _initializeTrackingViewTo;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set initializeTrackingViewTo(value:Number):void
+		{
+			_initializeTrackingViewTo = value;
+		}
+
+		
 		/** 
 		 * just a variable used when opening the untilist 
 		 */

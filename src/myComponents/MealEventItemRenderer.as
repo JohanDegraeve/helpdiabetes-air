@@ -31,6 +31,7 @@ package myComponents
 	import spark.components.LabelItemRenderer;
 	import spark.components.supportClasses.StyleableTextField;
 	
+	import views.SelectMealView;
 	import views.TemplatesView;
 	
 	/**
@@ -69,6 +70,11 @@ package myComponents
 		{
 			return _carbAmount;
 		}
+		
+		//all variables to maintain previous heights, if changed then invalidatesize must be called.
+		private var previousInsulinDetailsHeight:Number = 0;
+		private var previousSelectedMealsHeight:Number = 0;
+		
 		
 		/**
 		 * sets _carbAmount, if carbAmountDisplay not null then also invalidateSize() is called
@@ -149,8 +155,13 @@ package myComponents
 		/**
 		 * helper variable 
 		 */
-		var gramkh:String;
+		private var gramkh:String;
 		
+		/**
+		 * tells us where the next elements needs to be positioned, is also used in measure
+		 */
+		private var currentY:Number = 0;
+
 		/**
 		 * this is the width we would minimally need to represent 3 digits + 3 dots, because that's I assume the maximum number of digits we'll need to represent 
 		 * the amount value.<br>
@@ -239,6 +250,16 @@ package myComponents
 				insulinDetails.setStyle("fontSize",styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));//other details is written a bit smaller, fontsize defined in style.css
 				addChild(insulinDetails);
 			}
+			
+			if (!selectedMealItems) {
+				selectedMealItems = new StyleableTextField();
+				selectedMealItems.styleName = this;
+				selectedMealItems.editable = false;
+				selectedMealItems.multiline = true;
+				selectedMealItems.wordWrap = true;
+				selectedMealItems.setStyle("fontSize",styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));//other details is written a bit smaller, fontsize defined in style.css
+				addChild(selectedMealItems);
+			}
 		}
 		
 		// Override styleChanged() to proopgate style changes to compLabelDisplay.
@@ -250,6 +271,9 @@ package myComponents
 				carbAmountDisplay.styleChanged(styleName);
 			if (insulinDetails)
 				insulinDetails.styleChanged(styleName);
+			if (selectedMealItems)
+				selectedMealItems.styleChanged(styleName);
+
 		}
 		
 		// Override measure() to calculate the size required by the item renderer.
@@ -264,14 +288,15 @@ package myComponents
 			carbAmountDisplay.commitStyles();
 			if (insulinDetails)
 				insulinDetails.commitStyles();
+			if (selectedMealItems)
+				selectedMealItems.commitStyles();
 
 			//the needed height = sum of hights of different text fields + paddings..
 			measuredHeight = 
 				/* the height needed for the first line */ labelDisplay.textHeight + getStyle("paddingTop")  + /* getStyle("paddingBottom") +*/ 
-				/* hight needed for other details field */ (insulinDetails == null ? 0:insulinDetails.textHeight);
-			var temp:Object = getStyle("paddingBottom");
-			if (insulinDetails != null)
-				var temp2:Object = insulinDetails.textHeight;
+				+ previousInsulinDetailsHeight + previousSelectedMealsHeight;
+				/* hight needed for other details field */ //(insulinDetails == null ? 0:insulinDetails.textHeight) + 
+				/* hight needed for selecteditems */       //(selectedMealItems == null ? 0:selectedMealItems.textHeight);
 		}
 		
 		// Override layoutContents() to lay out the item renderer.
@@ -281,17 +306,13 @@ package myComponents
 			// carbAmount component, you do not have to call
 			// super.layoutContents().
 			
-			//tells us where the next elements needs to be positioned
-			var currentY:Number = 0;
-			
-			//used frequently
-			var paddingTop:Number = getStyle("paddingTop");
-			
 			// Commit the styles changes to labelDisplay and compLabelDisplay and others
 			labelDisplay.commitStyles();
 			carbAmountDisplay.commitStyles();
 			if (insulinDetails)
 				insulinDetails.commitStyles();
+			if (selectedMealItems)
+				selectedMealItems.commitStyles();
 			
 			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
 			//and then we'll extend carbamount if still possible
@@ -307,21 +328,36 @@ package myComponents
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,paddingTop);
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,paddingTop);
-			currentY = currentY + carbAmountAndLabelDisplayHeight + labelDisplay.y;
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,0);
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,0);
+			currentY = carbAmountDisplay.height;
 			
 		    if (insulinAmount != null && insulinDetails != null) {
 				insulinDetails.text = resourceManager.getString('general','calculated_insulin_amount') + " " + insulinAmount;
 				setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,getElementPreferredHeight(insulinDetails));
-				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY + styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));
-				currentY += insulinDetails.y + insulinDetails.height;
-				invalidateSize();
+				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY );
+				currentY += insulinDetails.height;
+				if (previousInsulinDetailsHeight != insulinDetails.height) {
+					previousInsulinDetailsHeight = insulinDetails.height;
+					invalidateSize();
+				}
 			} else {
 				setElementSize(insulinDetails,0,0);
 			}
 			
-			//if 
+			if (selectedMealItems != null && selectedMeals
+				!= null) {
+				selectedMealItems.text = selectedMeals;
+				setElementSize(selectedMealItems,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,getElementPreferredHeight(selectedMealItems));
+				setElementPosition(selectedMealItems,0 + PADDING_LEFT,currentY );
+				currentY +=  selectedMealItems.height;
+				if (previousSelectedMealsHeight != selectedMealItems.height) {
+					previousSelectedMealsHeight = selectedMealItems.height;
+					invalidateSize();
+				}
+			} else {
+				setElementSize(selectedMealItems,0,0);
+			}
 			
 		}
 	}

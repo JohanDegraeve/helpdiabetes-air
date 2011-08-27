@@ -12,9 +12,10 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import model.ModelLocator;
+			
 			import mx.collections.ArrayCollection;
 			import mx.resources.ResourceManager;
-			
 			
 			import spark.events.IndexChangeEvent;
 			private var menuList:ArrayCollection = 	new ArrayCollection([
@@ -41,6 +42,8 @@
 						navigator.pushView(FoodCounterView);
 						break;
 					case 1:
+						ModelLocator.getInstance().initializeTrackingView = true;
+						ModelLocator.getInstance().initializeTrackingViewTo = ModelLocator.getInstance().trackingList.length - 1;
 						navigator.pushView(TrackingView);
 						break;
 					case 2:
