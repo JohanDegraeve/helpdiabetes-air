@@ -31,11 +31,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import model.ModelLocator;
 			
 			import myComponents.IListElement;
+
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();
 			}
 			
 			private function onCreationComplete():void {
+				
 				if (ModelLocator.getInstance().initializeTrackingView) {
 					ModelLocator.getInstance().initializeTrackingView = false;
 					trackinglist.ensureIndexIsVisible(ModelLocator.getInstance().trackingList.length - 1);
@@ -48,7 +50,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
-	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" 
+	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="false"
 			dataProvider="{ModelLocator.getInstance().trackingList}"
 			itemRendererFunction="getItemRenderer">
 	</s:List>

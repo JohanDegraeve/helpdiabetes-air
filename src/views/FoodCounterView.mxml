@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		title="FoodCounterView"
 		initialize="init()" 
 		viewActivate="viewActivateHandler(event)"
-		creationComplete="onCreationComplete()" 
+		updateComplete="onCreationComplete()" 
 		>
 
 	<fx:Declarations>
@@ -76,6 +76,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function toTracking():void { 
+				ModelLocator.getInstance().initializeTrackingView = true;
+				ModelLocator.getInstance().initializeTrackingViewTo = ModelLocator.getInstance().trackingList.length - 1;
 				navigator.pushView(TrackingView);
 			}
 			

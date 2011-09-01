@@ -33,9 +33,13 @@ package model
 	import mx.resources.ResourceManager;
 	
 	import myComponents.DayLine;
+	import myComponents.DayLineItemRenderer;
+	import myComponents.DayLineItemRendererWithTotalAmount;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
+	import spark.components.List;
+	import spark.components.View;
 	
 	import utilities.ExcelSorting;
 
@@ -543,7 +547,6 @@ package model
 		{
 			_youngestDayLineStoredInTrackingList = value;
 		}
-
-
+		
 	}
 }

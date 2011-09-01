@@ -90,7 +90,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					Settings.getInstance().setSetting(settingId,(event.newValue as Number).toString());
 
 					//selectedmeal might still point to a previous meal which is finished by now,
-					//check if it's more than 15 minutes ago that a meal has been added, if so reset selectedmeal
+					//check if it's more than 15 minutes ago that a fooditem has been added, if so reset selectedmeal
 					if (((new Date()).valueOf() - new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION))) > 15*60*1000) {
 						ModelLocator.getInstance().resetSelectedMeal();
 					}

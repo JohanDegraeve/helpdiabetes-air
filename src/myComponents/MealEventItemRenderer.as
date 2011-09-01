@@ -358,7 +358,6 @@ package myComponents
 			} else {
 				setElementSize(selectedMealItems,0,0);
 			}
-			
 		}
 	}
 }

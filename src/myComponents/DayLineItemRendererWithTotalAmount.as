@@ -14,7 +14,7 @@ package myComponents
 	/**
 	 * an extension of daylineitemrender, that shows the total amount per day, of carbs or kilocalories or fat or protein - setting dependent 
 	 */
-	public class DayLineItemRendererWithTotalAmount extends DayLineItemRenderer
+	public class DayLineItemRendererWithTotalAmount extends DayLineItemRenderer 
 	{
 		/**
 		 * total amount for the day of carbs, protein, kilocalories or fat, depending on the user's preference
@@ -160,6 +160,8 @@ package myComponents
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,getStyle("paddingTop"));
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,getStyle("paddingTop"));
 		}
+		
+		
 		
 	}
 }
