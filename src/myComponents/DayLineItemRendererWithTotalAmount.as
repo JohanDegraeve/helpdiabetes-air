@@ -160,8 +160,5 @@ package myComponents
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,getStyle("paddingTop"));
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,getStyle("paddingTop"));
 		}
-		
-		
-		
 	}
 }

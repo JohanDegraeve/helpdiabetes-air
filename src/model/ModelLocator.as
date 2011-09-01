@@ -167,6 +167,7 @@ package model
 		 * the arraycollection used as list in trackingview<br>
 		 * It is declared here because it will be used in other classes as well, eg during intialization of the application it will already be created and initialized<br>
 		 * The trackingList contains all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents and also DayLine objects are stored here. Sorted by timestamp.<br>
+		 * any item in the trackinglist must be of a class extended from TrackingViewElement
 		 */ 
 		[Bindable]
 		public var trackingList:ArrayCollection = new ArrayCollection();

@@ -46,7 +46,7 @@ package myComponents
 	 * if the allMealsExtended flag is true, then all mealevents are extended<br>
 	 * if allMealsExtended flag is false, then only the mealevent with id ModelLocator.selectedMeal
 	 */
-	public class MealEventItemRenderer extends LabelItemRenderer
+	public class MealEventItemRenderer extends TrackingViewElementItemRenderer
 	{
 		//*****************//
 		// the display fields //
@@ -70,11 +70,6 @@ package myComponents
 		{
 			return _carbAmount;
 		}
-		
-		//all variables to maintain previous heights, if changed then invalidatesize must be called.
-		private var previousInsulinDetailsHeight:Number = 0;
-		private var previousSelectedMealsHeight:Number = 0;
-		
 		
 		/**
 		 * sets _carbAmount, if carbAmountDisplay not null then also invalidateSize() is called
@@ -170,6 +165,29 @@ package myComponents
 		 */
 		private var MINIMUM_CARB_AMOUNT_WIDTH:int = 100;
 
+		//all variables to maintain previous heights, if changed then invalidatesize must be called.
+		private var previousInsulinDetailsHeight:Number = 0;
+		private var previousSelectedMealsHeight:Number = 0;
+		
+		//variables to calculate the width and height of a mealevent rendered with this renderer
+		private static var _carbAmountCalculatedHeight:Number = 0;
+		private static var _carbAmountPreferredHeight:Number = 0;
+		private static var _insulinAmountCalculatedHeight:Number = 0;
+		private static var _insulinAmountPreferredHeight:Number=0;
+		/**
+		 * height of the first selectedmeal
+		 */
+		private static var _firstSelectedMealCalculatedHeight:Number=0;
+		/**
+		 * height of a selectedmeal in the mid
+		 */
+		private static var _midSelectedMealCalculatedHeight:Number=0;
+		/**
+		 * height of the last selectedmeal
+		 */
+		private static var _lastSelectedMealCalculatedHeight:Number=0;
+	
+		
 		/**
 		 * default constructor <br>
 		 * calls super and sets insulinAmount to null<br>
@@ -321,22 +339,32 @@ package myComponents
 			carbAmountDisplay.text = carbAmount + " " + gramkh;
 			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
 			
-			var carbAmountAndLabelDisplayHeight:Number = getElementPreferredHeight(carbAmountDisplay);
+			if (_carbAmountCalculatedHeight == 0) {//which means also _carbAmountPreferredHeight == 0
+				_carbAmountPreferredHeight = getElementPreferredHeight(carbAmountDisplay);
+				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
+				_carbAmountCalculatedHeight = labelDisplay.height;
+			} else 
+				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
 			
-			setElementSize(labelDisplay,labelDisplayWidth,carbAmountAndLabelDisplayHeight);
-			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,carbAmountAndLabelDisplayHeight);
+			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,_carbAmountPreferredHeight);
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,0);
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,0);
-			currentY = carbAmountDisplay.height;
+			currentY = _carbAmountCalculatedHeight;
 			
 		    if (insulinAmount != null && insulinDetails != null) {
 				insulinDetails.text = resourceManager.getString('general','calculated_insulin_amount') + " " + insulinAmount;
-				setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,getElementPreferredHeight(insulinDetails));
+				if (_insulinAmountCalculatedHeight == 0) {
+					_insulinAmountPreferredHeight = getElementPreferredHeight(insulinDetails);	
+					setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,_insulinAmountPreferredHeight);
+					_insulinAmountCalculatedHeight = insulinDetails.height;
+				} else
+					setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,_insulinAmountPreferredHeight);
 				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY );
-				currentY += insulinDetails.height;
+				currentY += _insulinAmountCalculatedHeight;
+				
 				if (previousInsulinDetailsHeight != insulinDetails.height) {
 					previousInsulinDetailsHeight = insulinDetails.height;
 					invalidateSize();
@@ -345,8 +373,7 @@ package myComponents
 				setElementSize(insulinDetails,0,0);
 			}
 			
-			if (selectedMealItems != null && selectedMeals
-				!= null) {
+			if (selectedMealItems != null && selectedMeals != null) {
 				selectedMealItems.text = selectedMeals;
 				setElementSize(selectedMealItems,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,getElementPreferredHeight(selectedMealItems));
 				setElementPosition(selectedMealItems,0 + PADDING_LEFT,currentY );
@@ -358,6 +385,10 @@ package myComponents
 			} else {
 				setElementSize(selectedMealItems,0,0);
 			}
+		}
+		
+		override public function getHeight(item:TrackingViewElement):Number {
+			return _carbAmountCalculatedHeight;
 		}
 	}
 }

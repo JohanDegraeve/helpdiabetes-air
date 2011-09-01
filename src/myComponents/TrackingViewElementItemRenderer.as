@@ -1,0 +1,50 @@
+/**
+ Copyright (C) 2011  hippoandfriends
+ 
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+ 
+ */
+package myComponents
+{
+	import spark.components.LabelItemRenderer;
+
+	/**
+	 * a superclass for the itemrenderers that are used for elements that can be in a trackingview<br>
+	 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and override getHeight and getWidth and calculate the 
+	 * height and width for the parameter item.<br>
+	 */
+	public class TrackingViewElementItemRenderer extends LabelItemRenderer
+	{
+		
+		public function TrackingViewElementItemRenderer() 
+		{
+		}
+		
+		/**
+		 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and override getHeight and getWidth and calculate the 
+		 * height and width for the parameter item.<br>
+		 */
+		public function getHeight(item:TrackingViewElement):Number {
+			return 0;			
+		}
+		
+		/**
+		 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and override getHeight and getWidth and calculate the 
+		 * height and width for the parameter item.<br>
+		 */
+		public function getWidth(item:TrackingViewElement):Number {
+			return 0;			
+		}
+	}
+}

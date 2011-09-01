@@ -24,7 +24,7 @@ package myComponents
 	 * can be added in an arraylist of meals or tracking events, will actually simple show a date in a color which is weekday dependent to 
 	 * clearly show the weekends
 	 */
-	public class DayLine implements IListElement
+	public class DayLine extends TrackingViewElement implements IListElement 
 	{
 		private var _timeStamp:Number;
 		

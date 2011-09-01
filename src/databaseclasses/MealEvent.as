@@ -25,6 +25,7 @@ package databaseclasses
 	
 	import myComponents.IListElement;
 	import myComponents.MealEventItemRenderer;
+	import myComponents.TrackingViewElement;
 	
 
 	/**
@@ -35,7 +36,7 @@ package databaseclasses
 	 * <br>
 	 * Also the selected Food Items are stored in here.<br>
 	 */ 
-	public class MealEvent implements IListElement
+	public class MealEvent extends TrackingViewElement implements IListElement
 	{
 		internal var _mealName:String;//made internal because meal.as failed to use mealName - no explanation
 		/**

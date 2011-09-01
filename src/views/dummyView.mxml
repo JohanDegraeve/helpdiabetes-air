@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!--
+a view that will not really interact with the user but will pop up a small period of time
+It wil have a list, with elements of different types, actually each type that can appear in a trackingview
+As a consequence, the corresponding itemrenderer of each type will be called at least once
+This will allow these itemrenderer the calculate the heigh of each item, which will then be used in a measure() function in a custom layout named here trackingViewLayout
+All this is based on a sample found in http://corlan.org/2011/07/11/creating-flex-mobile-lists-part-ii-using-virtualization
+
+The trackingViewLayout is a layout used in the TrackingView list, so code of there to get so more info, and also the itemrenderer of elements that can be in a tracking view (like daylineitemrenderwithtotalamount)
+There we have a specific function that allows to measure the hight of an item, that height is based on static values stored in the itemrenderer, and these values will be calculated during creation of this view over here.
+-->
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		initialize="onInitialize()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import databaseclasses.Meal;
+			import databaseclasses.MealEvent;
+			import databaseclasses.SelectedFoodItem;
+			import databaseclasses.Unit;
+			
+			import mx.collections.ArrayCollection;
+			
+			import myComponents.DayLineWithTotalAmount;
+			import myComponents.IListElement;
+			[Bindable]
+			public var dummyTrackingViewList:ArrayCollection; 
+
+			private function onInitialize():void {
+				dummyTrackingViewList = new ArrayCollection();
+				
+				//a daylinewith totalamount, doesn't matter what date, here's it's 1st of january 1970
+				dummyTrackingViewList.addItem(new DayLineWithTotalAmount(0));
+				
+				//a list of selectedfooditems, let's take at least three
+				var selectedFoodItems:ArrayCollection = new ArrayCollection();
+				var newSelectedFoodItem:SelectedFoodItem = new SelectedFoodItem(
+					"food item 1",
+					new Unit("unit 1",10,10,10,10,10),
+					20);
+				//we are not setting the selecteditemid and mealevent id
+				selectedFoodItems.addItem(newSelectedFoodItem);
+				newSelectedFoodItem = new SelectedFoodItem(
+						"food item 2",
+						new Unit("unit 2",10,10,10,10,10),
+						20);
+				selectedFoodItems.addItem(newSelectedFoodItem);
+				
+				newSelectedFoodItem = new SelectedFoodItem(
+					"food item 3",
+					new Unit("unit 3",10,10,10,10,10),
+					20);
+				selectedFoodItems.addItem(newSelectedFoodItem);
+				
+				//a mealevent,with any mealname, and any time , here it's 1000 ms after 1st of January 1970
+				var newMealEvent:MealEvent = new MealEvent("any mealname",
+					20,//any insulinratio value
+					50,//any correctionfactor value
+					120,//any previous bglevel value
+					1000,//1000 ms after 1st of January 1970
+					null,//no dispatcher
+					false,//don't store in the database
+					new ArrayCollection(selectedFoodItems.toArray()),
+					120,//any mealevent id
+					1001//1001 ms after 1st of January 1970
+				);
+				newSelectedFoodItem = new SelectedFoodItem(
+					"food item 2",
+					new Unit("unit 2",10,10,10,10,10),
+					20);
+				
+				dummyTrackingViewList.addItem(newMealEvent);
+				
+			}
+			
+			private function getItemRenderer(item:Object):ClassFactory {
+				return (item as IListElement).listElementRendererFunction();
+			}
+			
+
+		]]>
+	</fx:Script>
+	<s:List id="dummyList" left="0" right="0" top="0" bottom="0" itemRendererFunction="getItemRenderer" visible="false"
+			dataProvider="{dummyTrackingViewList}" >
+	</s:List>
+
+</s:View>

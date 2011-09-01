@@ -30,7 +30,7 @@ package myComponents
 	import spark.components.supportClasses.StyleableTextField;
 	import spark.formatters.DateTimeFormatter;
 
-	public class DayLineItemRenderer extends LabelItemRenderer
+	public class DayLineItemRenderer extends TrackingViewElementItemRenderer
 	{
 		/**
 		 * to display the date 
