@@ -166,8 +166,7 @@ package myComponents
 		private var MINIMUM_CARB_AMOUNT_WIDTH:int = 100;
 
 		//all variables to maintain previous heights, if changed then invalidatesize must be called.
-		private var previousInsulinDetailsHeight:Number = 0;
-		private var previousSelectedMealsHeight:Number = 0;
+		private var previousY:Number = 0;
 		
 		//variables to calculate the width and height of a mealevent rendered with this renderer
 		private static var _carbAmountCalculatedHeight:Number = 0;
@@ -198,6 +197,7 @@ package myComponents
 			insulinAmount = null;
 			selectedMeals = null;
 			gramkh = resourceManager.getString('general','gram_of_carbs_short');
+			
 		}
 
 		/**
@@ -310,9 +310,9 @@ package myComponents
 				selectedMealItems.commitStyles();
 
 			//the needed height = sum of hights of different text fields + paddings..
-			measuredHeight = 
-				/* the height needed for the first line */ labelDisplay.textHeight + getStyle("paddingTop")  + /* getStyle("paddingBottom") +*/ 
-				+ previousInsulinDetailsHeight + previousSelectedMealsHeight;
+			measuredHeight = previousY;
+				/* the height needed for the first line */ /* labelDisplay.textHeight + getStyle("paddingTop")  + */ /* getStyle("paddingBottom") +*/ 
+				//+ previousInsulinDetailsHeight + previousSelectedMealsHeight;
 				/* hight needed for other details field */ //(insulinDetails == null ? 0:insulinDetails.textHeight) + 
 				/* hight needed for selecteditems */       //(selectedMealItems == null ? 0:selectedMealItems.textHeight);
 		}
@@ -331,6 +331,8 @@ package myComponents
 				insulinDetails.commitStyles();
 			if (selectedMealItems)
 				selectedMealItems.commitStyles();
+			
+			var upLiftForNextField:int = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
 			
 			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
 			//and then we'll extend carbamount if still possible
@@ -352,7 +354,7 @@ package myComponents
 			
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,0);
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,0);
-			currentY = _carbAmountCalculatedHeight;
+			currentY = _carbAmountCalculatedHeight -upLiftForNextField;
 			
 		    if (insulinAmount != null && insulinDetails != null) {
 				insulinDetails.text = resourceManager.getString('general','calculated_insulin_amount') + " " + insulinAmount;
@@ -363,12 +365,7 @@ package myComponents
 				} else
 					setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,_insulinAmountPreferredHeight);
 				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY );
-				currentY += _insulinAmountCalculatedHeight;
-				
-				if (previousInsulinDetailsHeight != insulinDetails.height) {
-					previousInsulinDetailsHeight = insulinDetails.height;
-					invalidateSize();
-				}
+				currentY += _insulinAmountCalculatedHeight -upLiftForNextField;
 			} else {
 				setElementSize(insulinDetails,0,0);
 			}
@@ -377,13 +374,14 @@ package myComponents
 				selectedMealItems.text = selectedMeals;
 				setElementSize(selectedMealItems,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,getElementPreferredHeight(selectedMealItems));
 				setElementPosition(selectedMealItems,0 + PADDING_LEFT,currentY );
-				currentY +=  selectedMealItems.height;
-				if (previousSelectedMealsHeight != selectedMealItems.height) {
-					previousSelectedMealsHeight = selectedMealItems.height;
-					invalidateSize();
-				}
+				currentY +=  selectedMealItems.height -upLiftForNextField;
 			} else {
 				setElementSize(selectedMealItems,0,0);
+			}
+			
+			if (currentY != previousY) {
+				previousY = currentY;
+				invalidateSize();
 			}
 		}
 		

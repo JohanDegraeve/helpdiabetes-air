@@ -22,7 +22,14 @@ s|Application {fontSize:20pt}
  	lightBlueLight:#0CD9F8;
 	lightBlueDark:#5C939B;
 	
-}	
+}
+
+.removePaddingBottomForStyleableTextField {
+	/* StyleableTextFIeld seems to have a large paddingBottom which I was not able to remove so what i did : */
+	/* when a StyleableTextField is positioned, then the next field will be uplifted with a predefined number of pixels, so the next field actually overlaps the previous field */
+	/* the gap here defines the amount of pixels that a new field following a styleabletextfield is uplifed */
+	gap:5;
+}
 
 s|BorderContainer {
 	/* used here for example in timepicker, datepicker, insulinamountbicker*/
