@@ -165,11 +165,6 @@ package myComponents
 		private var gramkh:String;
 		
 		/**
-		 * tells us where the next elements needs to be positioned, is also used in measure
-		 */
-		private var currentY:Number = 0;
-
-		/**
 		 * this is the width we would minimally need to represent 3 digits + 3 dots, because that's I assume the maximum number of digits we'll need to represent 
 		 * the amount value.<br>
 		 * Ideally this value should be calculated somewhere, eg based on style, calculate size for 3 times the largest digit + 3 dots<br>
@@ -190,12 +185,21 @@ package myComponents
 		private var previousY:Number = 0;
 		
 		//variables to calculate the width and height of a mealevent rendered with this renderer
+		//preferred values are values obtained with method getPreferredHeight
+		//calculated values are values obtained with object-name.height
+		//preferred values needs to be used in  method setelementsize
+		//calculated values needs to be used to calculate the real heigh, eg val calculating currentY
 		private static var _carbAmountCalculatedHeight:Number = 0;
 		private static var _carbAmountPreferredHeight:Number = 0;
 		private static var _insulinAmountCalculatedHeight:Number = 0;
-		private static var _insulinAmountPreferredHeight:Number=0;
-		private static var _selectedMealCalculatedHeight:Number=0;
-		private static var _selectedMealPreferredHeight:Number=0;
+		private static var _insulinAmountPreferredHeight:Number = 0;
+		private static var _selectedMealCalculatedHeight:Number = 0;
+		private static var _selectedMealPreferredHeight:Number = 0;
+		
+		/**
+		 * if styleabletextfield is added, then paddingbottom is too high, next element will be uplifted by an amount of pixels which is upLiftForNextField.
+		 */
+		private var upLiftForNextField:int;
 		
 		/**
 		 * default constructor <br>
@@ -206,7 +210,7 @@ package myComponents
 			super();
 			insulinAmount = null;
 			gramkh = resourceManager.getString('general','gram_of_carbs_short');
-			
+			upLiftForNextField = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
 		}
 
 		/**
@@ -313,28 +317,24 @@ package myComponents
 		
 		// Override measure() to calculate the size required by the item renderer.
 		override protected function measure():void {
-			super.measure();
+//			super.measure();
 				
 			// Commit the styles changes to labelDisplay and carbAmount. 
 			// This method must be called before the text is displayed, 
 			// and any time the styles have changed. 
 			// This method does nothing if the styles have already been committed. 
-			labelDisplay.commitStyles();
-			carbAmountDisplay.commitStyles();
-			if (insulinDetails)
-				insulinDetails.commitStyles();
-			if (selectedMealsDescriptionStyleableTextFields)
-				for (var l:int = 0;l < selectedMealsDescriptionStyleableTextFields.length; l++) {
-					(selectedMealsDescriptionStyleableTextFields.getItemAt(l)).commitStyles();
-					(selectedMealsCarbAmountStyleableTextFields.getItemAt(l)).commitStyles();
-				}
+	//		labelDisplay.commitStyles();
+		//	carbAmountDisplay.commitStyles();
+			//if (insulinDetails)
+				//insulinDetails.commitStyles();
+			//if (selectedMealsDescriptionStyleableTextFields)
+				//for (var l:int = 0;l < selectedMealsDescriptionStyleableTextFields.length; l++) {
+					//(selectedMealsDescriptionStyleableTextFields.getItemAt(l)).commitStyles();
+					//(selectedMealsCarbAmountStyleableTextFields.getItemAt(l)).commitStyles();
+			//	}
 
-			//the needed height = sum of hights of different text fields + paddings..
-			measuredHeight = previousY;
-				/* the height needed for the first line */ /* labelDisplay.textHeight + getStyle("paddingTop")  + */ /* getStyle("paddingBottom") +*/ 
-				//+ previousInsulinDetailsHeight + previousSelectedMealsHeight;
-				/* hight needed for other details field */ //(insulinDetails == null ? 0:insulinDetails.textHeight) + 
-				/* hight needed for selecteditems */       //(selectedMealItems == null ? 0:selectedMealItems.textHeight);
+			measuredHeight = getHeight();
+			previousY = measuredHeight;
 		}
 		
 		// Override layoutContents() to lay out the item renderer.
@@ -354,8 +354,6 @@ package myComponents
 					(selectedMealsDescriptionStyleableTextFields.getItemAt(l)).commitStyles();
 					(selectedMealsCarbAmountStyleableTextFields.getItemAt(l)).commitStyles();
 				}
-			
-			var upLiftForNextField:int = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
 			
 			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
 			//and then we'll extend carbamount if still possible
@@ -378,7 +376,7 @@ package myComponents
 			
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,0);
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,0);
-			currentY = _carbAmountCalculatedHeight -upLiftForNextField;
+			var currentY:Number = _carbAmountCalculatedHeight - upLiftForNextField;
 			
 		    if (insulinAmount != null && insulinDetails != null) {
 				insulinDetails.text = resourceManager.getString('general','calculated_insulin_amount') + " " + insulinAmount;
@@ -469,8 +467,28 @@ package myComponents
 			}
 		}
 		
-		override public function getHeight(item:TrackingViewElement):Number {
-			return _carbAmountCalculatedHeight;
+		override public function getHeight(item:TrackingViewElement = null):Number {
+			//if item = null then assign item to data, which may be (not sure yet) a mealevent
+			//wheter it's a mealevent or not is checked by checking later against null value, if not null then it must be a mealevent
+			if (item == null)
+				item = (this.data as MealEvent);
+			if (item == null) //parameter was null and this.data is also null, so there's nothing to calculate
+				return 0;
+			
+			var returnValue:int = 0;
+			//height of label and carbAmount
+			returnValue += _carbAmountCalculatedHeight - upLiftForNextField;
+			if (insulinAmount != null && insulinDetails != null) {
+				returnValue += _insulinAmountCalculatedHeight - upLiftForNextField;
+			}
+			//height of different selectedmeals
+			if (selectedMealsDescriptionStrings != null) {
+				returnValue += (_selectedMealCalculatedHeight - upLiftForNextField) * selectedMealsDescriptionStrings.length;
+			}
+			//one uplift to be removed.
+			returnValue += upLiftForNextField;
+			
+			return returnValue;
 		}
 	}
 }

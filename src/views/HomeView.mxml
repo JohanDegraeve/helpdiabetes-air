@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title="HomeView"
-		initialize="init()" >
+		initialize="init()" 
+		creationComplete="onCreationComplete()">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -56,6 +57,20 @@
 						navigator.pushView(InfoAndHelpView);
 						break;
 				}
+			}
+			
+			/**
+			 * what I achieve here is that after HomeView is created, the dummyView will be pushed<br>
+			 * When dummyView is popped, then data will be a boolean value being set to true, in which case dummyView will not be pushed again. 
+			 */
+			private function onCreationComplete():void {
+				if (data)
+					if (data is Boolean)
+						if ((data as Boolean) == true)
+							return
+							
+				data = new Boolean(true);
+				navigator.pushView(dummyView);
 			}
 		]]>
 	</fx:Script>

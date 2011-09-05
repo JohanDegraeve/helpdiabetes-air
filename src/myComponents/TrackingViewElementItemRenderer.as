@@ -32,19 +32,20 @@ package myComponents
 		}
 		
 		/**
-		 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and override getHeight and getWidth and calculate the 
+		 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and overrides getHeight calculate the 
 		 * height and width for the parameter item.<br>
+		 * if Item is null, then the implementation should try to calculate the height for the own data property<br>
 		 */
-		public function getHeight(item:TrackingViewElement):Number {
+		public function getHeight(item:TrackingViewElement = null):Number {
 			return 0;			
 		}
 		
 		/**
 		 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and override getHeight and getWidth and calculate the 
 		 * height and width for the parameter item.<br>
-		 */
-		public function getWidth(item:TrackingViewElement):Number {
+		 
+		public function getWidth(item:TrackingViewElement = null):Number {
 			return 0;			
-		}
+		}*/
 	}
 }

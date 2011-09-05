@@ -55,7 +55,7 @@ There we have a specific function that allows to measure the hight of an item, t
 				//a list of selectedfooditems, let's take at least three
 				var selectedFoodItems:ArrayCollection = new ArrayCollection();
 				var newSelectedFoodItem:SelectedFoodItem = new SelectedFoodItem(
-					"food item 1",
+					"HIT THE BACK KEY",
 					new Unit("unit 1",10,10,10,10,10),
 					20);
 				//we are not setting the selecteditemid and mealevent id
@@ -97,10 +97,9 @@ There we have a specific function that allows to measure the hight of an item, t
 				return (item as IListElement).listElementRendererFunction();
 			}
 			
-
 		]]>
 	</fx:Script>
-	<s:List id="dummyList" left="0" right="0" top="0" bottom="0" itemRendererFunction="getItemRenderer" visible="false"
+	<s:List id="dummyList" left="0" right="0" top="0" bottom="0" itemRendererFunction="getItemRenderer" visible="true"
 			dataProvider="{dummyTrackingViewList}" >
 	</s:List>
 
