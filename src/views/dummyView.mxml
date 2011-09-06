@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 a view that will not really interact with the user but will pop up a small period of time
 It wil have a list, with elements of different types, actually each type that can appear in a trackingview
 As a consequence, the corresponding itemrenderer of each type will be called at least once
-This will allow these itemrenderer the calculate the heigh of each item, which will then be used in a measure() function in a custom layout named here trackingViewLayout
+This will allow these itemrenderer the calculate the height of each item, which will then be used in a measure() function in a custom layout named here trackingViewLayout (or something like that , to be updated)
 All this is based on a sample found in http://corlan.org/2011/07/11/creating-flex-mobile-lists-part-ii-using-virtualization
 
-The trackingViewLayout is a layout used in the TrackingView list, so code of there to get so more info, and also the itemrenderer of elements that can be in a tracking view (like daylineitemrenderwithtotalamount)
+TO BE UPDATED
+The trackingViewLayout is a layout used in the TrackingView list, so go there to get so more info, and also the itemrenderer of elements that can be in a tracking view (like daylineitemrenderwithtotalamount)
 There we have a specific function that allows to measure the hight of an item, that height is based on static values stored in the itemrenderer, and these values will be calculated during creation of this view over here.
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 

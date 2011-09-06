@@ -64,6 +64,14 @@ package myComponents
 		 */
 		private var carbAmountDisplay:StyleableTextField;
 		
+		//variables to calculate the width and height of a mealevent rendered with this renderer
+		//preferred values are values obtained with method getPreferredHeight
+		//calculated values are values obtained with object-name.height
+		//preferred values needs to be used in  method setelementsize
+		//calculated values needs to be used to calculate the real heigh, eg val calculating currentY
+		private static var _carbAmountCalculatedHeight:Number = 0;
+		private static var _carbAmountPreferredHeight:Number = 0;
+		
 		/**
 		 * constructor 
 		 */
@@ -71,6 +79,13 @@ package myComponents
 		{
 			super();
 		}
+		
+		// Override measure() to calculate the size required by the item renderer.
+		override protected function measure():void {
+			measuredHeight = getHeight();
+		}
+		
+
 		
 		/**
 		 * override the data property to initialize dayLineDisplay
@@ -148,17 +163,32 @@ package myComponents
 			
 			carbAmountDisplay.text = Math.round(new Number(totalAmount)) + " " + resourceManager.getString('general','gram_of_carbs_short');
 			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
-			
-			var carbAmountDisplayHeight:Number = getElementPreferredHeight(carbAmountDisplay);
-			var labelDisplayHeight:Number = getElementPreferredHeight(labelDisplay);
-			
-			setElementSize(labelDisplay,labelDisplayWidth,labelDisplayHeight);
-			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,carbAmountDisplayHeight);
+
+			if (_carbAmountCalculatedHeight == 0) {//which means also _carbAmountPreferredHeight == 0
+				_carbAmountPreferredHeight = getElementPreferredHeight(carbAmountDisplay);
+				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
+				_carbAmountCalculatedHeight = labelDisplay.height;
+			} else 
+				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
+
+			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,_carbAmountPreferredHeight);
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,getStyle("paddingTop"));
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,getStyle("paddingTop"));
 		}
+		
+		override public function getHeight(item:TrackingViewElement = null):Number {
+			//if item = null then assign item to data, which may be (not sure yet) a mealevent
+			//wheter it's a mealevent or not is checked by checking later against null value, if not null then it must be a mealevent
+			if (item == null)
+				item = (this.data as DayLineWithTotalAmount);
+			if (item == null) //parameter was null and this.data is also null, so there's nothing to calculate
+				return 0;
+			
+			return _carbAmountCalculatedHeight;
+		}
+
 	}
 }
