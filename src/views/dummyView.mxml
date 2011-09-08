@@ -21,7 +21,11 @@ a view that will not really interact with the user but will pop up a small perio
 It wil have a list, with elements of different types, actually each type that can appear in a trackingview
 As a consequence, the corresponding itemrenderer of each type will be called at least once
 This will allow these itemrenderer the calculate the height of each item, which will then be used in a measure() function in a custom layout named here trackingViewLayout (or something like that , to be updated)
-All this is based on a sample found in http://corlan.org/2011/07/11/creating-flex-mobile-lists-part-ii-using-virtualization
+
+TO BE UPDATED
+Further development still planned based on a sample found in http://corlan.org/2011/07/11/creating-flex-mobile-lists-part-ii-using-virtualization
+Goal of all this is to improve the scrolling behaviour for the trackinglist.
+But after having imlement part of it (the getHeight methods in itemrenderers) performance seems to be improved already a little bit.
 
 TO BE UPDATED
 The trackingViewLayout is a layout used in the TrackingView list, so go there to get so more info, and also the itemrenderer of elements that can be in a tracking view (like daylineitemrenderwithtotalamount)
