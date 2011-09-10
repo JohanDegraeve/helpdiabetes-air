@@ -20,6 +20,8 @@ package myComponents
 	import databaseclasses.MealEvent;
 	import databaseclasses.SelectedFoodItem;
 	
+	import flash.display.GradientType;
+	import flash.geom.Matrix;
 	import flash.system.Capabilities;
 	import flash.text.TextLineMetrics;
 	
@@ -199,7 +201,7 @@ package myComponents
 		/**
 		 * if styleabletextfield is added, then paddingbottom is too high, next element will be uplifted by an amount of pixels which is upLiftForNextField.
 		 */
-		private var upLiftForNextField:int;
+		private static var upLiftForNextField:int;
 		
 		/**
 		 * default constructor <br>
@@ -210,7 +212,8 @@ package myComponents
 			super();
 			insulinAmount = null;
 			gramkh = resourceManager.getString('general','gram_of_carbs_short');
-			upLiftForNextField = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
+			if (upLiftForNextField == 0)
+				upLiftForNextField = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
 		}
 
 		/**
@@ -345,7 +348,7 @@ package myComponents
 			// super.layoutContents().
 			
 			// Commit the styles changes to labelDisplay and compLabelDisplay and others
-			labelDisplay.commitStyles();
+			/*labelDisplay.commitStyles();
 			carbAmountDisplay.commitStyles();
 			if (insulinDetails)
 				insulinDetails.commitStyles();
@@ -353,7 +356,7 @@ package myComponents
 				for (var l:int = 0;l < selectedMealsDescriptionStyleableTextFields.length; l++) {
 					(selectedMealsDescriptionStyleableTextFields.getItemAt(l)).commitStyles();
 					(selectedMealsCarbAmountStyleableTextFields.getItemAt(l)).commitStyles();
-				}
+				}*/
 			
 			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
 			//and then we'll extend carbamount if still possible
@@ -478,17 +481,28 @@ package myComponents
 			var returnValue:int = 0;
 			//height of label and carbAmount
 			returnValue += _carbAmountCalculatedHeight - upLiftForNextField;
-			if (insulinAmount != null && insulinDetails != null) {
+			if ((item as MealEvent).insulinRatio != 0) {
 				returnValue += _insulinAmountCalculatedHeight - upLiftForNextField;
 			}
 			//height of different selectedmeals
-			if (selectedMealsDescriptionStrings != null) {
-				returnValue += (_selectedMealCalculatedHeight - upLiftForNextField) * selectedMealsDescriptionStrings.length;
+			if ((item as MealEvent).selectedFoodItems != null) {
+				if ((item as MealEvent).selectedFoodItems.length > 0)
+					returnValue += (_selectedMealCalculatedHeight - upLiftForNextField) * (item as MealEvent).selectedFoodItems.length;
 			}
 			//one uplift to be removed.
 			returnValue += upLiftForNextField;
 			
 			return returnValue;
+		}
+		
+		/**
+		 * overriden because flex implementation seems to add a large separator above the item
+		 */
+		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
+		{
+			graphics.beginFill(0xFFFFFF,1);
+			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+			graphics.endFill();
 		}
 	}
 }

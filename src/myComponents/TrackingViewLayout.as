@@ -81,6 +81,8 @@ package myComponents
 				totalHeight += elementHeight ;
 				addToVectorIndex(i, totalHeight - elementHeight );
 			}
+			//just adding one element because I use this last value to calculate the size of the really last element (ie the max-1 array element) in method updatevirtual
+			addToVectorIndex(i,totalHeight);
 			
 			layoutTarget.measuredWidth = dataGroupTarget.width;
 			layoutTarget.measuredHeight = totalHeight;
@@ -180,7 +182,6 @@ package myComponents
 				_containerHeight = containerHeight;
 			
 			var y:Number = 0;
-			var maxHeight:Number = 0;
 			var elementHeight:Number, prevElementHeight:Number;
 			
 			y = 0;
@@ -200,7 +201,7 @@ package myComponents
 				// Position the element
 				element.setLayoutBoundsPosition(0, y);
 				prevElementHeight = elementHeight;
-				// Update the current position, add the gap
+				
 			}
 			// Scrolling support - update the content size
 			layoutTarget.setContentSize(containerWidth, y);
@@ -230,47 +231,32 @@ package myComponents
 			var y:Number = 0;
 			//var maxWidth:Number = 0;
 			//var maxHeight:Number = 0;
-			var elementHeight:Number, prevElementHeight:Number;
+			var elementHeight:Number;
 			
 			//provide the initial values
 			if (!_firstIndexInView) 
 				_firstIndexInView = 0;
-			//if (!_lastIndexInView) 
-				//_lastIndexInView = yToIndex.length - 1 > layoutTarget.height ? yToIndex[layoutTarget.height + 1]  : layoutTarget.numElements - 1;
-			
-			//add some extra rows after the current view
 			currentFirstIndex = _firstIndexInView;
 			if (currentFirstIndex < 0 )
 				currentFirstIndex = 0;
-/*			if (!addExtraItems) {
-				addExtraItems = Math.ceil(containerWidth / (_columnWidth + _horizontalGap)) * Math.ceil(containerHeight / ((_tileHeight + _sectionHeight) / 2)); 
-			}*/
-			//currentLastIndex = _firstIndexInView /* + addExtraItems*/;
-			//if (currentLastIndex > layoutTarget.numElements - 1)
-			//	currentLastIndex = layoutTarget.numElements - 1;
 			
-			y = indexToY[currentFirstIndex];
-//			var count:int = currentLastIndex + 1;
+			//y = indexToY[currentFirstIndex];
 			var count:int = currentFirstIndex;
 			var element:ILayoutElement;
 			
 			do  {
-				// get the current element, we're going to work with the
-				// ILayoutElement interface
 				element = layoutTarget.getVirtualElementAt(count);
-				elementHeight = (element as  TrackingViewElementItemRenderer).getHeight((element as TrackingViewElement));
-				// Resize the element to its preferred size by passing
-				// NaN for the width and height constraints
-				element.setLayoutBoundsSize(NaN, NaN);
+				
+				elementHeight = indexToY[count + 1] - indexToY[count];//there's always a count + 1 element because I've added an extra el
+				
 				element.setLayoutBoundsSize(layoutTarget.width, elementHeight);
 				
-				//increase Y
-				y = y + elementHeight;
 				
 				// Position the element
 				element.setLayoutBoundsPosition(0, y);
-				prevElementHeight = elementHeight;
-				
+
+				y = y + elementHeight;
+
 				currentLastIndex = count;//seems used in scrollpositionchanged
 				count++;
 			} while ((y < containerHeight && (count < (layoutTarget as DataGroup).dataProvider.length)));

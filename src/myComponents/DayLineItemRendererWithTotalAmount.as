@@ -83,6 +83,7 @@ package myComponents
 		// Override measure() to calculate the size required by the item renderer.
 		override protected function measure():void {
 			measuredHeight = getHeight();
+			measuredMinHeight = measuredHeight;
 		}
 		
 
@@ -147,14 +148,8 @@ package myComponents
 		
 		// Override layoutContents() to lay out the item renderer.
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
-			// Because you are handling the layout of both the 
-			// predefined labelDisplay component and the new 
-			// carbAmount component, you do not have to call
-			// super.layoutContents().
-
-			// Commit the styles changes to labelDisplay and compLabelDisplay. 
-			labelDisplay.commitStyles();
-			carbAmountDisplay.commitStyles();
+			//labelDisplay.commitStyles();
+			//carbAmountDisplay.commitStyles();
 			
 			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
 			//and then we'll extend carbamount if still possible
@@ -175,8 +170,8 @@ package myComponents
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,getStyle("paddingTop"));
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,getStyle("paddingTop"));
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,0);
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,0);
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {
@@ -187,7 +182,7 @@ package myComponents
 			if (item == null) //parameter was null and this.data is also null, so there's nothing to calculate
 				return 0;
 			
-			return _carbAmountCalculatedHeight;
+			return _carbAmountCalculatedHeight ;
 		}
 
 	}
