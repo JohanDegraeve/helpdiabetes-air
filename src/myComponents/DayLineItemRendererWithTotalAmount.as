@@ -73,6 +73,10 @@ package myComponents
 		private static var _carbAmountPreferredHeight:Number = 0;
 		
 		/**
+		 * the middle is actually an offset to be used top and bottom of a label itemrenderer, to make sure the text is in the middle
+		 */
+		private static var themiddle:Number;
+		/**
 		 * constructor 
 		 */
 		public function DayLineItemRendererWithTotalAmount()
@@ -170,8 +174,10 @@ package myComponents
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,0);
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,0);
+			if (themiddle == 0)
+				themiddle = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2;
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,themiddle);
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,themiddle);
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {

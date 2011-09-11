@@ -23,6 +23,7 @@ package myComponents
 	import flash.display.GradientType;
 	import flash.geom.Matrix;
 	import flash.system.Capabilities;
+	import flash.text.AntiAliasType;
 	import flash.text.TextLineMetrics;
 	
 	import mx.collections.ArrayCollection;
@@ -198,6 +199,10 @@ package myComponents
 		private static var _selectedMealCalculatedHeight:Number = 0;
 		private static var _selectedMealPreferredHeight:Number = 0;
 		
+		private static var theMiddleOfCarbAmountField:Number = 0;
+		private static var theMiddleOfSelectedItemField:Number = 0;
+		private static var theMiddleOfInsulinField:Number = 0;
+		
 		/**
 		 * if styleabletextfield is added, then paddingbottom is too high, next element will be uplifted by an amount of pixels which is upLiftForNextField.
 		 */
@@ -269,26 +274,6 @@ package myComponents
 				addChild(carbAmountDisplay);
 			}
 
-			if (MINIMUM_CARB_AMOUNT_WIDTH_LARGE_FONT == 100) {//most probably it's not yet been calculated
-				// calculate MINIMUM_CARB_AMOUNT_WIDTH
-				
-				//THE OLD WAY OF DOING IT
-				//var textLineMetricx:TextLineMetrics = this.measureText("9999 ...");
-				//MINIMUM_CARB_AMOUNT_WIDTH_LARGE_FONT = textLineMetricx.width;
-				// UNTIL HERE
-				var tempField2:StyleableTextField = new StyleableTextField();
-				tempField2.setStyle("fontSize",this.getStyle("fontSize"));
-				tempField2.text = "9999 ...";
-				MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT = tempField2.getLineMetrics(0).width;
-			}
-			
-			if (MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT == 100) {//most probably it's not yet been calculated
-				// calculate MINIMUM_CARB_AMOUNT_WIDTH
-				var tempField:StyleableTextField = new StyleableTextField();
-				tempField.setStyle("fontSize",styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));
-				tempField.text = "9999 ...";
-				MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT = tempField.getLineMetrics(0).width;
-			}
 			
 			if (!insulinDetails) {
 				insulinDetails = new StyleableTextField();
@@ -358,6 +343,14 @@ package myComponents
 					(selectedMealsCarbAmountStyleableTextFields.getItemAt(l)).commitStyles();
 				}*/
 			
+			if (MINIMUM_CARB_AMOUNT_WIDTH_LARGE_FONT == 100) {//most probably it's not yet been calculated
+				carbAmountDisplay.commitStyles();
+				// calculate MINIMUM_CARB_AMOUNT_WIDTH
+				carbAmountDisplay.text = "9999 ...";
+				MINIMUM_CARB_AMOUNT_WIDTH_LARGE_FONT = carbAmountDisplay.getLineMetrics(0).width;
+			}
+			
+			
 			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
 			//and then we'll extend carbamount if still possible
 			//NEED TO CHECK ONCE WITH DEBUGGER IF THIS IS ALWAYS EQUAL TO MINIMUM_CARB_AMOUNT_WIDTH - I THINK SO BECAUSE HERE carbAmountDisplay has no text yet
@@ -377,8 +370,10 @@ package myComponents
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,0);
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,0);
+			if (theMiddleOfCarbAmountField == 0)
+				theMiddleOfCarbAmountField = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,theMiddleOfCarbAmountField);
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,theMiddleOfCarbAmountField);
 			var currentY:Number = _carbAmountCalculatedHeight - upLiftForNextField;
 			
 		    if (insulinAmount != null && insulinDetails != null) {
@@ -389,7 +384,9 @@ package myComponents
 					_insulinAmountCalculatedHeight = insulinDetails.height;
 				} else
 					setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,_insulinAmountPreferredHeight);
-				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY );
+				if (theMiddleOfInsulinField == 0)
+					theMiddleOfInsulinField = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2
+				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY + theMiddleOfInsulinField );
 				currentY += _insulinAmountCalculatedHeight -upLiftForNextField;
 			} else {
 				setElementSize(insulinDetails,0,0);
@@ -421,8 +418,11 @@ package myComponents
 					(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField).truncateToFit();
 					(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField).truncateToFit();
 					
-					setElementPosition(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,0 + PADDING_LEFT,currentY);
-					setElementPosition(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,currentY);
+					if (theMiddleOfSelectedItemField == 0)
+						theMiddleOfSelectedItemField = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2
+					
+					setElementPosition(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,0 + PADDING_LEFT,currentY + theMiddleOfSelectedItemField);
+					setElementPosition(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,currentY + theMiddleOfSelectedItemField);
 					
 					currentY += _selectedMealCalculatedHeight - upLiftForNextField;
 				}
@@ -468,6 +468,16 @@ package myComponents
 				addChild(tempStyleAbleTextField2);
 				selectedMealsCarbAmountStyleableTextFields.addItem(tempStyleAbleTextField2);
 			}
+
+			if (MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT == 100) {//most probably it's not yet been calculated
+				if (amount > 0) {
+					// calculate MINIMUM_CARB_AMOUNT_WIDTH
+					(selectedMealsCarbAmountStyleableTextFields.getItemAt(0) as StyleableTextField).text = "9999 ...";
+					MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT = getElementPreferredWidth(selectedMealsCarbAmountStyleableTextFields.getItemAt(0) as StyleableTextField);
+				}
+			}
+			
+
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {
