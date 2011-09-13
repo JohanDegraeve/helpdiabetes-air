@@ -38,8 +38,8 @@ package myComponents
 		private var indexToY:Vector.<int>; 
 		private var currentFirstIndex:int;
 		private var currentLastIndex:int;
-		private var _containerWidth:Number;
-		private var _containerHeight:Number;
+		//private var _containerWidth:Number;
+		//private var _containerHeight:Number;
 		
  //  		private var addExtraItems:int;
 		
@@ -56,10 +56,10 @@ package myComponents
 			if (!layoutTarget)
 				return;
 			var dataGroupTarget:DataGroup = layoutTarget as DataGroup;
-			if (dataGroupTarget.width == 0 || dataGroupTarget.height == 0) {
+			/*if (dataGroupTarget.width == 0 || dataGroupTarget.height == 0) {
 				_containerWidth = _containerHeight = -1;
 				return;
-			}
+			}*/
 
 			
 			var totalHeight:Number = 0;
@@ -75,7 +75,7 @@ package myComponents
 			//loop though all the elements elements
 			for (var i:int = 0; i < count; i++) {
 				d = dataProvider.getItemAt(i);
-				elementHeight = ((d as IListElement).listElementRendererFunction().newInstance() as TrackingViewElementItemRenderer).getHeight((d as TrackingViewElement));
+				elementHeight = ((d as IListElement).listElementRendererFunction().newInstance() as TrackingViewElementItemRenderer).getHeight((d as TrackingViewElement)) ;
 				//add the index to vector
 				addToVectorY(i, totalHeight /* + 1*/, elementHeight);//I'm not adding the 1 here because I'm also not doing that in the getHeight method in the itemrenderer, meaning the elements overlap with one pixel height
 				totalHeight += elementHeight ;
@@ -150,9 +150,9 @@ package myComponents
 					i0 = yToIndex[yToIndex.length - 1 - g.height];
 				i1 = yToIndex[yToIndex.length - 1];
 			}
-			//			trace("y0, y1: " + y0 + " | " + y1);
-			//			trace("i0, i1: " + i0 + " | " + i1);
-			//			trace("currentFirstIndex, currentLastIndex : " + currentFirstIndex + " | " + currentLastIndex);
+					trace("y0, y1: " + y0 + " | " + y1);
+					trace("i0, i1: " + i0 + " | " + i1);
+					trace("currentFirstIndex, currentLastIndex : " + currentFirstIndex + " | " + currentLastIndex);
 			setIndexInView(i0, i1);
 			//invalidate display list only if we have items that are not already renderered
 			if (i0 < currentFirstIndex || i1 > currentLastIndex) {
@@ -176,10 +176,10 @@ package myComponents
 			if (!(layoutTarget as DataGroup).dataProvider || (layoutTarget as DataGroup).dataProvider.length == 0)
 				return;
 			
-			if (!_containerWidth)
+			/*if (!_containerWidth)
 				_containerWidth = containerWidth;
 			if (!_containerHeight)
-				_containerHeight = containerHeight;
+				_containerHeight = containerHeight;*/
 			
 			var y:Number = 0;
 			var elementHeight:Number, prevElementHeight:Number;
@@ -215,19 +215,19 @@ package myComponents
 			if (!(layoutTarget as DataGroup).dataProvider || (layoutTarget as DataGroup).dataProvider.length == 0)
 				return;
 			
-			if (!_containerWidth)
+			/*if (!_containerWidth)
 				_containerWidth = containerWidth;
 			if (!_containerHeight)
-				_containerHeight = containerHeight;
+				_containerHeight = containerHeight;*/
 			//a resize of the component occured
-			if (_containerWidth != containerWidth || _containerHeight != containerHeight) {
+			/*if (_containerWidth != containerWidth || _containerHeight != containerHeight) {
 				_containerWidth = containerWidth;
 				_containerHeight = containerHeight;
 				//addExtraItems = 0;
 				measure();
 				//set the new _firstIndex and _lastIndex
 				scrollPositionChanged();
-			}
+			}*/
 			var y:Number = 0;
 			//var maxWidth:Number = 0;
 			//var maxHeight:Number = 0;
@@ -240,7 +240,7 @@ package myComponents
 			if (currentFirstIndex < 0 )
 				currentFirstIndex = 0;
 			
-			//y = indexToY[currentFirstIndex];
+			y = indexToY[currentFirstIndex];
 			var count:int = currentFirstIndex;
 			var element:ILayoutElement;
 			
