@@ -480,7 +480,7 @@ package myComponents
 
 		}
 		
-		override public function getHeight(item:TrackingViewElement = null):Number {
+		override public function getHeight(item:TrackingViewElement = null):Number {  
 			//if item = null then assign item to data, which may be (not sure yet) a mealevent
 			//wheter it's a mealevent or not is checked by checking later against null value, if not null then it must be a mealevent
 			if (item == null)

@@ -50,11 +50,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
-	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true"
+	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().trackingList}"
 			itemRendererFunction="getItemRenderer">
 		<s:layout>
-			<myComponents:TrackingViewLayout useVirtualLayout="true"/>
+			<myComponents:TrackingViewLayout useVirtualLayout="true" />
 		</s:layout>
 	</s:List>
 </s:View>
