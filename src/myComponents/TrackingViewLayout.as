@@ -195,6 +195,7 @@ package myComponents
 				return;
 			_firstIndexInView = firstIndex;
 			_lastIndexInView = lastIndex;
+			
 		}
 	}
 }
