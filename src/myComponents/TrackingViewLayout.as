@@ -48,11 +48,6 @@ package myComponents
 			if (!layoutTarget)
 				return;
 			var dataGroupTarget:DataGroup = layoutTarget as DataGroup;
-			/*if (dataGroupTarget.width == 0 || dataGroupTarget.height == 0) {
-				_containerWidth = _containerHeight = -1;
-				return;
-			}*/
-
 			
 			var totalHeight:Number = 0;
 			var dataProvider:IList = dataGroupTarget.dataProvider;
@@ -80,7 +75,7 @@ package myComponents
 			layoutTarget.measuredHeight = totalHeight ;
 			layoutTarget.measuredMinWidth = dataGroupTarget.width;
 			layoutTarget.measuredMinHeight = totalHeight; 
-			layoutTarget.setContentSize(dataGroupTarget.width, totalHeight);// i don't think this should be done in  measure
+			layoutTarget.setContentSize(dataGroupTarget.width, totalHeight);
 		}
 		
 		private function addToVectorY(index:int, startHeight:Number, elementHeight:Number):void {
@@ -115,7 +110,6 @@ package myComponents
 			
 			var y0:Number = scrollR.top;
 			var y1:Number = scrollR.bottom - .0001;
-			trace("scrollpositionchanged " + y0 + " , " + y1);
 			if (y1 <= y0) {
 				setIndexInView(0, n);
 				return;
@@ -140,31 +134,17 @@ package myComponents
 					i0 = yToIndex[yToIndex.length - 1 - g.height];
 				i1 = yToIndex[yToIndex.length - 1];
 			}
-			trace ("i0,i1 = " + i0 + " , " + i1);
 			setIndexInView(i0,i1);
-			//invalidate display list only if we have items that are not already renderered
-			//trace("i0, i1: " + i0 + " | " + i1);
-			//trace("_currentFirstIndexInView, _currentLastIndexInView : " + _currentFirstIndexInView + " | " + _currentLastIndexInView);
 			if (i0 < _currentFirstIndexInView || i1 > _currentLastIndexInView) {
 				g.invalidateDisplayList();
-				
-				trace("invalidatedisplaylist called with i0,i1 = " + i0 + "," + i1 + " and _currentFirstIndexInView, _currentLastIndexInView = " + _currentFirstIndexInView + "," + _currentLastIndexInView);
-				trace ("_firstIndexInView, _lastIndexInView = " + _firstIndexInView + "," + _lastIndexInView  );
 			}
 		}
 		
 		override public function updateDisplayList(containerWidth:Number, containerHeight:Number):void {
-			trace ("now in updatedisplaylist");
 			var layoutTarget:GroupBase = target;
 			if (!(layoutTarget as DataGroup).dataProvider || (layoutTarget as DataGroup).dataProvider.length == 0)
 				return;
-	
-			/*	_currentFirstIndexInView = 9;
-			_currentLastIndexInView = 20;
-			_firstIndexInView = 11;
-			_lastIndexInView = 21;*/
 			
-			var y:Number = 0;
 			var elementHeight:Number;
 			
 			//provide the initial values
@@ -176,33 +156,38 @@ package myComponents
 			if (_lastIndexInView == 0) //this will force to set lastindexinview correctly (and also first)
 				scrollPositionChanged();
 			
-			/*_lastIndexInView +=20;
-			if (_lastIndexInView > layoutTarget.numElements - 1)
-				_lastIndexInView = layoutTarget.numElements - 1;*/
-			
-			
 			_currentFirstIndexInView = (_firstIndexInView < 0 ? 0 : _firstIndexInView) ;
 			
-			y = indexToY[_currentFirstIndexInView ];
 			var count:int = _currentFirstIndexInView;
-			var startPosition:int = y;
 			var element:ILayoutElement;
 			
 			do  {
 				element = layoutTarget.getVirtualElementAt(count);
 				
 				elementHeight = indexToY[count + 1] - indexToY[count];//there's always a count + 1 element because I've added an extra el
-				//element.setLayoutBoundsSize(NaN, NaN);
 				element.setLayoutBoundsSize(layoutTarget.width, elementHeight);
-				element.setLayoutBoundsPosition(0, y);
+				element.setLayoutBoundsPosition(0, indexToY[count ]);
 
-				y = y + elementHeight;
 				
 				count++;
-				//var temp:Object = y - startPosition;
-				//var temp2:Object = (layoutTarget as DataGroup).dataProvider.length;
-			} while (count <= _lastIndexInView)//( ((y - startPosition) < containerHeight) && (count < (layoutTarget as DataGroup).dataProvider.length) );
+			} while (count <= _lastIndexInView);
 			_currentLastIndexInView = _lastIndexInView ;
+			//now add one additional element before the first, to make scrolling a bit more performant
+			if (_currentFirstIndexInView > 0) {
+				element = layoutTarget.getVirtualElementAt(_currentFirstIndexInView - 1);
+				elementHeight = indexToY[_currentFirstIndexInView] - indexToY[_currentFirstIndexInView - 1];
+				element.setLayoutBoundsSize(layoutTarget.width, elementHeight);
+				element.setLayoutBoundsPosition(0, indexToY[_currentFirstIndexInView - 1]);
+				_currentFirstIndexInView--;
+			}
+			//add an additional element after the last
+			if (_currentLastIndexInView <  (layoutTarget as DataGroup).dataProvider.length - 1) {
+				element = layoutTarget.getVirtualElementAt(_currentLastIndexInView + 1);
+				elementHeight = indexToY[_currentLastIndexInView + 2] - indexToY[_currentLastIndexInView + 1];
+				element.setLayoutBoundsSize(layoutTarget.width, elementHeight);
+				element.setLayoutBoundsPosition(0,  indexToY[_currentLastIndexInView +1]);
+				_currentLastIndexInView++;
+			}
 		}
 		
 		private function setIndexInView(firstIndex:int, lastIndex:int):void {
@@ -210,7 +195,6 @@ package myComponents
 				return;
 			_firstIndexInView = firstIndex;
 			_lastIndexInView = lastIndex;
-			//dispatchEvent(new Event("indexInViewChanged"));
 		}
 	}
 }

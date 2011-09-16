@@ -67,15 +67,15 @@ package databaseclasses
 		 */ 
 		public static const SettingINSULIN_RATIO_SUPPER:int=7;
 		/**
-		 * switch time breakfast to lunch
+		 * switch time breakfast to lunch, local time
 		 */
 		public static const SettingBREAKFAST_UNTIL: int =  8;
 		/**
-		 * switch time lunch to snack
+		 * switch time lunch to snack, local time
 		 */
 		public static const SettingLUNCH_UNTIL:int = 9;
 		/**
-		 * switch time snack to supper 
+		 * switch time snack to supper , , local time
 		 */
 		public static const SettingSNACK_UNTIL:int = 10;
 		/**
@@ -116,9 +116,9 @@ package databaseclasses
 			"0", //lunch
 			"0", //snack
 			"0", //supper
-			"37800000", // January 1, 1970, 10h30 Hr in ms
-			"55800000", // January 1, 1970, 15h30 Hr in ms
-			"61200000", // January 1, 1970, 17 Hr in ms
+			"37800000", // January 1, 1970, 10h30 Hr in ms, local time,
+			"55800000", // January 1, 1970, 15h30 Hr in ms, local time,
+			"61200000", // January 1, 1970, 17 Hr in ms, local time,
 			"0", //correction factor
 			"0", //the first blood glucose event id to be used
 			"999999", // a high value for maximum time difference last bloodglucose event and meal

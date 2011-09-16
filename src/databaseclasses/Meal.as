@@ -114,15 +114,13 @@ package databaseclasses
 			if (!isNaN(timeStamp))
 				this._timeStamp = timeStamp;
 			else ;//no need to set or change the timestamp because it's already been set during meal creation, if it's the first selecteditem being added then the timestamp will be set to current timestamp a bit later
-			
-			
 
-			now.setFullYear(1970,1,1);
-			if (now.getTime() < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
+			var nowAsNumber:Number = (now.hours * 3600 + now.minutes * 60 + now.seconds)*1000;
+			if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
 				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST));
-			} else if (now.getTime() < new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))) {
+			} else if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))) {
 				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_LUNCH));
-			} else if (now.getTime() < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))) {
+			} else if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))) {
 				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SNACK));
 			} else {
 				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SUPPER));

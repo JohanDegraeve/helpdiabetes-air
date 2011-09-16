@@ -312,7 +312,7 @@ package model
 		public function refreshMeals(updateSelectedMeal:Boolean = true):void {
 			meals = new ArrayCollection();
 			
-			var todayAsDate:Date = new Date();//that's the actual time, in milliseconds since 1970
+			var todayAsDate:Date = new Date();//that's the actual time, in milliseconds since 1970, utc
 			var todayAtMidNight:Number = (new Date(todayAsDate.fullYear,todayAsDate.month,todayAsDate.date)).valueOf();//today at 00:00 - well understood local time,
 			//so if we are here GMT +2 , it's the number of milliseconds since 1970 till this morning at 00:00 - 2 Hrs, in other words it's yesterday evening at 22:00
 			
@@ -435,7 +435,7 @@ package model
 		}
 		
 		/**
-		 * gets in the meals, the second meal that is one of the standards meals, and assigns it to _selectedMeal
+		 * sets selectedMeal to the second meal that is one of the standards meals
 		 */
 		public function resetSelectedMeal():void {
 			//initiailize selectedMeal to the second meal that is one of the standards meal
@@ -487,7 +487,7 @@ package model
 				   if (mealEvent.timeStamp >= asOfDateAndTime)	{
 					   var mealEventTimeStampAsDate:Date = new Date(mealEvent.timeStamp);
 					   //the timestamp but only the hours, minutes and seconds
-					   var mealEventTimeStampHourMinute:Number = (new Date(0,0,0,mealEventTimeStampAsDate.hoursUTC,mealEventTimeStampAsDate.minutesUTC,mealEventTimeStampAsDate.secondsUTC)).valueOf();
+					   var mealEventTimeStampHourMinute:Number = (new Date(1970,0,1,mealEventTimeStampAsDate.hoursUTC,mealEventTimeStampAsDate.minutesUTC,mealEventTimeStampAsDate.secondsUTC,0)).valueOf();
 						if (mealEventTimeStampHourMinute >= fromTime)
 							if (mealEventTimeStampHourMinute <= toTime)
 								mealEvent.insulinRatio = newInsulinRatio;

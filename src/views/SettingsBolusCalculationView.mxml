@@ -158,7 +158,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					snackRatio.text = (newValue as Number).toString();
 					supperRatio.text = (newValue as Number).toString();
 
-					//do almost the same as already done above :
+					//do almost the same as already done above , but no for all meals from 00:00 till 23:59
 					//it could also be that the meal where the last addition was done, is one  in the future, and it's less than 15 minutes ago
 					//so we need to assure we'll update also as of the current meal which is..
 					var secondMeal:int = ModelLocator.getInstance().getRefreshedSelectedMeal();
