@@ -312,11 +312,21 @@ package model
 		public function refreshMeals(updateSelectedMeal:Boolean = true):void {
 			meals = new ArrayCollection();
 			
-			var todayAsDate:Date = new Date();//that's the actual time, in milliseconds since 1970, utc
-			var todayAtMidNight:Number = (new Date(todayAsDate.fullYear,todayAsDate.month,todayAsDate.date)).valueOf();//today at 00:00 - well understood local time,
-			//so if we are here GMT +2 , it's the number of milliseconds since 1970 till this morning at 00:00 - 2 Hrs, in other words it's yesterday evening at 22:00
+			/**
+			 * that's the actual time, in milliseconds since 1970, utc
+			 */
+			var todayAsDate:Date = new Date();
+			/**
+			 * today at 00:00 local but in utc milliseconds,<br>
+			 * so if we are here GMT +2 , it's the number of milliseconds since 1970 till this morning at 00:00 - 2 Hrs, in other words it's yesterday evening at 22:00<br>
+			 */
+			var todayAtMidNight:Number = (new Date(todayAsDate.fullYear,todayAsDate.month,todayAsDate.date)).valueOf();
 			
-			var todayHourMinute:Number = todayAsDate.valueOf() - todayAtMidNight;//number of milliseconds since 00:00 in the morning, 
+			/**
+			 * number of milliseconds since 00:00 in the morning<br>
+			 * but local, so for example if it's here in Belgium 10:03, then this value = (10*3600 + 3*60)*1000, no matter what the utc time is.
+			 */
+			var todayHourMinute:Number = todayAsDate.valueOf() - todayAtMidNight;
 			
 			//to avoid having to get the resource each time, we'll do it once here
 			var breakfast:String = ResourceManager.getInstance().getString('general','breakfast');
@@ -383,9 +393,21 @@ package model
 			}
 			
 			//now check for each mealevent, if it needs to replace a meal or if it needs to be added, replace if the name corresponds to one of the mealnames
+			/**
+			 * mealEventTimeStamp as Date
+			 */
 			var mealEventTimeStamp:Date;
+			/**
+			 * timestamp in ms utc, starting 1st of january 1970
+			 */
 			var mealEventTimeStampAtMidNight:Number;
+			/**
+			 * mealTimeStamp as Date
+			 */
 			var mealTimeStamp:Date;
+			/**
+			 * timestamp in ms, utc, starting 1st of january 1970
+			 */
 			var mealTimeStampAtMidNight:Number;
 			
 			if (trackingList.length > 0) {
@@ -413,6 +435,7 @@ package model
 												(trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
 												mealFound = true;
 												_meals.setItemAt(new Meal(null,(trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
+												k = _meals.length;
 											}
 										}
 									}
@@ -477,7 +500,10 @@ package model
 		}
 		
 		/**
-		 * updates insulinratio for all mealevents in trackinglist, with timeStamp > asOfDateAndTime and time of day  between fromTime and toTime<br>
+		 * updates insulinratio for all mealevents in trackinglist, with timeStamp > asOfDateAndTime and time of day  between fromTime and toTime whereby ,
+		 * asOfDateAndTime is ms since 1st of January 1970 UTC<br>
+		 * <br>fromTime and toTime are local time, as example :<br>
+		 * if it's here in Belgium 10:03, then this value = (10*3600 + 3*60)*1000, no matter what the utc time is.<br>
 		 * Also database will be updated.<br>
 		 */
 		public function updateInsulinRatiosInTrackingList(asOfDateAndTime:Number,newInsulinRatio:Number,fromTime:Number,toTime:Number):void {
@@ -487,9 +513,9 @@ package model
 				   if (mealEvent.timeStamp >= asOfDateAndTime)	{
 					   var mealEventTimeStampAsDate:Date = new Date(mealEvent.timeStamp);
 					   //the timestamp but only the hours, minutes and seconds
-					   var mealEventTimeStampHourMinute:Number = (new Date(1970,0,1,mealEventTimeStampAsDate.hoursUTC,mealEventTimeStampAsDate.minutesUTC,mealEventTimeStampAsDate.secondsUTC,0)).valueOf();
+					   var mealEventTimeStampHourMinute:Number =  (mealEventTimeStampAsDate.hours * 3600 + mealEventTimeStampAsDate.minutes * 60 + mealEventTimeStampAsDate.seconds)*1000;;//(new Date(1970,0,1,mealEventTimeStampAsDate.hoursUTC,mealEventTimeStampAsDate.minutesUTC,mealEventTimeStampAsDate.secondsUTC,0)).valueOf();
 						if (mealEventTimeStampHourMinute >= fromTime)
-							if (mealEventTimeStampHourMinute <= toTime)
+							if (mealEventTimeStampHourMinute < toTime)
 								mealEvent.insulinRatio = newInsulinRatio;
 				   }
 			   }

@@ -104,7 +104,7 @@ package databaseclasses
 		 */
 		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,timeStamp:Number,dispatcher:EventDispatcher, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null, mealEventId:Number = Number.NaN,  lastModifiedTimeStamp:Number = Number.NaN) {
 			this._mealName = mealName;
-			if (insulinRatio == Number.NaN)
+			if (isNaN(insulinRatio))
 				this._insulinRatio = 0;
 			else
 				this._insulinRatio = insulinRatio;
@@ -351,11 +351,12 @@ package databaseclasses
 		 * 
 		 */
 		public function set  insulinRatio(value:Number):void {
-			if (insulinRatio == Number.NaN)
+			if (isNaN(_insulinRatio))
 				this._insulinRatio = 0;
 			else
 				this._insulinRatio = value;
 			Database.getInstance().updateInsulineRatio(this.mealEventId,value,null);
+			recalculateInsulinAmount();
 		}
 
 		/**

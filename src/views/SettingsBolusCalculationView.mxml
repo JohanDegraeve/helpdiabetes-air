@@ -166,7 +166,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					ModelLocator.getInstance().updateInsulinRatiosInTrackingList(
 						(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp < ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp ? 
 						(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp : ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp,
-						(event.newValue as Number),
+						(newValue as Number),
 						0,
 						86400000);
 				}
