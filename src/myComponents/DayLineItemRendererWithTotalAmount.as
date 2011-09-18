@@ -102,10 +102,12 @@ package myComponents
 			
 			var endOfDay:Number = (value as DayLine).timeStamp + (86400000 - 1);
 			var totalAmountAsNumber:Number = 0;
-			for (var i:int = 0;i < ModelLocator.getInstance().trackingList.length;i++) {
+			var foundAMealEventInTheSameDay:Boolean = false;
+			for (var i:int = ModelLocator.getInstance().trackingList.length - 1;i >= 0 ;i--) {
 				if (ModelLocator.getInstance().trackingList.getItemAt(i) is MealEvent) 
-					if ((ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).timeStamp >= (value as DayLine).timeStamp)
-						if ((ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).timeStamp < endOfDay)
+					if ((ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).timeStamp >= (value as DayLine).timeStamp) { 
+						if ((ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).timeStamp < endOfDay) {
+							foundAMealEventInTheSameDay = true;
 							if (Settings.getInstance().getSetting(Settings.SettingsIMPORTANT_VALUE_FOR_USER) == "carbs") 
 								totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).totalCarbs;
 							else
@@ -117,8 +119,16 @@ package myComponents
 									else
 										if (Settings.getInstance().getSetting(Settings.SettingsIMPORTANT_VALUE_FOR_USER) == "kilocalories")
 											totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).totalKilocalories;
-			}
+						} else {
+							if (foundAMealEventInTheSameDay) //stop searching
+								i = -1;
+						}
+					} else {
+						if (foundAMealEventInTheSameDay) //stop searching
+							i = -1;
+					}
 			totalAmount = totalAmountAsNumber.toString();
+			}
 		}
 		
 		/**
