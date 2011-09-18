@@ -28,9 +28,12 @@ package myComponents
 	{
 		private var _timeStamp:Number;
 		
+		/**
+		 * creates a dayline with timeStamp, time will be set to 00:00 in the morning 0 seconds 0 milliseconds 
+		 */
 		public function DayLine( timeStamp:Number)
 		{
-			this._timeStamp = timeStamp;
+			this.timeStamp = timeStamp;
 		}
 		
 		public function get timeStamp():Number {
@@ -41,9 +44,16 @@ package myComponents
 			return new ClassFactory(DayLineItemRenderer);
 		}
 
+		
+		/**
+		 * sets thh timeStamp, time will be set to 00:00 in the morning 0 seconds 0 milliseconds , with 00:00 being local time<br>
+		 * For instance if here in Belgium it is GMT+2, if timeStamp represents for example 5th of January 2011 at 10 o'clock, then timeStamp will be set to 4th of January at 22:00, which is the UTC time corresponding to 00:00 here in Belgium on 5th of January
+		 */
 		public function set timeStamp(value:Number):void
 		{
-			_timeStamp = value;
+			var newDate:Date = new Date(value);
+			newDate.setHours(0,0,0,0);
+			_timeStamp = newDate.valueOf();
 		}
 		
 	}

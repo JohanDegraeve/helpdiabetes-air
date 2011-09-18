@@ -356,29 +356,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						new Number(amount_textinput.text)));
 				
 				var creationTimeStampAsDate:Date = new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp);
-				var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYear,creationTimeStampAsDate.month,creationTimeStampAsDate.date,0,0,0,0)).valueOf();
-				if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
+				creationTimeStampAsDate.setHours(0,0,0,0);
+				if (creationTimeStampAsDate.valueOf() > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
 					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.getInstance().oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
 						ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(i));
 						if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
 							i =  ModelLocator.getInstance().oldestDayLineStoredInTrackingList;//we don't need to do that 
 					}
 					ModelLocator.getInstance().trackingList.refresh();
-					ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+					ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 					if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 				}
 				else
-					if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+					if (creationTimeStampAsDate.valueOf() < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
 						for (var j:Number = creationTimeStampAsDate.valueOf(); j <  ModelLocator.getInstance().youngestDayLineStoredInTrackingList;j = j + 86400000) {
 							ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(j));
 							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
 								j = ModelLocator.getInstance().youngestDayLineStoredInTrackingList;
 						}
 						ModelLocator.getInstance().trackingList.refresh();
-						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 						if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 					}
 			}
 			
