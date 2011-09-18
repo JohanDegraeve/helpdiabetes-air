@@ -17,8 +17,13 @@
  */
 package myComponents
 {	
+	import databaseclasses.Meal;
+	import databaseclasses.MealEvent;
+	
 	import flash.events.Event;
 	import flash.geom.Rectangle;
+	
+	import model.ModelLocator;
 	
 	import mx.collections.IList;
 	import mx.core.ClassFactory;
@@ -43,7 +48,6 @@ package myComponents
 		 * 
 		 */ 
 		override public function measure():void {
-			trace("measure");
 			var layoutTarget:GroupBase = target;
 			if (!layoutTarget)
 				return;
@@ -147,13 +151,27 @@ package myComponents
 			
 			var elementHeight:Number;
 			
-			//provide the initial values
-			if (!_firstIndexInView) 
+			//provide the initial values, based on selectedmeal
+			if (!_firstIndexInView) {
+				//_firstIndexInView = 0;
+				var firstMealEventToShow:Number = (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.mealEventId;
+				for (var trackingCounter:int = ModelLocator.getInstance().trackingList.length - 1; trackingCounter >= 0;trackingCounter--) {
+					if (ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) is MealEvent) {
+						if ((ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) as MealEvent).mealEventId == firstMealEventToShow) {
+							_firstIndexInView = trackingCounter;
+							trackingCounter = -1;
+						}
+					}
+				}
+				if (_firstIndexInView) {//firstindex found, so we can set the scrollrect
+					verticalScrollPosition = indexToY[_firstIndexInView];				
+				}
+			}
+			
+			if (!_firstIndexInView) // if _firstindexinview still not existing then initialize to zero.
 				_firstIndexInView = 0;
 			
-			if (!_lastIndexInView) //if lastindexinview isn't set yet then set it to zero
-				_lastIndexInView = 0;
-			if (_lastIndexInView == 0) //this will force to set lastindexinview correctly (and also first)
+			if (!_lastIndexInView) //this will force to set lastindexinview correctly (and also first)
 				scrollPositionChanged();
 			
 			_currentFirstIndexInView = (_firstIndexInView < 0 ? 0 : _firstIndexInView) ;
