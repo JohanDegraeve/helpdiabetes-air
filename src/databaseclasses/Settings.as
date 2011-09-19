@@ -81,7 +81,7 @@ package databaseclasses
 		/**
 		 * correction factor to be used when calculating insulindose
 		 */
-		public static const SettingCORRECTION_FACTOR:int=11;
+		public static const SettingCORRECTION_FACTOR:int=11
 		/**
 		 * id of last bloodglucose event
 		 */

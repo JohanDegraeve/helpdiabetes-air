@@ -42,6 +42,7 @@ package myComponents
 		private var indexToY:Vector.<int>; 
 		private var _currentFirstIndexInView:int;
 		private var _currentLastIndexInView:int;
+		private var _firstUpdateDisplayList:Boolean=true;
 		
 		
 		/**
@@ -150,21 +151,37 @@ package myComponents
 				return;
 			
 			var elementHeight:Number;
+			var temp:Object = ModelLocator.getInstance().selectedMeal;
 			
 			//provide the initial values, based on selectedmeal
-			if (!_firstIndexInView) {
-				//_firstIndexInView = 0;
-				var firstMealEventToShow:Number = (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.mealEventId;
-				for (var trackingCounter:int = ModelLocator.getInstance().trackingList.length - 1; trackingCounter >= 0;trackingCounter--) {
-					if (ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) is MealEvent) {
-						if ((ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) as MealEvent).mealEventId == firstMealEventToShow) {
-							_firstIndexInView = trackingCounter;
-							trackingCounter = -1;
+			if (_firstUpdateDisplayList) {
+				_firstUpdateDisplayList = false;
+				if (indexToY[indexToY.length - 1] < containerHeight) {
+					_firstIndexInView = 0;					
+				} else {
+					var firstMealEventToShow:Number;
+					try {
+						firstMealEventToShow = (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.mealEventId;
+						for (var trackingCounter:int = ModelLocator.getInstance().trackingList.length - 1; trackingCounter >= 0;trackingCounter--) {
+							if (ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) is MealEvent) {
+								if ((ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) as MealEvent).mealEventId == firstMealEventToShow) {
+									_firstIndexInView = trackingCounter;
+									trackingCounter = -1;
+								}
+							}
+						}
+					} catch (erObject:TypeError) {
+						//this happens when mealEvent is null, which can be eg when going the tracking a mealtime after having created the latest meal, in this case, we'll simply set the _firstindex to lastelement
+						//so the tracking list will show the last element
+						_firstIndexInView = ModelLocator.getInstance().trackingList.length - 1;
+					}
+					if (_firstIndexInView) {//firstindex found, so we can set the scrollrect
+						if (indexToY[indexToY.length - 1] - indexToY[_firstIndexInView] < containerHeight) {
+							verticalScrollPosition = 	indexToY[indexToY.length - 1] - containerHeight;						
+						} else {
+							verticalScrollPosition = indexToY[_firstIndexInView];
 						}
 					}
-				}
-				if (_firstIndexInView) {//firstindex found, so we can set the scrollrect
-					verticalScrollPosition = indexToY[_firstIndexInView];				
 				}
 			}
 			
