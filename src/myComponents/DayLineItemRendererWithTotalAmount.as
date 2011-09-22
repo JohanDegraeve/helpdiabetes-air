@@ -177,6 +177,7 @@ package myComponents
 				_carbAmountPreferredHeight = getElementPreferredHeight(carbAmountDisplay);
 				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
 				_carbAmountCalculatedHeight = labelDisplay.height;
+				ModelLocator.StyleableTextFieldHeight = _carbAmountCalculatedHeight;
 			} else 
 				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
 

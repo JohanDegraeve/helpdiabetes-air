@@ -179,7 +179,7 @@ package myComponents
 						if (indexToY[indexToY.length - 1] - indexToY[_firstIndexInView] < containerHeight) {
 							verticalScrollPosition = 	indexToY[indexToY.length - 1] - containerHeight;						
 						} else {
-							verticalScrollPosition = indexToY[_firstIndexInView];
+							verticalScrollPosition = indexToY[_firstIndexInView] - 100;
 						}
 					}
 				}

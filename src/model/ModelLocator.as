@@ -186,6 +186,10 @@ package model
 		 */
 		private var dataSort:Sort = new Sort();
 
+		/**
+		 *the height that a styleabletextfield would normally have, calculated somewhere during startup 
+		 */
+		static public var StyleableTextFieldHeight:int = 0;
 		
 		/**
 		 * constructor

@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		remove="onRemove()"
 		add="addHandler()">
 	<fx:Declarations>
-		<!--  seperationerror="" makes sure there's no round border even when there's a separator error -->
+		<!--  seperationerror="" makes sure there's no round border even when there's a separator error 
 		<mx:NumberValidator
 			id="amountValidator"
 			source="{amount_textinput}" 
@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			domain="real"
 			thousandsSeparator="." 
 			separationError="">
-		</mx:NumberValidator>
+		</mx:NumberValidator>-->
 	</fx:Declarations>
 	
 	<fx:Metadata>
@@ -69,7 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.components.Label;
 			
 			[Bindable]
-			private var description_textarea_text:String ;
+			private var description_textarea_text:String  ;
 			[Bindable]
 			private var details_button_text:String ;
 			[Bindable]
@@ -82,8 +82,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var meal_button_text:String = "dummy_button";
 			[Bindable]
 			private var add_button_text:String;
-			[Bindable]
-			private var details_button_fontsize:int;
 			
 			[Bindable]
 			private var meals:ArrayCollection;
@@ -116,7 +114,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function onCreationComplete():void {
 				//we'll add an eventlistener for pressing enter when editing the amount
-				amount_textinput.addEventListener(FlexEvent.ENTER,onPressEnter);
+				//amount_textinput.addEventListener(FlexEvent.ENTER,onPressEnter);
 				
 				
 				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
@@ -185,7 +183,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 				
 				//set focus to amount field, on android this immediately shows up the keyboard
-				this.focusManager.setFocus(amount_textinput);
+				//this.focusManager.setFocus(amount_textinput);
 				
 			}
 			
@@ -319,8 +317,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					amount_textinput_text = "0";
 
 				
-				var validationResultEvent:ValidationResultEvent = amountValidator.validate(null,true);
-				if (validationResultEvent.results == null)
+				//var validationResultEvent:ValidationResultEvent = amountValidator.validate(null,true);
+		/*		if (validationResultEvent.results == null)
 					details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
 				else {
 					for (var i:int = 0;i < validationResultEvent.results.length;i++) {
@@ -333,7 +331,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
 						}
 					}
-				}
+				}*/
 			}
 			
 			/**
@@ -353,7 +351,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				.addSelectedFoodItem(
 					new SelectedFoodItem(retrievedFoodItem.itemDescription,
 						retrievedFoodItem.getUnit(selectedUnit),
-						new Number(amount_textinput.text)));
+						new Number("6")));
 				
 				var creationTimeStampAsDate:Date = new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);
@@ -419,35 +417,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
-		<s:Group y="0" x="0" width="100%" height = "100%" >
-			<s:layout>
-				<s:VerticalLayout>
-				</s:VerticalLayout>
-			</s:layout>
-			
-			<!-- the food item description -->
+		<myComponents:AddFoodItemGroup y="0" x="0" width="100%" height = "100%" 
+									   description_textarea_text="{description_textarea_text}" 
+									   details_button_text="{details_button_text}"
+									   amount_textarea_text="{amount_textarea_text}"
+									   meal_textarea_text="{meal_textarea_text}"
+									   amount_textinput_text="{amount_textinput_text}"
+									   meal_button_text="{meal_button_text}"
+									   add_button_text="{add_button_text}">
+			<!-- the food item description 
 			<s:TextArea id="description_textarea"  width="100%" text="{description_textarea_text}" editable="false" creationComplete="details_button_fontsize = description_textarea.getStyle('fontSize')*0.8;"/>
 			
-			<!-- where we mention the amount of carbs that is in the chosen amount. I don't remember why I have set the fontsize variable -->
+			 where we mention the amount of carbs that is in the chosen amount. I don't remember why I have set the fontsize variable 
 			<s:Button id="details_button" width="100%" label="{details_button_text}" click="popUpUnitList()" fontSize="{details_button_fontsize}"/>
 			
 			<s:HGroup gap="6" width="100%">
-				<!-- just the text "Amount:" -->
+				 just the text "Amount:" 
 				<s:TextArea id="amount_textarea"   width="50%" editable="false" text="{amount_textarea_text}"/>
-				<!-- where the user can enter the chosen amount -->
+				 where the user can enter the chosen amount 
 				<s:TextInput  restrict="0123456789.,"  id="amount_textinput"  width="50%" editable="true" text="@{amount_textinput_text}" change="amountTextChanged()" />
 			</s:HGroup>
 			<s:HGroup gap="6" width="100%">
-				<!-- just the text "Meal:" -->
+				 just the text "Meal:" 
 				<s:TextArea id="meal_textarea"  width = "50%" editable="false" text="{meal_textarea_text}"/>
-				<!-- the button to select another meal, and showing the currently selected meal -->
+				 the button to select another meal, and showing the currently selected meal 
 				<s:Button id="meal_button" width = "50%"  label="{meal_button_text}" click="mealButtonClicked()"/>
 			</s:HGroup>
-			<!-- the button to add the fooditem to the currently selected meal -->
+			 the button to add the fooditem to the currently selected meal 
 			<s:HGroup  gap="6" width="100%" horizontalAlign="center">
 				<s:Button id="add_button" label="{add_button_text}" enabled="true" click="addButtonClicked()"/>
-			</s:HGroup>
-		</s:Group>
+			</s:HGroup>-->
+		</myComponents:AddFoodItemGroup>
 	
 </s:View>
  
