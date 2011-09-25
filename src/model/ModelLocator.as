@@ -187,9 +187,27 @@ package model
 		private var dataSort:Sort = new Sort();
 
 		/**
-		 *the height that a styleabletextfield would normally have, calculated somewhere during startup 
+		 * the calculated height that a styleabletextfield would normally have, calculated somewhere during startup 
 		 */
-		static public var StyleableTextFieldHeight:int = 0;
+		static public var StyleableTextFieldCalculatedHeight:int = 0;
+		
+		/**
+		 * the  preferred height that a styleabletextfield would normally have, calculated somewhere during startup 
+		 */
+		static public var StyleableTextFieldPreferredHeight:int = 0;
+
+		static private var _offSetSoThatTextIsInTheMiddle:int=0;
+
+		/**
+		 * offset to be used top and bottom of a label itemrenderer, to make sure the text is in the middle
+		 */
+		public static function get offSetSoThatTextIsInTheMiddle():int
+		{
+			if (_offSetSoThatTextIsInTheMiddle == 0)
+				_offSetSoThatTextIsInTheMiddle = (StyleableTextFieldCalculatedHeight - StyleableTextFieldPreferredHeight)/2;
+			return _offSetSoThatTextIsInTheMiddle;
+		}
+
 		
 		/**
 		 * constructor

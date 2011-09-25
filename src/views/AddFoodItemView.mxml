@@ -56,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.collections.ArrayList;
 			import mx.core.FlexGlobals;
 			import mx.core.IFlexDisplayObject;
+			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
 			import mx.events.ValidationResultEvent;
 			import mx.geom.RoundedRectangle;
@@ -69,7 +70,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.components.Label;
 			
 			[Bindable]
-			private var description_textarea_text:String  ;
+			private var description_textarea_text:String ;
 			[Bindable]
 			private var details_button_text:String ;
 			[Bindable]
@@ -91,7 +92,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var retrievedFoodItem:FoodItem;
 			
 			private var checkLastMealUpdateRequired:Boolean = true;
-
+			
 			/**
 			 * the chosen unit from the list of units in retrievedFoodItem
 			 */
@@ -257,7 +258,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			/**
 			 * pop up for unitlist
 			 */ 
-			private function popUpUnitList():void {
+			private function popUpUnitList(e:MouseEvent = null):void {
 				ModelLocator.getInstance().unitList = new ArrayCollection();
 				ModelLocator.getInstance().unitList .addItem((retrievedFoodItem.getUnit(0) as Unit).unitDescription);
 				for (var i:int = 1; i < retrievedFoodItem.getNumberOfUnits();i++)
@@ -337,7 +338,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			/**
 			 * will add a selectedFoodItem to the selected meal, called when addButton is clicked
 			 */ 
-			private function addButtonClicked():void {
+			private function addButtonClicked(e:MouseEvent = null):void {
 	
 				navigator.popView();
 				
@@ -351,7 +352,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				.addSelectedFoodItem(
 					new SelectedFoodItem(retrievedFoodItem.itemDescription,
 						retrievedFoodItem.getUnit(selectedUnit),
-						new Number("6")));
+						new Number(amount_textinput_text)));
 				
 				var creationTimeStampAsDate:Date = new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);
@@ -383,7 +384,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			/**
 			 * called when mealbutton clicked
 			 */
-			private function mealButtonClicked():void {
+			private function mealButtonClicked(e:MouseEvent = null):void {
 				data = new Object();
 				data.retrievedFoodItem = retrievedFoodItem;
 				data.selectedUnit = selectedUnit;
@@ -424,7 +425,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 									   meal_textarea_text="{meal_textarea_text}"
 									   amount_textinput_text="{amount_textinput_text}"
 									   meal_button_text="{meal_button_text}"
-									   add_button_text="{add_button_text}">
+									   add_button_text="{add_button_text}"
+									   details_button_click_function="{popUpUnitList}"
+									   meal_button_click_function="{mealButtonClicked}"
+									   add_button_click_function="{addButtonClicked}">
 			<!-- the food item description 
 			<s:TextArea id="description_textarea"  width="100%" text="{description_textarea_text}" editable="false" creationComplete="details_button_fontsize = description_textarea.getStyle('fontSize')*0.8;"/>
 			

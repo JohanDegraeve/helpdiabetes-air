@@ -1,12 +1,19 @@
 package myComponents
 {
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.text.StyleSheet;
+	
 	import model.ModelLocator;
+	
+	import mx.events.FlexEvent;
 	
 	import spark.components.Button;
 	import spark.components.DataGroup;
 	import spark.components.Group;
 	import spark.components.supportClasses.GroupBase;
 	import spark.components.supportClasses.StyleableTextField;
+	import spark.skins.mobile.supportClasses.MobileSkin;
 	
 	public class AddFoodItemGroup extends Group
 	{
@@ -51,6 +58,28 @@ package myComponents
 		}
 		
 		private var details_button:Button;
+		
+		private var _details_button_click_function:Function;
+
+		/**
+		 * the function that will be called when the button is clicked 
+		 */
+		public function get details_button_click_function():Function
+		{
+			return _details_button_click_function;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set details_button_click_function(value:Function):void
+		{
+			_details_button_click_function = value;
+			if (details_button) {
+				details_button.addEventListener(MouseEvent.CLICK,_details_button_click_function);
+			}
+		}
+
 
 		//*********************
 		// amount entered by the user, can be editable in case buttons are not used
@@ -136,6 +165,72 @@ package myComponents
 		
 		private var meal_button:Button;
 		
+		/**
+		 * the function to call when meal button is clicked 
+		 */
+		private var _meal_button_click_function:Function;
+		
+		/**
+		 * the function that will be called when the button is clicked 
+		 */
+		public function get meal_button_click_function():Function
+		{
+			return _meal_button_click_function;
+		}
+		
+		/**
+		 * @private
+		 */
+		public function set meal_button_click_function(value:Function):void
+		{
+			_meal_button_click_function = value;
+			if (meal_button) {
+				meal_button.addEventListener(MouseEvent.CLICK,_meal_button_click_function);
+			}
+		}
+		
+		/**
+		 * are the buttonsizes already known or not. 
+		 */
+		static private var buttonSizesKnown:Boolean = false;
+		/**
+		 * the minimum width of a digit button
+		 */
+		static private var buttonMinimumWidth:int;
+		/**
+		 * the maximum width of a digit button
+		 */
+		static private var buttonMaximumWidth:int;
+		/**
+		 *  the minimum height of such a button 
+		 */
+		static private var buttonMinimumHeight:int;
+		/**
+		 * the maximum height of such a button
+		 */
+		static private var buttonMaximumHeight:int;
+		/**
+		 * gap between buttons, between last row of buttons and bottom, between first row of buttons and last field above
+		 */
+		static private var buttonGap:int;
+		/**
+		 * gap to be used between left side and any textfield, between textfield and right side, and between textfields
+		 */
+		static private var textGap:int;
+		/**
+		 *  if false then the selectedamount still has the value added by the app, based on fooditem database, not yet changed by user
+		 */
+		private var _defaultAmountOverwritten:Boolean = false;
+
+		/**
+		 *  if false then the selectedamount still has the value added by the app, based on fooditem database, not yet changed by user
+		 */
+		public function get defaultAmountOverwritten():Boolean
+		{
+			return _defaultAmountOverwritten;
+		}
+		
+		
 		//*********************
 		// the button to add the fooditem to the list of selected items
 		//*********************
@@ -157,6 +252,45 @@ package myComponents
 		
 		private var add_button:Button;
 		
+		private var _add_button_click_function:Function;
+		
+		/**
+		 * the function that will be called when the button is clicked 
+		 */
+		public function get add_button_click_function():Function
+		{
+			return _add_button_click_function;
+		}
+		
+		//*********************
+		// the digit buttons
+		//*********************
+		private var button_0:Button;
+		private var button_1:Button;
+		private var button_2:Button;
+		private var button_3:Button;
+		private var button_4:Button;
+		private var button_5:Button;
+		private var button_6:Button;
+		private var button_7:Button;
+		private var button_8:Button;
+		private var button_9:Button;
+		private var button_DEL:Button;
+		private var button_DecimalPoint:Button;
+
+		
+		/**
+		 * @private
+		 */
+		public function set add_button_click_function(value:Function):void
+		{
+			_add_button_click_function = value;
+			if (add_button) {
+				add_button.addEventListener(MouseEvent.CLICK,_add_button_click_function);
+			}
+		}
+		
+
 		/**
 		 * the width is set during updatedisplaylist, and used in measure
 		 */
@@ -172,7 +306,14 @@ package myComponents
 		public function AddFoodItemGroup()
 		{
 			super();
-			
+			if (!buttonSizesKnown) {
+				buttonMinimumWidth = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonMinimumWidth");
+				buttonMaximumWidth = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonMaximumWidth");
+				buttonMinimumHeight = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonMinimumHeight");
+				buttonMaximumHeight = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonMaximumHeight");
+				buttonGap = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonGap");
+				textGap = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("textGap");
+			}
 		}
 		
 		/**
@@ -192,41 +333,117 @@ package myComponents
 		
 		override protected function updateDisplayList(containerWidth:Number, containerHeight:Number):void {
 			//super.updateDisplayList(containerWidth,containerHeight);
+		
 			var oldwidth:Number = _width;
 			var oldheight:Number = _height;
 			_width=containerWidth;
 			_height = 0;
 
-			description_textarea.setLayoutBoundsSize(containerWidth,ModelLocator.StyleableTextFieldHeight);
-			description_textarea.setLayoutBoundsPosition(0,0);
-			_height = ModelLocator.StyleableTextFieldHeight;
+			description_textarea.setLayoutBoundsSize(containerWidth - textGap * 2 ,ModelLocator.StyleableTextFieldCalculatedHeight);
+			description_textarea.setLayoutBoundsPosition(textGap,ModelLocator.offSetSoThatTextIsInTheMiddle);
+			_height = ModelLocator.StyleableTextFieldCalculatedHeight;
 			
-			details_button.setLayoutBoundsSize(containerWidth,ModelLocator.StyleableTextFieldHeight);
-			details_button.setLayoutBoundsPosition(0,_height);
-			_height += ModelLocator.StyleableTextFieldHeight;
+			var preferredButtonHeight:int = details_button.getPreferredBoundsHeight();
+			details_button.setLayoutBoundsSize(containerWidth - textGap * 2,preferredButtonHeight);
+			details_button.setLayoutBoundsPosition(textGap,_height);
+			_height += preferredButtonHeight;
+			
+			_height += textGap;//juist adding some gap
 
-			amount_textarea.setLayoutBoundsSize(containerWidth,ModelLocator.StyleableTextFieldHeight);
-			amount_textarea.setLayoutBoundsPosition(0,_height);
-			_height += ModelLocator.StyleableTextFieldHeight;
+			var preferredAmountTextAreaWidth:int = amount_textarea.getPreferredBoundsWidth();
+			amount_textarea.setLayoutBoundsSize(preferredAmountTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
+			amount_textarea.setLayoutBoundsPosition(textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
+			
+			amount_textinput.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredAmountTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
+			amount_textinput.setLayoutBoundsPosition(textGap + preferredAmountTextAreaWidth + textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
+			_height += ModelLocator.StyleableTextFieldCalculatedHeight;
 
-			amount_textinput.setLayoutBoundsSize(containerWidth,ModelLocator.StyleableTextFieldHeight);
-			amount_textinput.setLayoutBoundsPosition(0,_height);
-			_height += ModelLocator.StyleableTextFieldHeight;
+			_height += textGap;//juist adding some gap
+
+			var preferredMealTextAreaWidth:int = meal_textarea.getPreferredBoundsWidth();
+			meal_textarea.setLayoutBoundsSize(preferredMealTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
+			meal_textarea.setLayoutBoundsPosition(textGap,_height 
+				+ ModelLocator.offSetSoThatTextIsInTheMiddle + 
+				/* to make sure the text of the textarea is nicely aligned with the text in the mealbutton */(preferredButtonHeight - ModelLocator.StyleableTextFieldCalculatedHeight)/2);
 			
-			meal_textarea.setLayoutBoundsSize(containerWidth,ModelLocator.StyleableTextFieldHeight);
-			meal_textarea.setLayoutBoundsPosition(0,_height);
-			_height += ModelLocator.StyleableTextFieldHeight;
+			meal_button.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredMealTextAreaWidth,preferredButtonHeight);
+			meal_button.setLayoutBoundsPosition(textGap + preferredMealTextAreaWidth + textGap,_height);
+			_height += preferredButtonHeight;
+
+			_height += textGap;//juist adding some gap
 			
-			meal_button.setLayoutBoundsSize(containerWidth,ModelLocator.StyleableTextFieldHeight);
-			meal_button.setLayoutBoundsPosition(0,_height);
-			_height += ModelLocator.StyleableTextFieldHeight;
+			var availableWidthForDigitButtons:int = Math.floor(containerWidth*0.7);
+			var buttonHeight:int = Math.floor((containerHeight - _height - buttonGap * 4)/4);
+			buttonHeight = Math.min(buttonHeight,buttonMaximumHeight);
+
+			add_button.setLayoutBoundsSize(containerWidth - textGap * 2 - availableWidthForDigitButtons,buttonHeight);
+			add_button.setLayoutBoundsPosition(availableWidthForDigitButtons + textGap ,_height);
 			
-			add_button.setLayoutBoundsSize(containerWidth,ModelLocator.StyleableTextFieldHeight);
-			add_button.setLayoutBoundsPosition(0,_height);
-			_height += ModelLocator.StyleableTextFieldHeight +30;
+			//lets see if the digitbuttons will be drawn or not
+			if (containerHeight - _height - buttonGap * 4 - buttonMinimumHeight * 4 < 0) {
+				//don't draw it
+			} else {
+				//yes draw the buttons
+				
+				var buttonWidth:int = Math.floor((availableWidthForDigitButtons - buttonGap * 4)/3);
+				buttonWidth = Math.min(buttonWidth,buttonMaximumWidth);
+				var leftOffset:int = Math.floor((availableWidthForDigitButtons - 3 * buttonWidth - 2 * buttonGap)/2);
+				
+				if (button_0 == null) {
+					button_0 = new Button();button_1 = new Button();button_2 = new Button();button_3 = new Button();button_4 = new Button();button_5 = new Button();
+					button_6 = new Button();button_7 = new Button();button_8 = new Button();button_9 = new Button();button_DecimalPoint = new Button();button_DEL = new Button();
+					
+					//button_0.styleName = this;button_1.styleName = this;button_2.styleName = this;button_3.styleName = this;button_4.styleName = this;button_5.styleName = this;
+					//button_6.styleName = this;button_7.styleName = this;button_8.styleName = this;button_9.styleName = this;button_DecimalPoint.styleName = this;button_DEL.styleName = this;
+					
+					button_0.label = "0";button_1.label = "1";button_2.label = "2";button_3.label = "3";button_4.label = "4";button_5.label = "5";
+					button_6.label = "6";button_7.label = "7";button_8.label = "8";button_9.label = "9";button_DecimalPoint.label = ".";button_DEL.label = "<";
+					
+					addElement(button_0);addElement(button_1);addElement(button_2);addElement(button_3);addElement(button_4);addElement(button_5);
+					addElement(button_6);addElement(button_7);addElement(button_8);addElement(button_9);addElement(button_DEL);addElement(button_DecimalPoint);
+					
+					button_0.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_1.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_2.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+					button_3.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_4.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_5.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+					button_6.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_7.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_8.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+					button_DecimalPoint.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DEL.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+					
+					button_0.setLayoutBoundsSize(buttonWidth, buttonHeight);button_1.setLayoutBoundsSize(buttonWidth, buttonHeight);button_2.setLayoutBoundsSize(buttonWidth, buttonHeight);button_3.setLayoutBoundsSize(buttonWidth, buttonHeight);
+					button_4.setLayoutBoundsSize(buttonWidth, buttonHeight);button_5.setLayoutBoundsSize(buttonWidth, buttonHeight);button_6.setLayoutBoundsSize(buttonWidth, buttonHeight);button_7.setLayoutBoundsSize(buttonWidth, buttonHeight);
+					button_8.setLayoutBoundsSize(buttonWidth, buttonHeight);button_9.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DecimalPoint.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DEL.setLayoutBoundsSize(buttonWidth, buttonHeight);
+					
+					button_7.setLayoutBoundsPosition(leftOffset ,_height);
+					button_8.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+					button_9.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+					_height += buttonHeight + buttonGap  ;
+					button_4.setLayoutBoundsPosition(leftOffset ,_height);
+					button_5.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+					button_6.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+					_height += buttonHeight + buttonGap  ;
+					button_1.setLayoutBoundsPosition(leftOffset ,_height);
+					button_2.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+					button_3.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+					_height += buttonHeight + buttonGap  ;
+					button_DecimalPoint.setLayoutBoundsPosition(leftOffset ,_height);
+					button_0.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+					button_DEL.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+					_height += buttonHeight + buttonGap  ;
+				} else {
+					//we don't need to recreate all buttons because they already exist, but we do need to continue calculating _height
+					//here I just repeated all increase of _height as done in case buttons are created
+					_height += buttonHeight + buttonGap;
+					_height += buttonHeight + buttonGap;
+					_height += buttonHeight + buttonGap;
+					_height += buttonHeight + buttonGap;  
+				}
+			}
 			
 			if ((oldwidth != _width) || (oldheight != _height))
 				invalidateSize();
+		}
+		
+		private function digitButtonClicked(e:MouseEvent):void {
+			(e.currentTarget as Button).label;
+			
 		}
 		
 		override protected function createChildren():void  {
@@ -246,6 +463,8 @@ package myComponents
 				//details_button.multiline = false;
 				//details_button.wordWrap = false;
 				details_button.label = details_button_text;
+				if (_details_button_click_function != null)
+					details_button.addEventListener(flash.events.MouseEvent.CLICK,_details_button_click_function);
 				addElement(details_button);
 			}
 			if (!amount_textinput) {
@@ -255,6 +474,7 @@ package myComponents
 				amount_textinput.multiline = false;
 				amount_textinput.wordWrap = false;
 				amount_textinput.text = amount_textinput_text;
+				amount_textinput.setStyle("color","0x0B333C");
 				addElement(amount_textinput);
 			}
 			if (!amount_textarea) {
@@ -278,6 +498,8 @@ package myComponents
 			if (!meal_button) {
 				meal_button = new Button();
 				meal_button.styleName = this;
+				if (_meal_button_click_function != null)
+					meal_button.addEventListener(MouseEvent.CLICK,_meal_button_click_function);
 				//meal_button.editable = false;
 				//meal_button.multiline = false;
 				//meal_button.wordWrap = false;
@@ -290,6 +512,8 @@ package myComponents
 				//add_button.editable = false;
 				//add_button.multiline = false;
 				//add_button.wordWrap = false;
+				if (_add_button_click_function != null)
+					add_button.addEventListener(MouseEvent.CLICK,_add_button_click_function);
 				add_button.label = add_button_text;
 				addElement(add_button);
 			}
