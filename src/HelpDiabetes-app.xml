@@ -103,7 +103,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 		<!-- The window's initial maximum size, specified as a width/height pair in pixels, such as "1600 1200". Optional. -->
 		<!-- <maxSize></maxSize> -->
-	<autoOrients>true</autoOrients>
+	<aspectRatio>portrait</aspectRatio>	
+	<autoOrients>false</autoOrients>
     <fullScreen>false</fullScreen>
     <visible>false</visible>
   </initialWindow>

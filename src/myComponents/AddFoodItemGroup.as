@@ -110,7 +110,7 @@ package myComponents
 				amount_textinput.htmlText = "<p>"+value+"</p>";
 				callLater(function():void{
 					var myStyleSheet:StyleSheet = new StyleSheet();
-					myStyleSheet.parseCSS("p {color:#9F9E9E;}");
+					myStyleSheet.parseCSS(defaultAmountOverwritten ? "p {color:#000000;}":"p {color:#9F9E9E;}");
 					amount_textinput.styleSheet = myStyleSheet;
 				}); 
 				invalidateDisplayList();
@@ -119,31 +119,6 @@ package myComponents
 		
 		private var amount_textinput:StyleableTextField;
 		
-		/**
-		 * function to be called, when native keyboard is open and enter is pressed. native keyboard is used for editing amount_text_input, in case it is editable
-		 */
-		private var _enterPressedFunction:Function;
-
-		/**
-		 * function to be called, when native keyboard is open and enter is pressed. native keyboard is used for editing amount_text_input, in case it is editable
-		 */
-		public function get enterPressed():Function
-		{
-			return _enterPressedFunction;
-		}
-
-		/**
-		 * function to be called, when native keyboard is open and enter is pressed. native keyboard is used for editing amount_text_input, in case it is editable
-		 */
-		public function set enterPressed(value:Function):void
-		{
-			if (_enterPressedFunction == value)
-				return;
-			_enterPressedFunction = value;
-			if (amount_textinput != null) {
-				amount_textinput.addEventListener(FlexEvent.ENTER,_enterPressedFunction);
-			}
-		}
 		
 		private var _amountTextChangedFunction:Function;
 
@@ -294,6 +269,13 @@ package myComponents
 		public function get defaultAmountOverwritten():Boolean
 		{
 			return _defaultAmountOverwritten;
+		}
+		/**
+		 *  if false then the selectedamount still has the value added by the app, based on fooditem database, not yet changed by user
+		 */
+		public function set defaultAmountOverwritten(value:Boolean):void
+		{
+			_defaultAmountOverwritten = value;
 		}
 		
 		
@@ -520,6 +502,10 @@ package myComponents
 		}
 		
 		private function digitButtonClicked(e:MouseEvent):void {
+			if (!defaultAmountOverwritten) {
+				defaultAmountOverwritten = true;
+				amount_textinput_text = "";
+			}
 			var buttonText:String = (e.currentTarget as Button).label;
 			if (buttonText == "<") {
 				if (amount_textinput_text.length > 0)

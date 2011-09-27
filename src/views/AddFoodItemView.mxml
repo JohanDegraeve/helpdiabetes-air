@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
+<!--
+Originally I have been using pure mxml for this, but later on I've put a lot of the field in a customized group named AddFoodItemGroup written in mxml
+The reader will see here a lot of interaction between AddFoodItemGroup.as and AddFoodItemView.mxml, the split between the two is not very logic, its more historic.
+-->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		actionBarVisible="true" 
@@ -24,18 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		title="AddFoodItemView" xmlns:myComponents="myComponents.*" xmlns:mx="library://ns.adobe.com/flex/mx"
 		creationComplete="onCreationComplete()"
 		remove="onRemove()"
-		add="addHandler()">
+		add="addHandler()"
+		>
 	<fx:Declarations>
-		<!--  seperationerror="" makes sure there's no round border even when there's a separator error 
-		<mx:NumberValidator
-			id="amountValidator"
-			source="{amount_textinput}" 
-			property="text" 
-			allowNegative="false" 
-			domain="real"
-			thousandsSeparator="." 
-			separationError="">
-		</mx:NumberValidator>-->
 	</fx:Declarations>
 	
 	<fx:Metadata>
@@ -58,11 +53,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.core.IFlexDisplayObject;
 			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
-			import mx.events.ValidationResultEvent;
-			import mx.geom.RoundedRectangle;
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
-			import mx.validators.ValidationResult;
 			
 			import myComponents.DayLine;
 			import myComponents.DayLineWithTotalAmount;
@@ -79,22 +71,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var meal_textarea_text:String;
 			private var _amount_textarea_text:String;
 
-			[Bindable]
-			public function get amount_textarea_text():String
-			{
-				return _amount_textarea_text;
-			}
-
-			public function set amount_textarea_text(value:String):void
-			{
-				if (_amount_textarea_text == value) 
-					return;
-				_amount_textarea_text = value;
-				details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));	
-			}
 
 			[Bindable]
-			private var meal_button_text:String = "dummy_button";
+			private var meal_button_text:String;
 			[Bindable]
 			private var add_button_text:String;
 			
@@ -213,7 +192,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				//first remove the eventlistener
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				
-				var temp3:Object = ModelLocator.getInstance().meals;
 				//now check the time difference
 				if (((new Date()).valueOf() - new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION))) < 15*60*1000) {
 					//it's less than 15 minutes since the last meal addition
@@ -365,11 +343,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 			}
 
-			private function onPressEnter(event:FlexEvent):void {
-				addButtonClicked();
-			}
-			
 			private function amountTextChanged():void {
+				addFoodItemGroup.defaultAmountOverwritten = true;
 				//first replace "," by ".", because flex doesn't seem to work correctly when using "," as decimal seperator
 				var temp:String;
 				temp = amount_textinput_text.split(",").join(".");
@@ -383,24 +358,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				//this means user has not entered any amount
 				if (amount_textinput_text == "")
 					amount_textinput_text = "0";
-				
-				
-				//var validationResultEvent:ValidationResultEvent = amountValidator.validate(null,true);
-				//if (validationResultEvent.results == null)
-					details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
-				/*else {
-					for (var i:int = 0;i < validationResultEvent.results.length;i++) {
-						if ((validationResultEvent.results[i] as ValidationResult).errorCode == "requiredField") {
-							//amountfield is empty, just keep it empty and set detailsbuttontext with value = 0
-							details_button_text = createDetailsButtonText(selectedUnit,0);
-						}
-						if ((validationResultEvent.results[i] as ValidationResult).errorCode == "separation") {
-							//user is trying to add a seperation for "duizendtallen", ignore it, it seems to work anyway treating thousands seperator as decimal seperator
-							details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
-						}
-					}
-				}*/
-			
+
+				details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
 			}
 
 
@@ -423,7 +382,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
-		<myComponents:AddFoodItemGroup y="0" x="0" width="100%" height = "100%" 
+		<myComponents:AddFoodItemGroup id="addFoodItemGroup"
+									   y="0" x="0" width="100%" height = "100%" 
 									   description_textarea_text="{description_textarea_text}" 
 									   details_button_text="@{details_button_text}"
 									   amount_textarea_text="{_amount_textarea_text}"
@@ -434,33 +394,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 									   details_button_click_function="{popUpUnitList}"
 									   meal_button_click_function="{mealButtonClicked}"
 									   add_button_click_function="{addButtonClicked}"
-									   enterPressed="{onPressEnter}"
 									   amountTextChangedFunction="{amountTextChanged}"
 									   >
-			<!-- the food item description
-			amount_textinput_text_changed_function="{amountTextChanged}"
-			
-			<s:TextArea id="description_textarea"  width="100%" text="{description_textarea_text}" editable="false" creationComplete="details_button_fontsize = description_textarea.getStyle('fontSize')*0.8;"/>
-			
-			 where we mention the amount of carbs that is in the chosen amount. I don't remember why I have set the fontsize variable 
-			<s:Button id="details_button" width="100%" label="{details_button_text}" click="popUpUnitList()" fontSize="{details_button_fontsize}"/>
-			
-			<s:HGroup gap="6" width="100%">
-				 just the text "Amount:" 
-				<s:TextArea id="amount_textarea"   width="50%" editable="false" text="{amount_textarea_text}"/>
-				 where the user can enter the chosen amount 
-				<s:TextInput  restrict="0123456789.,"  id="amount_textinput"  width="50%" editable="true" text="@{amount_textinput_text}" change="amountTextChanged()" />
-			</s:HGroup>
-			<s:HGroup gap="6" width="100%">
-				 just the text "Meal:" 
-				<s:TextArea id="meal_textarea"  width = "50%" editable="false" text="{meal_textarea_text}"/>
-				 the button to select another meal, and showing the currently selected meal 
-				<s:Button id="meal_button" width = "50%"  label="{meal_button_text}" click="mealButtonClicked()"/>
-			</s:HGroup>
-			 the button to add the fooditem to the currently selected meal 
-			<s:HGroup  gap="6" width="100%" horizontalAlign="center">
-				<s:Button id="add_button" label="{add_button_text}" enabled="true" click="addButtonClicked()"/>
-			</s:HGroup>-->
 		</myComponents:AddFoodItemGroup>
 	
 </s:View>
