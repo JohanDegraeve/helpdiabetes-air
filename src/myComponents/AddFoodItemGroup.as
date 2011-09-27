@@ -7,12 +7,16 @@ package myComponents
 	import model.ModelLocator;
 	
 	import mx.events.FlexEvent;
+	import mx.events.ValidationResultEvent;
+	import mx.validators.NumberValidator;
+	import mx.validators.ValidationResult;
 	
 	import spark.components.Button;
 	import spark.components.DataGroup;
 	import spark.components.Group;
 	import spark.components.supportClasses.GroupBase;
 	import spark.components.supportClasses.StyleableTextField;
+	import spark.globalization.StringTools;
 	import spark.skins.mobile.supportClasses.MobileSkin;
 	
 	public class AddFoodItemGroup extends Group
@@ -29,6 +33,8 @@ package myComponents
 
 		public function set description_textarea_text(value:String):void
 		{
+			if (_description_textarea_text == value)
+				return;
 			_description_textarea_text = value;
 			if (description_textarea) {
 				description_textarea.text = value;
@@ -43,6 +49,7 @@ package myComponents
 		//*********************
 		private var _details_button_text:String ;
 		
+		[Bindable]
 		public function get details_button_text():String
 		{
 			return _details_button_text;
@@ -50,6 +57,8 @@ package myComponents
 
 		public function set details_button_text(value:String):void
 		{
+			if (_details_button_text == value)
+				return;
 			_details_button_text = value;
 			if (details_button) {
 				details_button.label = value;
@@ -86,6 +95,7 @@ package myComponents
 		//*********************
 		private var _amount_textinput_text:String;
 
+		[Bindable]
 		public function get amount_textinput_text():String
 		{
 			return _amount_textinput_text;
@@ -93,20 +103,69 @@ package myComponents
 
 		public function set amount_textinput_text(value:String):void
 		{
+			if (_amount_textinput_text == value)
+				return;
 			_amount_textinput_text = value;
 			if (amount_textinput) {
-				amount_textinput.text = value;
+				amount_textinput.htmlText = "<p>"+value+"</p>";
+				callLater(function():void{
+					var myStyleSheet:StyleSheet = new StyleSheet();
+					myStyleSheet.parseCSS("p {color:#9F9E9E;}");
+					amount_textinput.styleSheet = myStyleSheet;
+				}); 
 				invalidateDisplayList();
 			}
 		}
 		
 		private var amount_textinput:StyleableTextField;
+		
+		/**
+		 * function to be called, when native keyboard is open and enter is pressed. native keyboard is used for editing amount_text_input, in case it is editable
+		 */
+		private var _enterPressedFunction:Function;
 
+		/**
+		 * function to be called, when native keyboard is open and enter is pressed. native keyboard is used for editing amount_text_input, in case it is editable
+		 */
+		public function get enterPressed():Function
+		{
+			return _enterPressedFunction;
+		}
+
+		/**
+		 * function to be called, when native keyboard is open and enter is pressed. native keyboard is used for editing amount_text_input, in case it is editable
+		 */
+		public function set enterPressed(value:Function):void
+		{
+			if (_enterPressedFunction == value)
+				return;
+			_enterPressedFunction = value;
+			if (amount_textinput != null) {
+				amount_textinput.addEventListener(FlexEvent.ENTER,_enterPressedFunction);
+			}
+		}
+		
+		private var _amountTextChangedFunction:Function;
+
+		public function get amountTextChangedFunction():Function
+		{
+			return _amountTextChangedFunction;
+		}
+
+		public function set amountTextChangedFunction(value:Function):void
+		{
+			if (_amountTextChangedFunction == value)
+				return;
+			_amountTextChangedFunction = value;
+		}
+
+		
 		//*********************
 		// the static text saying meal...
 		//*********************
 		private var _meal_textarea_text:String;
 
+		[Bindable]
 		public function get meal_textarea_text():String
 		{
 			return _meal_textarea_text;
@@ -114,6 +173,8 @@ package myComponents
 
 		public function set meal_textarea_text(value:String):void
 		{
+			if (_meal_button_text == value)
+				return;
 			_meal_textarea_text = value;
 			if (meal_textarea) {
 				meal_textarea.text = value;
@@ -135,6 +196,8 @@ package myComponents
 
 		public function set amount_textarea_text(value:String):void
 		{
+			if (_amount_textarea_text == value)
+				return;
 			_amount_textarea_text = value;
 			if (amount_textarea) {
 				amount_textarea.text = value;
@@ -156,6 +219,8 @@ package myComponents
 
 		public function set meal_button_text(value:String):void
 		{
+			if (_meal_button_text == value)
+				return;
 			_meal_button_text = value;
 			if (meal_button) {
 				meal_button.label = value;
@@ -189,6 +254,8 @@ package myComponents
 			}
 		}
 		
+		
+		
 		/**
 		 * are the buttonsizes already known or not. 
 		 */
@@ -221,7 +288,6 @@ package myComponents
 		 *  if false then the selectedamount still has the value added by the app, based on fooditem database, not yet changed by user
 		 */
 		private var _defaultAmountOverwritten:Boolean = false;
-
 		/**
 		 *  if false then the selectedamount still has the value added by the app, based on fooditem database, not yet changed by user
 		 */
@@ -300,6 +366,8 @@ package myComponents
 		 */
 		private var _height:Number;
 		
+		private var amountValidator:NumberValidator;
+		
 		/**
 		 * constructor, nothing special about it, calls super 
 		 */
@@ -314,6 +382,13 @@ package myComponents
 				buttonGap = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonGap");
 				textGap = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("textGap");
 			}
+			amountValidator = new NumberValidator();
+			amountValidator.allowNegative = false;
+			amountValidator.source = amount_textinput;
+			amountValidator.property = "text";
+			amountValidator.domain="real"
+			amountValidator.thousandsSeparator=".";
+			amountValidator.separationError="";
 		}
 		
 		/**
@@ -353,7 +428,7 @@ package myComponents
 			var preferredAmountTextAreaWidth:int = amount_textarea.getPreferredBoundsWidth();
 			amount_textarea.setLayoutBoundsSize(preferredAmountTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
 			amount_textarea.setLayoutBoundsPosition(textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
-			
+
 			amount_textinput.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredAmountTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
 			amount_textinput.setLayoutBoundsPosition(textGap + preferredAmountTextAreaWidth + textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
 			_height += ModelLocator.StyleableTextFieldCalculatedHeight;
@@ -382,6 +457,9 @@ package myComponents
 			//lets see if the digitbuttons will be drawn or not
 			if (containerHeight - _height - buttonGap * 4 - buttonMinimumHeight * 4 < 0) {
 				//don't draw it
+				amount_textinput.editable = true;
+				amount_textinput.restrict = "0123456789.";
+				//focusManager.setFocus(amount_textinput);
 			} else {
 				//yes draw the buttons
 				
@@ -405,7 +483,7 @@ package myComponents
 					button_0.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_1.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_2.addEventListener(MouseEvent.CLICK,digitButtonClicked);
 					button_3.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_4.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_5.addEventListener(MouseEvent.CLICK,digitButtonClicked);
 					button_6.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_7.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_8.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-					button_DecimalPoint.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DEL.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+					button_9.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DecimalPoint.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DEL.addEventListener(MouseEvent.CLICK,digitButtonClicked);
 					
 					button_0.setLayoutBoundsSize(buttonWidth, buttonHeight);button_1.setLayoutBoundsSize(buttonWidth, buttonHeight);button_2.setLayoutBoundsSize(buttonWidth, buttonHeight);button_3.setLayoutBoundsSize(buttonWidth, buttonHeight);
 					button_4.setLayoutBoundsSize(buttonWidth, buttonHeight);button_5.setLayoutBoundsSize(buttonWidth, buttonHeight);button_6.setLayoutBoundsSize(buttonWidth, buttonHeight);button_7.setLayoutBoundsSize(buttonWidth, buttonHeight);
@@ -442,8 +520,22 @@ package myComponents
 		}
 		
 		private function digitButtonClicked(e:MouseEvent):void {
-			(e.currentTarget as Button).label;
-			
+			var buttonText:String = (e.currentTarget as Button).label;
+			if (buttonText == "<") {
+				if (amount_textinput_text.length > 0)
+					amount_textinput_text = amount_textinput_text.substring(0,amount_textinput_text.length - 1);
+			} else if (buttonText == ".") {
+				if (amount_textinput_text.indexOf(".") >= 0)
+					return;//don't add any additional decimal point
+				if (amount_textarea_text.length > 0)
+					amount_textinput_text = amount_textinput_text + "."
+			} else  {
+				if (amount_textinput_text == "0")
+					amount_textinput_text = buttonText;
+				else
+					amount_textinput_text += buttonText;
+			}
+			amountTextChangedFunction();
 		}
 		
 		override protected function createChildren():void  {
@@ -474,7 +566,7 @@ package myComponents
 				amount_textinput.multiline = false;
 				amount_textinput.wordWrap = false;
 				amount_textinput.text = amount_textinput_text;
-				amount_textinput.setStyle("color","0x0B333C");
+				//amount_textinput.setStyle("color","0x0B333C");
 				addElement(amount_textinput);
 			}
 			if (!amount_textarea) {

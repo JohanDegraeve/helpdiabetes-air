@@ -77,8 +77,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var amount_textinput_text:String;
 			[Bindable]
 			private var meal_textarea_text:String;
+			private var _amount_textarea_text:String;
+
 			[Bindable]
-			private var amount_textarea_text:String;
+			public function get amount_textarea_text():String
+			{
+				return _amount_textarea_text;
+			}
+
+			public function set amount_textarea_text(value:String):void
+			{
+				if (_amount_textarea_text == value) 
+					return;
+				_amount_textarea_text = value;
+				details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));	
+			}
+
 			[Bindable]
 			private var meal_button_text:String = "dummy_button";
 			[Bindable]
@@ -114,10 +128,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			
 			private function onCreationComplete():void {
-				//we'll add an eventlistener for pressing enter when editing the amount
-				//amount_textinput.addEventListener(FlexEvent.ENTER,onPressEnter);
-				
-				
 				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
@@ -183,9 +193,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					details_button_text = createDetailsButtonText(selectedUnit,(new Number(amount_textinput_text)) == 0 ? -1: new Number(amount_textinput_text));
 				}
 				
-				//set focus to amount field, on android this immediately shows up the keyboard
-				//this.focusManager.setFocus(amount_textinput);
-				
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
@@ -229,7 +236,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function preInit():void {
 				meal_textarea_text = resourceManager.getString('addfooditemview','meal_button');
 				add_button_text = resourceManager.getString("addfooditemview","add_button");
-				amount_textarea_text = resourceManager.getString("addfooditemview","amount");
+				_amount_textarea_text = resourceManager.getString("addfooditemview","amount");
 				amount_textinput_text = "0";
 				thisObject = this;
 				ModelLocator.getInstance().unitList = new ArrayCollection();
@@ -284,55 +291,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						//set it to empty string, this allows the user to immediately start typing an amount
 						amount_textinput_text = "";
 				}
-			}
-			
-			/**
-			 * function to fill in the details_text_area_text for the specified unit and chosenAmount
-			 * if chosenAmount = -1 then standardamount will be used
-			 */ 
-			private function createDetailsButtonText(index:int, chosenAmount:Number):String {
-				var standardAmount:Number = retrievedFoodItem.getUnit(index).standardAmount;
-				if (chosenAmount == -1)
-					chosenAmount = standardAmount;
-				return chosenAmount + " " +
-					retrievedFoodItem.getUnit(index).unitDescription + " : " +
-					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","gram_of_carbs_short") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).fat/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).protein/standardAmount*chosenAmount  *100)/100)+ " " +  resourceManager.getString("general","gram_of_protein") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).kcal/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","kilocalories") + ".";
-			}
-			
-			private function amountTextChanged():void {
-				//first replace "," by ".", because flex doesn't seem to work correctly when using "," as decimal seperator
-				var temp:String;
-				temp = amount_textinput_text.split(",").join(".");
-				//applying a trick here to get rid of too many ".", first replacing the first "." by "{", hoping the user will never type this character
-				//then replacing all remaining "." by "", then rereplacing "{" by "."
-				temp = temp.split(".",2).join("{");
-				temp = temp.split(".").join("");
-				amount_textinput_text = temp.split("{",2).join(".");
-				
-				//now if amount = "" (ie empty string) set it to 0
-				//this means user has not entered any amount
-				if (amount_textinput_text == "")
-					amount_textinput_text = "0";
-
-				
-				//var validationResultEvent:ValidationResultEvent = amountValidator.validate(null,true);
-		/*		if (validationResultEvent.results == null)
-					details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
-				else {
-					for (var i:int = 0;i < validationResultEvent.results.length;i++) {
-						if ((validationResultEvent.results[i] as ValidationResult).errorCode == "requiredField") {
-							//amountfield is empty, just keep it empty and set detailsbuttontext with value = 0
-							details_button_text = createDetailsButtonText(selectedUnit,0);
-						}
-						if ((validationResultEvent.results[i] as ValidationResult).errorCode == "separation") {
-							//user is trying to add a seperation for "duizendtallen", ignore it, it seems to work anyway treating thousands seperator as decimal seperator
-							details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
-						}
-					}
-				}*/
 			}
 			
 			/**
@@ -406,9 +364,56 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				}
 			}
-			
+
 			private function onPressEnter(event:FlexEvent):void {
 				addButtonClicked();
+			}
+			
+			private function amountTextChanged():void {
+				//first replace "," by ".", because flex doesn't seem to work correctly when using "," as decimal seperator
+				var temp:String;
+				temp = amount_textinput_text.split(",").join(".");
+				//applying a trick here to get rid of too many ".", first replacing the first "." by "{", hoping the user will never type this character
+				//then replacing all remaining "." by "", then rereplacing "{" by "."
+				temp = temp.split(".",2).join("{");
+				temp = temp.split(".").join("");
+				amount_textinput_text = temp.split("{",2).join(".");
+				
+				//now if amount = "" (ie empty string) set it to 0
+				//this means user has not entered any amount
+				if (amount_textinput_text == "")
+					amount_textinput_text = "0";
+				
+				
+				//var validationResultEvent:ValidationResultEvent = amountValidator.validate(null,true);
+				//if (validationResultEvent.results == null)
+					details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
+				/*else {
+					for (var i:int = 0;i < validationResultEvent.results.length;i++) {
+						if ((validationResultEvent.results[i] as ValidationResult).errorCode == "requiredField") {
+							//amountfield is empty, just keep it empty and set detailsbuttontext with value = 0
+							details_button_text = createDetailsButtonText(selectedUnit,0);
+						}
+						if ((validationResultEvent.results[i] as ValidationResult).errorCode == "separation") {
+							//user is trying to add a seperation for "duizendtallen", ignore it, it seems to work anyway treating thousands seperator as decimal seperator
+							details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
+						}
+					}
+				}*/
+			
+			}
+
+
+			private function createDetailsButtonText(index:int, chosenAmount:Number):String {
+				var standardAmount:Number = retrievedFoodItem.getUnit(index).standardAmount;
+				if (chosenAmount == -1)
+					chosenAmount = standardAmount;
+				return chosenAmount + " " +
+					retrievedFoodItem.getUnit(index).unitDescription + " : " +
+					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","gram_of_carbs_short") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).fat/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).protein/standardAmount*chosenAmount  *100)/100)+ " " +  resourceManager.getString("general","gram_of_protein") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).kcal/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","kilocalories") + ".";
 			}
 			
 		]]>
@@ -420,16 +425,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</s:navigationContent>
 		<myComponents:AddFoodItemGroup y="0" x="0" width="100%" height = "100%" 
 									   description_textarea_text="{description_textarea_text}" 
-									   details_button_text="{details_button_text}"
-									   amount_textarea_text="{amount_textarea_text}"
-									   meal_textarea_text="{meal_textarea_text}"
-									   amount_textinput_text="{amount_textinput_text}"
+									   details_button_text="@{details_button_text}"
+									   amount_textarea_text="{_amount_textarea_text}"
+									   meal_textarea_text="@{meal_textarea_text}"
+									   amount_textinput_text="@{amount_textinput_text}"
 									   meal_button_text="{meal_button_text}"
 									   add_button_text="{add_button_text}"
 									   details_button_click_function="{popUpUnitList}"
 									   meal_button_click_function="{mealButtonClicked}"
-									   add_button_click_function="{addButtonClicked}">
-			<!-- the food item description 
+									   add_button_click_function="{addButtonClicked}"
+									   enterPressed="{onPressEnter}"
+									   amountTextChangedFunction="{amountTextChanged}"
+									   >
+			<!-- the food item description
+			amount_textinput_text_changed_function="{amountTextChanged}"
+			
 			<s:TextArea id="description_textarea"  width="100%" text="{description_textarea_text}" editable="false" creationComplete="details_button_fontsize = description_textarea.getStyle('fontSize')*0.8;"/>
 			
 			 where we mention the amount of carbs that is in the chosen amount. I don't remember why I have set the fontsize variable 
