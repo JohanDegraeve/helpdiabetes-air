@@ -436,65 +436,55 @@ package myComponents
 			add_button.setLayoutBoundsSize(containerWidth - textGap * 2 - availableWidthForDigitButtons,buttonHeight);
 			add_button.setLayoutBoundsPosition(availableWidthForDigitButtons + textGap ,_height);
 			
-			//lets see if the digitbuttons will be drawn or not
-			if (containerHeight - _height - buttonGap * 4 - buttonMinimumHeight * 4 < 0) {
-				//don't draw it
-				amount_textinput.editable = true;
-				amount_textinput.restrict = "0123456789.";
-				//focusManager.setFocus(amount_textinput);
+			var buttonWidth:int = Math.floor((availableWidthForDigitButtons - buttonGap * 4)/3);
+			buttonWidth = Math.min(buttonWidth,buttonMaximumWidth);
+			var leftOffset:int = Math.floor((availableWidthForDigitButtons - 3 * buttonWidth - 2 * buttonGap)/2);
+			
+			if (button_0 == null) {
+				button_0 = new Button();button_1 = new Button();button_2 = new Button();button_3 = new Button();button_4 = new Button();button_5 = new Button();
+				button_6 = new Button();button_7 = new Button();button_8 = new Button();button_9 = new Button();button_DecimalPoint = new Button();button_DEL = new Button();
+				
+				//button_0.styleName = this;button_1.styleName = this;button_2.styleName = this;button_3.styleName = this;button_4.styleName = this;button_5.styleName = this;
+				//button_6.styleName = this;button_7.styleName = this;button_8.styleName = this;button_9.styleName = this;button_DecimalPoint.styleName = this;button_DEL.styleName = this;
+				
+				button_0.label = "0";button_1.label = "1";button_2.label = "2";button_3.label = "3";button_4.label = "4";button_5.label = "5";
+				button_6.label = "6";button_7.label = "7";button_8.label = "8";button_9.label = "9";button_DecimalPoint.label = ".";button_DEL.label = "<";
+				
+				addElement(button_0);addElement(button_1);addElement(button_2);addElement(button_3);addElement(button_4);addElement(button_5);
+				addElement(button_6);addElement(button_7);addElement(button_8);addElement(button_9);addElement(button_DEL);addElement(button_DecimalPoint);
+				
+				button_0.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_1.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_2.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+				button_3.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_4.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_5.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+				button_6.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_7.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_8.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+				button_9.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DecimalPoint.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DEL.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+				
+				button_0.setLayoutBoundsSize(buttonWidth, buttonHeight);button_1.setLayoutBoundsSize(buttonWidth, buttonHeight);button_2.setLayoutBoundsSize(buttonWidth, buttonHeight);button_3.setLayoutBoundsSize(buttonWidth, buttonHeight);
+				button_4.setLayoutBoundsSize(buttonWidth, buttonHeight);button_5.setLayoutBoundsSize(buttonWidth, buttonHeight);button_6.setLayoutBoundsSize(buttonWidth, buttonHeight);button_7.setLayoutBoundsSize(buttonWidth, buttonHeight);
+				button_8.setLayoutBoundsSize(buttonWidth, buttonHeight);button_9.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DecimalPoint.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DEL.setLayoutBoundsSize(buttonWidth, buttonHeight);
+				
+				button_1.setLayoutBoundsPosition(leftOffset ,_height);
+				button_2.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+				button_3.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+				_height += buttonHeight + buttonGap  ;
+				button_4.setLayoutBoundsPosition(leftOffset ,_height);
+				button_5.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+				button_6.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+				_height += buttonHeight + buttonGap  ;
+				button_7.setLayoutBoundsPosition(leftOffset ,_height);
+				button_8.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+				button_9.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+				_height += buttonHeight + buttonGap  ;
+				button_DecimalPoint.setLayoutBoundsPosition(leftOffset ,_height);
+				button_0.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+				button_DEL.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+				_height += buttonHeight + buttonGap  ;
 			} else {
-				//yes draw the buttons
-				
-				var buttonWidth:int = Math.floor((availableWidthForDigitButtons - buttonGap * 4)/3);
-				buttonWidth = Math.min(buttonWidth,buttonMaximumWidth);
-				var leftOffset:int = Math.floor((availableWidthForDigitButtons - 3 * buttonWidth - 2 * buttonGap)/2);
-				
-				if (button_0 == null) {
-					button_0 = new Button();button_1 = new Button();button_2 = new Button();button_3 = new Button();button_4 = new Button();button_5 = new Button();
-					button_6 = new Button();button_7 = new Button();button_8 = new Button();button_9 = new Button();button_DecimalPoint = new Button();button_DEL = new Button();
-					
-					//button_0.styleName = this;button_1.styleName = this;button_2.styleName = this;button_3.styleName = this;button_4.styleName = this;button_5.styleName = this;
-					//button_6.styleName = this;button_7.styleName = this;button_8.styleName = this;button_9.styleName = this;button_DecimalPoint.styleName = this;button_DEL.styleName = this;
-					
-					button_0.label = "0";button_1.label = "1";button_2.label = "2";button_3.label = "3";button_4.label = "4";button_5.label = "5";
-					button_6.label = "6";button_7.label = "7";button_8.label = "8";button_9.label = "9";button_DecimalPoint.label = ".";button_DEL.label = "<";
-					
-					addElement(button_0);addElement(button_1);addElement(button_2);addElement(button_3);addElement(button_4);addElement(button_5);
-					addElement(button_6);addElement(button_7);addElement(button_8);addElement(button_9);addElement(button_DEL);addElement(button_DecimalPoint);
-					
-					button_0.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_1.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_2.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-					button_3.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_4.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_5.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-					button_6.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_7.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_8.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-					button_9.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DecimalPoint.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DEL.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-					
-					button_0.setLayoutBoundsSize(buttonWidth, buttonHeight);button_1.setLayoutBoundsSize(buttonWidth, buttonHeight);button_2.setLayoutBoundsSize(buttonWidth, buttonHeight);button_3.setLayoutBoundsSize(buttonWidth, buttonHeight);
-					button_4.setLayoutBoundsSize(buttonWidth, buttonHeight);button_5.setLayoutBoundsSize(buttonWidth, buttonHeight);button_6.setLayoutBoundsSize(buttonWidth, buttonHeight);button_7.setLayoutBoundsSize(buttonWidth, buttonHeight);
-					button_8.setLayoutBoundsSize(buttonWidth, buttonHeight);button_9.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DecimalPoint.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DEL.setLayoutBoundsSize(buttonWidth, buttonHeight);
-					
-					button_7.setLayoutBoundsPosition(leftOffset ,_height);
-					button_8.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
-					button_9.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
-					_height += buttonHeight + buttonGap  ;
-					button_4.setLayoutBoundsPosition(leftOffset ,_height);
-					button_5.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
-					button_6.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
-					_height += buttonHeight + buttonGap  ;
-					button_1.setLayoutBoundsPosition(leftOffset ,_height);
-					button_2.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
-					button_3.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
-					_height += buttonHeight + buttonGap  ;
-					button_DecimalPoint.setLayoutBoundsPosition(leftOffset ,_height);
-					button_0.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
-					button_DEL.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
-					_height += buttonHeight + buttonGap  ;
-				} else {
-					//we don't need to recreate all buttons because they already exist, but we do need to continue calculating _height
-					//here I just repeated all increase of _height as done in case buttons are created
-					_height += buttonHeight + buttonGap;
-					_height += buttonHeight + buttonGap;
-					_height += buttonHeight + buttonGap;
-					_height += buttonHeight + buttonGap;  
-				}
+				//we don't need to recreate all buttons because they already exist, but we do need to continue calculating _height
+				//here I just repeated all increase of _height as done in case buttons are created
+				_height += buttonHeight + buttonGap;
+				_height += buttonHeight + buttonGap;
+				_height += buttonHeight + buttonGap;
+				_height += buttonHeight + buttonGap;  
 			}
 			
 			if ((oldwidth != _width) || (oldheight != _height))

@@ -37,7 +37,7 @@ s|Application {fontSize:20pt}
 	/* this is about the digit buttons */
 	buttonMinimumWidth:40;/* the minimum width of such a button */
 	buttonMaximumWidth:80;/* the maximum widht of such a button */
-	buttonMinimumHeight:40;/* the minimum height of such a button */
+	buttonMinimumHeight:20;/* the minimum height of such a button */
 	buttonMaximumHeight:80;/* the maximum height of such a button */
 	buttonGap:2;/* gap between buttons, between last row of buttons and bottom, between first row of buttons and last field above*/
 	textGap:5;/* gap to be used between left side and any textfield, between textfield and right side, and between textfields */
