@@ -79,9 +79,6 @@ view to show ModelLocator.getInstance().meals in a list
 					navigator.popView();
 				} else {
 					
-					//saving event.newIndex in data, so that we still know it when return from changemealdateandtime
-					data = new Object();
-					data.tempSelection = event.newIndex;
 					navigator.pushView(ChangeMealDateAndTimeView,{
 						meal:theMeal
 					},CHANGE_MEAL_DATE_AND_TIME);
@@ -100,12 +97,15 @@ view to show ModelLocator.getInstance().meals in a list
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
 					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
-						ModelLocator.getInstance().selectedMeal = data.tempSelection;
-						ModelLocator.getInstance().meals.refresh();
-						navigator.popView();
+						if (navigator.poppedViewReturnedObject.object != null) {
+							ModelLocator.getInstance().selectedMeal = navigator.poppedViewReturnedObject.object as Number;
+							navigator.popView();
+						}
 					} else if (navigator.poppedViewReturnedObject.context == ADD_NEW_MEAL) {
-						ModelLocator.getInstance().selectedMeal = navigator.poppedViewReturnedObject.object as Number;
-						navigator.popView();
+						if (navigator.poppedViewReturnedObject.object != null) {
+							ModelLocator.getInstance().selectedMeal = navigator.poppedViewReturnedObject.object as Number;
+							navigator.popView();
+						}
 					} 
 				}
 			}
@@ -118,6 +118,9 @@ view to show ModelLocator.getInstance().meals in a list
 			}
 			
 			private function clickHandler(event:MouseEvent):void {
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
+
 				navigator.pushView(AddMealView,null,ADD_NEW_MEAL);
 			}
 

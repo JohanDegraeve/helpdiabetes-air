@@ -66,13 +66,16 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			private var ok_button_text:String;
 			private var previousTimeStamp:Number;
 			
-			private var timePicker:TimePicker;
-			private var datePicker:DatePicker;
+			private var dateOrTimePicket:Group;
 			
 			/**
 			 * if false then user has clicked cancel or back button in some place, means meal should not be changed
 			 */
 			private var mealChosen:Boolean = false;
+			/**
+			 * index of the selected meal in the list of meals 
+			 */
+			private var selectedMealIndex:int;
 
 			private function preInit():void {
 				ok_button_text = resourceManager.getString('general','ok');
@@ -83,72 +86,70 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
 				time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
 				previousTimeStamp = (data.meal as Meal).timeStamp ;
+				selectedMealIndex = ModelLocator.getInstance().meals.getItemIndex(data.meal as Meal);
 			}
 			
 			private function dateClicked():void {
-				datePicker = new DatePicker();
-				datePicker.currentDate = new Date((data.meal as Meal).timeStamp);
-				datePicker.addEventListener(PickerEvent.PICKER_SET, onDateSet);
-				datePicker.addEventListener(PickerEvent.PICKER_CANCEL, onDateCancel);
-				PopUpManager.addPopUp(datePicker, this, true);
-				PopUpManager.centerPopUp(datePicker);
-
-				function onDateCancel(event: PickerEvent): void
-				{
-					datePicker.removeEventListener(PickerEvent.PICKER_SET, onDateSet);
-					datePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onDateCancel);
-				}
-				function onDateSet(event: PickerEvent): void
-				{
-					datePicker.removeEventListener(PickerEvent.PICKER_SET, onDateSet);
-					datePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onDateCancel);
-					(data.meal as Meal).timeStamp = (event.newValue as Date).valueOf();
-					date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
-				}
+				dateOrTimePicket = new DatePicker();
+				(dateOrTimePicket as DatePicker).currentDate = new Date((data.meal as Meal).timeStamp);
+				dateOrTimePicket.addEventListener(PickerEvent.PICKER_SET, onTimeSet);
+				dateOrTimePicket.addEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
+				PopUpManager.addPopUp(dateOrTimePicket, this, true);
+				PopUpManager.centerPopUp(dateOrTimePicket);
 			}
 
 
 			private function timeClicked():void {
-				timePicker = new TimePicker();
-				timePicker.currentTime = new Date((data.meal as Meal).timeStamp);
-				timePicker.addEventListener(PickerEvent.PICKER_SET, onTimeSet);
-				timePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
-				PopUpManager.addPopUp(timePicker, this, true);
-				PopUpManager.centerPopUp(timePicker);
-				
-				function onTimeCancel(event: PickerEvent): void
-				{
-					timePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeSet);
-					timePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
-					(data.meal as Meal).timeStamp = previousTimeStamp;
-				}
-				
-				function onTimeSet(event: PickerEvent): void
-				{
-					timePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeSet);
-					timePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
-					(data.meal as Meal).timeStamp = (event.newValue as Date).valueOf();
-					time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
-				}
+				dateOrTimePicket = new TimePicker();
+				(dateOrTimePicket as TimePicker).currentTime = new Date((data.meal as Meal).timeStamp);
+				dateOrTimePicket.addEventListener(PickerEvent.PICKER_SET, onTimeSet);
+				dateOrTimePicket.addEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
+				PopUpManager.addPopUp(dateOrTimePicket, this, true);
+				PopUpManager.centerPopUp(dateOrTimePicket);
 			}
+			
+			private function onTimeCancel(event: PickerEvent): void
+			{
+				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_SET, onTimeSet);
+				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
+				(data.meal as Meal).timeStamp = previousTimeStamp;
+			}
+			
+			private function onTimeSet(event: PickerEvent): void
+			{
+				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_SET, onTimeSet);
+				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
+				(data.meal as Meal).timeStamp = (event.newValue as Date).valueOf();
+				time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
+				date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
+				ModelLocator.getInstance().meals.refresh();
+				selectedMealIndex = ModelLocator.getInstance().meals.getItemIndex(data.meal as Meal);
+			}
+
 			
 			/**
 			 * refresh the meals list, and pop two views so that we return back to addfooditemview
 			 */
 			private function okClicked():void {
-				//ModelLocator.getInstance().meals.refresh();
 				mealChosen = true;
 				navigator.popView();
 			}
 			
 			private function onRemoved(event:Event):void
 			{
-				if (timePicker != null)
-					PopUpManager.removePopUp(timePicker);
-				if (datePicker != null)
-					PopUpManager.removePopUp(datePicker);
+				if (dateOrTimePicket != null)
+					PopUpManager.removePopUp(dateOrTimePicket);
 			}
-			
+
+			/**
+			 * if a meal is added then the reference to that meal is returned 
+			 */
+			override public function createReturnObject():Object {
+				if (mealChosen) {
+					return new Number(selectedMealIndex);
+				}
+				else return null;
+			}
 		]]>
 	</fx:Script>
 	

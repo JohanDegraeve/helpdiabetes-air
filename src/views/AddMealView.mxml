@@ -53,8 +53,8 @@ view to add a new meal
 			private var time_button_text:String;
 			[Bindable]
 			private var ok_button_text:String;
-			private var timePicker:TimePicker;
-			private var datePicker:DatePicker;
+			private var dateOrTimePicker:Group;
+			//private var datePicker:DatePicker;
 			/**
 			 * if false then user has clicked cancel or back button in some place, means meal not added
 			 */
@@ -65,54 +65,70 @@ view to add a new meal
 			 */
 			private var newMealIndex:int;
 			
+			/**
+			 * its the actual date off the meal
+			 */
 			private var _currentDateAndTime:Date;
 
+			/**
+			 * its the actual date off the meal
+			 */
 			private function get currentDateAndTime():Date
 			{
 				return _currentDateAndTime;
 			}
+			
+			/**
+			 * true if user edited the mealname 
+			 */
+			private var _userChangedMealName:Boolean;
 
+			/**
+			 * its the actual date off the meal
+			 */
 			private function set currentDateAndTime(value:Date):void
 			{
 				_currentDateAndTime = value;
 				date_button_text = dateformatter.format(_currentDateAndTime);
 				time_button_text = timeformatter.format(_currentDateAndTime);
+				if (!_userChangedMealName)
+					mealname_textarea_text = resourceManager.getString('addmealview','meal') + " " + timeformatter.format(currentDateAndTime);
 			}
 			
 			private function onCreationComplete():void {
 				currentDateAndTime = new Date();
-				mealname_textarea_text = resourceManager.getString('addmealview','meal') + " " + timeformatter.format(currentDateAndTime);
 				ok_button_text = resourceManager.getString('general','ok');
+				_userChangedMealName : false;
 			}
 			
 			private function dateClicked():void {
-				datePicker = new DatePicker();
-				datePicker.currentDate = new Date();
-				datePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
-				datePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
-				PopUpManager.addPopUp(datePicker, this, true);
-				PopUpManager.centerPopUp(datePicker);
+				dateOrTimePicker  = new DatePicker();
+				(dateOrTimePicker as DatePicker).currentDate = currentDateAndTime;
+				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
+				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
+				PopUpManager.addPopUp(dateOrTimePicker, this, true);
+				PopUpManager.centerPopUp(dateOrTimePicker);
 			}
 
 			private function timeClicked():void {
-				timePicker = new TimePicker();
-				timePicker.currentTime = new Date();
-				timePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
-				timePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
-				PopUpManager.addPopUp(timePicker, this, true);
-				PopUpManager.centerPopUp(timePicker);
+				dateOrTimePicker = new TimePicker();
+				(dateOrTimePicker as TimePicker).currentTime = currentDateAndTime;
+				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
+				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
+				PopUpManager.addPopUp(dateOrTimePicker, this, true);
+				PopUpManager.centerPopUp(dateOrTimePicker);
 			}
 			
 			private function onTimeOrDateCancel(event: PickerEvent): void
 			{
-				timePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
-				timePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
+				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
+				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 			}
 			
 			private function onTimeOrDateSet(event: PickerEvent): void
 			{
-				timePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
-				timePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
+				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
+				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				if ((event.newValue as Date).valueOf() > (new Date()).valueOf()) {//check if entered date is > currentdate
 					currentDateAndTime = (event.newValue as Date);
 				}
@@ -146,7 +162,7 @@ view to add a new meal
 		</s:layout>
 		
 		<!-- the mealname -->
-		<s:TextArea id="meal_name"  width="100%" text="{mealname_textarea_text}" editable="true" />
+		<s:TextArea id="meal_name"  width="100%" text="@{mealname_textarea_text}" editable="true" change="{_userChangedMealName = true}" />
 		
 		<!-- the date -->
 		<s:Button id="date_button" width="100%" label="{date_button_text}" click="dateClicked()" />
