@@ -4,6 +4,7 @@ copied from franto.com
 -->										  
 <!--
 user wil enter a time
+client needs to set currentTime, which is a timestamp in ms. User can only change hour, minutes, seconds but year, month, date remains. ms will be set to zero
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"

@@ -171,6 +171,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<!-- </fileType> -->
 	<!-- </fileTypes> -->
 
+    <!-- iOS specific capabilities -->
+	<iPhone>
+		<!-- A list of plist key/value pairs to be added to the application Info.plist -->
+		<InfoAdditions>
+            <![CDATA[
+                <key>UIDeviceFamily</key>
+                <array>
+                    <string>1</string>
+                    <string>2</string>
+                </array>
+                <key>UIStatusBarStyle</key>
+                <string>UIStatusBarStyleBlackOpaque</string>
+                <key>UIRequiresPersistentWiFi</key>
+                <string>YES</string>
+            ]]>
+        </InfoAdditions>
+        <requestedDisplayResolution>high</requestedDisplayResolution>
+	</iPhone>
+
+
 	<!-- Specify Android specific tags that get passed to AndroidManifest.xml file. -->
 	<!--<android> 
 		<manifestAdditions>

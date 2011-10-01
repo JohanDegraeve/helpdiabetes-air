@@ -503,8 +503,6 @@ package model
 			var mealCounter:int = 0;
 			
 			for (var m:int = 0;m < _meals.length;m++) {
-				var temp:Object = _meals.getItemAt(m) ;
-				var temp2:Object = _meals;
 				if ((_meals.getItemAt(m) is Meal) || (_meals.getItemAt(m) is MealEvent)) {
 					if (((_meals.getItemAt(m) as Meal).mealName == breakfast) ||
 						((_meals.getItemAt(m) as Meal).mealName == lunch) || 
@@ -557,12 +555,20 @@ package model
 		/**
 		 * @private
 		 */
-		public function set meals(value:ArrayCollection):void
+		private function set meals(value:ArrayCollection):void
 		{
 			_meals = value;
 			//create the sort for the trackinglist and the meals
 			_meals.sort = dataSort;
-
+		}
+		
+		/**
+		 * adds a meal and returns the index of the newly stored meal, after refreshing 
+		 */
+		public function addMeal(newMeal:Meal):int {
+			_meals.addItem(newMeal);
+			_meals.refresh();
+			return _meals.getItemIndex(newMeal);
 		}
 
 		/**

@@ -136,18 +136,9 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			 * refresh the meals list, and pop two views so that we return back to addfooditemview
 			 */
 			private function okClicked():void {
-				ModelLocator.getInstance().meals.refresh();
+				//ModelLocator.getInstance().meals.refresh();
 				mealChosen = true;
 				navigator.popView();
-			}
-			
-			/**
-			 * will return navigator.context if mealChosen is true
-			 */
-			override public function createReturnObject():Object {
-				if (mealChosen)
-					return navigator.context;
-				else return null;
 			}
 			
 			private function onRemoved(event:Event):void

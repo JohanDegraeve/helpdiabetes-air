@@ -52,6 +52,11 @@ view to show ModelLocator.getInstance().meals in a list
 			 * when addHandler is called, the value of the return object will be check, if equal to CHANGE_MEAL_DATE_AND_TIME then view is popped
 			 */
 			private static const CHANGE_MEAL_DATE_AND_TIME:int = 1;
+			/**
+			 * used as context value when pushing the view addmealview<br>
+			 * when addHandler is called, the value of the return object will be checked, if equal to  ADD_NEW_MEAL, then view is popped
+			 */
+			private static const ADD_NEW_MEAL:int=2
 			
 			private function onCreationComplete():void {
 				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
@@ -79,9 +84,7 @@ view to show ModelLocator.getInstance().meals in a list
 					data.tempSelection = event.newIndex;
 					navigator.pushView(ChangeMealDateAndTimeView,{
 						meal:theMeal
-					},{
-						context:CHANGE_MEAL_DATE_AND_TIME
-					});
+					},CHANGE_MEAL_DATE_AND_TIME);
 				}
 			}
 			
@@ -96,11 +99,14 @@ view to show ModelLocator.getInstance().meals in a list
 			 */
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
-					if (navigator.poppedViewReturnedObject.object.context == CHANGE_MEAL_DATE_AND_TIME) {
+					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
 						ModelLocator.getInstance().selectedMeal = data.tempSelection;
 						ModelLocator.getInstance().meals.refresh();
 						navigator.popView();
-					}
+					} else if (navigator.poppedViewReturnedObject.context == ADD_NEW_MEAL) {
+						ModelLocator.getInstance().selectedMeal = navigator.poppedViewReturnedObject.object as Number;
+						navigator.popView();
+					} 
 				}
 			}
 			
@@ -111,6 +117,9 @@ view to show ModelLocator.getInstance().meals in a list
 				return navigator.context;
 			}
 			
+			private function clickHandler(event:MouseEvent):void {
+				navigator.pushView(AddMealView,null,ADD_NEW_MEAL);
+			}
 
 			
 		]]>
@@ -118,6 +127,9 @@ view to show ModelLocator.getInstance().meals in a list
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="clickHandler(event)"/>
+	</s:actionContent>
 	<s:List id="meallist" left="0" right="0" top="0" bottom="0" width="100%"
 			dataProvider="{ModelLocator.getInstance().meals}" 
 			itemRendererFunction="getItemRenderer">
