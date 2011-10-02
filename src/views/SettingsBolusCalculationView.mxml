@@ -182,6 +182,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (amountPicker != null)
 					PopUpManager.removePopUp(amountPicker);
+				if (confirmationPicker != null)
+					PopUpManager.removePopUp(confirmationPicker);
 			}
 			
 		]]>
