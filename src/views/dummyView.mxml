@@ -86,8 +86,8 @@ There we have a specific function that allows to measure the hight of an item, t
 					null,//no dispatcher
 					false,//don't store in the database
 					new ArrayCollection(selectedFoodItems.toArray()),
-					120,//any mealevent id
-					1001//1001 ms after 1st of January 1970
+					-5,//a mealevent id that will normally never be negative, but will be used in mealeventitemrenderer, to make sure it's displayed extended, and so that height is correctly calculated
+					1001//1001 ms after 1st of January 1970, arbitrary amount
 				);
 				newSelectedFoodItem = new SelectedFoodItem(
 					"food item 2",

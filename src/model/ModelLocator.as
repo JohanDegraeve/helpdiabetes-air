@@ -107,7 +107,7 @@ package model
 		 */
 		public static const SELECTEDMEAL_CHANGED:String="selected_meal_changed";
 		/**
-		 * used for event dispatching, when selectedMeal initialized, meaning changed form value -1 to value > 0<br>
+		 * used for event dispatching, when selectedMeal initialized, meaning changed from value -1 to value > 0<br>
 		 */
 		public static const SELECTEDMEAL_INITIALIZED:String="selected_meal_initialized";
 		

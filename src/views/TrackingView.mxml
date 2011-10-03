@@ -14,7 +14,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
-
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
 		xmlns:s="library://ns.adobe.com/flex/spark"
@@ -44,11 +43,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					trackinglist.ensureIndexIsVisible(ModelLocator.getInstance().initializeTrackingViewTo);
 				}
 			}
-			
 		]]>
 	</fx:Script>
 	<s:navigationContent>
-		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
+		<s:Button label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
 	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().trackingList}"

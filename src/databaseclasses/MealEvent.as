@@ -88,6 +88,27 @@ package databaseclasses
 		private var _totalProtein:Number;
 		private var _totalCarbs:Number;
 		
+		/**
+		 * defines if selected meals are shown in tracking view
+		 */
+		private var _extendedInTrackingView:Boolean = false;
+
+		/**
+		 * defines if selected meals are shown in tracking view
+		 */
+		public function get extendedInTrackingView():Boolean
+		{
+			return _extendedInTrackingView;
+		}
+
+		/**
+		 * defines if selected meals are shown in tracking view
+		 */
+		public function set extendedInTrackingView(value:Boolean):void
+		{
+			_extendedInTrackingView = value;
+		}
+		
 		
 		/**
 		 * mealEvent will be created and automatically inserted into the database if databaseStorage = true<br>

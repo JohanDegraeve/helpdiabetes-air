@@ -17,14 +17,20 @@
  */
 package myComponents
 {
+	import databaseclasses.Meal;
 	import databaseclasses.MealEvent;
 	import databaseclasses.SelectedFoodItem;
 	
 	import flash.display.GradientType;
+	import flash.display.InteractiveObject;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.system.Capabilities;
 	import flash.text.AntiAliasType;
 	import flash.text.TextLineMetrics;
+	
+	import model.ModelLocator;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
@@ -42,16 +48,35 @@ package myComponents
 	 * an itemrenderer for a mealevent<br>
 	 * What shall it show<br>
 	 * - a timestamp (hh:mm) and mealname - the amount of carbs, protein, fat or kilocalories, depending on user preferences<br>
-	 * - the calculated insulin amount, if the insulin ratio used to calculate the insulin amount if not 0<br>
+	 * - the calculated insulin amount, if the insulin ratio used to calculate the insulin amount is not 0<br>
 	 * - if  the mealevent is extended :<br>
 	 * &nbsp;&nbsp;&nbsp;- all the selected meals one by one<br>
 	 * <br>
 	 * When is a mealevent extended ?<br>
-	 * if the allMealsExtended flag is true, then all mealevents are extended<br>
-	 * if allMealsExtended flag is false, then only the mealevent with id ModelLocator.selectedMeal
+	 * By default the currently selected meal (as in modelllocator defined) is extended. But user can click on a meal which will extended that meal. It will stay extended.
 	 */
 	public class MealEventItemRenderer extends TrackingViewElementItemRenderer
 	{
+		
+		private var _mealExtended:Boolean = false;
+
+		/**
+		 * defines if the selected fooditems are to be shown or not. 
+		 */
+		private function get mealExtended():Boolean
+		{
+			return _mealExtended;
+		}
+
+		/**
+		 * @private
+		 */
+		private function set mealExtended(value:Boolean):void
+		{
+			_mealExtended = value;
+		}
+
+		
 		//*****************//
 		// the display fields //
 		// labelDisplay will be used to shown the first field with timestamp and meal name on the left and amount on the right
@@ -144,11 +169,6 @@ package myComponents
 		 */
 		private var selectedMealsCarbAmountStyleableTextFields:ArrayCollection;
 		
-		//*****************//
-		/**
-		 * if true then all mealevents are shown extended<br>
-		 */
-		private var allMealsExtended:Boolean = false;
 		
 		/**
 		 * padding left 
@@ -204,6 +224,11 @@ package myComponents
 		private static var theMiddleOfInsulinField:Number = 0;
 		
 		/**
+		 * the mealevent being rendered is stored here 
+		 */
+		private var renderedMealEvent:MealEvent;
+		
+		/**
 		 * if styleabletextfield is added, then paddingbottom is too high, next element will be uplifted by an amount of pixels which is upLiftForNextField.
 		 */
 		private static var upLiftForNextField:int;
@@ -219,6 +244,13 @@ package myComponents
 			gramkh = resourceManager.getString('general','gram_of_carbs_short');
 			if (upLiftForNextField == 0)
 				upLiftForNextField = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
+			addEventListener(MouseEvent.CLICK,elementClicked);
+		}
+		
+		private function elementClicked(event:Event):void {
+			renderedMealEvent.extendedInTrackingView = true;
+			mealExtended = true;
+			invalidateParentSizeAndDisplayList();
 		}
 
 		/**
@@ -227,6 +259,8 @@ package myComponents
 		 */
 		override public function set data(value:Object):void {
 			super.data = value;
+			
+			renderedMealEvent = (value as MealEvent);
 			
 			if (!data) return;//did this because I found it in an example 
 			
@@ -244,19 +278,8 @@ package myComponents
 				insulinAmount = ((Math.round((value as MealEvent).calculatedInsulinAmount * 10))/10).toString();
 			}
 			
-			if ((value as MealEvent).selectedFoodItems != null) 
-				if ((value as MealEvent).selectedFoodItems.length > 0) {
-					selectedMealsDescriptionStrings = new ArrayCollection();
-					selectedMealsCarbAmountStrings = new ArrayCollection();
-					var selectedFoodItem:SelectedFoodItem = ((value as MealEvent).selectedFoodItems.getItemAt(0) as SelectedFoodItem);
-					for (var i:int = 0 ; i < (value as MealEvent).selectedFoodItems.length ; i++) {
-						selectedFoodItem = ((value as MealEvent).selectedFoodItems.getItemAt(i) as SelectedFoodItem);
-						selectedMealsDescriptionStrings.addItem((Math.round(selectedFoodItem.chosenAmount * 10))/10 + " " + 
-							selectedFoodItem.unit.unitDescription + " " + 
-							selectedFoodItem.itemDescription);
-						selectedMealsCarbAmountStrings.addItem(((Math.round(selectedFoodItem.chosenAmount * selectedFoodItem.unit.carbs / selectedFoodItem.unit.standardAmount * 10))/10).toString() );
-					}
-				}
+			mealExtended = getMealExtendedValue(value as MealEvent);
+			
 		}
 		
 		/**
@@ -303,24 +326,7 @@ package myComponents
 				}
 		}
 		
-		// Override measure() to calculate the size required by the item renderer.
 		override protected function measure():void {
-//			super.measure();
-				
-			// Commit the styles changes to labelDisplay and carbAmount. 
-			// This method must be called before the text is displayed, 
-			// and any time the styles have changed. 
-			// This method does nothing if the styles have already been committed. 
-	//		labelDisplay.commitStyles();
-		//	carbAmountDisplay.commitStyles();
-			//if (insulinDetails)
-				//insulinDetails.commitStyles();
-			//if (selectedMealsDescriptionStyleableTextFields)
-				//for (var l:int = 0;l < selectedMealsDescriptionStyleableTextFields.length; l++) {
-					//(selectedMealsDescriptionStyleableTextFields.getItemAt(l)).commitStyles();
-					//(selectedMealsCarbAmountStyleableTextFields.getItemAt(l)).commitStyles();
-			//	}
-
 			measuredHeight = getHeight();
 			previousY = measuredHeight;
 		}
@@ -331,19 +337,9 @@ package myComponents
 			// predefined labelDisplay component and the new 
 			// carbAmount component, you do not have to call
 			// super.layoutContents().
-			
-			// Commit the styles changes to labelDisplay and compLabelDisplay and others
-			/*labelDisplay.commitStyles();
-			carbAmountDisplay.commitStyles();
-			if (insulinDetails)
-				insulinDetails.commitStyles();
-			if (selectedMealsDescriptionStyleableTextFields)
-				for (var l:int = 0;l < selectedMealsDescriptionStyleableTextFields.length; l++) {
-					(selectedMealsDescriptionStyleableTextFields.getItemAt(l)).commitStyles();
-					(selectedMealsCarbAmountStyleableTextFields.getItemAt(l)).commitStyles();
-				}*/
-			
-			if (MINIMUM_CARB_AMOUNT_WIDTH_LARGE_FONT == 100) {//most probably it's not yet been calculated
+
+			if (MINIMUM_CARB_AMOUNT_WIDTH_LARGE_FONT == 100) {
+				//most probably it's not yet been calculated
 				carbAmountDisplay.commitStyles();
 				// calculate MINIMUM_CARB_AMOUNT_WIDTH
 				carbAmountDisplay.text = "9999 ...";
@@ -392,10 +388,26 @@ package myComponents
 				setElementSize(insulinDetails,0,0);
 			}
 			
-			if (selectedMealsDescriptionStrings != null) {
+			if (mealExtended)  {
+				if (selectedMealsDescriptionStrings == null) {
+					if (renderedMealEvent.selectedFoodItems != null) 
+						if (renderedMealEvent.selectedFoodItems.length > 0) {
+							selectedMealsDescriptionStrings = new ArrayCollection();
+							selectedMealsCarbAmountStrings = new ArrayCollection();
+							var selectedFoodItem:SelectedFoodItem = (renderedMealEvent.selectedFoodItems.getItemAt(0) as SelectedFoodItem);
+							for (var i:int = 0 ; i < renderedMealEvent .selectedFoodItems.length ; i++) {
+								selectedFoodItem = (renderedMealEvent.selectedFoodItems.getItemAt(i) as SelectedFoodItem);
+								selectedMealsDescriptionStrings.addItem((Math.round(selectedFoodItem.chosenAmount * 10))/10 + " " + 
+									selectedFoodItem.unit.unitDescription + " " + 
+									selectedFoodItem.itemDescription);
+								selectedMealsCarbAmountStrings.addItem(((Math.round(selectedFoodItem.chosenAmount * selectedFoodItem.unit.carbs / selectedFoodItem.unit.standardAmount * 10))/10).toString() );
+							}
+						}
+				}
+				//
 				if (selectedMealsCarbAmountStyleableTextFields == null || selectedMealsCarbAmountStyleableTextFields.length == 0)
 					createSelectedMealCarbAmountStyleableTextFields(selectedMealsDescriptionStrings.length);
-				if (selectedMealsDescriptionStyleableTextFields == null || selectedMealsCarbAmountStyleableTextFields.length == 0)
+				if (selectedMealsDescriptionStyleableTextFields == null || selectedMealsDescriptionStyleableTextFields.length == 0)
 					createSelectedMealDescriptionStyleableTextFields(selectedMealsDescriptionStrings.length);
 				for (var m:int; m < selectedMealsCarbAmountStyleableTextFields.length; m++) { 
 					//resuing some variables already defined while calculating labelDisplay and carbAmountDisplay
@@ -426,12 +438,7 @@ package myComponents
 					
 					currentY += _selectedMealCalculatedHeight - upLiftForNextField;
 				}
-			} else {
-				for (var p:int; p < selectedMealsCarbAmountStyleableTextFields.length; p++) { 
-					//we should never come here because if there's no selectedMealsDescriptionStrings, then selectedMealCarbamountSTyleableTextFields will have no elements
-					setElementSize(selectedMealsCarbAmountStyleableTextFields.getItemAt(p),0,0);
-				}
-			}
+			} 
 			
 			//let's re-add some bottom offset
 			currentY += upLiftForNextField;
@@ -494,11 +501,15 @@ package myComponents
 			if ((item as MealEvent).insulinRatio != 0) {
 				returnValue += _insulinAmountCalculatedHeight - upLiftForNextField;
 			}
-			//height of different selectedmeals
-			if ((item as MealEvent).selectedFoodItems != null) {
-				if ((item as MealEvent).selectedFoodItems.length > 0)
-					returnValue += (_selectedMealCalculatedHeight - upLiftForNextField) * (item as MealEvent).selectedFoodItems.length;
+			
+			//height of different selectedmeals, only if mealExtended is true 
+			if (getMealExtendedValue(item as MealEvent)) {
+				if ((item as MealEvent).selectedFoodItems != null) {
+					if ((item as MealEvent).selectedFoodItems.length > 0)
+						returnValue += (_selectedMealCalculatedHeight - upLiftForNextField) * (item as MealEvent).selectedFoodItems.length;
+				}
 			}
+
 			//one uplift to be removed.
 			returnValue += upLiftForNextField;
 			
@@ -514,5 +525,20 @@ package myComponents
 			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 			graphics.endFill();
 		}
+		
+		private function getMealExtendedValue(mealEvent:MealEvent):Boolean {
+			if (mealEvent.extendedInTrackingView)
+				return true;
+			var returnValue:Boolean = false;
+			if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent != null) {
+				if (mealEvent.mealEventId == (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.mealEventId) {
+					returnValue = true;
+				}
+			}
+			if (mealEvent.mealEventId == -5)
+				returnValue = true;//this is for the dummyView
+			return returnValue;
+		}
+
 	}
 }
