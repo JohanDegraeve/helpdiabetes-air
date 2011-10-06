@@ -22,7 +22,6 @@ package myComponents
 	import databaseclasses.SelectedFoodItem;
 	
 	import flash.display.GradientType;
-	import flash.display.InteractiveObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
@@ -207,6 +206,14 @@ package myComponents
 		//all variables to maintain previous heights, if changed then invalidatesize must be called.
 		private var previousY:Number = 0;
 		
+		private static var _mealEventBGColorDark:* = 0;
+		private static var _mealEventBGColorLight:* = 0;
+		private static var backGroundColors:Array ;
+		private static var alphas:Array = [1, 1];
+		private static var ratios:Array = [0, 255];
+		private static var matrix:Matrix = new Matrix();
+
+		
 		//variables to calculate the width and height of a mealevent rendered with this renderer
 		//preferred values are values obtained with method getPreferredHeight
 		//calculated values are values obtained with object-name.height
@@ -245,12 +252,23 @@ package myComponents
 			if (upLiftForNextField == 0)
 				upLiftForNextField = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
 			addEventListener(MouseEvent.CLICK,elementClicked);
+			if (_mealEventBGColorDark == 0) {
+				_mealEventBGColorDark = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("mealEventBackGroundDark");
+				_mealEventBGColorLight = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("mealEventBackGroundLight");
+				backGroundColors = [_mealEventBGColorDark, _mealEventBGColorLight];
+			}
 		}
 		
 		private function elementClicked(event:Event):void {
-			renderedMealEvent.extendedInTrackingView = true;
-			mealExtended = true;
-			invalidateParentSizeAndDisplayList();
+			if (mealExtended) {
+				//meal is already extended but user is clicking it again, meaning the editmealeventview needs to open.
+				//event will bubble to list, where it will be caught
+			} else {
+				renderedMealEvent.extendedInTrackingView = true;
+				mealExtended = true;
+				invalidateParentSizeAndDisplayList();
+				event.stopPropagation();
+			}
 		}
 
 		/**
@@ -521,9 +539,14 @@ package myComponents
 		 */
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
-			graphics.beginFill(0xFFFFFF,1);
+			matrix.createGradientBox(unscaledWidth, unscaledHeight, Math.PI / 2, 0, 0);
+			graphics.beginGradientFill(GradientType.LINEAR, backGroundColors, alphas, ratios, matrix);
 			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 			graphics.endFill();
+/*
+			graphics.beginFill(_mealEventBGColorDark,1);
+			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+			graphics.endFill();*/
 		}
 		
 		private function getMealExtendedValue(mealEvent:MealEvent):Boolean {
@@ -533,10 +556,13 @@ package myComponents
 			if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent != null) {
 				if (mealEvent.mealEventId == (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.mealEventId) {
 					returnValue = true;
+					mealEvent.extendedInTrackingView = true;
 				}
 			}
-			if (mealEvent.mealEventId == -5)
+			if (mealEvent.mealEventId == -5) {
 				returnValue = true;//this is for the dummyView
+				mealEvent.extendedInTrackingView = true;
+			}
 			return returnValue;
 		}
 

@@ -151,7 +151,6 @@ package myComponents
 				return;
 			
 			var elementHeight:Number;
-			var temp:Object = ModelLocator.getInstance().selectedMeal;
 			
 			//provide the initial values, based on selectedmeal
 			if (_firstUpdateDisplayList) {

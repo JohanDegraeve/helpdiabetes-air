@@ -66,19 +66,19 @@ There we have a specific function that allows to measure the hight of an item, t
 				//we are not setting the selecteditemid and mealevent id
 				selectedFoodItems.addItem(newSelectedFoodItem);
 				newSelectedFoodItem = new SelectedFoodItem(
-						"food item 2",
+						"HIT THE BACK KEY",
 						new Unit("unit 2",10,10,10,10,10),
 						20);
 				selectedFoodItems.addItem(newSelectedFoodItem);
 				
 				newSelectedFoodItem = new SelectedFoodItem(
-					"food item 3",
+					"HIT THE BACK KEY",
 					new Unit("unit 3",10,10,10,10,10),
 					20);
 				selectedFoodItems.addItem(newSelectedFoodItem);
 				
 				//a mealevent,with any mealname, and any time , here it's 1000 ms after 1st of January 1970
-				var newMealEvent:MealEvent = new MealEvent("any mealname",
+				var newMealEvent:MealEvent = new MealEvent("HIT THE BACK KEY",
 					20,//any insulinratio value
 					50,//any correctionfactor value
 					120,//any previous bglevel value

@@ -17,11 +17,104 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="EditMealEventView">
+		xmlns:s="library://ns.adobe.com/flex/spark" title="EditMealEventView"
+		initialize="onInitialize()">
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<fx:Metadata>
+		[ResourceBundle("editmealeventview")]
+		[ResourceBundle("general")]
+	</fx:Metadata>
+
+	<fx:Script>
+		<![CDATA[
+			import databaseclasses.MealEvent;
+			import databaseclasses.SelectedFoodItem;
+			
+			import myComponents.SelectedMealItemRenderer;
+			
+			import spark.formatters.DateTimeFormatter;
+			[Bindable]
+			private var dateTimeAndMealName_text:String;
+			
+			[Bindable]
+			private var insulinAmount_text:String;
+			[Bindable]
+			private var insulinRatio_text:String;
+			
+			[Bindable]
+			private var mealEvent:MealEvent;
+
+			private static var dateFormatter:DateTimeFormatter ;
+			private static var timeFormatter:DateTimeFormatter ;
+
+			override public function set data(value:Object):void {
+				mealEvent = value as MealEvent;
+			}
+			
+			private function onInitialize():void {
+				dateFormatter = new DateTimeFormatter();
+				dateFormatter.dateTimePattern = resourceManager.getString('general','datepattern');
+				dateFormatter.useUTC = false;
+				dateFormatter.setStyle("locale",Capabilities.language.substr(0,2));
+				timeFormatter = new DateTimeFormatter();
+				timeFormatter.dateTimePattern = resourceManager.getString('general','timepattern');
+				timeFormatter.useUTC = false;
+				timeFormatter.setStyle("locale",Capabilities.language.substr(0,2));
+				
+				dateTimeAndMealName_text = mealEvent.mealName + " - " + timeFormatter.format(mealEvent.timeStamp) + " - " + dateFormatter.format(mealEvent.timeStamp);
+				if (mealEvent.insulinRatio != 0) {
+					insulinAmount_text = resourceManager.getString('general','calculated_insulin_amount') + " " + ((Math.round(mealEvent.calculatedInsulinAmount * 10))/10).toString();
+					insulinRatio_text = resourceManager.getString('editmealeventview','insulinRatioUsed') + " " + mealEvent.insulinRatio;
+				} else insulinAmount_text = null;
+			}
+			
+			private function displaySelectedItem(item:Object):String {
+				return (item as SelectedFoodItem).itemDescription;
+			}
+			
+			private function itemRendererFunction(item:Object):ClassFactory {
+				return  new ClassFactory(SelectedMealItemRenderer);
+			}
+		]]>
+	</fx:Script>
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+ 			<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="{styleManager.getStyleDeclaration('.backGroundColorInLists').getStyle('mealEventBackGroundDark')}" ratio="0" alpha="1"/>
+					<s:GradientEntry color="{styleManager.getStyleDeclaration('.backGroundColorInLists').getStyle('mealEventBackGroundLight')}" ratio="1" alpha="1"/>
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	<s:Group width="100%" >
+		<s:layout >
+			<s:VerticalLayout gap="0">
+			</s:VerticalLayout>
+		</s:layout>
+		<s:TextArea id="dateTimeAndMealName" width="100%" text="{dateTimeAndMealName_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" 
+					updateComplete="{dateTimeAndMealName.height = dateTimeAndMealName.scroller.viewport.contentHeight + 2}"/>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0x000000" weight="1"/>
+			</s:stroke>
+		</s:Line>
+		<s:TextArea visible="{insulinAmount_text != null}" id="insulinAmount" width="100%" text="{insulinAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
+					updateComplete="{insulinAmount.height = insulinAmount.scroller.viewport.contentHeight + 2}"/>
+		<s:TextArea visible="{insulinAmount_text != null}" id="insulinRatio" width="100%" text="{insulinRatio_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
+					updateComplete="{insulinRatio.height = insulinRatio.scroller.viewport.contentHeight + 2}"/>
+		<s:Line width="100%" visible="{insulinAmount_text != null}" >
+			<s:stroke>
+				<s:SolidColorStroke color="0x000000" weight="1"/>
+			</s:stroke>
+		</s:Line>
+		<s:TextArea id="selectedItemsTitle" width="100%" text="{resourceManager.getString('editmealeventview','selecteditems')}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
+					updateComplete="{insulinRatio.height = insulinRatio.scroller.viewport.contentHeight + 2}"/>
+		<s:List id="fooditemlist" width="100%" useVirtualLayout="true" dataProvider="{mealEvent.selectedFoodItems}" contentBackgroundAlpha="0"
+				labelFunction="displaySelectedItem" itemRendererFunction="itemRendererFunction" />
+	</s:Group>
 </s:View>

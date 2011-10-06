@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.MealEvent;
+			
 			import model.ModelLocator;
 			
 			import myComponents.IListElement;
@@ -43,6 +45,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					trackinglist.ensureIndexIsVisible(ModelLocator.getInstance().initializeTrackingViewTo);
 				}
 			}
+			
+			private function onClick(event:MouseEvent):void {
+				//var temp:Object= (event.currentTarget as List).selectedIndex;
+				if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
+					navigator.pushView(EditMealEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex)); 					
+				}
+			}
 		]]>
 	</fx:Script>
 	<s:navigationContent>
@@ -50,6 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</s:navigationContent>
 	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().trackingList}"
+			click="onClick(event)"
 			itemRendererFunction="getItemRenderer">
 		<s:layout>
 			<myComponents:TrackingViewLayout useVirtualLayout="true" />
