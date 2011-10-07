@@ -220,9 +220,25 @@ package myComponents
 		//preferred values needs to be used in  method setelementsize
 		//calculated values needs to be used to calculate the real heigh, eg val calculating currentY
 		private static var _carbAmountCalculatedHeight:Number = 0;
+		public static function get carbAmountCalculatedHeight():Number
+		{
+			return _carbAmountCalculatedHeight;
+		}
 		private static var _carbAmountPreferredHeight:Number = 0;
+		public static function get carbAmountPreferredHeight():Number
+		{
+			return _carbAmountPreferredHeight;
+		}
 		private static var _insulinAmountCalculatedHeight:Number = 0;
+		public static function get insulinAmountCalculatedHeight():Number
+		{
+			return _insulinAmountCalculatedHeight;
+		}
 		private static var _insulinAmountPreferredHeight:Number = 0;
+		public static function get insulinAmountPreferredHeight():Number
+		{
+			return _insulinAmountPreferredHeight;
+		}
 		private static var _selectedMealCalculatedHeight:Number = 0;
 		private static var _selectedMealPreferredHeight:Number = 0;
 		
@@ -238,7 +254,15 @@ package myComponents
 		/**
 		 * if styleabletextfield is added, then paddingbottom is too high, next element will be uplifted by an amount of pixels which is upLiftForNextField.
 		 */
-		private static var upLiftForNextField:int;
+		private static var _upLiftForNextField:int;
+		/**
+		 * if styleabletextfield is added, then paddingbottom is too high, next element will be uplifted by an amount of pixels which is upLiftForNextField.
+		 */
+		public static function get upLiftForNextField():int
+		{
+			return _upLiftForNextField;
+		}
+
 		
 		/**
 		 * default constructor <br>
@@ -249,8 +273,8 @@ package myComponents
 			super();
 			insulinAmount = null;
 			gramkh = resourceManager.getString('general','gram_of_carbs_short');
-			if (upLiftForNextField == 0)
-				upLiftForNextField = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
+			if (_upLiftForNextField == 0)
+				_upLiftForNextField = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
 			addEventListener(MouseEvent.CLICK,elementClicked);
 			if (_mealEventBGColorDark == 0) {
 				_mealEventBGColorDark = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("mealEventBackGroundDark");
@@ -388,7 +412,7 @@ package myComponents
 				theMiddleOfCarbAmountField = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,theMiddleOfCarbAmountField);
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,theMiddleOfCarbAmountField);
-			var currentY:Number = _carbAmountCalculatedHeight - upLiftForNextField;
+			var currentY:Number = _carbAmountCalculatedHeight - _upLiftForNextField;
 			
 		    if (insulinAmount != null && insulinDetails != null) {
 				insulinDetails.text = resourceManager.getString('general','calculated_insulin_amount') + " " + insulinAmount;
@@ -401,7 +425,7 @@ package myComponents
 				if (theMiddleOfInsulinField == 0)
 					theMiddleOfInsulinField = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2
 				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY + theMiddleOfInsulinField );
-				currentY += _insulinAmountCalculatedHeight -upLiftForNextField;
+				currentY += _insulinAmountCalculatedHeight -_upLiftForNextField;
 			} else {
 				setElementSize(insulinDetails,0,0);
 			}
@@ -454,12 +478,12 @@ package myComponents
 					setElementPosition(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,0 + PADDING_LEFT,currentY + theMiddleOfSelectedItemField);
 					setElementPosition(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,currentY + theMiddleOfSelectedItemField);
 					
-					currentY += _selectedMealCalculatedHeight - upLiftForNextField;
+					currentY += _selectedMealCalculatedHeight - _upLiftForNextField;
 				}
 			} 
 			
 			//let's re-add some bottom offset
-			currentY += upLiftForNextField;
+			currentY += _upLiftForNextField;
 			
 			if (currentY != previousY) {
 				previousY = currentY;
@@ -515,21 +539,21 @@ package myComponents
 			
 			var returnValue:int = 0;
 			//height of label and carbAmount
-			returnValue += _carbAmountCalculatedHeight - upLiftForNextField;
+			returnValue += _carbAmountCalculatedHeight - _upLiftForNextField;
 			if ((item as MealEvent).insulinRatio != 0) {
-				returnValue += _insulinAmountCalculatedHeight - upLiftForNextField;
+				returnValue += _insulinAmountCalculatedHeight - _upLiftForNextField;
 			}
 			
 			//height of different selectedmeals, only if mealExtended is true 
 			if (getMealExtendedValue(item as MealEvent)) {
 				if ((item as MealEvent).selectedFoodItems != null) {
 					if ((item as MealEvent).selectedFoodItems.length > 0)
-						returnValue += (_selectedMealCalculatedHeight - upLiftForNextField) * (item as MealEvent).selectedFoodItems.length;
+						returnValue += (_selectedMealCalculatedHeight - _upLiftForNextField) * (item as MealEvent).selectedFoodItems.length;
 				}
 			}
 
 			//one uplift to be removed.
-			returnValue += upLiftForNextField;
+			returnValue += _upLiftForNextField;
 			
 			return returnValue;
 		}

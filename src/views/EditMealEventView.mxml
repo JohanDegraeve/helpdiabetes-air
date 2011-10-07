@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import databaseclasses.MealEvent;
 			import databaseclasses.SelectedFoodItem;
 			
-			import myComponents.SelectedMealItemRenderer;
+			import myComponents.SelectedFoodItemRenderer;
 			
 			import spark.formatters.DateTimeFormatter;
 			[Bindable]
@@ -74,7 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function itemRendererFunction(item:Object):ClassFactory {
-				return  new ClassFactory(SelectedMealItemRenderer);
+				return  new ClassFactory(SelectedFoodItemRenderer);
 			}
 		]]>
 	</fx:Script>

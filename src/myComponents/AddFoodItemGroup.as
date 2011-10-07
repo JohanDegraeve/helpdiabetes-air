@@ -603,6 +603,5 @@ package myComponents
 				addElement(add_button);
 			}
 		}
-		
 	}
 }
