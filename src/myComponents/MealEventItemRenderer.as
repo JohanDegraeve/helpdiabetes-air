@@ -356,7 +356,6 @@ package myComponents
 		override public function styleChanged(styleName:String):void {
 			super.styleChanged(styleName);
 			
-			// Pass any style changes to compLabelDisplay. 
 			if (carbAmountDisplay)
 				carbAmountDisplay.styleChanged(styleName);
 			if (insulinDetails)
@@ -567,10 +566,6 @@ package myComponents
 			graphics.beginGradientFill(GradientType.LINEAR, backGroundColors, alphas, ratios, matrix);
 			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 			graphics.endFill();
-/*
-			graphics.beginFill(_mealEventBGColorDark,1);
-			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
-			graphics.endFill();*/
 		}
 		
 		private function getMealExtendedValue(mealEvent:MealEvent):Boolean {

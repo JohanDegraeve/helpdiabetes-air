@@ -14,6 +14,8 @@ s|Application {fontSize:20pt}
 	fontSize:16pt;
 	paddingTop:4pt;	/* not yet used */
     paddingBottom:4pt; /* not yet used */
+	paddingLeft:4pt;
+	paddingRight:4pt;
 }
 
 .backGroundColorInLists {/* colors used in background of list elements */

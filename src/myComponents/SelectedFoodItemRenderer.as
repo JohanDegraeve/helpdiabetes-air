@@ -24,6 +24,13 @@ package myComponents
 {
 	import databaseclasses.SelectedFoodItem;
 	
+	import flash.display.GradientType;
+	import flash.geom.Matrix;
+	
+	import flashx.textLayout.factory.TruncationOptions;
+	import flashx.textLayout.formats.BackgroundColor;
+	
+	import spark.components.DataGroup;
 	import spark.components.LabelItemRenderer;
 	import spark.components.supportClasses.StyleableTextField;
 	
@@ -41,35 +48,133 @@ package myComponents
 		
 		private var _selectedFoodItem:SelectedFoodItem;
 		
-		public function SelectedFoodItemRenderer()
+		/**
+		 * the text for the amountOfCarbsEtcText styleable textfield
+		 */
+		private var _amountOfCarbsEtcText:String;
+
+		/**
+		 * the text for the amountOfCarbsEtcText styleable textfield
+		 */
+		private function get amountOfCarbsEtcText():String
 		{
-			super();
+			return _amountOfCarbsEtcText;
+		}
+
+		/**
+		 * the text for the amountOfCarbsEtcText styleable textfield
+		 */
+		private function set amountOfCarbsEtcText(value:String):void
+		{
+			if (value == _amountOfCarbsEtcText)
+				return;
+			_amountOfCarbsEtcText = value;
+			if (_amountOfCarbsEtc != null) {
+				_amountOfCarbsEtc.text = _amountOfCarbsEtcText;
+				invalidateSize();
+			}
 		}
 		
 		/**
-		 * no background will be drawn
+		 * the text for the amountOfCarbsEtcText styleable textfield
+		 */
+		private var _labelDisplayText:String;
+		
+		/**
+		 * the text for the amountOfCarbsEtcText styleable textfield
+		 */
+		private function get labelDisplayText():String
+		{
+			return _labelDisplayText;
+		}
+		/**
+		 * the text for the amountOfCarbsEtcText styleable textfield
+		 */
+		private function set labelDisplayText(value:String):void
+		{
+			if (value == _labelDisplayText)
+				return;
+			_labelDisplayText = value;
+			if (labelDisplay != null) {
+				label = value;
+				invalidateSize();
+			}
+		}
+		
+		private static var  paddingLeft:Number = -1 ; 
+		private  static var  paddingRight:Number;
+		private  static var  paddingTop:Number  ;
+		private  static var  paddingBottom:Number;
+		
+		private static var _mealEventBGColorDark:* = 0;
+		private static var _mealEventBGColorLight:* = 0;
+		
+		public function SelectedFoodItemRenderer()
+		{
+			super();
+			if (paddingLeft == -1) {
+				 paddingLeft   = styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("paddingLeft"); 
+				 paddingRight  = styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("paddingRight");
+				 paddingTop    = styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("paddingTop");
+				 paddingBottom = styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("paddingBottom");
+			}
+			if (_mealEventBGColorDark == 0) {
+				_mealEventBGColorDark = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("mealEventBackGroundDark");
+				_mealEventBGColorLight = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("mealEventBackGroundLight");
+			}
+
+		}
+		
+		/**
+		 * each subsequent item will be drawn in another backgroundcolor, either mealEventBGColorDark or mealEventBGColorLight
 		 */
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
+			var itemCounter:int = 0;
+			while ((((parent as DataGroup).dataProvider.getItemAt(itemCounter) as SelectedFoodItem) != _selectedFoodItem) && (itemCounter < (parent as DataGroup).dataProvider.length))
+				itemCounter ++;
+			graphics.beginFill(    ((itemCounter++)%2 == 0) ? _mealEventBGColorDark:_mealEventBGColorLight, 1);
+			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+			graphics.endFill();
 		}
+		
 
 		override public function set data(value:Object):void {
 			_selectedFoodItem = value as SelectedFoodItem;
+			labelDisplayText =  _selectedFoodItem.chosenAmount + " " + _selectedFoodItem.unit.unitDescription + " " + _selectedFoodItem.itemDescription;
+			amountOfCarbsEtcText = _selectedFoodItem.chosenAmount * _selectedFoodItem.unit.carbs + " " + resourceManager.getString('general','gram_of_carbs');
 		}
 		
 		override protected function createChildren():void {
 			super.createChildren();
-			labelDisplay.multiline=true;
-			labelDisplay.multiline=true;
-			
-			_amountOfCarbsEtc = new StyleableTextField();
-			_amountOfCarbsEtc.styleName = this;
-			_amountOfCarbsEtc.editable = false;
-			_amountOfCarbsEtc.multiline = true;
-			_amountOfCarbsEtc.wordWrap = true;
-			_amountOfCarbsEtc.setStyle("fontSize",styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));
-			addChild(_amountOfCarbsEtc);
+
+			if (!_amountOfCarbsEtc) {
+				_amountOfCarbsEtc = new StyleableTextField();
+				_amountOfCarbsEtc.styleName = this;
+				_amountOfCarbsEtc.editable = false;
+				_amountOfCarbsEtc.multiline = true;
+				_amountOfCarbsEtc.wordWrap = true;
+				_amountOfCarbsEtc.setStyle("fontSize",styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));
+				addChild(_amountOfCarbsEtc);
+			}
 		}
+		
+		override protected function createLabelDisplay():void {
+			super.createLabelDisplay();
+			labelDisplay.styleName = this;
+			labelDisplay.editable = false;
+			labelDisplay.multiline = true;
+			labelDisplay.wordWrap = true;
+		}
+		
+		// Override styleChanged() to proopgate style changes to compLabelDisplay.
+		override public function styleChanged(styleName:String):void {
+			super.styleChanged(styleName);
+			
+			if (_amountOfCarbsEtc)
+				_amountOfCarbsEtc.styleChanged(styleName);
+		}
+
 		
 		override protected function measure():void {
 			//layout of an item is similar to a mealevent in trackingview with some exception
@@ -82,22 +187,17 @@ package myComponents
 			} else
 				measuredHeight = previousY;
 		}
-	
+		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
+			super.layoutContents(unscaledWidth,unscaledHeight);
 			var currentY:int=0;
-			
-			label = _selectedFoodItem.chosenAmount + " " + _selectedFoodItem.unit.unitDescription + " " + _selectedFoodItem.itemDescription;
-			var fieldHeight:int = getElementPreferredHeight(labelDisplay);
-			setElementSize(labelDisplay,unscaledWidth,fieldHeight);
-			setElementPosition(labelDisplay,0,currentY);
-			currentY = fieldHeight ; 
-			
-			_amountOfCarbsEtc.text = "balblabla";
-			fieldHeight = getElementPreferredHeight(_amountOfCarbsEtc);
-			setElementSize(_amountOfCarbsEtc,unscaledWidth,fieldHeight);
-			setElementPosition(_amountOfCarbsEtc,0,currentY);
-			currentY = currentY + fieldHeight;
-			if (previousY < currentY) {
+			setElementPosition(labelDisplay,labelDisplay.x,paddingTop);
+
+			setElementSize(_amountOfCarbsEtc,unscaledWidth ,getElementPreferredHeight(_amountOfCarbsEtc));
+			//_amountOfCarbsEtc.truncateToFit();
+			setElementPosition(_amountOfCarbsEtc,paddingLeft, labelDisplay.height/*currentY /*+ mid*/);
+			currentY = paddingTop + labelDisplay.height + _amountOfCarbsEtc.height;
+			if (previousY != currentY) {
 				previousY = currentY;
 				invalidateSize();
 			}
