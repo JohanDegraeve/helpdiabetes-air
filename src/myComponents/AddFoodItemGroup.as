@@ -413,6 +413,7 @@ package myComponents
 			_width=containerWidth;
 			_height = 0;
 
+			description_textarea.truncateToFit();
 			description_textarea.setLayoutBoundsSize(containerWidth - textGap * 2 ,ModelLocator.StyleableTextFieldCalculatedHeight);
 			description_textarea.setLayoutBoundsPosition(textGap,ModelLocator.offSetSoThatTextIsInTheMiddle);
 			_height = ModelLocator.StyleableTextFieldCalculatedHeight;
