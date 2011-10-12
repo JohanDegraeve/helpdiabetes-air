@@ -128,7 +128,6 @@ package myComponents
 				myStyleSheet.parseCSS(defaultAmountOverwritten ? "p {color:#000000;}":"p {color:#9F9E9E;}");
 				amount_textinput.styleSheet = myStyleSheet;
 				amount_textinput.htmlText = "<p>"+value+"</p>";
-				invalidateDisplayList();
 			}
 		}
 		
@@ -363,8 +362,6 @@ package myComponents
 		 */
 		private var _height:Number;
 		
-		private var amountValidator:NumberValidator;
-		
 		/**
 		 * constructor, nothing special about it, calls super 
 		 */
@@ -379,13 +376,6 @@ package myComponents
 				buttonGap = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonGap");
 				textGap = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("textGap");
 			}
-			amountValidator = new NumberValidator();
-			amountValidator.allowNegative = false;
-			amountValidator.source = amount_textinput;
-			amountValidator.property = "text";
-			amountValidator.domain="real"
-			amountValidator.thousandsSeparator=".";
-			amountValidator.separationError="";
 		}
 		
 		/**
