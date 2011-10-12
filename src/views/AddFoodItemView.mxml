@@ -107,11 +107,15 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 
 			
 			private function onCreationComplete():void {
+				
 				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 				
-				//refresh the meals - checkLastMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
+				if (data is SelectedFoodItem)
+					checkLastMealUpdateRequired = false;
+				
+				//refresh the meals - checkLxstMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
 				//no need to call refreshMeals
 				//comment added 20/07/2011 : variable checkLastMealUpdateRequired is not really having the correct meaning. Before I called here refreshMeals with checkLastMealUpdateRequired as parameter
 				//  but that was not good.
@@ -156,14 +160,20 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						if (retrievedFoodItem.getNumberOfUnits() > 1) {
 							popUpUnitList();
 						}
-						
 					}
 					
 					function unitListRetrievelError(event:DatabaseEvent):void {
 						dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 						dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 					}
-				} else {
+				} else if (data is SelectedFoodItem) {
+					//addfooditemview created via tracking => click on mealevent => click on selectedfooditem
+					retrievedFoodItem = new FoodItem((data as SelectedFoodItem).itemDescription,new ArrayCollection([(data as SelectedFoodItem).unit]),0);
+					description_textarea_text = retrievedFoodItem.itemDescription;
+					details_button_text = createDetailsButtonText(0,(data as SelectedFoodItem).chosenAmount);
+					amount_textinput_text = (data as SelectedFoodItem).chosenAmount.toString();;
+					selectedUnit = 0;
+				} else { 
 					//addfooditem recreated after having pushed meal button and returning from selectedmealview
 					retrievedFoodItem = (data.retrievedFoodItem as FoodItem);
 					description_textarea_text = retrievedFoodItem.itemDescription;
@@ -333,6 +343,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private function onRemove():void {
 				if (popUpForUnitList != null)
 					PopUpManager.removePopUp(popUpForUnitList);
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 			}
 			
 			private function addHandler():void {
@@ -345,14 +357,20 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 
 			private function amountTextChanged():void {
 				addFoodItemGroup.defaultAmountOverwritten = true;
+				
+				/* ****delete*//////
 				//first replace "," by ".", because flex doesn't seem to work correctly when using "," as decimal seperator
-				var temp:String;
-				temp = amount_textinput_text.split(",").join(".");
+				//var temp:String;
+				//temp = amount_textinput_text.split(",").join(".");
+				/* ****delete*//////
+				
+				/* ****delete*//////
 				//applying a trick here to get rid of too many ".", first replacing the first "." by "{", hoping the user will never type this character
 				//then replacing all remaining "." by "", then rereplacing "{" by "."
-				temp = temp.split(".",2).join("{");
-				temp = temp.split(".").join("");
-				amount_textinput_text = temp.split("{",2).join(".");
+				//temp = temp.split(".",2).join("{");
+				//temp = temp.split(".").join("");
+				//amount_textinput_text = temp.split("{",2).join(".");
+				/* * *********** */
 				
 				//now if amount = "" (ie empty string) set it to 0
 				//this means user has not entered any amount

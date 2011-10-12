@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title="EditMealEventView"
-		initialize="onInitialize()">
+		initialize="onInitialize()"
+		>
 	<fx:Declarations>
 	</fx:Declarations>
 	<fx:Metadata>
@@ -28,11 +29,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.Meal;
 			import databaseclasses.MealEvent;
 			import databaseclasses.SelectedFoodItem;
 			
+			import model.ModelLocator;
+			
 			import myComponents.SelectedFoodItemRenderer;
 			
+			import spark.events.IndexChangeEvent;
 			import spark.formatters.DateTimeFormatter;
 			[Bindable]
 			private var dateTimeAndMealName_text:String;
@@ -49,6 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private static var timeFormatter:DateTimeFormatter ;
 
 			override public function set data(value:Object):void {
+				super.data = value;
 				mealEvent = value as MealEvent;
 			}
 			
@@ -68,7 +74,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					insulinRatio_text = resourceManager.getString('editmealeventview','insulinRatioUsed') + " " + mealEvent.insulinRatio;
 				} else insulinAmount_text = null;
 				
-				
+				for (var mealCounter:int = ModelLocator.getInstance().meals.length - 1;mealCounter >=0 ; mealCounter--) {
+					if (ModelLocator.getInstance().meals.getItemAt(mealCounter) is Meal) {
+						if ((ModelLocator.getInstance().meals.getItemAt(mealCounter) as Meal).mealEvent == mealEvent) {
+							ModelLocator.getInstance().selectedMeal = mealCounter;						
+							fooditemlist.addEventListener(Event.CHANGE,onClick);
+							mealCounter = -1;
+						}
+					}
+				}
 			}
 			
 			private function displaySelectedItem(item:Object):String {
@@ -77,6 +91,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function itemRendererFunction(item:Object):ClassFactory {
 				return  new ClassFactory(SelectedFoodItemRenderer);
+			}
+			
+			private function onClick(event:IndexChangeEvent):void {
+				data = mealEvent;
+				navigator.pushView(AddFoodItemView,mealEvent.selectedFoodItems.getItemAt(event.newIndex),null,null);
 			}
 		]]>
 	</fx:Script>

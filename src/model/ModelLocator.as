@@ -197,6 +197,8 @@ package model
 		static public var StyleableTextFieldPreferredHeight:int = 0;
 
 		static private var _offSetSoThatTextIsInTheMiddle:int=0;
+		
+		
 
 		/**
 		 * offset to be used top and bottom of a label itemrenderer, to make sure the text is in the middle

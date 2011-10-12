@@ -124,12 +124,10 @@ package myComponents
 				return;
 			_amount_textinput_text = value;
 			if (amount_textinput) {
+				var myStyleSheet:StyleSheet = new StyleSheet();
+				myStyleSheet.parseCSS(defaultAmountOverwritten ? "p {color:#000000;}":"p {color:#9F9E9E;}");
+				amount_textinput.styleSheet = myStyleSheet;
 				amount_textinput.htmlText = "<p>"+value+"</p>";
-				callLater(function():void{
-					var myStyleSheet:StyleSheet = new StyleSheet();
-					myStyleSheet.parseCSS(defaultAmountOverwritten ? "p {color:#000000;}":"p {color:#9F9E9E;}");
-					amount_textinput.styleSheet = myStyleSheet;
-				}); 
 				invalidateDisplayList();
 			}
 		}
@@ -560,7 +558,6 @@ package myComponents
 				amount_textinput.multiline = false;
 				amount_textinput.wordWrap = false;
 				amount_textinput.text = amount_textinput_text;
-				//amount_textinput.setStyle("color","0x0B333C");
 				addElement(amount_textinput);
 			}
 			if (!amount_textarea) {
