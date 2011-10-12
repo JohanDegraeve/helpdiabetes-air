@@ -69,7 +69,9 @@ package databaseclasses
 		public function set chosenAmount(value:Number):void
 		{
 			_chosenAmount = value;
+			Database.getInstance().updateSelectedFoodItemChosenAmount(this.selectedItemId,value,null);
 		}
+		
 
 		internal function get selectedItemId():int
 		{

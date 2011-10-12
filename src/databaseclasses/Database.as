@@ -165,6 +165,7 @@ package databaseclasses
 											":carbs," +
 											":fat)";
 		private const UPDATE_INSULINRATIO_IN_MEAL_EVENT:String = "UPDATE mealevents set insulinratio = :value WHERE mealeventid = :id";
+		private const UPDATE_CHOSENAMOUNT_IN_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set chosenamount = :value WHERE selectedfooditemid = :id";
 		
 		/**
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
@@ -1164,8 +1165,8 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_INSULINRATIO_IN_MEAL_EVENT;
 				localSqlStatement.parameters[":id"] = mealEventId;
 				localSqlStatement.parameters[":value"] = newInsulinRatioValue;
-				localSqlStatement.addEventListener(SQLEvent.RESULT, insulinRatioUpdated);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, insulinRatioUpdateFailed);
+				localSqlStatement.addEventListener(SQLEvent.RESULT, chosenAmountUpdated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, chosenAmountUpdateFailed);
 				localSqlStatement.execute();
 			}
 			
@@ -1180,18 +1181,18 @@ package databaseclasses
 			}
 			
 			
-			function insulinRatioUpdated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,insulinRatioUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,insulinRatioUpdateFailed);
+			function chosenAmountUpdated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,chosenAmountUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,chosenAmountUpdateFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
 				}
 			}
 			
-			function insulinRatioUpdateFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,insulinRatioUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,insulinRatioUpdateFailed);
+			function chosenAmountUpdateFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,chosenAmountUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,chosenAmountUpdateFailed);
 				trace("Failed to update a insulinratio. Database0070");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1635,6 +1636,61 @@ package databaseclasses
 			event.data = null;
 			dispatcher.dispatchEvent(event);
 		}
+		
+		internal function updateSelectedFoodItemChosenAmount(selectedFoodItemId:Number, newValue:Number, dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = UPDATE_CHOSENAMOUNT_IN_SELECTED_FOOD_ITEM;
+				localSqlStatement.parameters[":id"] = selectedFoodItemId;
+				localSqlStatement.parameters[":value"] = newValue;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, chosenAmountUpdated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, chosenAmountUpdateFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0101");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			
+			function chosenAmountUpdated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,chosenAmountUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,chosenAmountUpdateFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function chosenAmountUpdateFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,chosenAmountUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,chosenAmountUpdateFailed);
+				trace("Failed to update a insulinratio. Database0102");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+		}
+		
+
 			
 	} //class
 	

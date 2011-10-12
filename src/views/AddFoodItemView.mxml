@@ -104,7 +104,11 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 */
 			private static const SELECT_MEAL:int = 1;
 			
-
+			/**
+			 * should there be a button that allows the user to change the meal ? 
+			 */
+			[Bindable]
+			private var mealButtonRequired:Boolean = true;
 			
 			private function onCreationComplete():void {
 				
@@ -112,8 +116,12 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 				
-				if (data is SelectedFoodItem)
+				if (data is SelectedFoodItem) {
 					checkLastMealUpdateRequired = false;
+					mealButtonRequired=false;
+					meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
+					add_button_text = resourceManager.getString('general','save') 
+				}
 				
 				//refresh the meals - checkLxstMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
 				//no need to call refreshMeals
@@ -292,14 +300,19 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (amount_textinput_text =="")
 					amount_textinput_text ="0";
 				
-				//- get the selected meal (which may or may not already include a mealevent
-				//- create a selectedfooditem and add it
-				(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
-				.addSelectedFoodItem(
-					new SelectedFoodItem(retrievedFoodItem.itemDescription,
-						retrievedFoodItem.getUnit(selectedUnit),
-						new Number(amount_textinput_text)));
-				
+				if (data is SelectedFoodItem) {
+					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent
+					.updateSelectedFoodItemChosenAmount(data as SelectedFoodItem,new Number(amount_textinput_text));
+				} else {
+					//- get the selected meal (which may or may not already include a mealevent
+					//- create a selectedfooditem and add it
+					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
+					.addSelectedFoodItem(
+						new SelectedFoodItem(retrievedFoodItem.itemDescription,
+							retrievedFoodItem.getUnit(selectedUnit),
+							new Number(amount_textinput_text)));
+					
+				}
 				var creationTimeStampAsDate:Date = new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);
 				if (creationTimeStampAsDate.valueOf() > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
@@ -413,6 +426,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 									   meal_button_click_function="{mealButtonClicked}"
 									   add_button_click_function="{addButtonClicked}"
 									   amountTextChangedFunction="{amountTextChanged}"
+									   mealButtonRequired="{mealButtonRequired}"
 									   >
 		</myComponents:AddFoodItemGroup>
 	

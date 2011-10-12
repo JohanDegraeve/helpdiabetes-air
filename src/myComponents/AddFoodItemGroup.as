@@ -101,7 +101,7 @@ package myComponents
 		public function set details_button_click_function(value:Function):void
 		{
 			_details_button_click_function = value;
-			if (details_button) {
+			if (details_button && mealButtonRequired) {
 				details_button.addEventListener(MouseEvent.CLICK,_details_button_click_function);
 			}
 		}
@@ -238,9 +238,9 @@ package myComponents
 		public function set meal_button_click_function(value:Function):void
 		{
 			_meal_button_click_function = value;
-			if (meal_button) {
+			if (meal_button && mealButtonRequired) {
 				meal_button.addEventListener(MouseEvent.CLICK,_meal_button_click_function);
-			}
+			} 
 		}
 		
 		
@@ -323,6 +323,39 @@ package myComponents
 		{
 			return _add_button_click_function;
 		}
+		
+		private var _mealButtonRequired:Boolean = true;
+
+		public function get mealButtonRequired():Boolean
+		{
+			return _mealButtonRequired;
+		}
+
+		public function set mealButtonRequired(value:Boolean):void
+		{
+			if (_mealButtonRequired == value)
+				return;
+			_mealButtonRequired = value;
+			if (meal_button) {
+				if (_mealButtonRequired) {
+					if (!meal_button.hasEventListener(MouseEvent.CLICK))
+						meal_button.addEventListener(flash.events.MouseEvent.CLICK,_add_button_click_function);
+				}  else {
+					meal_button.removeEventListener(MouseEvent.CLICK,_add_button_click_function);
+					removeElement(meal_button);
+				}
+			}
+			if (details_button) {
+				if (_mealButtonRequired) {
+					if (!details_button.hasEventListener(MouseEvent.CLICK))
+						details_button.addEventListener(flash.events.MouseEvent.CLICK,_details_button_click_function);
+				}  else {
+					details_button.removeEventListener(MouseEvent.CLICK,_details_button_click_function);
+				}
+			}
+			invalidateDisplayList();
+		}
+
 		
 		//*********************
 		// the digit buttons
@@ -429,8 +462,10 @@ package myComponents
 				+ ModelLocator.offSetSoThatTextIsInTheMiddle + 
 				/* to make sure the text of the textarea is nicely aligned with the text in the mealbutton */(preferredButtonHeight - ModelLocator.StyleableTextFieldCalculatedHeight)/2);
 			
-			meal_button.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredMealTextAreaWidth,preferredButtonHeight);
-			meal_button.setLayoutBoundsPosition(textGap + preferredMealTextAreaWidth + textGap,_height);
+			if (mealButtonRequired) {
+				meal_button.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredMealTextAreaWidth,preferredButtonHeight);
+				meal_button.setLayoutBoundsPosition(textGap + preferredMealTextAreaWidth + textGap,_height);
+			}
 			_height += preferredButtonHeight;
 
 			_height += textGap;//juist adding some gap
@@ -537,7 +572,7 @@ package myComponents
 				//details_button.multiline = false;
 				//details_button.wordWrap = false;
 				details_button.label = details_button_text;
-				if (_details_button_click_function != null)
+				if (_details_button_click_function != null && mealButtonRequired)
 					details_button.addEventListener(flash.events.MouseEvent.CLICK,_details_button_click_function);
 				addElement(details_button);
 			}
@@ -568,10 +603,10 @@ package myComponents
 				meal_textarea.text = meal_textarea_text;
 				addElement(meal_textarea);
 			}
-			if (!meal_button) {
+			if (!meal_button && mealButtonRequired) {
 				meal_button = new Button();
 				meal_button.styleName = this;
-				if (_meal_button_click_function != null)
+				if (_meal_button_click_function != null && mealButtonRequired)
 					meal_button.addEventListener(MouseEvent.CLICK,_meal_button_click_function);
 				//meal_button.editable = false;
 				//meal_button.multiline = false;
@@ -585,8 +620,9 @@ package myComponents
 				//add_button.editable = false;
 				//add_button.multiline = false;
 				//add_button.wordWrap = false;
-				if (_add_button_click_function != null)
+				if (_add_button_click_function != null) {
 					add_button.addEventListener(MouseEvent.CLICK,_add_button_click_function);
+				} 
 				add_button.label = add_button_text;
 				addElement(add_button);
 			}

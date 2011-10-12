@@ -438,5 +438,16 @@ package databaseclasses
 			}
 		}
 		
+		public function updateSelectedFoodItemChosenAmount(selectedFoodItem:SelectedFoodItem,newAmount:Number):void {
+			//find the id
+			for (var ij:int=0;ij < _selectedFoodItems.length; ij++) {
+				if ((_selectedFoodItems.getItemAt(ij) as SelectedFoodItem) == selectedFoodItem) {
+					(_selectedFoodItems.getItemAt(ij) as SelectedFoodItem).chosenAmount = newAmount;
+					recalculateInsulinAmount();
+					recalculateTotals();
+					ij = _selectedFoodItems.length;
+				}
+			}
+		}
 	}
 }
