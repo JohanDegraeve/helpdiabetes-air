@@ -26,7 +26,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		[ResourceBundle("editmealeventview")]
 		[ResourceBundle("general")]
 	</fx:Metadata>
-
+	<s:states>
+		<s:State name="noInsulinAmount"/>
+		<s:State name="insulinAmount"/>
+	</s:states> 
+		
 	<fx:Script>
 		<![CDATA[
 			import databaseclasses.Meal;
@@ -83,6 +87,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 					}
 				}
+				
+				if (mealEvent.insulinRatio != 0)
+					currentState="insulinAmount"
 			}
 			
 			private function displaySelectedItem(item:Object):String {
@@ -125,11 +132,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					<s:SolidColorStroke color="0x000000" weight="1"/>
 				</s:stroke>
 			</s:Line>
-			<s:TextArea visible="{insulinAmount_text != null}" id="insulinAmount" width="100%" text="{insulinAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
-						updateComplete="{insulinAmount.height = insulinAmount.scroller.viewport.contentHeight + 2}"/>
-			<s:TextArea visible="{insulinAmount_text != null}" id="insulinRatio" width="100%" text="{insulinRatio_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
-						updateComplete="{insulinRatio.height = insulinRatio.scroller.viewport.contentHeight + 2}"/>
-			<s:Line width="100%" visible="{insulinAmount_text != null}" >
+			<s:TextArea includeIn="insulinAmount"  id="insulinAmount" width="100%" text="{insulinAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
+						updateComplete="{ insulinAmount.height = insulinAmount.scroller.viewport.contentHeight + 2 }"/>
+			<s:TextArea includeIn="insulinAmount" id="insulinRatio" width="100%" text="{insulinRatio_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
+						updateComplete="{insulinRatio.height = insulinRatio.scroller.viewport.contentHeight + 2 }"/>
+			<s:Line includeIn="insulinAmount" width="100%"  >
 				<s:stroke>
 					<s:SolidColorStroke color="0x000000" weight="1"/>
 				</s:stroke>
