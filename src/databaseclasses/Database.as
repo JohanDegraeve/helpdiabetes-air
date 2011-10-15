@@ -70,7 +70,7 @@ package databaseclasses
 		private  var dbFile:File  ;
 		private var xmlFileName:String;
 		private var foodFileName:String;
-		private var fooditemList:XMLList;
+		//private var fooditemList:XMLList;
 		
 		
 		private const CREATE_TABLE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS fooditems (itemid INTEGER PRIMARY KEY AUTOINCREMENT, " +

@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Metadata>
 		[ResourceBundle("settingsview")]
 		[ResourceBundle("general")]
+		[ResourceBundle("settingsboluscalculationview")]
 	</fx:Metadata>
 	
 	<fx:Script>
@@ -70,11 +71,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function prepareAmountPicker(amount:Number, mealName:String, settingId:int, textArea:TextArea):void {
 				amountPicker = new AmountPicker();
 				amountPicker.amount = amount.toString();
+				amountPicker.decimalDigits = 2;
+				amountPicker.maxNonDecimalDigits = 3;
+				amountPicker.decimalDigits = 2;
 				amountPicker.labelText1 = resourceManager.getString('settingsview','insulinratio_for');
 				amountPicker.labelText2 = mealName;
 				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
 				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 				PopUpManager.addPopUp(amountPicker, this, true);
+				PopUpManager.centerPopUp(amountPicker);
 				
 				
 				function onAmountCancel(event: PickerEvent): void
@@ -143,6 +148,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				PopUpManager.addPopUp(confirmationPicker, this, true);
 				PopUpManager.centerPopUp(confirmationPicker);
+				
 				function onYesClicked(event: PickerEvent): void
 				{
 					firstTime = true;//suppose user changes a next time, then again we'll ask to change all values
@@ -196,37 +202,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:Group id="breakfastSetting" y="0" x="0" width="100%" height = "100%" click="breakfastSettingClicked(event)">
+		<s:TextArea y="0" x="0" width="100%" height="100%" maxHeight="75" text="{resourceManager.getString('settingsboluscalculationview','explainingtext')}" borderVisible="false" editable="false"/>
+		<s:Group id="breakfastSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="breakfastSettingClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout>
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea width="60%" text="{resourceManager.getString('general','breakfast') + ' :'}" editable="false"/>
-			<s:TextArea id="breakfastRatio" width="40%" text="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST)}" editable="false"/>
+			<s:TextArea  width="60%" text="{resourceManager.getString('general','breakfast') }" editable="false" borderVisible="false"/>
+			<s:TextArea id="breakfastRatio" width="40%" text="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST)}" editable="false" borderVisible="false" textAlign="center"/>
 		</s:Group>
-		<s:Group id="lunchSetting" y="0" x="0" width="100%" height = "100%" click="lunchSettingClicked(event)">
+		<s:Group id="lunchSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="lunchSettingClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout>
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea width="60%" text="{resourceManager.getString('general','lunch') + ' :'}" editable="false"/>
-			<s:TextArea id="lunchRatio" width="40%" text="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_LUNCH)}" editable="false"/>
+			<s:TextArea width="60%" text="{resourceManager.getString('general','lunch') }" editable="false" borderVisible="false"/>
+			<s:TextArea id="lunchRatio" width="40%" text="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_LUNCH)}" editable="false" borderVisible="false" textAlign="center"/>
 		</s:Group>
-		<s:Group id="snackSetting" y="0" x="0" width="100%" height = "100%" click="snackSettingClicked(event)">
+		<s:Group id="snackSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="snackSettingClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout>
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea width="60%" text="{resourceManager.getString('general','snack') + ' :'}" editable="false"/>
-			<s:TextArea id="snackRatio" width="40%" text="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SNACK)}" editable="false"/>
+			<s:TextArea width="60%" text="{resourceManager.getString('general','snack') }" editable="false" borderVisible="false"/>
+			<s:TextArea id="snackRatio" width="40%" text="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SNACK)}" editable="false" borderVisible="false" textAlign="center"/>
 		</s:Group>
-		<s:Group id="supperSetting" y="0" x="0" width="100%" height = "100%" click="supperSettingClicked(event)">
+		<s:Group id="supperSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="supperSettingClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout>
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea width="60%" text="{resourceManager.getString('general','supper') + ' :'}" editable="false"/>
-			<s:TextArea id="supperRatio" width="40%" text="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SUPPER)}" editable="false"/>
+			<s:TextArea width="60%" text="{resourceManager.getString('general','supper') }" editable="false" borderVisible="false"/>
+			<s:TextArea id="supperRatio" width="40%" text="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SUPPER)}" editable="false" borderVisible="false" textAlign="center"/>
 		</s:Group>
 	</s:Group>
 </s:View>

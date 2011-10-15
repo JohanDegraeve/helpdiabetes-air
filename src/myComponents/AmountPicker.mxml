@@ -20,11 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 user will enter an amount for something, could be amount of insulin for a specific type of meal
 needs to be shown as popup
 after creation and before showing set labelText and amount
+you can also define maximum amount of digits after decimal point, maximum amount of digits before decimal point and to labeltexts
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark"
-		 implements="mx.managers.IFocusManagerContainer"
-		 creationComplete="onCreationComplete()">
+		 xmlns:s="library://ns.adobe.com/flex/spark">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -37,8 +36,63 @@ after creation and before showing set labelText and amount
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
-			[Bindable]
-			private var _amount: String;
+			[Bindable] private var hundreds:String;
+			[Bindable] private var tens:String;
+			[Bindable] private var units:String;
+			[Bindable] private var tenths:String;
+			[Bindable] private var hundredths:String;
+			
+			private var _maxNonDecimalDigits:int = 3;
+
+			/**
+			 * minimum value = 1, maximum value = 3<br>
+			 * 1 means only tens will be shown, value will be between 0 and 10 but less than 10 
+			 * 2 means only tens will be shown, value will be between 0 and 100 but less than 100
+			 * 3 means only tens will be shown, value will be between 0 and 1000 but less than 1000 */
+			public function get maxNonDecimalDigits():int
+			{
+				return _maxNonDecimalDigits;
+			}
+
+			/**
+			 * @private
+			 */
+			[Bindable] public function set maxNonDecimalDigits(value:int):void
+			{
+				if (value < 1)
+					throw new Error("maxNonDecimalDigits must be >= 1");
+				if (value > 3)
+					throw new Error("maxNonDecimalDigits must be <= 3");
+				if (!(parseFloat(_amount) < Math.pow(10,value)))
+					throw new Error("maxNonDecimalDigits and amount do not match up, amount is too big");
+				_maxNonDecimalDigits = value;
+			}
+
+			private var _decimalDigits:int = 1;
+			
+			/**
+			 * the maximum number of digits to the right of the decimal point<br>
+			 * minimum value 0, maximum value 2<br>
+			 * default value = 1;
+			 */
+			public function get decimalDigits():int
+			{
+				return _decimalDigits;
+			}
+			
+			/**
+			 * @private
+			 */
+			[Bindable] public function set decimalDigits(value:int):void
+			{
+				if (value < 0)
+					throw new Error("minimum value of decimalDigits = 0");
+				if (value > 2)	
+					throw new Error("maximum value of decimalDigits = 2");
+				_decimalDigits = value;
+			}
+			
+			private var _amount: String = "0";
 			
 			public function get amount(): String
 			{
@@ -47,9 +101,63 @@ after creation and before showing set labelText and amount
 			
 			public function set amount(value: String): void
 			{
-				_amount = value;
-				if (_amount == "0")
-					_amount = "";
+				var floatValue:Number = parseFloat(value);
+				if (!(floatValue < Math.pow(10,maxNonDecimalDigits)))
+					throw new Error("AmountPicker.mxml : value in 'set amount' must be smaller than " + Math.pow(10,maxNonDecimalDigits));
+				
+				//if there's more digits after the decimal point then what is being asked, then round up
+				_amount = ((Math.round(floatValue* (Math.pow(10,decimalDigits))))/(Math.pow(10,decimalDigits))).toString();
+				
+				var decimalPosition:int = _amount.indexOf('.');
+				if (decimalPosition == -1) {
+					hundredths="";
+					tenths="0";
+					if (_amount.length == 1) {
+						units=_amount.charAt(0);
+						tens="";
+						hundreds="";
+					} else if (_amount.length == 2) {
+						units=_amount.charAt(1);
+						tens=_amount.charAt(0);
+						hundreds="";
+					} else {
+						units=_amount.charAt(2);
+						tens=_amount.charAt(1);
+						hundreds=_amount.charAt(0);
+					}
+				} else if (decimalPosition == _amount.length -2) {
+					hundredths="";
+					tenths=_amount.charAt(_amount.length-1);
+					if (_amount.length == 3) {
+						units=_amount.charAt(_amount.length-3);
+						tens="";
+						hundreds="";
+					} else if (_amount.length == 4) {
+						units=_amount.charAt(_amount.length-3);
+						tens=_amount.charAt(_amount.length-4);
+						hundreds="";
+					} else {
+						units=_amount.charAt(_amount.length-3);
+						tens=_amount.charAt(_amount.length-4);
+						hundreds=_amount.charAt(_amount.length-5);
+					}
+				} else {
+					hundredths=_amount.charAt(_amount.length-1);
+					tenths=_amount.charAt(_amount.length-2);
+					if (_amount.length == 4) {
+						units=_amount.charAt(_amount.length-4);
+						tens="";
+						hundreds="";
+					} else if (_amount.length == 5) {
+						units=_amount.charAt(_amount.length-4);
+						tens=_amount.charAt(_amount.length-5);
+						hundreds="";
+					} else {
+						units=_amount.charAt(_amount.length-4);
+						tens=_amount.charAt(_amount.length-5);
+						hundreds=_amount.charAt(_amount.length-6);
+					}
+				}
 			}
 			
 			/**
@@ -61,7 +169,7 @@ after creation and before showing set labelText and amount
 				return _labelText1;
 			}
 			
-			public function set labelText1(value:String):void
+			[Bindable] public function set labelText1(value:String):void
 			{
 				_labelText1 = value;
 			}
@@ -75,39 +183,18 @@ after creation and before showing set labelText and amount
 				return _labelText2;
 			}
 			
-			public function set labelText2(value:String):void
+			[Bindable] public function set labelText2(value:String):void
 			{
 				_labelText2 = value;
 			}
-
-			// **************//
-			// see http://flex4examples.wordpress.com/2011/05/05/skinnabletextbase-focusmanager-runtime-error-popup/
-				            public function get defaultButton():IFlexDisplayObject
-				            {
-				                //TODO:
-				                return null;
-				            }
-				 
-				            public function set defaultButton(value:IFlexDisplayObject):void
-				            {
-				                //TODO:
-				            }
-			// **************//
 			
-			private function setAmount():void {
+			private function okClicked():void {
 				//first replace "," by ".", because flex doesn't seem to work correctly when using "," as decimal seperator
-				var temp:String;
-				temp = amount.split(",").join(".");
-				//applying a trick here to get rid of too many ".", first replacing the first "." by "{", hoping the user will never type this character
-				//then replacing all remaining "." by "", then rereplacing "{" by "."
-				temp = temp.split(".",2).join("{");
-				temp = temp.split(".").join("");
-				temp = temp.split("{",2).join(".");
-
+				
 				PopUpManager.removePopUp(this);
-
+				
 				var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
-				dpe.newValue = parseFloat(temp);
+				dpe.newValue = (Math.round((new Number(hundreds)*100 + new Number(tens)*10 + new Number(units) + new Number(tenths) /10 + new Number(hundredths)/100)*(Math.pow(10,decimalDigits))))/(Math.pow(10,decimalDigits));
 				dispatchEvent(dpe);
 			}
 			
@@ -115,21 +202,71 @@ after creation and before showing set labelText and amount
 				PopUpManager.removePopUp(this);
 			}
 			
-			private function onCreationComplete():void {
-				//set focus to amount field, on android this immediately shows up the keyboard
-				this.focusManager.setFocus(enteredRatio);
-				//we'll add an eventlistener for pressing enter when editing the amount
-				enteredRatio.addEventListener(FlexEvent.ENTER,onPressEnter);
+			private function incrementAmount(type:String):void {
+				if (type == "hundreds") {
+					hundreds = incrementValue(hundreds);
+				}
+				if (type == "tens")
+					tens = incrementValue(tens);
+				if (type == "units")
+					units = incrementValue(units);
+				if (type == "tenths")
+					tenths = incrementValue(tenths);
+				if (type == "hundredths")
+					hundredths = incrementValue(hundredths);
+			}
+			
+			private function decrementAmount(type:String):void {
+				if (type == "hundreds") {
+					hundreds = decrementValue(hundreds);
+				}
+				if (type == "tens")
+					tens = decrementValue(tens);
+				if (type == "units")
+					units = decrementValue(units);
+				if (type == "tenths")
+					tenths = decrementValue(tenths);
+				if (type == "hundredths")
+					hundredths = decrementValue(hundredths);
+			}
+			
+			private function incrementValue(oldValue:String):String {
+				var valueAsInt:int = parseInt(oldValue);
+				switch (valueAsInt) {
+					case 0: return "1";
+					case 1: return "2";
+					case 2: return "3";
+					case 3: return "4";
+					case 4: return "5";
+					case 5: return "6";
+					case 6: return "7";
+					case 7: return "8";
+					case 8: return "9";
+					case 9: return "0";
+				}
+				return "hi";
 			}
 
-			private function onPressEnter(event:FlexEvent):void {
-				setAmount();
+			private function decrementValue(oldValue:String):String {
+				var valueAsInt:int = parseInt(oldValue);
+				switch (valueAsInt) {
+					case 0: return "9";
+					case 1: return "0";
+					case 2: return "1";
+					case 3: return "2";
+					case 4: return "3";
+					case 5: return "4";
+					case 6: return "5";
+					case 7: return "6";
+					case 8: return "7";
+					case 9: return "8";
+				}
+				return "hi";
 			}
-
-		]]>
+]]>
 	</fx:Script>
 	<s:BorderContainer>
-		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="5" paddingRight="5" paddingTop="10">
 			<s:Label text="{labelText1}" width="100%" styleName="textColorInPickerOnDarkBackground" />
 			<s:Label text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
 			<s:Line width="100%">
@@ -137,15 +274,41 @@ after creation and before showing set labelText and amount
 					<s:SolidColorStroke color="0xcccccc" weight="2"/>
 				</s:stroke>
 			</s:Line>
-			<s:TextInput id="enteredRatio" text="@{_amount}" width="100%" maxWidth="{vgroup.width - 20}" restrict="0123456789.,"  />
+			<s:HGroup width="100%">
+				<s:VGroup includeInLayout="{maxNonDecimalDigits > 2}" gap="10">
+					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('hundreds')" width="100%"/>
+					<s:Label text="{hundreds}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
+					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('hundreds')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup includeInLayout="{maxNonDecimalDigits > 1}" gap="10">
+					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('tens')" width="100%"/>
+					<s:Label text="{tens}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
+					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('tens')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup gap="10">
+					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('units')" width="100%"/>
+					<s:Label text="{units}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
+					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('units')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup includeInLayout="{decimalDigits > 0}" gap="10">
+					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('tenths')" width="100%"/>
+					<s:Label text="{tenths}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
+					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('tenths')" width="100%"/>
+				</s:VGroup>
+				<s:VGroup includeInLayout="{decimalDigits > 1}" gap="10">
+					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('hundredths')" width="100%"/>
+					<s:Label text="{hundredths}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
+					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('hundredths')" width="100%"/>
+				</s:VGroup>
+			</s:HGroup>
 			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
 				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
-					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="setAmount()"/>
+					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="okClicked()"/>
 					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','cancel')}" click="cancel()"/>
 				</s:VGroup>
 			</s:BorderContainer>
 		</s:VGroup>
-
+		
 		
 	</s:BorderContainer>
 </s:Group>

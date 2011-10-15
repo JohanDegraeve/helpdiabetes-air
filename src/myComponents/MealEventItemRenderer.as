@@ -572,6 +572,12 @@ package myComponents
 			if (mealEvent.extendedInTrackingView)
 				return true;
 			var returnValue:Boolean = false;
+			
+			if (ModelLocator.getInstance().meals == null) {
+				//happens in case we get here view dummyview
+				return true;				
+			}
+			
 			if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent != null) {
 				if (mealEvent.mealEventId == (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.mealEventId) {
 					returnValue = true;
