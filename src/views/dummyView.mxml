@@ -50,8 +50,12 @@ There we have a specific function that allows to measure the hight of an item, t
 			import myComponents.IListElement;
 			[Bindable]
 			public var dummyTrackingViewList:ArrayCollection; 
-
+			
+			private var alrtTimer:Timer;
+			
 			private function onInitialize():void {
+				
+				
 				dummyTrackingViewList = new ArrayCollection();
 				
 				//a daylinewith totalamount, doesn't matter what date, here's it's 1st of january 1970
@@ -66,9 +70,9 @@ There we have a specific function that allows to measure the hight of an item, t
 				//we are not setting the selecteditemid and mealevent id
 				selectedFoodItems.addItem(newSelectedFoodItem);
 				newSelectedFoodItem = new SelectedFoodItem(
-						"HIT THE BACK KEY",
-						new Unit("unit 2",10,10,10,10,10),
-						20);
+					"HIT THE BACK KEY",
+					new Unit("unit 2",10,10,10,10,10),
+					20);
 				selectedFoodItems.addItem(newSelectedFoodItem);
 				
 				newSelectedFoodItem = new SelectedFoodItem(
@@ -96,16 +100,24 @@ There we have a specific function that allows to measure the hight of an item, t
 				
 				dummyTrackingViewList.addItem(newMealEvent);
 				
+				alrtTimer = new Timer(500, 1);
+				alrtTimer.addEventListener(TimerEvent.TIMER_COMPLETE, removeAlert);
+				alrtTimer.start();
 			}
 			
+			private function removeAlert(evt:TimerEvent):void {
+				navigator.popView();
+				alrtTimer.stop();
+				alrtTimer = null;
+			}
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();
 			}
 			
 		]]>
 	</fx:Script>
-	<s:List id="dummyList" left="0" right="0" top="0" bottom="0" itemRendererFunction="getItemRenderer" visible="true"
+	<s:List id="dummyList" left="0" right="0" top="0" bottom="0" itemRendererFunction="getItemRenderer" visible="false"
 			dataProvider="{dummyTrackingViewList}" >
 	</s:List>
-
+	
 </s:View>
