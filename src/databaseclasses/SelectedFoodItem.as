@@ -66,6 +66,10 @@ package databaseclasses
 			return _chosenAmount;
 		}
 
+		/**
+		 * the amount chosen by the user.<br>
+		 * when changed then also  database update happens with new value for chosenAmount 
+		 */
 		public function set chosenAmount(value:Number):void
 		{
 			_chosenAmount = value;

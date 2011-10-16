@@ -438,13 +438,17 @@ package databaseclasses
 			}
 		}
 		
+		/**
+		 * updates the chosenAmount of a specific selectedFoodItem, which causes also update in the database for the selectedfooditem<br>
+		 * Also insulinAmount is recalculated
+		 */
 		public function updateSelectedFoodItemChosenAmount(selectedFoodItem:SelectedFoodItem,newAmount:Number):void {
 			//find the id
 			for (var ij:int=0;ij < _selectedFoodItems.length; ij++) {
 				if ((_selectedFoodItems.getItemAt(ij) as SelectedFoodItem) == selectedFoodItem) {
 					(_selectedFoodItems.getItemAt(ij) as SelectedFoodItem).chosenAmount = newAmount;
-					recalculateInsulinAmount();
 					recalculateTotals();
+					recalculateInsulinAmount();
 					ij = _selectedFoodItems.length;
 				}
 			}
