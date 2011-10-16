@@ -72,8 +72,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				amountPicker = new AmountPicker();
 				amountPicker.amount = amount.toString();
 				amountPicker.decimalDigits = 2;
-				amountPicker.maxNonDecimalDigits = 3;
-				amountPicker.decimalDigits = 2;
+				amountPicker.maxNonDecimalDigits = 2;
+				amountPicker.decimalDigits = 1;
 				amountPicker.labelText1 = resourceManager.getString('settingsview','insulinratio_for');
 				amountPicker.labelText2 = mealName;
 				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);

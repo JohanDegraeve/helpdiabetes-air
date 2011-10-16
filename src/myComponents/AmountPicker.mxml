@@ -276,29 +276,34 @@ you can also define maximum amount of digits after decimal point, maximum amount
 			</s:Line>
 			<s:HGroup width="100%">
 				<s:VGroup includeInLayout="{maxNonDecimalDigits > 2}" gap="10">
-					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('hundreds')" width="100%"/>
+					<s:Button label="+" minWidth="52" minHeight="60" click="incrementAmount('hundreds')" width="100%"/>
 					<s:Label text="{hundreds}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('hundreds')" width="100%"/>
+					<s:Button label="-" minWidth="52" minHeight="60" click="decrementAmount('hundreds')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup includeInLayout="{maxNonDecimalDigits > 1}" gap="10">
-					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('tens')" width="100%"/>
+					<s:Button label="+" minWidth="52" minHeight="60" click="incrementAmount('tens')" width="100%"/>
 					<s:Label text="{tens}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('tens')" width="100%"/>
+					<s:Button label="-" minWidth="52" minHeight="60" click="decrementAmount('tens')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup gap="10">
-					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('units')" width="100%"/>
+					<s:Button id="anId" label="+" minWidth="52" minHeight="60" click="incrementAmount('units')" width="100%"/>
 					<s:Label text="{units}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('units')" width="100%"/>
+					<s:Button label="-" minWidth="52" minHeight="60" click="decrementAmount('units')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup includeInLayout="{decimalDigits > 0}" gap="10">
-					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('tenths')" width="100%"/>
+					<s:Label text="" height="{anId.height}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
+					<s:Label text="." width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
+					<s:Label text="" height="{anId.height}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
+				</s:VGroup>
+				<s:VGroup includeInLayout="{decimalDigits > 0}" gap="10">
+					<s:Button label="+" minWidth="52" minHeight="60" click="incrementAmount('tenths')" width="100%"/>
 					<s:Label text="{tenths}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('tenths')" width="100%"/>
+					<s:Button label="-" minWidth="52" minHeight="60" click="decrementAmount('tenths')" width="100%"/>
 				</s:VGroup>
 				<s:VGroup includeInLayout="{decimalDigits > 1}" gap="10">
-					<s:Button label="+" minWidth="55" minHeight="60" click="incrementAmount('hundredths')" width="100%"/>
+					<s:Button label="+" minWidth="52" minHeight="60" click="incrementAmount('hundredths')" width="100%"/>
 					<s:Label text="{hundredths}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="55" minHeight="60" click="decrementAmount('hundredths')" width="100%"/>
+					<s:Button label="-" minWidth="52" minHeight="60" click="decrementAmount('hundredths')" width="100%"/>
 				</s:VGroup>
 			</s:HGroup>
 			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
