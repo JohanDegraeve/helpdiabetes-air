@@ -152,7 +152,6 @@ package databaseclasses
 				this._mealEventId = mealEventId;
 				this._selectedFoodItems = selectedFoodItems;
 				recalculateTotals();
-				recalculateInsulinAmount();
 			}
 			else  {
 				_mealEventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
@@ -227,7 +226,6 @@ package databaseclasses
 				_totalFat += selectedFoodItem.unit.fat/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
 				*/
 				recalculateTotals();
-				recalculateInsulinAmount();
 				
 				_lastModifiedTimeStamp = (new Date()).valueOf();
 				Database.getInstance().updateMealEventLastModifiedTimeStamp(_lastModifiedTimeStamp,_mealEventId,localDispatcher);	
@@ -424,6 +422,10 @@ package databaseclasses
 			return _mealEventId;
 		}
 		
+		/**
+		 * recalculates total carbs, kilocalories, protein and fat<br>
+		 * also recalculates insulinamount 
+		 */
 		private function recalculateTotals():void {
 			_totalCarbs = 0;
 			_totalKilocalories = 0;
@@ -436,6 +438,7 @@ package databaseclasses
 				_totalProtein += selectedFoodItem.unit.protein/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
 				_totalFat += selectedFoodItem.unit.fat/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
 			}
+			recalculateInsulinAmount();
 		}
 		
 		/**
@@ -448,7 +451,6 @@ package databaseclasses
 				if ((_selectedFoodItems.getItemAt(ij) as SelectedFoodItem) == selectedFoodItem) {
 					(_selectedFoodItems.getItemAt(ij) as SelectedFoodItem).chosenAmount = newAmount;
 					recalculateTotals();
-					recalculateInsulinAmount();
 					ij = _selectedFoodItems.length;
 				}
 			}
