@@ -70,12 +70,6 @@ package model
 		*/
 		private var foodTables:Array;
 		
-		/**
-		 *  used in some places to calculate the needed width to hold a certain text - offset is the additional space
-		 */
-		public static const SIZE_OF_LONGEST_TEXT_OFFSET:Number = 20;
-
-		
 		public var maximumSearchStringLength:int = 25;
 		
 		/**** Add bindable application data here ***/
@@ -86,12 +80,6 @@ package model
 		[Bindable]
 		public var foodItemList:ArrayCollection = new ArrayCollection(); 
 
-		/**
-		 * unitlist used in popup in addfooditemview 
-		 */
-		[Bindable]
-		public var unitList:ArrayCollection; 
-		
 		/**
 		 * list of meals, mainly used in addfooditem, and also somewhere else, being reset each time addfooditem is opened
 		 */

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!--
+to chose an element from a list of a maximum number of elements
+-->
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 preinitialize="preInitialize()">
+	
+	<fx:Script>
+		<![CDATA[
+			import databaseclasses.UnitChangedEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			
+			[Bindable] private var element1:String="";
+			[Bindable] private var element2:String="";
+			[Bindable] private var element3:String="";
+			[Bindable] private var element4:String="";
+			[Bindable] private var element5:String="";
+			[Bindable] private var element6:String="";
+			[Bindable] private var element7:String="";
+			[Bindable] private var element8:String="";
+			[Bindable] private var element9:String="";
+			[Bindable] private var element10:String="";
+			
+			private var nrOfElements:int = 0;
+			private const maxElements:int = 10;
+			
+			private var _elements:ArrayCollection;
+
+			/**
+			 * elements arraycollection, maximum amount of elements = 10 ? 
+			 */
+			public function get elements():ArrayCollection
+			{
+				return _elements;
+			}
+
+			/**
+			 * @private
+			 */
+			public function set elements(value:ArrayCollection):void
+			{
+				if (value.length > maxElements)
+					throw new Error("maximum number of elements exceeded, maximum = " + maxElements + ". Received = " + value.length);
+				_elements = value;
+				nrOfElements = value.length;
+				try {
+					element1 = value.getItemAt(0) as String;
+					element2 = value.getItemAt(1) as String;
+					element3 = value.getItemAt(2) as String;
+					element4 = value.getItemAt(3) as String;
+					element5 = value.getItemAt(4) as String;
+					element6 = value.getItemAt(5) as String;
+					element7 = value.getItemAt(6) as String;
+					element8 = value.getItemAt(7) as String;
+					element9 = value.getItemAt(8) as String;
+					element10 = value.getItemAt(9) as String;
+				} catch (rangeError:RangeError) {
+										
+				}
+			}
+
+			
+			/**
+			 * two labels will be shown this is the second label 
+			 */
+			private var _labelText1:String = "";
+			public function get labelText1():String
+			{
+				return _labelText1;
+			}
+			
+			[Bindable] public function set labelText1(value:String):void
+			{
+				_labelText1 = value;
+			}
+			
+			/**
+			 * two labels will be shown this is the second label 
+			 */
+			private var _labelText2:String = "";
+			public function get labelText2():String
+			{
+				return _labelText2;
+			}
+			
+			[Bindable] public function set labelText2(value:String):void
+			{
+				_labelText2 = value;
+			}
+			
+			private function cancel():void  {
+				PopUpManager.removePopUp(this);
+			}
+			
+			private function preInitialize():void {
+				_elements = new ArrayCollection();
+			}
+			
+			private function elementClicked(element:String):void {
+				var unitChangedEvent:UnitChangedEvent = new UnitChangedEvent(UnitChangedEvent.ITEM_SELECTED);
+				if (element == "element1")
+					unitChangedEvent.index = 0;
+				else if (element == "element2")
+					unitChangedEvent.index = 1;
+				else if (element == "element3")
+					unitChangedEvent.index = 2;
+				else if (element == "element4")
+					unitChangedEvent.index = 3;
+				else if (element == "element5")
+					unitChangedEvent.index = 4;
+				else if (element == "element6")
+					unitChangedEvent.index = 5;
+				else if (element == "element7")
+					unitChangedEvent.index = 6;
+				else if (element == "element8")
+					unitChangedEvent.index = 7;
+				else if (element == "element9")
+					unitChangedEvent.index = 8;
+				else if (element == "element10")
+					unitChangedEvent.index = 9;
+				dispatchEvent(unitChangedEvent);
+			}
+			
+
+		]]>
+	</fx:Script>
+	
+	<s:BorderContainer >
+		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="5" paddingRight="5" paddingTop="10">
+			<s:Label includeInLayout="{labelText1 != ''}" text="{labelText1}" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<s:Label includeInLayout="{labelText2 != ''}" text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<s:Line includeInLayout="{labelText1 != '' || labelText2 != ''}" width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="3"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 0}" text="{element1}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element1')"/>
+			<s:Line includeInLayout="{nrOfElements > 1}" width="100%" >
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 1}" text="{element2}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element2')"/>
+			<s:Line includeInLayout="{nrOfElements > 2}" width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 2}" text="{element3}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element3')"/>
+			<s:Line includeInLayout="{nrOfElements > 3}" width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 3}" text="{element4}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element4')"/>
+			<s:Line includeInLayout="{nrOfElements > 4}" width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 4}" text="{element5}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element5')"/>
+			<s:Line includeInLayout="{nrOfElements > 5}" width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 5}" text="{element6}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element6')"/>
+			<s:Line includeInLayout="{nrOfElements > 6}" width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 6}" text="{element7}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element7')"/>
+			<s:Line includeInLayout="{nrOfElements > 7}" width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 7}" text="{element8}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element8')"/>
+			<s:Line includeInLayout="{nrOfElements > 8}" width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 8}" text="{element9}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element9')"/>
+			<s:Line includeInLayout="{nrOfElements > 9}" width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				</s:stroke>
+			</s:Line>
+			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 9}" text="{element10}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element10')"/>
+			<s:BorderContainer width="100%" backgroundColor="0xcccccc" minHeight="0">
+				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
+					<s:Button width="100%" minHeight="40" height="100%" label="{resourceManager.getStringArray('general','cancel')}" click="cancel()"/>
+				</s:VGroup>
+			</s:BorderContainer>
+
+		</s:VGroup>
+	</s:BorderContainer>
+</s:Group>
+	

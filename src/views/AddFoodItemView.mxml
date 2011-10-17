@@ -58,6 +58,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			
 			import myComponents.DayLine;
 			import myComponents.DayLineWithTotalAmount;
+			import myComponents.elementFromListPicker;
 			
 			import spark.components.Label;
 			
@@ -80,8 +81,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			[Bindable]
 			private var meals:ArrayCollection;
 		
-			private var thisObject:DisplayObject;
-			
 			private var retrievedFoodItem:FoodItem;
 			
 			private var checkLastMealUpdateRequired:Boolean = true;
@@ -92,11 +91,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private var selectedUnit:int;
 			
 			private var DEFAULT_SIZE_OF_LONGEST_TEXT:int = 50;
-			
-			//just a selectunit to measure the style and so 
-			private static var aSelectUnit:SelectUnit;
-			
-			private var popUpForUnitList:SelectUnit;
 			
 			/**
 			 * used as context value when pushing the view SelectMealView<br>
@@ -109,6 +103,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 */
 			[Bindable]
 			private var mealButtonRequired:Boolean = true;
+			
+			private var aSelectUnit:elementFromListPicker;
 			
 			private function onCreationComplete():void {
 				
@@ -234,51 +230,28 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				add_button_text = resourceManager.getString("addfooditemview","add_button");
 				_amount_textarea_text = resourceManager.getString("addfooditemview","amount");
 				amount_textinput_text = "0";
-				thisObject = this;
-				ModelLocator.getInstance().unitList = new ArrayCollection();
-				ModelLocator.getInstance().unitList.addItem(new Unit("dummy value",0,0,0,0,0));
-				aSelectUnit = new SelectUnit();
-			}
-			
-			private function getSizeOfLongestTextInList(strings:ArrayCollection):Number {
-				//calculate the length of the longest text, in pixels.
-				var label:Label = new Label();
-				var sizeOfLongestText:int = DEFAULT_SIZE_OF_LONGEST_TEXT;
-				label.regenerateStyleCache(false);
-				label.setStyle("fontSize",aSelectUnit.getStyle("fontSize")) ;
-				label.setStyle("fontStyle",aSelectUnit.getStyle("fontStyle")) ;
-				label.setStyle("fontWeight",aSelectUnit.getStyle("fontWeight"));
-				label.setStyle("fontFamily",aSelectUnit.getStyle("fontFamily"));
-				
-				for (var i:int = 0;i < strings.length; i++) {
-					var textLineMetricx:TextLineMetrics = label.measureText(strings.getItemAt(i).toString());
-					if (textLineMetricx.width + ModelLocator.SIZE_OF_LONGEST_TEXT_OFFSET > sizeOfLongestText)
-						sizeOfLongestText = textLineMetricx.width + ModelLocator.SIZE_OF_LONGEST_TEXT_OFFSET ;
-				}
-				return sizeOfLongestText;
 			}
 			
 			/**
 			 * pop up for unitlist
 			 */ 
 			private function popUpUnitList(e:MouseEvent = null):void {
-				ModelLocator.getInstance().unitList = new ArrayCollection();
-				ModelLocator.getInstance().unitList .addItem((retrievedFoodItem.getUnit(0) as Unit).unitDescription);
+				var unitList:ArrayCollection = new ArrayCollection();
+				unitList .addItem((retrievedFoodItem.getUnit(0) as Unit).unitDescription);
 				for (var i:int = 1; i < retrievedFoodItem.getNumberOfUnits();i++)
-					ModelLocator.getInstance().unitList.addItem((retrievedFoodItem.getUnit(i) as Unit).unitDescription);
+					unitList.addItem((retrievedFoodItem.getUnit(i) as Unit).unitDescription);
 				
-				ModelLocator.getInstance().width = getSizeOfLongestTextInList(ModelLocator.getInstance().unitList);
-				popUpForUnitList = new SelectUnit();
-				popUpForUnitList.addEventListener(UnitChangedEvent.ITEM_SELECTED, selectedUnitChanged);
-				PopUpManager.addPopUp(popUpForUnitList,thisObject,true);
-				var xtemp:int = (width - ModelLocator.getInstance().width)/2;
-				if (xtemp < 0)
-					xtemp = width;
-				popUpForUnitList.x = xtemp;
+				aSelectUnit = new elementFromListPicker();
+				aSelectUnit.addEventListener(UnitChangedEvent.ITEM_SELECTED, selectedUnitChanged);
+				aSelectUnit.elements = unitList;
+				aSelectUnit.labelText1 = resourceManager.getString('addfooditemview','select_unit');
+				
+				PopUpManager.addPopUp(aSelectUnit,UIComponent(this.parentApplication),true);
+				PopUpManager.centerPopUp(aSelectUnit);
 				
 				function selectedUnitChanged(event:UnitChangedEvent):void {
-					popUpForUnitList.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
-					PopUpManager.removePopUp(popUpForUnitList);
+					aSelectUnit.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
+					PopUpManager.removePopUp(aSelectUnit);
 					details_button_text = createDetailsButtonText(event.index,-1);
 					selectedUnit = event.index;
 					if (retrievedFoodItem.getUnit(event.index).standardAmount != 100)
@@ -354,8 +327,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			}
 			
 			private function onRemove():void {
-				if (popUpForUnitList != null)
-					PopUpManager.removePopUp(popUpForUnitList);
+				if (aSelectUnit != null)
+					PopUpManager.removePopUp(aSelectUnit);
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 			}
