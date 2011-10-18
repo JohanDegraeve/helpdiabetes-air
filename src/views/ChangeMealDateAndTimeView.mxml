@@ -26,7 +26,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 		preinitialize="preInit()"
 		creationComplete="onCreationComplete()"
 		title="ChangeMealDateAndTime"
-		removed="onRemoved(event)">
+		backKeyPressed="view1_backKeyPressedHandler(event)">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}">
 			
@@ -135,12 +135,6 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				navigator.popView();
 			}
 			
-			private function onRemoved(event:Event):void
-			{
-				if (dateOrTimePicket != null)
-					PopUpManager.removePopUp(dateOrTimePicket);
-			}
-
 			/**
 			 * if a meal is added then the reference to that meal is returned 
 			 */
@@ -150,6 +144,18 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				}
 				else return null;
 			}
+			
+			protected function view1_backKeyPressedHandler(event:FlexEvent):void
+			{
+				if (dateOrTimePicket != null) {
+					if (dateOrTimePicket.isPopUp) {
+						PopUpManager.removePopUp(dateOrTimePicket);
+						event.preventDefault();
+					}
+					dateOrTimePicket = null;
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	

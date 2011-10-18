@@ -17,8 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsBolusCalculationView" removed="onRemoved(event)"
-		>
+		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsBolusCalculationView" 
+		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -43,6 +43,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
 			
+			import spark.events.ViewNavigatorEvent;
+			
 			private var amountPicker:AmountPicker;
 			private var confirmationPicker:RequestConfirmation;
 			
@@ -52,11 +54,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private var firstTime:Boolean = true;
 			
+			private function onBackKeyPressed(event:Event):void {
+				if (amountPicker != null) {
+					if (amountPicker.isPopUp) {
+						PopUpManager.removePopUp(amountPicker);
+						event.preventDefault();
+					}
+					amountPicker = null;
+				} 
+				if (confirmationPicker != null) {
+					if (confirmationPicker.isPopUp) {
+						PopUpManager.removePopUp(confirmationPicker);
+						event.preventDefault();
+					}
+					confirmationPicker = null;
+				}  
+			}
+			
 			private function breakfastSettingClicked(event:Event):void  {
 				prepareAmountPicker(parseFloat(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST)),resourceManager.getString('general','breakfast'),Settings.SettingINSULIN_RATIO_BREKFAST,breakfastRatio);
 			}
 
-			private function lunchSettingClicked(event:Event):void  {
+			private function lunchSettingClicked(event:Event):void  {				
 				prepareAmountPicker(parseFloat(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_LUNCH)),resourceManager.getString('general','lunch'),Settings.SettingINSULIN_RATIO_LUNCH,lunchRatio);
 			}
 			
@@ -133,10 +152,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						checkOtherSettings(event.newValue as Number);
 					}
 				}
-				
-
 			}
-			
 			
 			private function checkOtherSettings(newValue:Number):void {
 				firstTime = false;
@@ -182,14 +198,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 				}
-			}
-			
-			private function onRemoved(event:Event):void
-			{
-				if (amountPicker != null)
-					PopUpManager.removePopUp(amountPicker);
-				if (confirmationPicker != null)
-					PopUpManager.removePopUp(confirmationPicker);
 			}
 			
 		]]>

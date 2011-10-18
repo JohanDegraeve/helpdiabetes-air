@@ -22,7 +22,8 @@ view to add a new meal
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		creationComplete="onCreationComplete()"
-		title="AddMealView">
+		title="AddMealView"
+		backKeyPressed="view1_backKeyPressedHandler(event)">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
 		<s:DateTimeFormatter id ="timeformatter" dateTimePattern="{resourceManager.getString('general','timepattern')}" useUTC="false"/>
@@ -37,6 +38,7 @@ view to add a new meal
 			
 			import model.ModelLocator;
 			
+			import mx.events.FlexEvent;
 			import mx.formatters.DateFormatter;
 			import mx.managers.PopUpManager;
 			
@@ -150,6 +152,19 @@ view to add a new meal
 				}
 				else return null;
 			}
+			
+			protected function view1_backKeyPressedHandler(event:FlexEvent):void
+			{
+				if (dateOrTimePicker != null) {
+					if (dateOrTimePicker.isPopUp)
+					{
+						PopUpManager.removePopUp(dateOrTimePicker);
+						event.preventDefault();
+					}
+					dateOrTimePicker = null;
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	<s:navigationContent>
