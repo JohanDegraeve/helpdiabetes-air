@@ -271,7 +271,7 @@ you can also define maximum amount of digits after decimal point, maximum amount
 			<s:Label text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
 			<s:Line width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="2"/>
+					<s:SolidColorStroke color="0xcccccc" weight="3"/>
 				</s:stroke>
 			</s:Line>
 			<s:HGroup width="100%">

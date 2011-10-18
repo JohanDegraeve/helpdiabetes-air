@@ -100,7 +100,7 @@ client needs to set currentDate, which is a timestamp in ms. User can only chang
 			<s:Label text="{dayformatter.format(currentDate)}" width="100%" styleName="textColorInPickerOnDarkBackground"/>
 			<s:Line width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="2"/>
+					<s:SolidColorStroke color="0xcccccc" weight="3"/>
 				</s:stroke>
 			</s:Line>
 			<s:HGroup width="100%">
