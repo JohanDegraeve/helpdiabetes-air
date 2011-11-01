@@ -1,37 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <foodtable>
-   <timestamp><![CDATA[20111510235443]]></timestamp>
-   <source><![CDATA[Axelle]]></source>
+   <timestamp><![CDATA[20111030221849]]></timestamp>
+   <source><![CDATA[ ]]></source>
    <fooditemlist>
-      <fooditem>
-         <description><![CDATA[Abricot (hors noyau)]]></description>
-         <unitlist>
-            <unit>
-               <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[9.2]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[moyen (45g)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[4.1]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[portion de 4 moyens ou 5 petits (180g)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[16.5]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-         </unitlist>
-      </fooditem>
       <fooditem>
          <description><![CDATA[Abricot au sirop léger]]></description>
          <unitlist>
@@ -214,7 +185,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Airelle (hors noyau)]]></description>
+         <description><![CDATA[Airelle]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -317,6 +288,14 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[17.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[portion de 30g (Curly Club - Moyenne - 50%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[15.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -918,6 +897,35 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Barbe à papa]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[95.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[petite de 25g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[23.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[grande de 50g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[47.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Barquette 3 châtons de Lu]]></description>
          <unitlist>
             <unit>
@@ -937,7 +945,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[biscuit au chocolat  de 6.6g (65,2%)]]></description>
+               <description><![CDATA[biscuit au chocolat  de 6.6g (65.2%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -1008,7 +1016,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 28,5g]]></description>
+               <description><![CDATA[unité de 28.5g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -1043,7 +1051,7 @@
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[110]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[72.0]]></carbs>
@@ -1100,7 +1108,7 @@
          <description><![CDATA[Barre Fitness (Nestlé)]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[unité de 23,5g (fraise-69.5%)]]></description>
+               <description><![CDATA[unité de 23.5g (fraise-69.5%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -1108,7 +1116,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 23,5g (chocolat-74.8%)]]></description>
+               <description><![CDATA[unité de 23.5g (chocolat-74.8%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -1146,7 +1154,7 @@
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[109]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[72.0]]></carbs>
@@ -1364,7 +1372,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 21,9g]]></description>
+               <description><![CDATA[unité de 21.9g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -1372,7 +1380,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[mini de 15,5g (72.4%)]]></description>
+               <description><![CDATA[mini de 15.5g (72.4%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -1465,14 +1473,14 @@
          <unitlist>
             <unit>
                <description><![CDATA[g (chocolat)]]></description>
-               <standardamount><![CDATA[104]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[76.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 21,5g (chocolat)]]></description>
+               <description><![CDATA[unité de 21.5g (chocolat)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -1517,7 +1525,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 21,5g (fruits rouges-77%)]]></description>
+               <description><![CDATA[unité de 21.5g (fruits rouges-77%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -1530,8 +1538,8 @@
          <description><![CDATA[Barre Spécial K mini breaks (Kelloggs)]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[g (nature, citron, chocolat, fraise)]]></description>
-               <standardamount><![CDATA[107]]></standardamount>
+               <description><![CDATA[g (nature| citron| chocolat| fraise)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[73.0]]></carbs>
@@ -1552,7 +1560,7 @@
          <unitlist>
             <unit>
                <description><![CDATA[g (brownie choco)]]></description>
-               <standardamount><![CDATA[112]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[67.0]]></carbs>
@@ -1568,7 +1576,7 @@
             </unit>
             <unit>
                <description><![CDATA[g (choc. noisette)]]></description>
-               <standardamount><![CDATA[111]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[66.0]]></carbs>
@@ -1589,7 +1597,7 @@
          <unitlist>
             <unit>
                <description><![CDATA[g (choc. au lait)]]></description>
-               <standardamount><![CDATA[113]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[72.0]]></carbs>
@@ -1605,7 +1613,7 @@
             </unit>
             <unit>
                <description><![CDATA[g (choc. noisette)]]></description>
-               <standardamount><![CDATA[114]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[71.0]]></carbs>
@@ -1666,7 +1674,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[22.2]]></carbs>
+               <carbs><![CDATA[22.22]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -2023,7 +2031,7 @@
             </unit>
             <unit>
                <description><![CDATA[biscuit de 13g (Monoprix - 70%)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[9.0]]></carbs>
@@ -2126,7 +2134,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[35.7]]></carbs>
+               <carbs><![CDATA[35.71]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -2175,7 +2183,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[mini (7g)]]></description>
+               <description><![CDATA[mini de 7g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -2241,7 +2249,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[verre pu briquen(20cl)]]></description>
+               <description><![CDATA[verre ou brique (20cl)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -2254,7 +2262,7 @@
          <description><![CDATA[Boisson chocolatée Banania (McDo)]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[verre (200ml)]]></description>
+               <description><![CDATA[verre de 200ml]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -2321,7 +2329,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité de 4g]]></description>
-               <standardamount><![CDATA[5]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[3.9]]></carbs>
@@ -2470,8 +2478,8 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[biscuit de 5,9g (Monoprix - 81%)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
+               <description><![CDATA[biscuit de 5.9g (Monoprix - 81%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[4.7]]></carbs>
@@ -2807,7 +2815,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyen (140g)]]></description>
+               <description><![CDATA[fruit moyen (140g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -3271,7 +3279,7 @@
             </unit>
             <unit>
                <description><![CDATA[pièce dite bouchée (17g)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[10.2]]></carbs>
@@ -3328,7 +3336,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[cub's de 4,3g]]></description>
+               <description><![CDATA[cub's de 4.3g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -3697,7 +3705,7 @@
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[101]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[73.9]]></carbs>
@@ -3726,7 +3734,7 @@
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[102]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[74.2]]></carbs>
@@ -3784,7 +3792,7 @@
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[103]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[73.2]]></carbs>
@@ -3832,7 +3840,7 @@
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[26.1]]></carbs>
+               <carbs><![CDATA[26.05]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -3958,7 +3966,7 @@
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[104]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[80.3]]></carbs>
@@ -4581,6 +4589,14 @@
                <carbs><![CDATA[23.9]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
+            <unit>
+               <description><![CDATA[portion de 30g + 125ml de lait]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.2]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
          </unitlist>
       </fooditem>
       <fooditem>
@@ -4848,6 +4864,14 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[24.9]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[portion de 30g + 125ml de lait]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[31.1]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -5166,7 +5190,7 @@
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[29.1]]></carbs>
+               <carbs><![CDATA[29.05]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -5327,13 +5351,8 @@
                <carbs><![CDATA[76.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
-         </unitlist>
-      </fooditem>
-      <fooditem>
-         <description><![CDATA[Cerises au sirop]]></description>
-         <unitlist>
             <unit>
-               <description><![CDATA[g]]></description>
+               <description><![CDATA[g (au sirop)]]></description>
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -5396,7 +5415,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 12,5g]]></description>
+               <description><![CDATA[unité de 12.5g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -6268,7 +6287,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 7,2g]]></description>
+               <description><![CDATA[unité de 7.2g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -6283,6 +6302,14 @@
                <carbs><![CDATA[63.5]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
+            <unit>
+               <description><![CDATA[unité de 7.5g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[4.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
          </unitlist>
       </fooditem>
       <fooditem>
@@ -6293,7 +6320,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[13.8]]></carbs>
+               <carbs><![CDATA[13.77]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -6307,7 +6334,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Citron frais pulpe]]></description>
+         <description><![CDATA[Citron jaune (hors peau)]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -6373,7 +6400,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (70g)]]></description>
+               <description><![CDATA[fruit moyen (70g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -6536,19 +6563,6 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Coeur de boeuf (anone - fruit exotique)]]></description>
-         <unitlist>
-            <unit>
-               <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[15.0]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-         </unitlist>
-      </fooditem>
-      <fooditem>
          <description><![CDATA[Coeur de palmier (légume)]]></description>
          <unitlist>
             <unit>
@@ -6666,7 +6680,15 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[15.8]]></carbs>
+               <carbs><![CDATA[14.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[c. à soupe (20g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[2.9]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -6679,15 +6701,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[14.5]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[c. à soupe (20g)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[2.9]]></carbs>
+               <carbs><![CDATA[15.8]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -6814,6 +6828,56 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Confiture ou gelée (moyenne)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[60.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[c. à soupe (30g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[18.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Congolais (ou rocher à la noix de coco)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[grand (boulangerie)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[15.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[petit (recette maison)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[7.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (marque Locmaria)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[57.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Cookie au chocolat ou pépites ou fourrés cacao]]></description>
          <unitlist>
             <unit>
@@ -6826,7 +6890,7 @@
             </unit>
             <unit>
                <description><![CDATA[g (chocolat - Auchan)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[62.7]]></carbs>
@@ -6842,7 +6906,7 @@
             </unit>
             <unit>
                <description><![CDATA[g (pépites - Auchan)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[57.0]]></carbs>
@@ -6930,7 +6994,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Coquille de poissont jacques s béchamel]]></description>
+         <description><![CDATA[Coquille de poisson st-jacques, béchamel]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -6954,14 +7018,6 @@
          <description><![CDATA[Cornet glace ou sorbet]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[ml (hors cornet)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[20.0]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
                <description><![CDATA[cornet 1 boule (50 ml)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
@@ -6980,20 +7036,52 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Cornichon]]></description>
+         <description><![CDATA[Cornet glace ou sorbet (vide)]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[g]]></description>
+               <description><![CDATA[g (classique)]]></description>
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[2.2]]></carbs>
+               <carbs><![CDATA[76.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[cornet simple de 6g (vide)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[4.8]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[cornet double de 10g (vide)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[7.6]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (gaufrette Picard)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[85.4]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[cornet gaufrette épaisse de 12.5g (Picard)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[10.7]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Cornichons]]></description>
+         <description><![CDATA[Cornichon]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -7056,7 +7144,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Coulis fruits rouges (framboise, fraise, groseille, cassis)]]></description>
+         <description><![CDATA[Coulis fruits rouges (framboise. fraise. groseille. cassis)]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -7118,7 +7206,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[71.4]]></carbs>
+               <carbs><![CDATA[71.43]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -7143,7 +7231,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 16,7g]]></description>
+               <description><![CDATA[unité de 16.7g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -7159,7 +7247,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 16,7g]]></description>
+               <description><![CDATA[unité de 16.7g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -7390,11 +7478,122 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Crêpe  nature]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (pâte maison peu sucrée)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 50g (pâte maison peu sucrée - diam.30cm)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[15.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (à emporter)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[40.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité artisanale de 60g (diam.35cm)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[16.8]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 70g (marque Picard - (30% glucides) ]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[21.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Crêpe au sucre]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[unité de 50g (pâte maison peu sucrée - diam. 20cm) + sucre]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[20.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 25g (industrielle - diam. 25cm  - 59% glucides)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[15.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité artisanale de 70g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[25.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Crêpe fourrée chocolat ou confiture]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[unité de 50g (pâte maison peu sucrée - diam. 20cm) + garniture]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[25.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité (à emporter ou crêperie) avec Nutella]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[35.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (Picard)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[33.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[Picard crêpe chocolat 80g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[27.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Crêpe fourrée Whaou]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[unité de 31g (chocolat-58%)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[18.0]]></carbs>
@@ -7430,6 +7629,43 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[17.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Crêpe salée (fromage, jambon)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[20.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[petite (50g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[10.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[grande (150g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité Findus de 50 g (18%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[9.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -7538,6 +7774,27 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Croissant au jambon]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[23.1]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 130g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Croque (McDo)]]></description>
          <unitlist>
             <unit>
@@ -7559,6 +7816,27 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Croque madame]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[16.1]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 90g à 100g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[16.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Croque monsieur]]></description>
          <unitlist>
             <unit>
@@ -7570,7 +7848,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 200g (Picard - 27,2%)]]></description>
+               <description><![CDATA[unité de 200g (Picard - 27.2%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -7591,6 +7869,51 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[39.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[Tendre Croque Herta Au Toaster ! de 100g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[29.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Croque monsieur]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[unité de 90g à 100g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[23.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[Tendre Croque Herta  de 100g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[27.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[Tendre Croque Herta Maxi de 150g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[39.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 200g (Picard - 27.2%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[54.3]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -7901,7 +8224,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Datte fraîche (hors noyau)]]></description>
+         <description><![CDATA[Datte fraîche]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -7912,7 +8235,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (13g)]]></description>
+               <description><![CDATA[fruit moyen (13g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -8141,6 +8464,19 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Dragée]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[unité de 5g (Festy - 82%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[4.1]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Duplo]]></description>
          <unitlist>
             <unit>
@@ -8223,7 +8559,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 50g (Picard - 29,6%)]]></description>
+               <description><![CDATA[unité de 50g (Picard - 29.6%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -8299,6 +8635,14 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[20.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[pot de 125g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[25.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -8412,7 +8756,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 6,6g]]></description>
+               <description><![CDATA[unité de 6.6g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -8631,7 +8975,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Féculents - moyenne (riz, pâtes, pommes de terre, couscous, blé)]]></description>
+         <description><![CDATA[Féculents - moyenne (riz. pâtes. pommes de terre. couscous. blé)]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g (cuisson à l'eau)]]></description>
@@ -8723,6 +9067,48 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Feuilleté au saumon]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[19.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[part de 120g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[23.6]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Feuilleté béchamel,fromage, jambon]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[27.3]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[part de 120g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[32.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Feuilleté doré de Lu]]></description>
          <unitlist>
             <unit>
@@ -8798,7 +9184,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité moyenne (100g)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[10.5]]></carbs>
@@ -8818,7 +9204,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (40g)]]></description>
+               <description><![CDATA[fruit moyen (40g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -8957,6 +9343,35 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[22.4]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Flammenkueche]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (moyenne)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[29.1]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (Picard)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[22.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[individuelle (120g  - Picard)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[27.5]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -9317,7 +9732,44 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Frite (McDo)]]></description>
+         <description><![CDATA[Friand à la viande ou fromage]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (fromage)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[29.6]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité au fromage de 80g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[23.6]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (à la viande)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[17.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité à la viande de 80g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[13.6]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Frite (McDo - restauration)]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -9354,22 +9806,14 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Frites maison]]></description>
+         <description><![CDATA[Frites (surgelées)]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[g (friteuse)]]></description>
+               <description><![CDATA[g (friteuse - moyenne)]]></description>
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[33.0]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[assiette de 150g]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[49.5]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -9378,6 +9822,30 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[27.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (friteuse - Mc Cain)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[21.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (four - Mc Cain)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[24.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (micro-ondes - Mc Cain)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[33.5]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -9464,6 +9932,35 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Fruit confit]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[80.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (assortis - Vahiné)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[76.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (macédoine - Vahiné)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[75.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Fruit de la passion]]></description>
          <unitlist>
             <unit>
@@ -9526,7 +10023,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[16.7]]></carbs>
+               <carbs><![CDATA[16.67]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -9560,7 +10057,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[66.7]]></carbs>
+               <carbs><![CDATA[66.67]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -9574,7 +10071,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Fruits rouges (framboise, fraise, groseille, cassis) moyenne]]></description>
+         <description><![CDATA[Fruits rouges (framboise. fraise. groseille. cassis) moyenne]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -9616,7 +10113,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Galette de maîs (Bjorg)]]></description>
+         <description><![CDATA[Galette de maïs (Bjorg)]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -9661,6 +10158,96 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[18.3]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Galette de sarrasin  nature]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 30g (diam.20cm)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[9.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 50g (diam.30cm)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[15.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 65g (diam.40cm)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[19.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 50g (Picard - 33.8%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[16.9]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Galette de sarrasin jambon,fromage (diam. 30cm)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (moyenne)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[20.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 100g (galette 50g + garniture 50g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[20.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[grande complète (crêperie)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[25.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[complète Picard (150g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[18.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[industrielle jambon fromage (150g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[25.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -9769,6 +10356,135 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[32.1]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Gateau de semoule]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[18.9]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (conserve Yabon)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[15.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Gâteau maison ou Pâtisserie (moyenne)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[part]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[40.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Gâteaux secs (moyenne)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[70.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[gâteau de 10g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[7.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Gaufre  nature, chantilly , sucre]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (nature| recette maison avec pâte sans sucre)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité à emporter ou restaurant (70g - 43%) nature]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité à emporter ou restaurant (70g) avec sucre glace ou chantilly]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[35.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Gaufre industrielle]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (moyenne)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[55.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 33g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[18.1]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 33g (marque Brichard-55.6%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[18.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[Fantasia de 44g (marque Belbake-55.8%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[24.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[gaufre sucrée de Liège de 50g (55.4% - Lotus)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[27.7]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -10063,6 +10779,51 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Gougère]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[18.8]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[petite de 8g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[1.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[portion de 12 petites (100g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[18.8]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[grande de 50g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[9.4]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[petite de 8g - Picard-24.5%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[2.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Goûters REM de Lu]]></description>
          <unitlist>
             <unit>
@@ -10276,7 +11037,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[bâtonnet de 6,6g]]></description>
+               <description><![CDATA[bâtonnet de 6.6g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -10297,7 +11058,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 5,4g]]></description>
+               <description><![CDATA[unité de 5.4g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -10352,19 +11113,6 @@
          <description><![CDATA[Guacamole]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[5.1]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-         </unitlist>
-      </fooditem>
-      <fooditem>
-         <description><![CDATA[Guacamole]]></description>
-         <unitlist>
-            <unit>
                <description><![CDATA[g (moyenne)]]></description>
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
@@ -10389,11 +11137,24 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[g (Monorpix)]]></description>
+               <description><![CDATA[g (Monoprix)]]></description>
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[5.8]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Guacamole]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[5.1]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -10415,6 +11176,35 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[10.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Hachis parmentier]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[10.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[assiette de 300g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[40.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (Marie)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[13.7]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -10864,6 +11654,35 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Kebab (pain, tomate, viande, salade)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[unité sans frites]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[60.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (non garni - Jacquet)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[53.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[pièce non garnie de 80g (Jacquet)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[42.4]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Kéfir]]></description>
          <unitlist>
             <unit>
@@ -11264,7 +12083,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyen (100g)]]></description>
+               <description><![CDATA[fruit moyen (100g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -11491,39 +12310,10 @@
             </unit>
             <unit>
                <description><![CDATA[petit verre (10cl)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[13.5]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-         </unitlist>
-      </fooditem>
-      <fooditem>
-         <description><![CDATA[Lait de soja nature]]></description>
-         <unitlist>
-            <unit>
-               <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[1.5]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[petit verre (10 cl)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[1.5]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[verre (20cl)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[3.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -11642,6 +12432,35 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Lasagnes à la bolognaise]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[11.6]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[assiette de 300g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[40.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (Marie)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[14.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Le M (McDo)]]></description>
          <unitlist>
             <unit>
@@ -11697,7 +12516,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Légumes secs, cuits (moyenne)]]></description>
+         <description><![CDATA[Légumes secs cuits (moyenne)]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -11945,7 +12764,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyen (13g)]]></description>
+               <description><![CDATA[fruit moyen (13g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -11966,51 +12785,6 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[16.2]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-         </unitlist>
-      </fooditem>
-      <fooditem>
-         <description><![CDATA[Lulu Ourson biscuit Lu]]></description>
-         <unitlist>
-            <unit>
-               <description><![CDATA[g (chocolat)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[58.0]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[biscuit au chocolat de 30g]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[17.4]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[mini biscuit de 6.8g (chocolat)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[4.2]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[biscuit de 30g (fraise ou framboise)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[19.0]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[mini biscuit de 6.8g (fraise ou framboise)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[4.4]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -12148,7 +12922,7 @@
          <description><![CDATA[Madeleine Bijou]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[nature de 17,6g (56%)]]></description>
+               <description><![CDATA[nature de 17.6g (56%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -12156,7 +12930,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[au chocolat de 21,6g (55%)]]></description>
+               <description><![CDATA[au chocolat de 21.6g (55%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -12264,7 +13038,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Maizena ou fécule de maïs]]></description>
+         <description><![CDATA[Maïzena ou fécule de maïs]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -12346,7 +13120,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (100g)]]></description>
+               <description><![CDATA[fruit moyen (100g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -12525,7 +13299,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité avec nappage chocolat (38g)]]></description>
-               <standardamount><![CDATA[2]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[70.0]]></carbs>
@@ -12533,7 +13307,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité avec nappage caramel (41g)]]></description>
-               <standardamount><![CDATA[2]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[79.0]]></carbs>
@@ -12541,7 +13315,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité avec nappage chocolat blanc (35g)]]></description>
-               <standardamount><![CDATA[2]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[71.0]]></carbs>
@@ -12562,7 +13336,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité avec nappage chocolat (38g)]]></description>
-               <standardamount><![CDATA[3]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[67.0]]></carbs>
@@ -12570,7 +13344,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité avec nappage caramel (41g)]]></description>
-               <standardamount><![CDATA[3]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[76.0]]></carbs>
@@ -12578,7 +13352,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité avec nappage chocolat blanc (35g)]]></description>
-               <standardamount><![CDATA[3]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[68.0]]></carbs>
@@ -12599,7 +13373,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité avec nappage chocolat (38g)]]></description>
-               <standardamount><![CDATA[4]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[70.0]]></carbs>
@@ -12607,7 +13381,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité avec nappage caramel (41g)]]></description>
-               <standardamount><![CDATA[4]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[79.0]]></carbs>
@@ -12615,7 +13389,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité avec nappage chocolat blanc (35g)]]></description>
-               <standardamount><![CDATA[4]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[71.0]]></carbs>
@@ -12852,7 +13626,7 @@
             </unit>
             <unit>
                <description><![CDATA[g (liquide ou crémeux - Auchan)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[78.0]]></carbs>
@@ -13021,7 +13795,7 @@
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[3.8]]></carbs>
+               <carbs><![CDATA[3.75]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -13100,7 +13874,7 @@
             </unit>
             <unit>
                <description><![CDATA[unité de 25g fraise - Auchan - 65%)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
+               <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[16.3]]></carbs>
@@ -13167,7 +13941,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Minirouké de Lu]]></description>
+         <description><![CDATA[Miniroulé de Lu]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g (moyenne)]]></description>
@@ -13257,7 +14031,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (18g)]]></description>
+               <description><![CDATA[fruit moyen (18g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -13507,7 +14281,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[pot de 12cl (ch.noir - La Laitière - 21,5%)]]></description>
+               <description><![CDATA[pot de 12cl (ch.noir - La Laitière - 21.5%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -13613,7 +14387,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[25.4]]></carbs>
+               <carbs><![CDATA[25.38]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -13833,7 +14607,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (160g)]]></description>
+               <description><![CDATA[fruit moyen (160g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -13851,6 +14625,51 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[7.2]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Nem (pâté impérial)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (moyenne)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[18.3]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[grand de 60g (moyenne)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[11.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (moyenne Picard)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[24.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[petit de 32g (Picard)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[7.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[grand de 60g (Picard)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[14.4]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -14101,7 +14920,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Noix (sèche)]]></description>
+         <description><![CDATA[Noix]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -14145,7 +14964,7 @@
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[5.1]]></carbs>
+               <carbs><![CDATA[5.12]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -14263,7 +15082,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[20.8]]></carbs>
+               <carbs><![CDATA[20.83]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -14482,7 +15301,20 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Orange (épluchée, diam. avec peau)]]></description>
+         <description><![CDATA[Omelette norvégienne]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[ml (Picard)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[19.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Orange (épluchée. diam. avec peau)]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -14493,7 +15325,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (200g)]]></description>
+               <description><![CDATA[fruit moyen (200g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -14598,6 +15430,80 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[8.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Ourson Lulu biscuit Lu]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (chocolat)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[58.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[biscuit au chocolat de 30g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[17.4]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[mini biscuit de 6.8g (chocolat)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[4.2]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[biscuit de 30g (fraise ou framboise)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[19.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[mini biscuit de 6.8g (fraise ou framboise)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[4.4]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Paella]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[13.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[assiette de 350g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[45.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[aux gambas et safran (Marie)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[16.3]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -14827,7 +15733,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[tranche de 22g (au miel - Brossard - 72,6%)]]></description>
+               <description><![CDATA[tranche de 22g (au miel - Brossard - 72.6%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -14843,7 +15749,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[tranche de 18g (au miel - Auchan - 76,9%)]]></description>
+               <description><![CDATA[tranche de 18g (au miel - Auchan - 76.9%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -14881,7 +15787,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[42.9]]></carbs>
+               <carbs><![CDATA[42.86]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -14973,7 +15879,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[54.6]]></carbs>
+               <carbs><![CDATA[54.55]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -15035,7 +15941,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 15,6g]]></description>
+               <description><![CDATA[unité de 15.6g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -15102,14 +16008,14 @@
             </unit>
             <unit>
                <description><![CDATA[g (Monoprix)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[62.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[biscuit de 8,2g]]></description>
+               <description><![CDATA[biscuit de 8.2g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -15130,7 +16036,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 8,3g]]></description>
+               <description><![CDATA[unité de 8.3g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -15156,7 +16062,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Pamplemousse  (épluché, diam. avec peau) ou Pomelo]]></description>
+         <description><![CDATA[Pamplemousse  (épluché. diam. avec peau) ou Pomelo]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -15193,6 +16099,27 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[15.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Pan bagnat (sandwich niçois)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (non garni)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[50.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[pièce de 80g (non garnie)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[40.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -15253,6 +16180,43 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Panini non garni]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[50.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[pièce classique de 100g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[50.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[pièce ovale de 120 g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[60.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[pièce de 60g (Jacquet - 51%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.6]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Papaye (pulpe - fruit exotique)]]></description>
          <unitlist>
             <unit>
@@ -15269,6 +16233,43 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[26.8]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Papillote confiserie]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (pâte de fruit)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[80.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 10g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[8.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (chocolat)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[50.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 10g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[5.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -15327,7 +16328,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[fond (230g)]]></description>
+               <description><![CDATA[fond de 230g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -15464,8 +16465,45 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 25g (Gayelor - 78,8%)]]></description>
+               <description><![CDATA[unité de 25g (Gayelor - 78.8%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[20.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Pâté en croûte]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (maison)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[11.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[tranche de 50g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[5.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (aux pistaches - Monoprix)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[19.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (moyenne mini pâté en croûte)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[20.0]]></carbs>
@@ -15630,7 +16668,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (125g)]]></description>
+               <description><![CDATA[fruit moyen (125g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -15842,6 +16880,14 @@
                <carbs><![CDATA[7.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
+            <unit>
+               <description><![CDATA[verre de 20cl]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[14.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
          </unitlist>
       </fooditem>
       <fooditem>
@@ -15935,7 +16981,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 16,7g]]></description>
+               <description><![CDATA[unité de 16.7g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -15956,7 +17002,7 @@
          <description><![CDATA[Petit déjeuner ou p'tit déjeuner de Lu (moyenne)]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[biscuit de 12,5g]]></description>
+               <description><![CDATA[biscuit de 12.5g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -15990,7 +17036,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Petit Ecolier Chocolat blanc, lait ou noir]]></description>
+         <description><![CDATA[Petit Ecolier Chocolat blanc. lait ou noir]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g (moyenne)]]></description>
@@ -16051,6 +17097,80 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[2.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Petit four salé]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (moyenne)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 10g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[3.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[portion de 3]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[9.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 10g - moyenne Picard (25%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[2.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Petit four sucré]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[50.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[pièce (env. 13g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[7.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[portion de 3]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[20.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité moyenne Picard (8g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[4.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -16411,7 +17531,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Pim's]]></description>
+         <description><![CDATA[Pims]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g (moyenne fruits)]]></description>
@@ -16569,7 +17689,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Plat du jour avec 200g de féculents (pâtes, riz, PdTerre)]]></description>
+         <description><![CDATA[Plat du jour avec 200g de féculents (pâtes. riz. PdTerre)]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[assiette]]></description>
@@ -17020,48 +18140,6 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Pommes de terre frites maison]]></description>
-         <unitlist>
-            <unit>
-               <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[33.0]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[assiette de 150g]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[49.5]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-         </unitlist>
-      </fooditem>
-      <fooditem>
-         <description><![CDATA[Pommes de terre frites surgelées ]]></description>
-         <unitlist>
-            <unit>
-               <description><![CDATA[g]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[23.5]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[assiette de 150g]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[35.2]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-         </unitlist>
-      </fooditem>
-      <fooditem>
          <description><![CDATA[Pommes de terre purée]]></description>
          <unitlist>
             <unit>
@@ -17304,6 +18382,27 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Potage de légumes, soupe]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[4.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[bol (25cl)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[10.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Potiron, potimarron cuit]]></description>
          <unitlist>
             <unit>
@@ -17475,44 +18574,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Prosper]]></description>
-         <unitlist>
-            <unit>
-               <description><![CDATA[g (au lait)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[72.0]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[biscuit de 25g]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[18.0]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[g (nature)]]></description>
-               <standardamount><![CDATA[100]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[69.0]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[biscuit de 25g]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[17.2]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-         </unitlist>
-      </fooditem>
-      <fooditem>
-         <description><![CDATA[Prune (pulpe)]]></description>
+         <description><![CDATA[Prune (hors noyau)]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -17523,7 +18585,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (36g)]]></description>
+               <description><![CDATA[fruit moyen (36g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -17760,16 +18822,16 @@
          <description><![CDATA[Quenelle Conserves Petitjean]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[volaille au naturel]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
+               <description><![CDATA[g (volaille au naturel)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[9.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[de veau au naturel]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
+               <description><![CDATA[g (veau au naturel)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[8.5]]></carbs>
@@ -17785,18 +18847,47 @@
             </unit>
             <unit>
                <description><![CDATA[g (brochet sauce Nantua)]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[9.7]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[Volaille sauce tomate]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
+               <description><![CDATA[g (volaille sauce tomate)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[7.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Quenelle fraîche + sauce béchamel]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[18.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[portion de 80g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[15.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (mini quenelles à poeler-Lustucru)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[16.5]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -17842,7 +18933,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (35g)]]></description>
+               <description><![CDATA[fruit moyen (35g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -18137,7 +19228,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[moyenne (30g)]]></description>
+               <description><![CDATA[fruit moyen (30g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -18310,6 +19401,35 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Risotto]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[15.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (saumon et poireaux à la crème - Marie)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[15.2]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (moyenne Picard)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[20.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Riz à la cantonaise (Marie)]]></description>
          <unitlist>
             <unit>
@@ -18358,7 +19478,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[pot de 125g (Mont-Blanc - 20,7%)]]></description>
+               <description><![CDATA[pot de 125g (Mont-Blanc - 20.7%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -18371,19 +19491,56 @@
          <description><![CDATA[Riz blanc]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[g (cuit)]]></description>
+               <description><![CDATA[g (moyenne générale Féculents)]]></description>
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[26.3]]></carbs>
+               <carbs><![CDATA[20.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[assiette de 200g]]></description>
+               <description><![CDATA[portion de 150g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[52.6]]></carbs>
+               <carbs><![CDATA[30.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (cuit - moyenne Ciqual 2008)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[27.2]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (sec - moyenne Ciqual 2008)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[78.1]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Riz cantonnais]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[19.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (à la cantonaise - Marie)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[20.8]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -18392,19 +19549,27 @@
          <description><![CDATA[Riz complet]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[g (cuit)]]></description>
+               <description><![CDATA[g (moyenne générale Féculents)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[20.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[portion de 150g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[30.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (cuit - moyenne Ciqual 2008)]]></description>
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[29.2]]></carbs>
-               <fat><![CDATA[-1.0]]></fat>
-            </unit>
-            <unit>
-               <description><![CDATA[assiette de 200g]]></description>
-               <standardamount><![CDATA[1]]></standardamount>
-               <kcal><![CDATA[-1]]></kcal>
-               <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[58.4]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -18645,7 +19810,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[13.3]]></carbs>
+               <carbs><![CDATA[13.33]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -18698,7 +19863,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Salade niçoise 'vraie' sans riz ni pomme de terre]]></description>
+         <description><![CDATA[Salade niçoise classique sans riz ni pomme de terre]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g]]></description>
@@ -18830,7 +19995,7 @@
          <description><![CDATA[Sandwich (baguette ou pain de mie)]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[pièce de 2 tranches standard de 30g + garniture]]></description>
+               <description><![CDATA[unité de 2 tranches standard de 30g + garniture]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -18838,7 +20003,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[pièce de 2 grandes tranches de 43g + garniture]]></description>
+               <description><![CDATA[unité de 2 grandes tranches de 43g + garniture]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -19160,6 +20325,22 @@
                <carbs><![CDATA[12.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
+            <unit>
+               <description><![CDATA[dose sauce Curry de 32g (25%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[8.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[dose sauce Moutarde de 29g (34.5%)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[10.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
          </unitlist>
       </fooditem>
       <fooditem>
@@ -19358,7 +20539,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[Portion de 125g cru]]></description>
+               <description><![CDATA[portion de 125g cru]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -19431,6 +20612,35 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Smarties]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[72.1]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[tube hexagonal (19g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[13.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[boite de minis  (14.4g)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[10.4]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Sodas (moyenne) : coca cola, orangina, fanta, limonade, sprite, schweppes]]></description>
          <unitlist>
             <unit>
@@ -19497,6 +20707,85 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Soufflé au fromage]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[5.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[part de 100g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[5.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (Picard)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[7.1]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[pièce de 120g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[8.5]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Soupe de légumes (sans pomme de terre)]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[4.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[bol (25cl)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[10.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Soupe de poisson]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[ml]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[2.8]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[bol (25cl)]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[5.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Spaghetti cuits ]]></description>
          <unitlist>
             <unit>
@@ -19513,6 +20802,19 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[40.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Spaghettis bolognaise]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[13.1]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -19991,7 +21293,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[froide (25à32 g)]]></description>
+               <description><![CDATA[froide (25 à 32 g)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -20489,7 +21791,7 @@
          <description><![CDATA[Starbuck Nappage caramel]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[dose (4g)]]></description>
+               <description><![CDATA[dose de 4g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -20502,7 +21804,7 @@
          <description><![CDATA[Starbuck Nappage chocolat]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[dose (4g)]]></description>
+               <description><![CDATA[dose de 4g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -20515,7 +21817,7 @@
          <description><![CDATA[Starbuck Sauce Mocha]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[dose (17g)]]></description>
+               <description><![CDATA[dose de 17g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -20528,7 +21830,7 @@
          <description><![CDATA[Starbuck Sirop aromatisé ]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[dose (10g)]]></description>
+               <description><![CDATA[dose de 10g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -20615,7 +21917,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[mini de 6g (Chupa Chups - 93,7%)]]></description>
+               <description><![CDATA[mini de 6g (Chupa Chups - 93.7%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -20623,7 +21925,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[unité de 12g (Arlequin Lutti - 94,7%)]]></description>
+               <description><![CDATA[unité de 12g (Arlequin Lutti - 94.7%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -20706,7 +22008,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[20.7]]></carbs>
+               <carbs><![CDATA[20.69]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -20748,7 +22050,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[31.0]]></carbs>
+               <carbs><![CDATA[31.01]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -20769,7 +22071,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[9.2]]></carbs>
+               <carbs><![CDATA[9.23]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
@@ -20972,6 +22274,27 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Tarte aux pommes]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[35.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[part de 115g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[40.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Tarte feuilletée (Marie)]]></description>
          <unitlist>
             <unit>
@@ -20991,7 +22314,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[g (chorizo, piperade de légumes)]]></description>
+               <description><![CDATA[g (chorizo| piperade de légumes)]]></description>
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -21012,7 +22335,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[part (100g)]]></description>
+               <description><![CDATA[part de 100g]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -21049,7 +22372,7 @@
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
-               <description><![CDATA[individuelle de 150g (Picard - 40,2%)]]></description>
+               <description><![CDATA[individuelle de 150g (Picard - 40.2%)]]></description>
                <standardamount><![CDATA[1]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -21398,6 +22721,27 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Torsade aux pépites de chocolat]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[50.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[unité de 120g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[60.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Tortilla chips]]></description>
          <unitlist>
             <unit>
@@ -21456,7 +22800,7 @@
          </unitlist>
       </fooditem>
       <fooditem>
-         <description><![CDATA[Tortilla de mais souple]]></description>
+         <description><![CDATA[Tortilla de maïs souple]]></description>
          <unitlist>
             <unit>
                <description><![CDATA[g (Old El Paso)]]></description>
@@ -21488,6 +22832,51 @@
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
                <carbs><![CDATA[20.4]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
+         <description><![CDATA[Tourte]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g (légumes)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[22.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (pommes de terre)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[23.3]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (poireaux saumon - Picard)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[22.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (poireaux-saumon - Marie)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[22.7]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[g (champignons jambon - Marie)]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[23.4]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
          </unitlist>
@@ -21569,6 +22958,27 @@
          </unitlist>
       </fooditem>
       <fooditem>
+         <description><![CDATA[Truffe au chocolat]]></description>
+         <unitlist>
+            <unit>
+               <description><![CDATA[g]]></description>
+               <standardamount><![CDATA[100]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[50.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+            <unit>
+               <description><![CDATA[grande de 20g ou 2 petites de 10g]]></description>
+               <standardamount><![CDATA[1]]></standardamount>
+               <kcal><![CDATA[-1]]></kcal>
+               <protein><![CDATA[-1.0]]></protein>
+               <carbs><![CDATA[10.0]]></carbs>
+               <fat><![CDATA[-1.0]]></fat>
+            </unit>
+         </unitlist>
+      </fooditem>
+      <fooditem>
          <description><![CDATA[Tuc Original (apéritif)]]></description>
          <unitlist>
             <unit>
@@ -21622,7 +23032,7 @@
          <description><![CDATA[Tuile Pringles (apéritif)]]></description>
          <unitlist>
             <unit>
-               <description><![CDATA[g toutes saveurs)]]></description>
+               <description><![CDATA[g (toutes saveurs)]]></description>
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
@@ -21922,7 +23332,7 @@
                <standardamount><![CDATA[100]]></standardamount>
                <kcal><![CDATA[-1]]></kcal>
                <protein><![CDATA[-1.0]]></protein>
-               <carbs><![CDATA[160.0]]></carbs>
+               <carbs><![CDATA[60.0]]></carbs>
                <fat><![CDATA[-1.0]]></fat>
             </unit>
             <unit>
