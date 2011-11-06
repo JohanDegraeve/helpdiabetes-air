@@ -20,19 +20,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*"
 		title="TrackingView"
+		remove="onRemove()"
 		creationComplete="onCreationComplete()"
 		>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<fx:Metadata>
+		[ResourceBundle("trackingview")]
+	</fx:Metadata>
+	
 	<fx:Script>
 		<![CDATA[
 			import databaseclasses.MealEvent;
+			import databaseclasses.UnitChangedEvent;
 			
 			import model.ModelLocator;
 			
+			import mx.collections.ArrayCollection;
+			import mx.core.UIComponent;
+			import mx.managers.PopUpManager;
+			
 			import myComponents.IListElement;
+			import myComponents.elementFromListPicker;
+			
+			private var aSelectUnit:elementFromListPicker;
 
+			
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();
 			}
@@ -46,20 +60,54 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 			}
 			
-			private function onClick(event:MouseEvent):void {
-				//var temp:Object= (event.currentTarget as List).selectedIndex;
+			private function onListElementClicked(event:MouseEvent):void {
 				if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
 					navigator.pushView(EditMealEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex)); 					
 				}
 			}
+			
+			/**
+			 * pop up for list of possible trackingevents that can be added
+			 */ 
+			private function addButtonClicked(e:MouseEvent = null):void {
+				//if (!hasEventListener(ViewNavigatorEvent.REMOVING))
+				//this.addEventListener(ViewNavigatorEvent.REMOVING,onRemoving);	//necessary for handling the back button in android
+				
+				var trackingEventList:ArrayCollection = new ArrayCollection();
+				trackingEventList .addItem(resourceManager.getString('trackingview','glucoseevent'));
+
+				aSelectUnit = new elementFromListPicker();
+				aSelectUnit.addEventListener(UnitChangedEvent.ITEM_SELECTED, trackingEventSelected);
+				aSelectUnit.elements = trackingEventList;
+				
+				PopUpManager.addPopUp(aSelectUnit,UIComponent(this.parentApplication),true);
+				PopUpManager.centerPopUp(aSelectUnit);
+				
+			}
+			
+			private function trackingEventSelected(event:UnitChangedEvent):void {
+				aSelectUnit.removeEventListener(UnitChangedEvent.ITEM_SELECTED,trackingEventSelected);
+				PopUpManager.removePopUp(aSelectUnit);
+				navigator.pushView(EditBGEventView);
+			}
+
+			private function onRemove():void {
+				if (aSelectUnit != null)
+					PopUpManager.removePopUp(aSelectUnit);
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,trackingEventSelected);
+			}			
+
 		]]>
 	</fx:Script>
 	<s:navigationContent>
 		<s:Button label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
+	</s:actionContent>
 	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().trackingList}"
-			click="onClick(event)"
+			click="onListElementClicked(event)"
 			itemRendererFunction="getItemRenderer">
 		<s:layout>
 			<myComponents:TrackingViewLayout useVirtualLayout="true" />

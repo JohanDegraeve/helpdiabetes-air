@@ -361,22 +361,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private function amountTextChanged():void {
 				addFoodItemGroup.defaultAmountOverwritten = true;
 				
-				/* ****delete*//////
-				//first replace "," by ".", because flex doesn't seem to work correctly when using "," as decimal seperator
-				//var temp:String;
-				//temp = amount_textinput_text.split(",").join(".");
-				/* ****delete*//////
-				
-				/* ****delete*//////
-				//applying a trick here to get rid of too many ".", first replacing the first "." by "{", hoping the user will never type this character
-				//then replacing all remaining "." by "", then rereplacing "{" by "."
-				//temp = temp.split(".",2).join("{");
-				//temp = temp.split(".").join("");
-				//amount_textinput_text = temp.split("{",2).join(".");
-				/* * *********** */
-				
-				//now if amount = "" (ie empty string) set it to 0
-				//this means user has not entered any amount
 				if (amount_textinput_text == "")
 					amount_textinput_text = "0";
 

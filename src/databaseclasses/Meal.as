@@ -143,7 +143,7 @@ package databaseclasses
 				if (de != null) {
 					if (de.data != null) {
 						previousBGEvent = (de.data as BloodGlucoseEvent);
-						if (now.date.valueOf() - previousBGEvent.creationTimeStamp < new Number(Settings.getInstance().getSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL))) {
+						if (now.date.valueOf() - previousBGEvent.timeStamp < new Number(Settings.getInstance().getSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL))) {
 							previousBGlevel = previousBGEvent.bloodGlucoseLevel;
 						}
 					}

@@ -117,7 +117,7 @@ view to show ModelLocator.getInstance().meals in a list
 				return navigator.context;
 			}
 			
-			private function clickHandler(event:MouseEvent):void {
+			private function addButtonClicked(event:MouseEvent):void {
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
 
@@ -131,7 +131,7 @@ view to show ModelLocator.getInstance().meals in a list
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="clickHandler(event)"/>
+		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
 	</s:actionContent>
 	<s:List id="meallist" left="0" right="0" top="0" bottom="0" width="100%"
 			dataProvider="{ModelLocator.getInstance().meals}" 

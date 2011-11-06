@@ -1,13 +1,26 @@
 package databaseclasses
 {
-	public class BloodGlucoseEvent
+	import mx.core.ClassFactory;
+	
+	import myComponents.BloodGlucoseEventItemRenderer;
+	import myComponents.IListElement;
+	import myComponents.TrackingViewElement;
+
+	public class BloodGlucoseEvent extends TrackingViewElement implements IListElement
 	{
-		private var _creationTimeStamp:Number;
+		private var _timeStamp:Number;
 		private var _bloodGlucoseLevel:int;
 		
-		public function BloodGlucoseEvent()
+		/**
+		 * creates a bloodglucose event and stores it immediately in the database<br>
+		 * timeStamp will be set to current date and time<br>
+		 * unit is a textstring denoting the unit used, mgperdl, or ... 
+		 */
+		public function BloodGlucoseEvent(glucoseLevel:int,unit:String)
 		{
-			
+			this._bloodGlucoseLevel = glucoseLevel;		
+			_timeStamp = (new Date()).valueOf();
+			Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,unit,null);
 		}
 		
 		
@@ -21,15 +34,19 @@ package databaseclasses
 			_bloodGlucoseLevel = value;
 		}
 
-		public function get creationTimeStamp():Number
+		public function get timeStamp():Number
 		{
-			return _creationTimeStamp;
+			return _timeStamp;
 		}
 
-		private function set creationTimeStamp(value:Number):void
+		private function set timeStamp(value:Number):void
 		{
-			_creationTimeStamp = value;
+			_timeStamp = value;
 		}
-
+		
+		public function listElementRendererFunction():ClassFactory
+		{
+			return new ClassFactory(BloodGlucoseEventItemRenderer);
+		}
 	}
 }

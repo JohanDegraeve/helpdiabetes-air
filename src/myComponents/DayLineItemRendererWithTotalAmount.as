@@ -103,8 +103,6 @@ package myComponents
 			measuredMinHeight = measuredHeight;
 		}
 		
-
-		
 		/**
 		 * override the data property to initialize dayLineDisplay
 		 */
@@ -160,8 +158,11 @@ package myComponents
 			}
 			
 			// calculate MINIMUM_CARB_AMOUNT_WIDTH
-			var textLineMetricx:TextLineMetrics = this.measureText("9999 ...");
-			MINIMUM_AMOUNT_WIDTH = textLineMetricx.width;
+			if (MINIMUM_AMOUNT_WIDTH == 0) {
+				// calculate MINIMUM_CARB_AMOUNT_WIDTH
+				var textLineMetricx:TextLineMetrics = this.measureText("999 ...");
+				MINIMUM_AMOUNT_WIDTH = textLineMetricx.width;
+			}
 		}
 		
 		// Override styleChanged() to proopgate style changes to compLabelDisplay.
