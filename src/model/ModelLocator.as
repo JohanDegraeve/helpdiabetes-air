@@ -177,21 +177,21 @@ package model
 		/**
 		 * the calculated height that a styleabletextfield would normally have, calculated somewhere during startup 
 		 */
-		static public var StyleableTextFieldCalculatedHeight:int = 0;
+		static public var StyleableTextFieldCalculatedHeight:Number = 0;
 		
 		/**
 		 * the  preferred height that a styleabletextfield would normally have, calculated somewhere during startup 
 		 */
-		static public var StyleableTextFieldPreferredHeight:int = 0;
+		static public var StyleableTextFieldPreferredHeight:Number = 0;
 
-		static private var _offSetSoThatTextIsInTheMiddle:int=0;
+		static private var _offSetSoThatTextIsInTheMiddle:Number=0;
 		
 		
 
 		/**
 		 * offset to be used top and bottom of a label itemrenderer, to make sure the text is in the middle
 		 */
-		public static function get offSetSoThatTextIsInTheMiddle():int
+		public static function get offSetSoThatTextIsInTheMiddle():Number
 		{
 			if (_offSetSoThatTextIsInTheMiddle == 0)
 				_offSetSoThatTextIsInTheMiddle = (StyleableTextFieldCalculatedHeight - StyleableTextFieldPreferredHeight)/2;

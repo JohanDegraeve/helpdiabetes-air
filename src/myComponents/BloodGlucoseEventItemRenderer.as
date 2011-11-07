@@ -20,6 +20,8 @@ package myComponents
 	import databaseclasses.BloodGlucoseEvent;
 	import databaseclasses.Settings;
 	
+	import flash.display.GradientType;
+	import flash.geom.Matrix;
 	import flash.text.TextLineMetrics;
 	
 	import model.ModelLocator;
@@ -40,8 +42,8 @@ package myComponents
 		
 		private var _glucoseLevel:String;
 		
-		private static var _bloodGlucoseCalculatedHeight:Number = 0;
-		private static var _bloodGlucosePreferredHeight:Number = 0;
+		//private static var _bloodGlucoseCalculatedHeight:Number = 30;
+		//private static var _bloodGlucosePreferredHeight:Number = 0;
 		
 		private static var MINIMUM_AMOUNT_WIDTH:int = 100;
 
@@ -79,11 +81,23 @@ package myComponents
 				invalidateSize();
 			}
 		}
-
+		
+		private static var _bloodGlucseEventBGColorDark:* = 0;
+		private static var _bloodGlucseEventBGColorLight:* = 0;
+		private static var backGroundColors:Array ;
+		private static var alphas:Array = [1, 1];
+		private static var ratios:Array = [0, 255];
+		private static var matrix:Matrix = new Matrix();
 		
 		public function BloodGlucoseEventItemRenderer()
 		{
 			super();
+			if (_bloodGlucseEventBGColorDark == 0) {
+				_bloodGlucseEventBGColorDark = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("bloodGlucoseEventBackGroundDark");
+				_bloodGlucseEventBGColorLight = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("bloodGlucoseEventBackGroundLight");
+				backGroundColors = [_bloodGlucseEventBGColorDark, _bloodGlucseEventBGColorLight];
+			}
+
 		}
 		
 		override public function set data(value:Object):void {
@@ -97,7 +111,8 @@ package myComponents
 			label = 
 				(date.hours.toString().length == 1 ? "0":"") + 	date.hours 
 				+ ":"  
-				+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes ;
+				+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes 
+				+ " " + resourceManager.getString('editbgeventview','glucose');
 			
 			glucoseLevel = renderedBGEvent.bloodGlucoseLevel.toString();
 		}
@@ -126,7 +141,7 @@ package myComponents
 			if (item == null) //parameter was null and this.data is also null, so there's nothing to calculate
 				return 0;
 			
-			return _bloodGlucoseCalculatedHeight;
+			return ModelLocator.StyleableTextFieldCalculatedHeight;
 		}
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -135,22 +150,26 @@ package myComponents
 			glucoseLevelDisplay.text = glucoseLevel + " " + resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
 			glucoseLevelDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(glucoseLevelDisplay));
 
-			if (_bloodGlucoseCalculatedHeight == 0) {
-				_bloodGlucosePreferredHeight = getElementPreferredHeight(glucoseLevelDisplay);
-				setElementSize(labelDisplay,labelDisplayWidth,_bloodGlucosePreferredHeight);
-				_bloodGlucoseCalculatedHeight = labelDisplay.height;
-				ModelLocator.StyleableTextFieldCalculatedHeight = _bloodGlucoseCalculatedHeight;
-				ModelLocator.StyleableTextFieldPreferredHeight = _bloodGlucosePreferredHeight;
-			} else 
-				setElementSize(labelDisplay,labelDisplayWidth,_bloodGlucosePreferredHeight);
-			
-			setElementSize(glucoseLevelDisplay,glucoseLevelDisplayWidth,_bloodGlucosePreferredHeight);
+			setElementSize(labelDisplay,labelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
+			setElementSize(glucoseLevelDisplay,glucoseLevelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
 			labelDisplay.truncateToFit();
 			glucoseLevelDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0 + PADDING_LEFT,ModelLocator.offSetSoThatTextIsInTheMiddle);
 			setElementPosition(glucoseLevelDisplay,unscaledWidth - PADDING_RIGHT - glucoseLevelDisplayWidth,ModelLocator.offSetSoThatTextIsInTheMiddle);
-
 		}
+		
+		/**
+		 * overriden because flex implementation seems to add a large separator above the item
+		 */
+		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
+		{
+			matrix.createGradientBox(unscaledWidth, unscaledHeight, Math.PI / 2, 0, 0);
+			graphics.beginGradientFill(GradientType.LINEAR, backGroundColors, alphas, ratios, matrix);
+			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+			graphics.endFill();
+		}
+		
+
 	}
 }

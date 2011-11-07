@@ -13,14 +13,18 @@ package databaseclasses
 		
 		/**
 		 * creates a bloodglucose event and stores it immediately in the database<br>
-		 * timeStamp will be set to current date and time<br>
-		 * unit is a textstring denoting the unit used, mgperdl, or ... 
+		 * unit is a textstring denoting the unit used, mgperdl, or ... <br>
+		 * if creationTimeStamp = null, then curren date and time is used
 		 */
-		public function BloodGlucoseEvent(glucoseLevel:int,unit:String)
+		public function BloodGlucoseEvent(glucoseLevel:int, unit:String, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true)
 		{
-			this._bloodGlucoseLevel = glucoseLevel;		
-			_timeStamp = (new Date()).valueOf();
-			Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,unit,null);
+			this._bloodGlucoseLevel = glucoseLevel;	
+			if (!isNaN(creationTimeStamp))
+				_timeStamp = creationTimeStamp;
+			else
+				_timeStamp = (new Date()).valueOf();
+			if (storeInDatabase)
+				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,unit,null);
 		}
 		
 		

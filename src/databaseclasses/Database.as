@@ -45,7 +45,7 @@ package databaseclasses
 	
 	import views.FoodCounterView;
 	
-
+	
 	
 	/**
 	 * Database class is a singleton
@@ -54,13 +54,13 @@ package databaseclasses
 	{
 		import mx.core.FlexGlobals;
 		import mx.resources.ResourceBundle;
-	
+		
 		[ResourceBundle("general")]
 		
 		private static var instance:Database = new Database();
 		
 		public var aConn:SQLConnection;		
-
+		
 		private var sqlStatement:SQLStatement;
 		
 		private var globalDispatcher:EventDispatcher;
@@ -74,61 +74,61 @@ package databaseclasses
 		
 		
 		private const CREATE_TABLE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS fooditems (itemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																							"description TEXT NOT NULL)";
+			"description TEXT NOT NULL)";
 		private const CREATE_TABLE_UNITS:String = "CREATE TABLE IF NOT EXISTS units (unitid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																					"fooditems_itemid INTEGER NOT NULL, " +
-																					"description TEXT NOT NULL, " +
-																					"standardamount INTEGER, " +
-																					"kcal INTEGER, " +
-																					"protein REAL, " +
-																					"carbs REAL NOT NULL, " +
-																					"fat REAL)";
+			"fooditems_itemid INTEGER NOT NULL, " +
+			"description TEXT NOT NULL, " +
+			"standardamount INTEGER, " +
+			"kcal INTEGER, " +
+			"protein REAL, " +
+			"carbs REAL NOT NULL, " +
+			"fat REAL)";
 		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (exerciseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																									   "level TEXT, " +
-																									   "creationtimestamp TIMESTAMP NOT NULL," +
-																									   "comment_2 TEXT)";
+			"level TEXT, " +
+			"creationtimestamp TIMESTAMP NOT NULL," +
+			"comment_2 TEXT)";
 		private const CREATE_TABLE_BLOODGLUCOSE_EVENTS:String = "CREATE TABLE IF NOT EXISTS bloodglucoseevents (bloodglucoseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																											   "unit TEXT NOT NULL, " +
-																											   "creationtimestamp TIMESTAMP NOT NULL," +
-																											   "value INTEGER NOT NULL)";
+			"unit TEXT NOT NULL, " +
+			"creationtimestamp TIMESTAMP NOT NULL," +
+			"value INTEGER NOT NULL)";
 		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (medicineventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																									 "medicinname TEXT NOT NULL, " +
-																									 "creationtimestamp TIMESTAMP NOT NULL," +
-																									 "amount REAL NOT NULL)";		
+			"medicinname TEXT NOT NULL, " +
+			"creationtimestamp TIMESTAMP NOT NULL," +
+			"amount REAL NOT NULL)";		
 		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER PRIMARY KEY, " +
-																							   "mealname TEXT NOT NULL, " +
-																							   "lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
-																							   "insulinratio INTEGER," +
-																							   "correctionfactor INTEGER," +
-																							   "creationtimestamp TIMESTAMP NOT NULL," +
-																							   "previousBGlevel INTEGER)";		
+			"mealname TEXT NOT NULL, " +
+			"lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
+			"insulinratio INTEGER," +
+			"correctionfactor INTEGER," +
+			"creationtimestamp TIMESTAMP NOT NULL," +
+			"previousBGlevel INTEGER)";		
 		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER PRIMARY KEY , " +
-																											 "mealevents_mealeventid INTEGER NOT NULL, " +
-																											 "itemdescription TEXT NOT NULL, " +
-																											 "unitdescription TEXT, " +
-																											 "standardamount INTEGER, " +
-																					   					     "kcal INTEGER, " +
-																											 "protein REAL, " +
-																											 "carbs REAL NOT NULL, " +
-																											 "fat REAL, " +
-																											 "chosenamount REAL NOT NULL)";		
+			"mealevents_mealeventid INTEGER NOT NULL, " +
+			"itemdescription TEXT NOT NULL, " +
+			"unitdescription TEXT, " +
+			"standardamount INTEGER, " +
+			"kcal INTEGER, " +
+			"protein REAL, " +
+			"carbs REAL NOT NULL, " +
+			"fat REAL, " +
+			"chosenamount REAL NOT NULL)";		
 		private const CREATE_TABLE_TEMPLATE_FOODITEMS:String = "CREATE TABLE   IF NOT EXISTS  templatefooditems (templateitemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																											 "templates_templateid INTEGER NOT NULL, " +
-																											 "itemdescription TEXT NOT NULL, " +
-																											 "unitdescription TEXT, " +
-																											 "standardamount INTEGER, " +
-																											 "kcal INTEGER, " +
-																											 "protein REAL, " +
-																											 "carbs REAL NOT NULL, " +
-																											 "fat REAL)";		
+			"templates_templateid INTEGER NOT NULL, " +
+			"itemdescription TEXT NOT NULL, " +
+			"unitdescription TEXT, " +
+			"standardamount INTEGER, " +
+			"kcal INTEGER, " +
+			"protein REAL, " +
+			"carbs REAL NOT NULL, " +
+			"fat REAL)";		
 		private const CREATE_TABLE_TEMPLATES:String = "CREATE TABLE IF NOT EXISTS templates (templateid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-																							"name TEXT NOT NULL)";
+			"name TEXT NOT NULL)";
 		private const CREATE_TABLE_SOURCE:String = "CREATE TABLE IF NOT EXISTS source (source TEXT)";
 		/**
 		 * CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, value TEXT)
 		 */ 
 		private const CREATE_TABLE_SETTINGS:String = "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY," +
-														"value TEXT)";
+			"value TEXT)";
 		/**
 		 * SELECT * FROM settings 
 		 */
@@ -137,6 +137,7 @@ package databaseclasses
 		private const GET_SOURCE:String = "SELECT * FROM source";
 		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
 		private const GET_ALLMEALEVENTS:String = "SELECT * FROM mealevents";
+		private const GET_ALLBLOODGLUCOSEEVENTS:String = "SELECT * FROM bloodglucoseevents";
 		private const GET_UNITLIST:String = "SELECT * FROM units WHERE fooditems_itemid = :fooditemid";
 		private const GET_ALLSELECTEDFOODITEMS:String="SELECT * FROM selectedfooditems";
 		/**
@@ -151,19 +152,19 @@ package databaseclasses
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
 		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description) VALUES (:description)";
 		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid,"+
-											"description," +
-											"standardamount," +
-											"kcal," +
-											"protein," +
-											"carbs," +
-											"fat) VALUES " +
-											"(:fooditems_itemid," + 
-											":description," +
-											":standardamount," +
-											":kcal," +
-											":protein," +
-											":carbs," +
-											":fat)";
+			"description," +
+			"standardamount," +
+			"kcal," +
+			"protein," +
+			"carbs," +
+			"fat) VALUES " +
+			"(:fooditems_itemid," + 
+			":description," +
+			":standardamount," +
+			":kcal," +
+			":protein," +
+			":carbs," +
+			":fat)";
 		private const UPDATE_INSULINRATIO_IN_MEAL_EVENT:String = "UPDATE mealevents set insulinratio = :value WHERE mealeventid = :id";
 		private const UPDATE_CHOSENAMOUNT_IN_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set chosenamount = :value WHERE selectedfooditemid = :id";
 		
@@ -171,7 +172,7 @@ package databaseclasses
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
 		 */ 
 		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp, insulinratio, correctionfactor, previousBGlevel, creationtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp,:insulinratio,:correctionfactor,:previousBGlevel,:creationtimestamp)";
-
+		
 		private const INSERT_SELECTEDITEM:String = "INSERT INTO selectedfooditems (selectedfooditemid, mealevents_mealeventid,itemdescription ,unitdescription,standardamount,kcal,protein,carbs, fat, chosenamount ) VALUES (:selectedfooditemid,:mealevents_mealeventid,:itemdescription ,:unitdescription,:standardamount,:kcal,:protein,:carbs,:fat,:chosenamount)";
 		
 		private const INSERT_BLOODGLUCOSEEVENT:String = "INSERT INTO bloodglucoseevents (bloodglucoseeventid, unit, creationtimestamp, value) VALUES (:bloodglucoseeventid, :unit,:creationtimestamp, :value)";
@@ -184,7 +185,7 @@ package databaseclasses
 			foodFileName = "foodfile-" + ResourceManager.getInstance().getString("general","TableLanguage");
 			sampleDbFileName = foodFileName + "-sample.db";
 			xmlFileName = foodFileName + ".xml";
-
+			
 			if (instance != null) {
 				throw new Error("Database class can only be accessed through Database.getInstance()");	
 			}
@@ -314,7 +315,7 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				getAllSettings();
 			}
-
+			
 			function tableCreationError(see:SQLErrorEvent):void {
 				trace("Failed to create settings table. Database:0005");
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
@@ -336,15 +337,15 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrievalFailed);
 				var result:Object = sqlStatement.getResult().data;
 				/* 
-				 * Settings class now has default value 
-				 * any setting which doesn't exist yet in the database needs to be stored in the database with value retrieved from Settings
-				 * any setting which already exists in the database will be stored in Settings class
-				 * so first store getresult.data values in an array of strings just a large as the Settings class, values that don't exist yet get null as value
+				* Settings class now has default value 
+				* any setting which doesn't exist yet in the database needs to be stored in the database with value retrieved from Settings
+				* any setting which already exists in the database will be stored in Settings class
+				* so first store getresult.data values in an array of strings just a large as the Settings class, values that don't exist yet get null as value
 				*/
 				for (var i:int = 0;i < retrievalResult.length;i++) {
 					retrievalResult[i] = null;
 				}
-					
+				
 				if (result != null && result is Array) {
 					for each (var o:Object in result) {
 						retrievalResult[(o.id as int)] = (o.value as String);
@@ -651,7 +652,7 @@ package databaseclasses
 		
 		private function checkSource():void {
 			var dispatcher:EventDispatcher = new EventDispatcher();
-
+			
 			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, checkSourceResult);
 			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, checkSourceError);
 			getSource(dispatcher);
@@ -698,7 +699,7 @@ package databaseclasses
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 			}
 		}
-
+		
 		/**
 		 * stores a food item in the database, obviously only the description, the dispatched databaseevent will have the inserted row id as lastInsertRowID<br>
 		 * if dispatcher != null then an event will be dispatches when finished
@@ -748,7 +749,7 @@ package databaseclasses
 			localSqlStatement.addEventListener(SQLEvent.RESULT, unitInserted);
 			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, unitInsertionError);
 			localSqlStatement.execute();
-
+			
 			function unitInserted(se:SQLEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitInserted);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitInsertionError);
@@ -764,10 +765,10 @@ package databaseclasses
 				if (dispatcher != null)
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 			}
-		
+			
 		};
 		
-
+		
 		/**
 		 * msql query for getting source<br>
 		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
@@ -810,14 +811,14 @@ package databaseclasses
 			var fileStream:FileStream = new FileStream();
 			var dispatcher:EventDispatcher = new EventDispatcher();
 			var foodtableXML:XML;
-		    var unitListXMLList:XMLList;
+			var unitListXMLList:XMLList;
 			var foodItemDescriptionsXMLList:XMLList;
 			var foodItemListCounter:int;
 			var unitListCounter:int;
 			var unitListSize:int;
 			var foodItemListSize:int;
 			var actualFoodItemRowId:int;
-
+			
 			trace("HelpDiabetes-air = loadFoodTable - before opening file");
 			fileStream.open(sourceFile,FileMode.READ);
 			foodtableXML = new XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
@@ -885,7 +886,7 @@ package databaseclasses
 						actualFoodItemRowId,
 						dispatcher);
 					unitListCounter++;
-
+					
 				}
 			}
 			
@@ -910,7 +911,7 @@ package databaseclasses
 			if (globalDispatcher != null)
 				globalDispatcher.dispatchEvent(new Event(DatabaseEvent.RESULT_EVENT));
 			//now continue prepopulating other stuff, like the tracking arraycollection, in the background
-			getAllMealEventsAndFillUpMeals();
+			getAllEventsAndFillUpMeals();
 		}
 		
 		
@@ -963,7 +964,7 @@ package databaseclasses
 				}
 			}
 		}
-
+		
 		/**
 		 * gets the fooditem for the specified fooditemid<br>
 		 * the fooditem will set in the data field of the event that will be dispatched to the specified dispatcher
@@ -975,7 +976,7 @@ package databaseclasses
 			var foodItemDescription:String;//the fooditem description needs to be temporarily stored.
 			var fooditemId:int;
 			var unitList:ArrayCollection;
-
+			
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
 			if (openSQLConnection(localdispatcher))
@@ -984,7 +985,7 @@ package databaseclasses
 			function onOpenResult(se:SQLEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
-
+				
 				localSqlStatement.addEventListener(SQLEvent.RESULT,foodItemRetrieved);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
 				localSqlStatement.sqlConnection = aConn;
@@ -1213,7 +1214,7 @@ package databaseclasses
 		private function openSQLConnection(dispatcher:EventDispatcher):Boolean {
 			// should I first check if there's still a connection open and close if necessary ?
 			if (aConn != null && aConn.connected) { 
-					return true;
+				return true;
 			} else {
 				aConn = new SQLConnection();
 				aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
@@ -1222,7 +1223,7 @@ package databaseclasses
 			}
 			
 			return false;
-	
+			
 			function onConnOpen(se:SQLEvent):void
 			{
 				trace("SQL Connection successfully opened in method Database.openSQLConnection");
@@ -1280,7 +1281,7 @@ package databaseclasses
 					dispatcher.dispatchEvent(event);
 				}
 			}
-
+			
 			
 			function settingUpdated(se:SQLEvent):void {
 				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingUpdated);
@@ -1307,14 +1308,14 @@ package databaseclasses
 		 * will add the mealevent to the database
 		 */
 		internal function createNewMealEvent(
-				mealEventId:int,
-				mealname:String,
-				lastmodifiedtimestamp:String,
-				insulinRatio:Number,
-				correctionFactor:Number,
-				previousBGlevel:int,
-				creationtimestamp:Number,
-				dispatcher:EventDispatcher):void {
+			mealEventId:int,
+			mealname:String,
+			lastmodifiedtimestamp:String,
+			insulinRatio:Number,
+			correctionFactor:Number,
+			previousBGlevel:int,
+			creationtimestamp:Number,
+			dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -1385,7 +1386,7 @@ package databaseclasses
 			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
-
+			
 			function onOpenResult(se:SQLEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
@@ -1507,18 +1508,18 @@ package databaseclasses
 			
 		}
 		
-	
+		
 		internal function updateMealEventLastModifiedTimeStamp(lastModifiedTimeStamp:Number,mealEventId:int,dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-
+			
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
-
 			
-
+			
+			
 			function onOpenError(e:SQLError):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
@@ -1536,7 +1537,7 @@ package databaseclasses
 				localSqlStatement.execute();
 				
 			}
-
+			
 			function timeStampModified(result:SQLEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,timeStampModified);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,timeStampModificationFailed);
@@ -1545,7 +1546,7 @@ package databaseclasses
 					dispatcher.dispatchEvent(event);
 				}
 			}
-
+			
 			function timeStampModificationFailed(error:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,timeStampModified);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,timeStampModificationFailed);
@@ -1555,15 +1556,15 @@ package databaseclasses
 				}
 				trace("Failed to create a selectedItem. Database0053");
 			}
-
+			
 			
 		}
 		
 		/**
-		 * get all mealevents and store them in the arraycollection in the modellocator as MealEvent objects<br>
+		 * get all mealevents, bloodglucoseevents, ... and store them in the arraycollection in the modellocator as MealEvent objects<br>
 		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects
 		 */
-		private function getAllMealEventsAndFillUpMeals():void {
+		private function getAllEventsAndFillUpMeals():void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -1585,14 +1586,14 @@ package databaseclasses
 			function onOpenResult(e:SQLError):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
-
+				
 				localSqlStatement.addEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
 				localSqlStatement.execute();
 			}
-
+			
 			function selectedFoodItemsRetrieved(result:SQLEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
@@ -1608,7 +1609,7 @@ package databaseclasses
 						selectedFoodItems.addItem(newSelectedFoodItem);
 					}
 				}
-
+				
 				localSqlStatement.addEventListener(SQLEvent.RESULT,mealEventsRetrieved);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
 				localSqlStatement.sqlConnection = aConn;
@@ -1622,14 +1623,10 @@ package databaseclasses
 				trace("Failed to get all selectedFoodItems. Database0061");
 			}
 			
-			/**
-			 * adds all mealevents retrieved from the database to the trackinglist<br>
-			 * at the same time will add daylines
-			 */
 			function mealEventsRetrieved(result:SQLEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
-
+				
 				var tempObject:Object = localSqlStatement.getResult().data;
 				
 				if (tempObject != null && tempObject is Array) {
@@ -1661,6 +1658,38 @@ package databaseclasses
 					}
 				}
 				
+				localSqlStatement.addEventListener(SQLEvent.RESULT,bloodGlucoseEventsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,bloodGlucoseRetrievalFailed);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = GET_ALLBLOODGLUCOSEEVENTS;
+				localSqlStatement.execute();
+				
+			}
+			
+			function bloodGlucoseEventsRetrieved(result:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,bloodGlucoseEventsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,bloodGlucoseRetrievalFailed);
+				
+				var tempObject:Object = localSqlStatement.getResult().data;
+				
+				if (tempObject != null && tempObject is Array) {
+					for each ( var o:Object in tempObject ) {
+						var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String,o.creationtimestamp as Number,false);
+						ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
+						var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
+						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+						if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
+							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+							ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						}
+					}
+				}
+				
 				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
 				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
 				//Now add list of daylines
@@ -1671,7 +1700,6 @@ package databaseclasses
 				
 				// now populate ModelLocator.getInstance().meals
 				ModelLocator.getInstance().refreshMeals();
-				
 			}
 			
 			function filterByMealEventId(item:Object):Boolean {
@@ -1683,9 +1711,15 @@ package databaseclasses
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
 				trace("Failed to get all mealevents. Database0060");
 			}
+			
+			function bloodGlucoseRetrievalFailed(error:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodGlucoseEventsRetrieved);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodGlucoseRetrievalFailed);
+				trace("Failed to get all mealevents. Database0090");
+			}
 		}
 		
-			
+		
 		
 		/**
 		 * 
@@ -1749,8 +1783,8 @@ package databaseclasses
 			
 		}
 		
-
-			
+		
+		
 	} //class
 	
 } //package

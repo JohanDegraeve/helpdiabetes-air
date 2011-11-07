@@ -142,11 +142,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
-				new BloodGlucoseEvent(
+				ModelLocator.getInstance().trackingList.addItem(new BloodGlucoseEvent(
 					parseInt(meteringResultText),
-					resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT))
-					);
-				ModelLocator.getInstance().trackingList.addItem(this);
+					resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT))));
 				ModelLocator.getInstance().trackingList.refresh();
 				navigator.popView();
 			}
@@ -188,11 +186,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:TextArea id="time" width="75%" text="@{timeText}" editable="false" borderVisible="false" textAlign="center"/>
 		</s:Group>
 		<s:Group id="okGroup" y="0" x="0" width="100%" height="100%" maxHeight="50" click="okClicked(event)">
-			<s:layout>
-				<s:HorizontalLayout>
-				</s:HorizontalLayout>
-			</s:layout>
-			<s:TextArea  id="okButton"  width="100%" maxWidth="100" text="{resourceManager.getString('general','ok')}" editable="false" borderVisible="false"/>
+			<s:TextArea  id="okButton"  textAlign="center" width="100%" text="{resourceManager.getString('addfooditemview','add_button')}" editable="false" borderVisible="false"/>
 		</s:Group>
 	</s:Group>
 </s:View>
