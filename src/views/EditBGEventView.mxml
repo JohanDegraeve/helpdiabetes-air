@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.managers.PopUpManager;
 			
 			import myComponents.DatePicker;
+			import myComponents.DayLineWithTotalAmount;
 			import myComponents.PickerEvent;
 			import myComponents.TimePicker;
 			private var dateOrTimePicker:Group;
@@ -142,9 +143,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
-				ModelLocator.getInstance().trackingList.addItem(new BloodGlucoseEvent(
+				var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(
 					parseInt(meteringResultText),
-					resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT))));
+					resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT)),currentDateAndTime.valueOf());
+				ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
+				
+				var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
+				var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+				if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
+					ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+					if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+				} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+					ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+					if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+						ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+				}
+				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
+				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
+				//Now add list of daylines
+				for (var counter:Number = youngest;counter - 1 < oldest;counter = counter + 86400000)
+					ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(counter));
+				
 				ModelLocator.getInstance().trackingList.refresh();
 				navigator.popView();
 			}
