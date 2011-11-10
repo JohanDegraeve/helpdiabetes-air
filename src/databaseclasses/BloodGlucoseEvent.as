@@ -12,7 +12,7 @@ package databaseclasses
 		private var _bloodGlucoseLevel:int;
 		
 		/**
-		 * creates a bloodglucose event and stores it immediately in the database<br>
+		 * creates a bloodglucose event and stores it immediately in the database if storeInDatabase = true<br>
 		 * unit is a textstring denoting the unit used, mgperdl, or ... <br>
 		 * if creationTimeStamp = null, then curren date and time is used
 		 */

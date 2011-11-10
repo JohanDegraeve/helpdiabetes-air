@@ -75,6 +75,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				var trackingEventList:ArrayCollection = new ArrayCollection();
 				trackingEventList .addItem(resourceManager.getString('trackingview','glucoseevent'));
+				trackingEventList .addItem(resourceManager.getString('trackingview','medicinevent'));
 
 				aSelectUnit = new elementFromListPicker();
 				aSelectUnit.addEventListener(UnitChangedEvent.ITEM_SELECTED, trackingEventSelected);
@@ -88,7 +89,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function trackingEventSelected(event:UnitChangedEvent):void {
 				aSelectUnit.removeEventListener(UnitChangedEvent.ITEM_SELECTED,trackingEventSelected);
 				PopUpManager.removePopUp(aSelectUnit);
-				navigator.pushView(EditBGEventView);
+				if (event.index == 0)
+					navigator.pushView(EditBGEventView);
+				else if (event.index == 1)
+					navigator.pushView(EditMedicinEventView);
 			}
 
 			private function onRemove():void {

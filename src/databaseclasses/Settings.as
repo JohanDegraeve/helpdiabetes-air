@@ -20,6 +20,8 @@ package databaseclasses
 {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	
+	import mx.resources.ResourceManager;
 
 	/**
 	 * Each time a new settings is defined, an additional constant should be defined, with default value and the array must be extended.<br>
@@ -31,6 +33,8 @@ package databaseclasses
 	public class Settings
 		
 	{
+		[ResourceBundle("editmedicineventview")]
+		
 		/** EXTEND LIST OF CONSTANTS IN CASE NEW SETTING NEEDS TO BE DEFINED  */
 		/**
 		 * the meal id where the last fooditem was stored
@@ -106,6 +110,33 @@ package databaseclasses
 		 */
 		public static const SettingsIMPORTANT_VALUE_FOR_USER:int = 16;
 		
+		/**
+		 * the string for the first insulin type , default value taken from resources
+		 */
+		public static const SettingsInsulinType1:int = 17;
+		/**
+		 * the string for the second insulin type  , default value taken from resources
+		 */
+		public static const SettingsInsulinType2:int = 18;
+		/**
+		 * the string for the third insulin type  , default value taken from resources
+		 */
+		public static const SettingsInsulinType3:int = 19;
+		/**
+		 * the string for the fourth insulin type  , default value taken from resources
+		 */
+		public static const SettingsInsulinType4:int = 20;
+		/**
+		 * the string for the fifth insulin type  , default value taken from resources
+		 */
+		public static const SettingsInsulinType5:int = 21;
+		
+		/**
+		 * denotes the default medicin, value is int 17, 18, 19, 20 or 21, denoting type 1, ... 5 respectively<br>
+		 * default value = 17
+		 */
+		public static const SettingsDefaultMedicin:int = 22;
+		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
 			"none",// initially there will be no meal too which the last  fooditem has been added
@@ -124,7 +155,13 @@ package databaseclasses
 			"999999", // a high value for maximum time difference last bloodglucose event and meal
 			"mgperdl", //unit for bloodglucose metering, this value must be known in locale/general.properties
 			"120",
-			"carbs"//possible values are "carbs", "protein", "fat", "kilocalories"
+			"carbs",//possible values are "carbs", "protein", "fat", "kilocalories"
+			"insulin type 1 defined in constructor",
+			"insulin type 2 defined in constructor",
+			"insulin type 3 defined in constructor",
+			"insulin type 4 defined in constructor",
+			"insulin type 5 defined in constructor",
+			"17"//default insulin type, meaning insulin type 1
 		];
 		
 		private static var instance:Settings = new Settings();
@@ -134,6 +171,11 @@ package databaseclasses
 			if (instance != null) {
 				throw new Error("Settings class can only be accessed through Settings.getInstance()");	
 			}
+			settings[SettingsInsulinType1] = ResourceManager.getInstance().getString('editmedicineventview','insulintype1');
+			settings[SettingsInsulinType2] = ResourceManager.getInstance().getString('editmedicineventview','insulintype2');
+			settings[SettingsInsulinType3] = ResourceManager.getInstance().getString('editmedicineventview','insulintype3');
+			settings[SettingsInsulinType4] = ResourceManager.getInstance().getString('editmedicineventview','insulintype4');
+			settings[SettingsInsulinType5] = ResourceManager.getInstance().getString('editmedicineventview','insulintype5');
 			instance = this;
 		}
 		

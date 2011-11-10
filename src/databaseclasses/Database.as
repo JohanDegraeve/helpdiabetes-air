@@ -177,6 +177,8 @@ package databaseclasses
 		
 		private const INSERT_BLOODGLUCOSEEVENT:String = "INSERT INTO bloodglucoseevents (bloodglucoseeventid, unit, creationtimestamp, value) VALUES (:bloodglucoseeventid, :unit,:creationtimestamp, :value)";
 		
+		private const INSERT_MEDICINEVENT:String = "INSERT INTO medicinevents (medicineventid, medicinname, amount, creationtimestamp) VALUES (:medicineventid, :medicinname, :creationtimestamp, :amount)";
+		
 		/**
 		 * constructor, should not be used, use getInstance()
 		 */
@@ -1471,8 +1473,8 @@ package databaseclasses
 				localSqlStatement.parameters[":carbs"] = carbs;
 				localSqlStatement.parameters[":fat"] = fat;
 				localSqlStatement.parameters[":chosenamount"] = chosenAmount;
-				localSqlStatement.addEventListener(SQLEvent.RESULT, bloodGlucoseLevelCreated);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, bloodGlucoseLevelCreationFailed);
+				localSqlStatement.addEventListener(SQLEvent.RESULT, selectedItemCreated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, selectedItemCreationFailed);
 				localSqlStatement.execute();
 			}
 			
@@ -1487,18 +1489,18 @@ package databaseclasses
 			}
 			
 			
-			function bloodGlucoseLevelCreated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodGlucoseLevelCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodGlucoseLevelCreationFailed);
+			function selectedItemCreated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
 				}
 			}
 			
-			function bloodGlucoseLevelCreationFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodGlucoseLevelCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodGlucoseLevelCreationFailed);
+			function selectedItemCreationFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
 				trace("Failed to create a selectedItem. Database0052");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1782,6 +1784,65 @@ package databaseclasses
 			}
 			
 		}
+		
+		
+		/**
+		 * new medicin event will be added to the database<br>
+		 * here the medicineventid will get the value of current date and time as Number 
+		 */
+		internal function createNewMedicinEvent(amount:int,medicin:String, timeStamp:Number,dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement()
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = INSERT_MEDICINEVENT;
+				//(bloodglucoseeventid, unit, creationtimestamp, value)
+				localSqlStatement.parameters[":medicineventid"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":amount"] = amount;
+				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
+				localSqlStatement.parameters[":medicin"] = medicin;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventCreated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, medicinEventCreationFailed);
+				localSqlStatement.execute();
+			}
+			
+			function medicinEventCreated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventCreationFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function medicinEventCreationFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventCreationFailed);
+				trace("Failed to create a medicinEvent. Database0091");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0092");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
+		
 		
 		
 		
