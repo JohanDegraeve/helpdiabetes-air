@@ -138,6 +138,7 @@ package databaseclasses
 		private const GET_ALLFOODITEMS:String = "SELECT * FROM fooditems";
 		private const GET_ALLMEALEVENTS:String = "SELECT * FROM mealevents";
 		private const GET_ALLBLOODGLUCOSEEVENTS:String = "SELECT * FROM bloodglucoseevents";
+		private const GET_ALLMEDICINEVENTS:String = "SELECT * FROM medicinevents";
 		private const GET_UNITLIST:String = "SELECT * FROM units WHERE fooditems_itemid = :fooditemid";
 		private const GET_ALLSELECTEDFOODITEMS:String="SELECT * FROM selectedfooditems";
 		/**
@@ -177,7 +178,7 @@ package databaseclasses
 		
 		private const INSERT_BLOODGLUCOSEEVENT:String = "INSERT INTO bloodglucoseevents (bloodglucoseeventid, unit, creationtimestamp, value) VALUES (:bloodglucoseeventid, :unit,:creationtimestamp, :value)";
 		
-		private const INSERT_MEDICINEVENT:String = "INSERT INTO medicinevents (medicineventid, medicinname, amount, creationtimestamp) VALUES (:medicineventid, :medicinname, :creationtimestamp, :amount)";
+		private const INSERT_MEDICINEVENT:String = "INSERT INTO medicinevents (medicineventid, medicinname, amount, creationtimestamp) VALUES (:medicineventid, :medicinname,  :amount, :creationtimestamp)";
 		
 		/**
 		 * constructor, should not be used, use getInstance()
@@ -1563,7 +1564,7 @@ package databaseclasses
 		}
 		
 		/**
-		 * get all mealevents, bloodglucoseevents, ... and store them in the arraycollection in the modellocator as MealEvent objects<br>
+		 * get all mealevents, bloodglucoseevents, medicinevents ... and store them in the arraycollection in the modellocator as MealEvent objects<br>
 		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects
 		 */
 		private function getAllEventsAndFillUpMeals():void {
@@ -1692,6 +1693,39 @@ package databaseclasses
 					}
 				}
 				
+				localSqlStatement.addEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = GET_ALLMEDICINEVENTS;
+				localSqlStatement.execute();
+				
+
+				
+			}
+			
+			function medicinEventsRetrieved(result:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
+				
+				var tempObject:Object = localSqlStatement.getResult().data;
+				
+				if (tempObject != null && tempObject is Array) {
+					for each ( var o:Object in tempObject ) {
+						var newMedicinEvent:MedicinEvent = new MedicinEvent(o.amount as Number,o.medicinname as String,o.creationtimestamp as Number,false);
+						ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
+						var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
+						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+						if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
+							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+							ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						}
+					}
+				}
 				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
 				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
 				//Now add list of daylines
@@ -1702,6 +1736,12 @@ package databaseclasses
 				
 				// now populate ModelLocator.getInstance().meals
 				ModelLocator.getInstance().refreshMeals();
+			}
+			
+			function medicinEventsRetrievalFailed(error:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
+				trace("Failed to get all mealevents. Database0094");
 			}
 			
 			function filterByMealEventId(item:Object):Boolean {
@@ -1807,7 +1847,7 @@ package databaseclasses
 				localSqlStatement.parameters[":medicineventid"] = (new Date()).valueOf();
 				localSqlStatement.parameters[":amount"] = amount;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
-				localSqlStatement.parameters[":medicin"] = medicin;
+				localSqlStatement.parameters[":medicinname"] = medicin;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, medicinEventCreationFailed);
 				localSqlStatement.execute();
@@ -1842,10 +1882,5 @@ package databaseclasses
 				}
 			}
 		}
-		
-		
-		
-		
 	} //class
-	
 } //package

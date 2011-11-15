@@ -30,8 +30,6 @@ package myComponents
 
 	public class BloodGlucoseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		private var renderedBGEvent:BloodGlucoseEvent;
-		
 		//*****************//
 		// the display fields //
 		// labelDisplay will be used to shown the first field with timestamp , amount in glucoseLevel will be on the right
@@ -103,18 +101,18 @@ package myComponents
 		override public function set data(value:Object):void {
 			super.data = value;
 			
-			renderedBGEvent = (value as BloodGlucoseEvent);
+			//renderedBGEvent = (value as BloodGlucoseEvent);
 			
 			if (!data) return;//did this because I found it in an example 
 			
-			var date:Date = new Date(((renderedBGEvent).timeStamp));
+			var date:Date = new Date(((value as BloodGlucoseEvent).timeStamp));
 			label = 
 				(date.hours.toString().length == 1 ? "0":"") + 	date.hours 
 				+ ":"  
 				+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes 
 				+ " " + resourceManager.getString('editbgeventview','glucose');
 			
-			glucoseLevel = renderedBGEvent.bloodGlucoseLevel.toString();
+			glucoseLevel = (value as BloodGlucoseEvent).bloodGlucoseLevel.toString();
 		}
 		
 		override protected function createChildren():void {

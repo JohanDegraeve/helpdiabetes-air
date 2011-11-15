@@ -25,8 +25,10 @@ s|Application {fontSize:20pt}
 	lightBlueDark:#5C939B; /* used in daylineitemrenderer , there's always a light and a dark side for each color , used in gradient fill*/
 	mealEventBackGroundLight:#FFFFFF; /*back ground color for mealevent in trackingview*/
 	mealEventBackGroundDark:#BCD7C6; /*back ground color for mealevent in trackingview*/	
-	bloodGlucoseEventBackGroundLight:#FFFFFF; /*back ground color for mealevent in trackingview*/
-	bloodGlucoseEventBackGroundDark:#FFDDED; /*back ground color for mealevent in trackingview*/	
+	bloodGlucoseEventBackGroundLight:#FFFFFF; /*back ground color for bloodglucose in trackingview*/
+	bloodGlucoseEventBackGroundDark:#FFDDED; /*back ground color for boodglucose in trackingview*/	
+	medicinEventBackGroundDark:#E8FFE9;
+	medicinEventBackGroundLight:#FFFFFF;
 }
 
 .removePaddingBottomForStyleableTextField {

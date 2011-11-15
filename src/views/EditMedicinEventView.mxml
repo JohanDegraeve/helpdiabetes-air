@@ -29,8 +29,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.MedicinEvent;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
+			
+			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
@@ -38,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import myComponents.AmountPicker;
 			import myComponents.DatePicker;
+			import myComponents.DayLineWithTotalAmount;
 			import myComponents.PickerEvent;
 			import myComponents.TimePicker;
 			import myComponents.elementFromListPicker;
@@ -47,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var dateOrTimePicker:Group;
 
 			[Bindable]
-			private var insulinTypetext:String;
+			private var medicinName:String;
 			[Bindable]
 			private var dateText:String ;
 			[Bindable]
@@ -97,7 +101,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				currentDateAndTime = new Date();
 				dateText = dateformatter.format(_currentDateAndTime);
 				timeText = timeformatter.format(_currentDateAndTime);
-				insulinTypetext = Settings.getInstance().getSetting(parseInt(Settings.getInstance().getSetting(Settings.SettingsDefaultMedicin)));
+				medicinName = Settings.getInstance().getSetting(parseInt(Settings.getInstance().getSetting(Settings.SettingsDefaultMedicin)));
 			}
 
 			private function insulinTypeGroupClicked(e:MouseEvent = null):void {
@@ -119,7 +123,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				function medicinSelected(event:UnitChangedEvent):void {
 					medicinPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED,medicinSelected);
 					PopUpManager.removePopUp(medicinPicker);
-					insulinTypetext = Settings.getInstance().getSetting(Settings.SettingsInsulinType1 + event.index);
+					medicinName = Settings.getInstance().getSetting(Settings.SettingsInsulinType1 + event.index);
 				}
 			}
 			
@@ -181,7 +185,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
+				var newMedicinEvent:MedicinEvent = new MedicinEvent(
+					parseInt(amountText),
+					medicinName,
+					currentDateAndTime.valueOf());
+				ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
 				
+				var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
+				var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+				if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
+					ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+					if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+				} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+					ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+					if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+						ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+				}
+				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
+				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
+				//Now add list of daylines
+				for (var counter:Number = youngest;counter - 1 < oldest;counter = counter + 86400000)
+					ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(counter));
+				
+				ModelLocator.getInstance().trackingList.refresh();
+				navigator.popView();
 			}
 		]]>
 	</fx:Script>
@@ -200,7 +228,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextArea  id="insulinTypeText" width="40%" text="{resourceManager.getString('editmedicineventview','medicin')}" editable="false" borderVisible="false"/>
-			<s:TextArea id="insulinType" width="60%" text="@{insulinTypetext}" editable="false" borderVisible="false" textAlign="center"/>
+			<s:TextArea id="medicinNameTextField" width="60%" text="@{medicinName}" editable="false" borderVisible="false" textAlign="center"/>
 		</s:Group>
 		<s:Group id="amountGroup" y="0" x="0" width="100%" click="amountGroupClicked(event)">
 			<s:layout>
