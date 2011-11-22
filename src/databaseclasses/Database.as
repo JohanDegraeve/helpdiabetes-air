@@ -139,6 +139,7 @@ package databaseclasses
 		private const GET_ALLMEALEVENTS:String = "SELECT * FROM mealevents";
 		private const GET_ALLBLOODGLUCOSEEVENTS:String = "SELECT * FROM bloodglucoseevents";
 		private const GET_ALLMEDICINEVENTS:String = "SELECT * FROM medicinevents";
+		private const GET_ALLEXERCISEEVENTS:String = "SELECT * FROM exerciseevents";
 		private const GET_UNITLIST:String = "SELECT * FROM units WHERE fooditems_itemid = :fooditemid";
 		private const GET_ALLSELECTEDFOODITEMS:String="SELECT * FROM selectedfooditems";
 		/**
@@ -179,6 +180,8 @@ package databaseclasses
 		private const INSERT_BLOODGLUCOSEEVENT:String = "INSERT INTO bloodglucoseevents (bloodglucoseeventid, unit, creationtimestamp, value) VALUES (:bloodglucoseeventid, :unit,:creationtimestamp, :value)";
 		
 		private const INSERT_MEDICINEVENT:String = "INSERT INTO medicinevents (medicineventid, medicinname, amount, creationtimestamp) VALUES (:medicineventid, :medicinname,  :amount, :creationtimestamp)";
+		
+		private const INSERT_EXERCISEEVENT:String = "INSERT INTO exerciseevents (exerciseeventid, level, creationtimestamp, comment_2) VALUES (:exerciseeventid, :level, :creationtimestamp, :comment_2)";
 		
 		/**
 		 * constructor, should not be used, use getInstance()
@@ -1564,7 +1567,7 @@ package databaseclasses
 		}
 		
 		/**
-		 * get all mealevents, bloodglucoseevents, medicinevents ... and store them in the arraycollection in the modellocator as MealEvent objects<br>
+		 * get all mealevents, bloodglucoseevents, medicinevents and exerciseevents and store them in the arraycollection in the modellocator as MealEvent objects<br>
 		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects
 		 */
 		private function getAllEventsAndFillUpMeals():void {
@@ -1692,15 +1695,11 @@ package databaseclasses
 						}
 					}
 				}
-				
 				localSqlStatement.addEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = GET_ALLMEDICINEVENTS;
 				localSqlStatement.execute();
-				
-
-				
 			}
 			
 			function medicinEventsRetrieved(result:SQLEvent):void {
@@ -1726,6 +1725,38 @@ package databaseclasses
 						}
 					}
 				}
+				
+				localSqlStatement.addEventListener(SQLEvent.RESULT,exerciseEventsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,exerciseEventsRetrievalFailed);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = GET_ALLEXERCISEEVENTS;
+				localSqlStatement.execute();
+			}
+			
+			function exerciseEventsRetrieved(result:SQLEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseEventsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseEventsRetrievalFailed);
+				
+				var tempObject:Object = localSqlStatement.getResult().data;
+				
+				if (tempObject != null && tempObject is Array) {
+					for each ( var o:Object in tempObject ) {
+						var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.creationtimestamp as Number,false);
+						ModelLocator.getInstance().trackingList.addItem(newExerciseEvent);
+						var creationTimeStampAsDate:Date = new Date(newExerciseEvent.timeStamp);
+						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+						if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
+							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+							ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						}
+					}
+				}
+				
 				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
 				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
 				//Now add list of daylines
@@ -1736,6 +1767,12 @@ package databaseclasses
 				
 				// now populate ModelLocator.getInstance().meals
 				ModelLocator.getInstance().refreshMeals();
+			}
+			
+			function exerciseEventsRetrievalFailed(error:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseEventsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseEventsRetrievalFailed);
+				trace("Failed to get all mealevents. Database0095");
 			}
 			
 			function medicinEventsRetrievalFailed(error:SQLErrorEvent):void {
@@ -1882,5 +1919,63 @@ package databaseclasses
 				}
 			}
 		}
+		
+		/**
+		 * new exercise event will be added to the database<br>
+		 * here the exerciseeventid will get the value of current date and time as Number 
+		 */
+		internal function createNewExerciseEvent(level:String, comment:String, timeStamp:Number,dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement()
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = INSERT_EXERCISEEVENT;
+				//(bloodglucoseeventid, unit, creationtimestamp, value)
+				localSqlStatement.parameters[":exerciseeventid"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":level"] = level;
+				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
+				localSqlStatement.parameters[":comment_2"] = comment;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, exerciseEventCreated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, exerciseEventCreationFailed);
+				localSqlStatement.execute();
+			}
+			
+			function exerciseEventCreated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseEventCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseEventCreationFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function exerciseEventCreationFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseEventCreated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseEventCreationFailed);
+				trace("Failed to create a medicinEvent. Database0093");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0094");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
+
 	} //class
 } //package

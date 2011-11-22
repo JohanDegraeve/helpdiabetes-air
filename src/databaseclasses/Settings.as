@@ -34,6 +34,7 @@ package databaseclasses
 		
 	{
 		[ResourceBundle("editmedicineventview")]
+		[ResourceBundle("editexerciseeventview")]
 		
 		/** EXTEND LIST OF CONSTANTS IN CASE NEW SETTING NEEDS TO BE DEFINED  */
 		/**
@@ -136,6 +137,31 @@ package databaseclasses
 		 * default value = 17
 		 */
 		public static const SettingsDefaultMedicin:int = 22;
+		/**
+		 * the string for exercise type, default value taken from resources 
+		 */
+		public static const SettingsExerciseType1:int = 23;
+		/**
+		 * the string for exercise type, default value taken from resources 
+		 */
+		public static const SettingsExerciseType2:int = 24;
+		/**
+		 * the string for exercise type, default value taken from resources 
+		 */
+		public static const SettingsExerciseType3:int = 25;
+		/**
+		 * the string for exercise type, default value taken from resources 
+		 */
+		public static const SettingsExerciseType4:int = 26;
+		/**
+		 * the string for exercise type, default value taken from resources 
+		 */
+		public static const SettingsExerciseType5:int = 27;
+		/**
+		 * denotes the default exercise, value is int 23, 24, 25, 26 or 27, denoting type 1, ... 5 respectively<br>
+		 * default value = 23
+		 */
+		public static const SettingsDefaultExercise:int = 28;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -161,7 +187,13 @@ package databaseclasses
 			"insulin type 3 defined in constructor",
 			"insulin type 4 defined in constructor",
 			"insulin type 5 defined in constructor",
-			"17"//default insulin type, meaning insulin type 1
+			"17",//default insulin type, meaning insulin type 1
+			"exercise type 1 defined in constructor",
+			"exercise type 2 defined in constructor",
+			"exercise type 3 defined in constructor",
+			"exercise type 4 defined in constructor",
+			"exercise type 5 defined in constructor",
+			"23"//default exercise type, meaning exercise type 1
 		];
 		
 		private static var instance:Settings = new Settings();
@@ -176,6 +208,11 @@ package databaseclasses
 			settings[SettingsInsulinType3] = ResourceManager.getInstance().getString('editmedicineventview','insulintype3');
 			settings[SettingsInsulinType4] = ResourceManager.getInstance().getString('editmedicineventview','insulintype4');
 			settings[SettingsInsulinType5] = ResourceManager.getInstance().getString('editmedicineventview','insulintype5');
+			settings[SettingsExerciseType1] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype1');
+			settings[SettingsExerciseType2] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype2');
+			settings[SettingsExerciseType3] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype3');
+			settings[SettingsExerciseType4] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype4');
+			settings[SettingsExerciseType5] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype5');
 			instance = this;
 		}
 		

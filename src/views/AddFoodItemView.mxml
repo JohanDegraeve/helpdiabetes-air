@@ -27,7 +27,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		tabBarVisible="true"
 		title="AddFoodItemView" xmlns:myComponents="myComponents.*" xmlns:mx="library://ns.adobe.com/flex/mx"
 		creationComplete="onCreationComplete()"
-		remove="onRemove()"
 		add="addHandler()"
 		backKeyPressed="onBackKeyPressed(event)"
 		>
@@ -235,7 +234,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					}
 				} 
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
-				
 			}
 			
 			private function preInit():void {
@@ -343,13 +341,13 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				});
 			}
 			
-			private function onRemove():void {
+/*			private function onRemove():void {
 				if (aSelectUnit != null)
 					PopUpManager.removePopUp(aSelectUnit);
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 			}
-			
+	*/		
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
 					if (navigator.poppedViewReturnedObject.object.context == SELECT_MEAL) {
@@ -374,10 +372,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					chosenAmount = standardAmount;
 				return chosenAmount + " " +
 					retrievedFoodItem.getUnit(index).unitDescription + " : " +
-					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","gram_of_carbs_short") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).fat/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).protein/standardAmount*chosenAmount  *100)/100)+ " " +  resourceManager.getString("general","gram_of_protein") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).kcal/standardAmount*chosenAmount *100)/100) + " " +  resourceManager.getString("general","kilocalories") + ".";
+					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_carbs_short") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).fat/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).protein/standardAmount*chosenAmount  *10)/10)+ " " +  resourceManager.getString("general","gram_of_protein") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).kcal/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","kilocalories") + ".";
 			}
 			
 		]]>

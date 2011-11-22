@@ -92,14 +92,14 @@ you can also define maximum amount of digits after decimal point, maximum amount
 				_decimalDigits = value;
 			}
 			
-			private var _amount: String = "0";
+			[Bindable] private var _amount: String = "0";
 			
 			public function get amount(): String
 			{
 				return (_amount == "" ? "0":_amount);
 			}
 			
-			public function set amount(value: String): void
+			public function set amount(value:String): void
 			{
 				var floatValue:Number = parseFloat(value);
 				if (!(floatValue < Math.pow(10,maxNonDecimalDigits)))
@@ -163,7 +163,7 @@ you can also define maximum amount of digits after decimal point, maximum amount
 			/**
 			 * two labels will be shown this is the second label 
 			 */
-			private var _labelText1:String;
+			private var _labelText1:String = "";
 			public function get labelText1():String
 			{
 				return _labelText1;
@@ -177,7 +177,8 @@ you can also define maximum amount of digits after decimal point, maximum amount
 			/**
 			 * two labels will be shown this is the second label 
 			 */
-			private var _labelText2:String;
+			private var _labelText2:String ="";
+			
 			public function get labelText2():String
 			{
 				return _labelText2;
@@ -206,28 +207,38 @@ you can also define maximum amount of digits after decimal point, maximum amount
 				if (type == "hundreds") {
 					hundreds = incrementValue(hundreds);
 				}
-				if (type == "tens")
+				if (type == "tens") {
 					tens = incrementValue(tens);
-				if (type == "units")
+				}
+				if (type == "units") {
 					units = incrementValue(units);
-				if (type == "tenths")
+				}
+				if (type == "tenths") {
 					tenths = incrementValue(tenths);
-				if (type == "hundredths")
+				}
+				if (type == "hundredths") {
 					hundredths = incrementValue(hundredths);
+				}
+				_amount = ((Math.round((new Number(hundreds)*100 + new Number(tens)*10 + new Number(units) + new Number(tenths) /10 + new Number(hundredths)/100)*(Math.pow(10,decimalDigits))))/(Math.pow(10,decimalDigits))).toString();			
 			}
 			
 			private function decrementAmount(type:String):void {
 				if (type == "hundreds") {
 					hundreds = decrementValue(hundreds);
 				}
-				if (type == "tens")
+				if (type == "tens") {
 					tens = decrementValue(tens);
-				if (type == "units")
+				}
+				if (type == "units") {
 					units = decrementValue(units);
-				if (type == "tenths")
+				}
+				if (type == "tenths") {
 					tenths = decrementValue(tenths);
-				if (type == "hundredths")
+				}
+				if (type == "hundredths") {
 					hundredths = decrementValue(hundredths);
+				}
+				_amount = ((Math.round((new Number(hundreds)*100 + new Number(tens)*10 + new Number(units) + new Number(tenths) /10 + new Number(hundredths)/100)*(Math.pow(10,decimalDigits))))/(Math.pow(10,decimalDigits))).toString();			
 			}
 			
 			private function incrementValue(oldValue:String):String {
@@ -267,8 +278,9 @@ you can also define maximum amount of digits after decimal point, maximum amount
 	</fx:Script>
 	<s:BorderContainer>
 		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="5" paddingRight="5" paddingTop="10">
-			<s:Label text="{labelText1}" width="100%" styleName="textColorInPickerOnDarkBackground" />
-			<s:Label text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<s:Label includeInLayout="{labelText1 != ''}" text="{labelText1}" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<s:Label includeInLayout="{labelText2 != ''}" text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<s:Label text = "{_amount}" width="100%" styleName="textColorInPickerOnDarkBackground" textAlign="center"/>
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0xcccccc" weight="3"/>

@@ -142,7 +142,7 @@ package myComponents
 		override public function set data(value:Object):void {
 			_selectedFoodItem = value as SelectedFoodItem;
 			labelDisplayText =  _selectedFoodItem.chosenAmount + " " + _selectedFoodItem.unit.unitDescription + " " + _selectedFoodItem.itemDescription;
-			amountOfCarbsEtcText = (Math.round((_selectedFoodItem.chosenAmount * _selectedFoodItem.unit.carbs / _selectedFoodItem.unit.standardAmount)*100))/100 + " " + resourceManager.getString('general','gram_of_carbs');
+			amountOfCarbsEtcText = (Math.round((_selectedFoodItem.chosenAmount * _selectedFoodItem.unit.carbs / _selectedFoodItem.unit.standardAmount)*10))/10 + " " + resourceManager.getString('general','gram_of_carbs');
 		}
 		
 		override protected function createChildren():void {
