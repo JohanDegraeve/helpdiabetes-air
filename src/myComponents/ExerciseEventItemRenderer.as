@@ -18,14 +18,43 @@
 package myComponents
 {
 	import databaseclasses.ExerciseEvent;
+	import databaseclasses.Settings;
 	
 	import flash.display.GradientType;
 	import flash.geom.Matrix;
+	import flash.text.TextLineMetrics;
 	
 	import model.ModelLocator;
+	
+	import spark.components.supportClasses.StyleableTextField;
 
 	public class ExerciseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
+		/**
+		 * 
+		 */
+		private var exerciseLevelDisplay:StyleableTextField;
+		
+		private var _exerciseLevel:String;
+
+		public function get exerciseLevel():String
+		{
+			return _exerciseLevel;
+		}
+
+		public function set exerciseLevel(value:String):void
+		{
+			if (_exerciseLevel == value)
+				return;
+			_exerciseLevel = value;
+			if (exerciseLevelDisplay != null) {
+				exerciseLevelDisplay.text = _exerciseLevel;
+				invalidateSize();
+			}
+		}
+
+		private static var MINIMUM_AMOUNT_WIDTH:int = 100;
+		
 		/**
 		 * padding left 
 		 */
@@ -34,7 +63,11 @@ package myComponents
 		 * padding right 
 		 */
 		private static const PADDING_RIGHT:int = 5;
-		
+		/**
+		 * minimum gap between two elements, horizontal
+		 */
+		private static const GAP_HORIZONTAL_MINIMUM:int = 5;
+
 		private static var _exerciseEventBGColorDark:* = 0;
 		private static var _exerciseEventBGColorLight:* = 0;
 		private static var backGroundColors:Array ;
@@ -62,7 +95,27 @@ package myComponents
 				(date.hours.toString().length == 1 ? "0":"") + 	date.hours 
 				+ ":"  
 				+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes 
-				+ " " + (value as ExerciseEvent).level;
+				+ " " + resourceManager.getString('editexerciseeventview','exercise');
+			
+			exerciseLevel = (value as ExerciseEvent).level;
+		}
+		
+		override protected function createChildren():void {
+			super.createChildren();
+			
+			if (!exerciseLevelDisplay) {
+				exerciseLevelDisplay = new StyleableTextField();
+				exerciseLevelDisplay.styleName = this;
+				exerciseLevelDisplay.editable = false;
+				exerciseLevelDisplay.multiline = false;
+				exerciseLevelDisplay.wordWrap = false;
+				addChild(exerciseLevelDisplay);
+			}
+			if (MINIMUM_AMOUNT_WIDTH == 0) {
+				// calculate MINIMUM_CARB_AMOUNT_WIDTH
+				var textLineMetricx:TextLineMetrics = this.measureText("piece of text");
+				MINIMUM_AMOUNT_WIDTH = textLineMetricx.width;
+			}
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {
@@ -75,10 +128,25 @@ package myComponents
 		}
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
+			
+			var exerciseLevelDisplayWidth:Number = Math.max(getElementPreferredWidth(exerciseLevelDisplay), MINIMUM_AMOUNT_WIDTH);
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - exerciseLevelDisplayWidth);
+			exerciseLevelDisplay.text = exerciseLevel ;
+			exerciseLevelDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(exerciseLevelDisplay));
+			
+			setElementSize(labelDisplay,labelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
+			setElementSize(exerciseLevelDisplay,exerciseLevelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
+			labelDisplay.truncateToFit();
+			exerciseLevelDisplay.truncateToFit();
+			
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,ModelLocator.offSetSoThatTextIsInTheMiddle);
+			setElementPosition(exerciseLevelDisplay,unscaledWidth - PADDING_RIGHT - exerciseLevelDisplayWidth,ModelLocator.offSetSoThatTextIsInTheMiddle);
+			
+			/*
 			setElementSize(labelDisplay,unscaledWidth - PADDING_LEFT - PADDING_RIGHT,ModelLocator.StyleableTextFieldPreferredHeight);
 			labelDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,ModelLocator.offSetSoThatTextIsInTheMiddle);
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,ModelLocator.offSetSoThatTextIsInTheMiddle);*/
 		}
 
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void

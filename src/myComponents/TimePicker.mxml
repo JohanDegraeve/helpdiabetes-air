@@ -10,17 +10,17 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
 		 >
 	<fx:Declarations>
-		<s:DateTimeFormatter id="timeFormatter" dateStyle="none" dateTimePattern="hh:mm a"/>
-		<s:DateTimeFormatter id="timeFormatter2" dateStyle="none" dateTimePattern="hh"/>
+		<s:DateTimeFormatter id="timeFormatter" dateStyle="none" dateTimePattern="hh:mm a" useUTC="{useUTC}"/>
+		<s:DateTimeFormatter id="timeFormatter2" dateStyle="none" dateTimePattern="hh" useUTC="{useUTC}"/>
 	</fx:Declarations>
 	<fx:Metadata>
 		[ResourceBundle("general")]
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import myComponents.PickerEvent;
-			
 			import mx.managers.PopUpManager;
+			
+			import myComponents.PickerEvent;
 			private var _currentTime: Date;
 			[Bindable]
 			public function get currentTime(): Date
@@ -32,6 +32,56 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 				_currentTime = value;
 				updateTimeParts();
 			}
+			
+			private var _useUTC:Boolean = false;
+
+			/**
+			 * A boolean flag to control whether the local or the UTC date and time values are used when the formatting a date. <br>
+			 * If useUTC is set to true then the UTC values are used. <br>
+			 * If the value is set to false, then the date time values of the operating system's current time zone is used
+			 */
+			public function get useUTC():Boolean
+			{
+				return _useUTC;
+			}
+			
+			private var _maxTime:Date = new Date(32531915068);
+
+			public function get maxTime():Date
+			{
+				return _maxTime;
+			}
+
+			public function set maxTime(value:Date):void
+			{
+				_maxTime = value;
+			}
+			private var _minTime:Date = new Date(0);
+			
+			public function get minTime():Date
+			{
+				return _minTime;
+			}
+			
+			public function set minTime(value:Date):void
+			{
+				_minTime = value;
+			}
+			
+
+
+			/**
+			 * @private
+			 */
+			public function set useUTC(value:Boolean):void
+			{
+				if (_useUTC == value)
+					return;
+				_useUTC = value;
+				timeFormatter.useUTC = value;
+				timeFormatter2.useUTC = value;
+			}
+
 			
 			[Bindable]
 			public var timeMode: String = 'AM';
@@ -118,7 +168,11 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 						second += value;
 						break;
 				}
-				currentTime = new Date(year, month, date, hour, minute, second);
+				var newTime:Date = new Date(year, month, date, hour, minute, second);
+				if ((newTime < maxTime) && (newTime > minTime)) {
+					currentTime = newTime;
+				} else
+					updateTimeParts();//this will force reset hour, minute and second to previous values
 			}
 			
 			private function setTime(): void

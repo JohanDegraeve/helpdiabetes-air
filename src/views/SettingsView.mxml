@@ -18,31 +18,75 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsView"
-		initialize="init()">
+		initialize="init()"
+		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.Settings;
+			import databaseclasses.UnitChangedEvent;
+			
 			import mx.collections.ArrayCollection;
+			import mx.core.UIComponent;
+			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
+			
+			import myComponents.elementFromListPicker;
 			
 			import spark.events.IndexChangeEvent;
 			
+			private var elementPicker:elementFromListPicker;
+
+			
 			[ResourceBundle("settingsview")]
+			
+			private function onBackKeyPressed(event:Event):void {
+				if (elementPicker != null) {
+					if (elementPicker.isPopUp) {
+						PopUpManager.removePopUp(elementPicker);
+						event.preventDefault();
+					}
+					elementPicker = null;
+				} 
+			}
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("settingsview","bolus_calculation"),
 				ResourceManager.getInstance().getString("settingsview","meal_times"),
+				ResourceManager.getInstance().getString("settingsview","bloodglucoseunit")
 			]);	
 			
 			private function init():void {
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
 			}
-			
-			
-			
+
+			private function selectBloodGlucoseUnit():void {
+				var unitList:ArrayCollection = new ArrayCollection();
+				unitList .addItem(ResourceManager.getInstance().getString("general","mgperdl"));
+				unitList .addItem(ResourceManager.getInstance().getString("general","mmoll"));
+				
+				elementPicker = new elementFromListPicker();
+				elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, selectedUnitChanged);
+				elementPicker.elements = unitList;
+				elementPicker.labelText1 = resourceManager.getString('settingsview','selectunit');
+				
+				PopUpManager.addPopUp(elementPicker,UIComponent(this.parentApplication),true);
+				PopUpManager.centerPopUp(elementPicker);
+				
+				function selectedUnitChanged(event:UnitChangedEvent):void {
+					elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
+					PopUpManager.removePopUp(elementPicker);
+					if (event.index == 0)
+						Settings.getInstance().setSetting(Settings.SettingsBLOODGLUCOSE_UNIT,"mgperdl");
+					else if (event.index == 1)
+						Settings.getInstance().setSetting(Settings.SettingsBLOODGLUCOSE_UNIT,"mmoll");
+					settingsList.selectedIndex = -1;
+				}
+			}
+
 			/**
 			 * will popup a view corresponding to the selected menu
 			 */
@@ -54,6 +98,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					case 1:
 						navigator.pushView(SettingsMealTimesView);
 						break;
+					case 2:
+						selectBloodGlucoseUnit();
 				}
 			}
 		]]>

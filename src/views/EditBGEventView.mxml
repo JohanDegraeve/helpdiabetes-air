@@ -149,21 +149,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
 				
 				var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
-				var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
-				if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-					ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+				creationTimeStampAsDate.setHours(0,0,0,0);
+				if (creationTimeStampAsDate.valueOf() > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
+					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.getInstance().oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
+						ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(i));
+						if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+							i =  ModelLocator.getInstance().oldestDayLineStoredInTrackingList;//we don't need to do that 
+					}
+					ModelLocator.getInstance().trackingList.refresh();
+					ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 					if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-				} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-					ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-					if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-						ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 				}
-				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
-				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
-				//Now add list of daylines
-				for (var counter:Number = youngest;counter - 1 < oldest;counter = counter + 86400000)
-					ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(counter));
+				else
+					if (creationTimeStampAsDate.valueOf() < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+						for (var j:Number = creationTimeStampAsDate.valueOf(); j <  ModelLocator.getInstance().youngestDayLineStoredInTrackingList;j = j + 86400000) {
+							ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(j));
+							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+								j = ModelLocator.getInstance().youngestDayLineStoredInTrackingList;
+						}
+						ModelLocator.getInstance().trackingList.refresh();
+						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+						if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+					}
 				
 				ModelLocator.getInstance().trackingList.refresh();
 				navigator.popView();
@@ -175,6 +184,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="{styleManager.getStyleDeclaration('.backGroundColorInLists').getStyle('bloodGlucoseEventBackGroundDark')}" ratio="0" alpha="1"/>
+					<s:GradientEntry color="{styleManager.getStyleDeclaration('.backGroundColorInLists').getStyle('bloodGlucoseEventBackGroundLight')}" ratio="1" alpha="1"/>
+				</s:entries>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>		
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
 		<s:layout>
 			<s:VerticalLayout>
