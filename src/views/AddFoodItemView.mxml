@@ -33,12 +33,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		>
 	<fx:Declarations>
 	</fx:Declarations>
-	
 	<fx:Metadata>
 		[ResourceBundle("addfooditemview")]
 		[ResourceBundle("general")]
 	</fx:Metadata>
-
 	<fx:Script>
 		<![CDATA[
 			import databaseclasses.*;

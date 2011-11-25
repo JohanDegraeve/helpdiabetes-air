@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsMedicinView"
+		backKeyPressed="onBackKeyPressed(event)">
+	<fx:Metadata>
+		[ResourceBundle("settingsmedicinview")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import databaseclasses.Settings;
+			
+			import mx.managers.PopUpManager;
+			
+			import myComponents.PickerEvent;
+			import myComponents.TextPicker;
+			
+			private var textPicker:TextPicker;
+			
+			private function onBackKeyPressed(event:Event):void {
+				if (textPicker != null) {
+					if (textPicker.isPopUp) {
+						PopUpManager.removePopUp(textPicker);
+						event.preventDefault();
+					}
+					textPicker = null;
+				} 
+			}
+			
+			private function type1GroupClicked(e:MouseEvent = null):void {
+				textPicker = new TextPicker();
+				//textPicker.labelText1 = 
+				textPicker.textField = Settings.getInstance().getSetting(Settings.SettingsInsulinType1);
+				textPicker.addEventListener(PickerEvent.PICKER_SET, ontype1Set);
+				textPicker.addEventListener(PickerEvent.PICKER_CANCEL, ontype1Cancel);
+				PopUpManager.addPopUp(textPicker, this, true);
+				PopUpManager.centerPopUp(textPicker);
+			}
+			
+			private function ontype1Set(event: PickerEvent): void
+			{
+				textPicker.removeEventListener(PickerEvent.PICKER_SET, ontype1Set);
+				textPicker.removeEventListener(PickerEvent.PICKER_CANCEL, ontype1Cancel);
+				Settings.getInstance().setSetting(Settings.SettingsInsulinType1,(event.newValue as String));
+			}
+			
+			private function ontype1Cancel(event:PickerEvent):void {
+				textPicker.removeEventListener(PickerEvent.PICKER_SET, ontype1Set);
+				textPicker.removeEventListener(PickerEvent.PICKER_CANCEL, ontype1Cancel);
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:navigationContent>
+		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
+	</s:navigationContent>
+	<s:Group y="0" x="0" width="100%" height = "100%"  left="5" top="5" right="5">
+		<s:layout>
+			<s:VerticalLayout>
+			</s:VerticalLayout>
+		</s:layout>
+		<s:TextArea y="0" x="0" width="100%" text="{resourceManager.getString('settingsmedicinview','explainingtext')}" borderVisible="false" editable="false"/>
+		<s:Group id="type1Group" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="type1GroupClicked(event)">
+			<s:layout>
+				<s:HorizontalLayout>
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:TextArea id="type1" text="{Settings.getInstance().getSetting(Settings.SettingsInsulinType1)}" editable="false" borderVisible="false" textAlign="center"/>
+		</s:Group>
+	</s:Group>
+
+</s:View>

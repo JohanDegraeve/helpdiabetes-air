@@ -55,7 +55,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("settingsview","bolus_calculation"),
 				ResourceManager.getInstance().getString("settingsview","meal_times"),
-				ResourceManager.getInstance().getString("settingsview","bloodglucoseunit")
+				ResourceManager.getInstance().getString("settingsview","bloodglucoseunit"),
+				ResourceManager.getInstance().getString("settingsview","medicin"),
+				ResourceManager.getInstance().getString("settingsview","exercise")
 			]);	
 			
 			private function init():void {
@@ -100,6 +102,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						break;
 					case 2:
 						selectBloodGlucoseUnit();
+						break;
+					case 3:
+						navigator.pushView(SettingsMedicinView);
+						break;
 				}
 			}
 		]]>
