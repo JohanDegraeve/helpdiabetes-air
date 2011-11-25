@@ -38,7 +38,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.events.IndexChangeEvent;
 			
 			private var elementPicker:elementFromListPicker;
-
 			
 			[ResourceBundle("settingsview")]
 			
@@ -73,7 +72,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				elementPicker = new elementFromListPicker();
 				elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, selectedUnitChanged);
 				elementPicker.elements = unitList;
-				elementPicker.labelText1 = resourceManager.getString('settingsview','selectunit');
+				elementPicker.labelText1 = resourceManager.getString('settingsview','currentunit') + 
+					resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
+				elementPicker.labelText2 = resourceManager.getString('settingsview','selectnewunit');
 				
 				PopUpManager.addPopUp(elementPicker,UIComponent(this.parentApplication),true);
 				PopUpManager.centerPopUp(elementPicker);
@@ -101,10 +102,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						navigator.pushView(SettingsMealTimesView);
 						break;
 					case 2:
+						settingsList.selectedIndex = -1;
 						selectBloodGlucoseUnit();
 						break;
 					case 3:
 						navigator.pushView(SettingsMedicinView);
+						break;
+					case 4:
+						navigator.pushView(SettingsExerciseView);
 						break;
 				}
 			}
@@ -115,7 +120,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</s:navigationContent>
 	<s:List id="settingsList" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.MenuElementItemRenderer"
 			dataProvider="{menuList}">
-		
 	</s:List>
-
 </s:View>

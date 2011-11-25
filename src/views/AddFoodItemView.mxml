@@ -115,7 +115,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					aSelectUnit = null;
 				} 
 			}
-			
 
 			private function onCreationComplete():void {
 				

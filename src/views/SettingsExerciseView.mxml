@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsexerciseView"
+		backKeyPressed="onBackKeyPressed(event)"
+		initialize="view1_initializeHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import databaseclasses.Settings;
+			
+			import mx.events.FlexEvent;
+			
+			import myComponents.PickerEvent;
+			
+			[Bindable] private var exerciseText1:String = "";
+			[Bindable] private var exerciseText2:String = "";
+			[Bindable] private var exerciseText3:String = "";
+			[Bindable] private var exerciseText4:String = "";
+			[Bindable] private var exerciseText5:String = "";
+			
+			private function onBackKeyPressed(event:Event):void {
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType1,exerciseText1);
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType2,exerciseText2);
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType3,exerciseText3);
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType4,exerciseText4);
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType5,exerciseText5);
+			}
+			
+			protected function view1_initializeHandler(event:FlexEvent):void
+			{
+				exerciseText1 = Settings.getInstance().getSetting(Settings.SettingsExerciseType1);
+				exerciseText2 = Settings.getInstance().getSetting(Settings.SettingsExerciseType2);
+				exerciseText3 = Settings.getInstance().getSetting(Settings.SettingsExerciseType3);
+				exerciseText4 = Settings.getInstance().getSetting(Settings.SettingsExerciseType4);
+				exerciseText5 = Settings.getInstance().getSetting(Settings.SettingsExerciseType5);
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:navigationContent>
+		<s:Button   label="Back" id="backButton" click="{onBackKeyPressed(event);navigator.popView()}"/>
+	</s:navigationContent>
+	<s:Group y="0" x="0" width="100%" height = "100%"  left="5" top="5" right="5">
+		<s:layout>
+			<s:VerticalLayout>
+			</s:VerticalLayout>
+		</s:layout>
+		<s:TextInput id="type1" text="@{exerciseText1}" editable="true" borderVisible="false" textAlign="left" />
+		<s:TextInput id="type2" text="@{exerciseText2}" editable="true" borderVisible="false" textAlign="left"/>
+		<s:TextInput id="type3" text="@{exerciseText3}" editable="true" borderVisible="false" textAlign="left"/>
+		<s:TextInput id="type4" text="@{exerciseText4}" editable="true" borderVisible="false" textAlign="left"/>
+		<s:TextInput id="type5" text="@{exerciseText5}" editable="true" borderVisible="false" textAlign="left"/>
+	</s:Group>
+	
+</s:View>
