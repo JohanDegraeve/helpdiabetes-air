@@ -45,7 +45,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 				return _useUTC;
 			}
 			
-			private var _maxTime:Date = new Date(32531915068);
+			private var _maxTime:Date = new Date(32531915068000);
 
 			public function get maxTime():Date
 			{
