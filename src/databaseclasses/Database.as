@@ -74,7 +74,7 @@ package databaseclasses
 		
 		
 		private const CREATE_TABLE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS fooditems (itemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-			"description TEXT NOT NULL)";
+			"description TEXT NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_UNITS:String = "CREATE TABLE IF NOT EXISTS units (unitid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"fooditems_itemid INTEGER NOT NULL, " +
 			"description TEXT NOT NULL, " +
@@ -82,19 +82,19 @@ package databaseclasses
 			"kcal INTEGER, " +
 			"protein REAL, " +
 			"carbs REAL NOT NULL, " +
-			"fat REAL)";
+			"fat REAL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (exerciseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"level TEXT, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
-			"comment_2 TEXT)";
+			"comment_2 TEXT, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_BLOODGLUCOSE_EVENTS:String = "CREATE TABLE IF NOT EXISTS bloodglucoseevents (bloodglucoseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"unit TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
-			"value INTEGER NOT NULL)";
+			"value INTEGER NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (medicineventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"medicinname TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
-			"amount REAL NOT NULL)";		
+			"amount REAL NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";		
 		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER PRIMARY KEY, " +
 			"mealname TEXT NOT NULL, " +
 			"lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
@@ -111,7 +111,7 @@ package databaseclasses
 			"protein REAL, " +
 			"carbs REAL NOT NULL, " +
 			"fat REAL, " +
-			"chosenamount REAL NOT NULL)";		
+			"chosenamount REAL NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";		
 		private const CREATE_TABLE_TEMPLATE_FOODITEMS:String = "CREATE TABLE   IF NOT EXISTS  templatefooditems (templateitemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"templates_templateid INTEGER NOT NULL, " +
 			"itemdescription TEXT NOT NULL, " +
@@ -120,15 +120,15 @@ package databaseclasses
 			"kcal INTEGER, " +
 			"protein REAL, " +
 			"carbs REAL NOT NULL, " +
-			"fat REAL)";		
+			"fat REAL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";		
 		private const CREATE_TABLE_TEMPLATES:String = "CREATE TABLE IF NOT EXISTS templates (templateid INTEGER PRIMARY KEY AUTOINCREMENT, " +
-			"name TEXT NOT NULL)";
+			"name TEXT NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_SOURCE:String = "CREATE TABLE IF NOT EXISTS source (source TEXT)";
 		/**
 		 * CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, value TEXT)
 		 */ 
 		private const CREATE_TABLE_SETTINGS:String = "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY," +
-			"value TEXT)";
+			"value TEXT, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		/**
 		 * SELECT * FROM settings 
 		 */
@@ -145,43 +145,43 @@ package databaseclasses
 		/**
 		 * INSERT INTO settings (id,value) VALUES (:id,:value)
 		 */
-		private const INSERT_SETTING:String = "INSERT INTO settings (id,value) VALUES (:id,:value)";
+		private const INSERT_SETTING:String = "INSERT INTO settings (id,value,lastmodifiedtimestamp) VALUES (:id,:value,:lastmodifiedtimestamp)";
 		/**
 		 * UPDATE settings set value = :value WHERE id = :id
 		 */
-		private const UPDATE_SETTING:String = "UPDATE settings set value = :value WHERE id = :id";
+		private const UPDATE_SETTING:String = "UPDATE settings set value = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE id = :id";
 		private const UPDATE_MEALEVENT_LASTMODIFIEDTIMESTAMP:String = "UPDATE mealevents SET lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE mealeventid = :mealeventid";
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
-		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description) VALUES (:description)";
-		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid,"+
+		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description,lastmodifiedtimestamp) VALUES (:description,:lastmodifiedtimestamp)";
+		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid," +
 			"description," +
 			"standardamount," +
 			"kcal," +
 			"protein," +
 			"carbs," +
-			"fat) VALUES " +
+			"fat, lastmodifiedtimestamp) VALUES " +
 			"(:fooditems_itemid," + 
 			":description," +
 			":standardamount," +
 			":kcal," +
 			":protein," +
 			":carbs," +
-			":fat)";
-		private const UPDATE_INSULINRATIO_IN_MEAL_EVENT:String = "UPDATE mealevents set insulinratio = :value WHERE mealeventid = :id";
-		private const UPDATE_CHOSENAMOUNT_IN_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set chosenamount = :value WHERE selectedfooditemid = :id";
+			":fat, :lastmodifiedtimestamp)";
+		private const UPDATE_INSULINRATIO_IN_MEAL_EVENT:String = "UPDATE mealevents set insulinratio = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE mealeventid = :id";
+		private const UPDATE_CHOSENAMOUNT_IN_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set chosenamount = :value,lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE selectedfooditemid = :id";
 		
 		/**
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
 		 */ 
 		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp, insulinratio, correctionfactor, previousBGlevel, creationtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp,:insulinratio,:correctionfactor,:previousBGlevel,:creationtimestamp)";
 		
-		private const INSERT_SELECTEDITEM:String = "INSERT INTO selectedfooditems (selectedfooditemid, mealevents_mealeventid,itemdescription ,unitdescription,standardamount,kcal,protein,carbs, fat, chosenamount ) VALUES (:selectedfooditemid,:mealevents_mealeventid,:itemdescription ,:unitdescription,:standardamount,:kcal,:protein,:carbs,:fat,:chosenamount)";
+		private const INSERT_SELECTEDITEM:String = "INSERT INTO selectedfooditems (selectedfooditemid, mealevents_mealeventid,itemdescription ,unitdescription,standardamount,kcal,protein,carbs, fat, chosenamount,lastmodifiedtimestamp ) VALUES (:selectedfooditemid,:mealevents_mealeventid,:itemdescription ,:unitdescription,:standardamount,:kcal,:protein,:carbs,:fat,:chosenamount, :lastmodifiedtimestamp)";
 		
-		private const INSERT_BLOODGLUCOSEEVENT:String = "INSERT INTO bloodglucoseevents (bloodglucoseeventid, unit, creationtimestamp, value) VALUES (:bloodglucoseeventid, :unit,:creationtimestamp, :value)";
+		private const INSERT_BLOODGLUCOSEEVENT:String = "INSERT INTO bloodglucoseevents (bloodglucoseeventid, unit, creationtimestamp, value, lastmodifiedtimestamp) VALUES (:bloodglucoseeventid, :unit,:creationtimestamp, :value, :lastmodifiedtimestamp)";
 		
-		private const INSERT_MEDICINEVENT:String = "INSERT INTO medicinevents (medicineventid, medicinname, amount, creationtimestamp) VALUES (:medicineventid, :medicinname,  :amount, :creationtimestamp)";
+		private const INSERT_MEDICINEVENT:String = "INSERT INTO medicinevents (medicineventid, medicinname, amount, creationtimestamp, lastmodifiedtimestamp) VALUES (:medicineventid, :medicinname,  :amount, :creationtimestamp, :lastmodifiedtimestamp)";
 		
-		private const INSERT_EXERCISEEVENT:String = "INSERT INTO exerciseevents (exerciseeventid, level, creationtimestamp, comment_2) VALUES (:exerciseeventid, :level, :creationtimestamp, :comment_2)";
+		private const INSERT_EXERCISEEVENT:String = "INSERT INTO exerciseevents (exerciseeventid, level, creationtimestamp, comment_2, lastmodifiedtimestamp) VALUES (:exerciseeventid, :level, :creationtimestamp, :comment_2, :lastmodifiedtimestamp)";
 		
 		/**
 		 * constructor, should not be used, use getInstance()
@@ -374,6 +374,7 @@ package databaseclasses
 						sqlStatement.text = INSERT_SETTING;
 						sqlStatement.parameters[":id"] = id;
 						sqlStatement.parameters[":value"] = Settings.getInstance().getSetting(id);
+						sqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 						sqlStatement.execute();
 						
 					} else {
@@ -715,6 +716,7 @@ package databaseclasses
 			localSqlStatement.sqlConnection = aConn;
 			localSqlStatement.text = INSERT_FOODITEM;
 			localSqlStatement.parameters[":description"] = foodItemDescription;
+			localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 			localSqlStatement.addEventListener(SQLEvent.RESULT, foodItemInserted);
 			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, foodItemInsertionError);
 			localSqlStatement.execute();
@@ -752,6 +754,7 @@ package databaseclasses
 			localSqlStatement.parameters[":carbs"] = carbs;
 			localSqlStatement.parameters[":fat"] = fat;
 			localSqlStatement.parameters[":fooditems_itemid"] = fooditems_itemid;
+			localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 			localSqlStatement.addEventListener(SQLEvent.RESULT, unitInserted);
 			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, unitInsertionError);
 			localSqlStatement.execute();
@@ -1174,6 +1177,7 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_INSULINRATIO_IN_MEAL_EVENT;
 				localSqlStatement.parameters[":id"] = mealEventId;
 				localSqlStatement.parameters[":value"] = newInsulinRatioValue;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, chosenAmountUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, chosenAmountUpdateFailed);
 				localSqlStatement.execute();
@@ -1273,6 +1277,7 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_SETTING;
 				localSqlStatement.parameters[":id"] = id;
 				localSqlStatement.parameters[":value"] = value;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, settingUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, settingUpdateFailed);
 				localSqlStatement.execute();
@@ -1403,6 +1408,7 @@ package databaseclasses
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":value"] = level;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, bloodGlucoseLevelCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, bloodGlucoseLevelCreationFailed);
 				localSqlStatement.execute();
@@ -1477,6 +1483,7 @@ package databaseclasses
 				localSqlStatement.parameters[":carbs"] = carbs;
 				localSqlStatement.parameters[":fat"] = fat;
 				localSqlStatement.parameters[":chosenamount"] = chosenAmount;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, selectedItemCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, selectedItemCreationFailed);
 				localSqlStatement.execute();
@@ -1825,6 +1832,7 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_CHOSENAMOUNT_IN_SELECTED_FOOD_ITEM;
 				localSqlStatement.parameters[":id"] = selectedFoodItemId;
 				localSqlStatement.parameters[":value"] = newValue;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, chosenAmountUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, chosenAmountUpdateFailed);
 				localSqlStatement.execute();
@@ -1885,6 +1893,7 @@ package databaseclasses
 				localSqlStatement.parameters[":amount"] = amount;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":medicinname"] = medicin;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, medicinEventCreationFailed);
 				localSqlStatement.execute();
@@ -1942,6 +1951,7 @@ package databaseclasses
 				localSqlStatement.parameters[":level"] = level;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":comment_2"] = comment;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, exerciseEventCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, exerciseEventCreationFailed);
 				localSqlStatement.execute();

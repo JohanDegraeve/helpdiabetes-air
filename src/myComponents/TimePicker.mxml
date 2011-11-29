@@ -45,30 +45,47 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 				return _useUTC;
 			}
 			
+			/**
+			 * maximum time to which user can set the new time 
+			 */
 			private var _maxTime:Date = new Date(32531915068000);
 
+			/**
+			 * maximum time to which user can set the new time 
+			 */
 			public function get maxTime():Date
 			{
 				return _maxTime;
 			}
 
+			/**
+			 * maximum time to which user can set the new time 
+			 */
 			public function set maxTime(value:Date):void
 			{
 				_maxTime = value;
 			}
+
+			/**
+			 * minimum time to which user can set the new time 
+			 */
 			private var _minTime:Date = new Date(0);
 			
+			/**
+			 * minimum time to which user can set the new time 
+			 */
 			public function get minTime():Date
 			{
 				return _minTime;
 			}
 			
+			/**
+			 * minimum time to which user can set the new time 
+			 */
 			public function set minTime(value:Date):void
 			{
 				_minTime = value;
 			}
-			
-
 
 			/**
 			 * @private
