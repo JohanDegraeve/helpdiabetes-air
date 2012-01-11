@@ -23,6 +23,7 @@
 				ResourceManager.getInstance().getString("general","foodcounter"),
 				ResourceManager.getInstance().getString("general","tracking"),
 				ResourceManager.getInstance().getString("general","foodtable"),
+				ResourceManager.getInstance().getString("general","synchronize"),
 				ResourceManager.getInstance().getString("general","settings"),
 				ResourceManager.getInstance().getString("general","infoabout")
 			]);	
@@ -51,9 +52,12 @@
 						navigator.pushView(FoodTableView);
 						break;
 					case 3:
-						navigator.pushView(SettingsView);
+						navigator.pushView(SynchronizeView);
 						break;
 					case 4:
+						navigator.pushView(SettingsView);
+						break;
+					case 5:
 						navigator.pushView(InfoAndHelpView);
 						break;
 				}
