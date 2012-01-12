@@ -144,7 +144,6 @@ package model
 			_initializeTrackingViewTo = value;
 		}
 
-		
 		/** 
 		 * just a variable used when opening the untilist 
 		 */

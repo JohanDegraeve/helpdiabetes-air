@@ -105,7 +105,7 @@ client needs to set currentDate, which is a timestamp in ms. User can only chang
 			</s:Line>
 			<s:HGroup width="100%">
 				<s:VGroup gap="10" >
-					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('day')" width="100%"/>
+					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('day')" width="100%" />
 					<s:Label text="{day}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
 					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('day')" width="100%"/>
 				</s:VGroup>

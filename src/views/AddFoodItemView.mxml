@@ -27,16 +27,27 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		tabBarVisible="true"
 		title="AddFoodItemView" xmlns:myComponents="myComponents.*" xmlns:mx="library://ns.adobe.com/flex/mx"
 		creationComplete="onCreationComplete()"
-		add="addHandler()"
+		backKeyPressed = "onBackKeyPressed(event)"
 		remove="onRemove()"
-		backKeyPressed="onBackKeyPressed(event)"
-		>
+		add="addHandler()">
 	<fx:Declarations>
+		<!--  seperationerror="" makes sure there's no round border even when there's a separator error -->
+		<mx:NumberValidator
+			id="amountValidator"
+			source="{amount_textinput}" 
+			property="text" 
+			allowNegative="false" 
+			domain="real"
+			thousandsSeparator="." 
+			separationError="">
+		</mx:NumberValidator>
 	</fx:Declarations>
+	
 	<fx:Metadata>
 		[ResourceBundle("addfooditemview")]
 		[ResourceBundle("general")]
 	</fx:Metadata>
+	
 	<fx:Script>
 		<![CDATA[
 			import databaseclasses.*;
@@ -52,15 +63,17 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			import mx.core.IFlexDisplayObject;
 			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
+			import mx.events.ValidationResultEvent;
+			import mx.geom.RoundedRectangle;
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
+			import mx.validators.ValidationResult;
 			
 			import myComponents.DayLine;
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.elementFromListPicker;
 			
 			import spark.components.Label;
-			import spark.events.ViewNavigatorEvent;
 			
 			[Bindable]
 			private var description_textarea_text:String ;
@@ -70,17 +83,18 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private var amount_textinput_text:String;
 			[Bindable]
 			private var meal_textarea_text:String;
-			private var _amount_textarea_text:String;
-
-
 			[Bindable]
-			private var meal_button_text:String;
+			private var amount_textarea_text:String;
+			[Bindable]
+			private var meal_button_text:String = "dummy_button";
 			[Bindable]
 			private var add_button_text:String;
+			[Bindable]
+			private var details_button_fontsize:int;
 			
 			[Bindable]
 			private var meals:ArrayCollection;
-		
+			
 			private var retrievedFoodItem:FoodItem;
 			
 			private var checkLastMealUpdateRequired:Boolean = true;
@@ -92,19 +106,13 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			
 			private var DEFAULT_SIZE_OF_LONGEST_TEXT:int = 50;
 			
+			private var aSelectUnit:elementFromListPicker;
+			
 			/**
 			 * used as context value when pushing the view SelectMealView<br>
 			 * when addHandler is called, the value of the return object will be check, if equal to CHANGE_MEAL_DATE_AND_TIME then not allowed to call checkLastMealUpdate
 			 */
 			private static const SELECT_MEAL:int = 1;
-			
-			/**
-			 * should there be a button that allows the user to change the meal ? 
-			 */
-			[Bindable]
-			private var mealButtonRequired:Boolean = true;
-			
-			private var aSelectUnit:elementFromListPicker;
 			
 			private function onBackKeyPressed(event:Event):void {
 				if (aSelectUnit != null) {
@@ -115,21 +123,22 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					aSelectUnit = null;
 				} 
 			}
-
+			
+			private function onRemove():void {
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
+			}
+			
 			private function onCreationComplete():void {
+				//we'll add an eventlistener for pressing enter when editing the amount
+				amount_textinput.addEventListener(FlexEvent.ENTER,onPressEnter);
+				
 				
 				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 				
-				if (data is SelectedFoodItem) {
-					checkLastMealUpdateRequired = false;
-					mealButtonRequired=false;
-					meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
-					add_button_text = resourceManager.getString('general','save') 
-				}
-				
-				//refresh the meals - checkLxstMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
+				//refresh the meals - checkLastMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
 				//no need to call refreshMeals
 				//comment added 20/07/2011 : variable checkLastMealUpdateRequired is not really having the correct meaning. Before I called here refreshMeals with checkLastMealUpdateRequired as parameter
 				//  but that was not good.
@@ -142,7 +151,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						checkLastMealUpdate();
 					meal_button_text = 	(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				}
-
+				
 				if (data is FoodItem) {
 					//addfooditemview has been created vi foodcounter view, so initial setup is necessary
 					var dispatcher:EventDispatcher = new EventDispatcher();
@@ -174,20 +183,14 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						if (retrievedFoodItem.getNumberOfUnits() > 1) {
 							popUpUnitList();
 						}
+						
 					}
 					
 					function unitListRetrievelError(event:DatabaseEvent):void {
 						dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 						dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 					}
-				} else if (data is SelectedFoodItem) {
-					//addfooditemview created via tracking => click on mealevent => click on selectedfooditem
-					retrievedFoodItem = new FoodItem((data as SelectedFoodItem).itemDescription,new ArrayCollection([(data as SelectedFoodItem).unit]),0);
-					description_textarea_text = retrievedFoodItem.itemDescription;
-					details_button_text = createDetailsButtonText(0,(data as SelectedFoodItem).chosenAmount);
-					amount_textinput_text = (data as SelectedFoodItem).chosenAmount.toString();;
-					selectedUnit = 0;
-				} else { 
+				} else {
 					//addfooditem recreated after having pushed meal button and returning from selectedmealview
 					retrievedFoodItem = (data.retrievedFoodItem as FoodItem);
 					description_textarea_text = retrievedFoodItem.itemDescription;
@@ -195,6 +198,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					amount_textinput_text = data.amount_textinput_text;
 					details_button_text = createDetailsButtonText(selectedUnit,(new Number(amount_textinput_text)) == 0 ? -1: new Number(amount_textinput_text));
 				}
+				
+				//set focus to amount field, on android this immediately shows up the keyboard
+				this.focusManager.setFocus(amount_textinput);
+				
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
@@ -215,6 +222,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				//first remove the eventlistener
 				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				
+				var temp3:Object = ModelLocator.getInstance().meals;
 				//now check the time difference
 				if (((new Date()).valueOf() - new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION))) < 15*60*1000) {
 					//it's less than 15 minutes since the last meal addition
@@ -231,22 +239,20 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					}
 				} 
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+				
 			}
 			
 			private function preInit():void {
 				meal_textarea_text = resourceManager.getString('addfooditemview','meal_button');
 				add_button_text = resourceManager.getString("addfooditemview","add_button");
-				_amount_textarea_text = resourceManager.getString("addfooditemview","amount");
+				amount_textarea_text = resourceManager.getString("addfooditemview","amount");
 				amount_textinput_text = "0";
 			}
 			
 			/**
 			 * pop up for unitlist
 			 */ 
-			private function popUpUnitList(e:MouseEvent = null):void {
-				//if (!hasEventListener(ViewNavigatorEvent.REMOVING))
-					//this.addEventListener(ViewNavigatorEvent.REMOVING,onRemoving);	//necessary for handling the back button in android
-					
+			private function popUpUnitList():void {
 				var unitList:ArrayCollection = new ArrayCollection();
 				unitList .addItem((retrievedFoodItem.getUnit(0) as Unit).unitDescription);
 				for (var i:int = 1; i < retrievedFoodItem.getNumberOfUnits();i++)
@@ -272,32 +278,77 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						//set it to empty string, this allows the user to immediately start typing an amount
 						amount_textinput_text = "";
 				}
+				}
+				
+			
+			/**
+			 * function to fill in the details_text_area_text for the specified unit and chosenAmount
+			 * if chosenAmount = -1 then standardamount will be used
+			 */ 
+			private function createDetailsButtonText(index:int, chosenAmount:Number):String {
+				var standardAmount:Number = retrievedFoodItem.getUnit(index).standardAmount;
+				if (chosenAmount == -1)
+					chosenAmount = standardAmount;
+				return chosenAmount + " " +
+					retrievedFoodItem.getUnit(index).unitDescription + " : " +
+					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_carbs_short") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).fat/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).protein/standardAmount*chosenAmount  *10)/10)+ " " +  resourceManager.getString("general","gram_of_protein") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).kcal/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","kilocalories") + ".";
+			}
+			
+			private function amountTextChanged():void {
+				//first replace "," by ".", because flex doesn't seem to work correctly when using "," as decimal seperator
+				var temp:String;
+				temp = amount_textinput_text.split(",").join(".");
+				//applying a trick here to get rid of too many ".", first replacing the first "." by "{", hoping the user will never type this character
+				//then replacing all remaining "." by "", then rereplacing "{" by "."
+				temp = temp.split(".",2).join("{");
+				temp = temp.split(".").join("");
+				amount_textinput_text = temp.split("{",2).join(".");
+				
+				//now if amount = "" (ie empty string) set it to 0
+				//this means user has not entered any amount
+				if (amount_textinput_text == "")
+					amount_textinput_text = "0";
+				
+				
+				var validationResultEvent:ValidationResultEvent = amountValidator.validate(null,true);
+				if (validationResultEvent.results == null)
+					details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
+				else {
+					for (var i:int = 0;i < validationResultEvent.results.length;i++) {
+						if ((validationResultEvent.results[i] as ValidationResult).errorCode == "requiredField") {
+							//amountfield is empty, just keep it empty and set detailsbuttontext with value = 0
+							details_button_text = createDetailsButtonText(selectedUnit,0);
+						}
+						if ((validationResultEvent.results[i] as ValidationResult).errorCode == "separation") {
+							//user is trying to add a seperation for "duizendtallen", ignore it, it seems to work anyway treating thousands seperator as decimal seperator
+							details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
+						}
+					}
+				}
 			}
 			
 			/**
 			 * will add a selectedFoodItem to the selected meal, called when addButton is clicked
 			 */ 
-			private function addButtonClicked(e:MouseEvent = null):void {
-	
+			private function addButtonClicked():void {
+				
 				navigator.popView();
 				
 				//first of all when amount = "", set it to 0
 				if (amount_textinput_text =="")
 					amount_textinput_text ="0";
 				
-				if (data is SelectedFoodItem) {
-					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent
-					.updateSelectedFoodItemChosenAmount(data as SelectedFoodItem,new Number(amount_textinput_text));
-				} else {
-					//- get the selected meal (which may or may not already include a mealevent
-					//- create a selectedfooditem and add it
-					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
-					.addSelectedFoodItem(
-						new SelectedFoodItem(retrievedFoodItem.itemDescription,
-							retrievedFoodItem.getUnit(selectedUnit),
-							new Number(amount_textinput_text)));
-					
-				}
+				//- get the selected meal (which may or may not already include a mealevent
+				//- create a selectedfooditem and add it
+				(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
+				.addSelectedFoodItem(
+					new SelectedFoodItem(retrievedFoodItem.itemDescription,
+						retrievedFoodItem.getUnit(selectedUnit),
+						new Number(amount_textinput.text)));
+				
 				var creationTimeStampAsDate:Date = new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);
 				if (creationTimeStampAsDate.valueOf() > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
@@ -328,7 +379,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			/**
 			 * called when mealbutton clicked
 			 */
-			private function mealButtonClicked(e:MouseEvent = null):void {
+			private function mealButtonClicked():void {
 				data = new Object();
 				data.retrievedFoodItem = retrievedFoodItem;
 				data.selectedUnit = selectedUnit;
@@ -338,11 +389,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				});
 			}
 			
-			private function onRemove():void {
-				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
-				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
-			}
-			
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
 					if (navigator.poppedViewReturnedObject.object.context == SELECT_MEAL) {
@@ -350,52 +396,47 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					}
 				}
 			}
-
-			private function amountTextChanged():void {
-				addFoodItemGroup.defaultAmountOverwritten = true;
-				
-				if (amount_textinput_text == "")
-					amount_textinput_text = "0";
-
-				details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
-			}
-
-
-			private function createDetailsButtonText(index:int, chosenAmount:Number):String {
-				var standardAmount:Number = retrievedFoodItem.getUnit(index).standardAmount;
-				if (chosenAmount == -1)
-					chosenAmount = standardAmount;
-				return chosenAmount + " " +
-					retrievedFoodItem.getUnit(index).unitDescription + " : " +
-					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_carbs_short") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).fat/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).protein/standardAmount*chosenAmount  *10)/10)+ " " +  resourceManager.getString("general","gram_of_protein") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).kcal/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","kilocalories") + ".";
+			
+			private function onPressEnter(event:FlexEvent):void {
+				addButtonClicked();
 			}
 			
 		]]>
 	</fx:Script>
-
+	
 	
 	<s:navigationContent>
 		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
-		<myComponents:AddFoodItemGroup id="addFoodItemGroup"
-									   y="0" x="0" width="100%" height = "100%" 
-									   description_textarea_text="{description_textarea_text}" 
-									   details_button_text="@{details_button_text}"
-									   amount_textarea_text="{_amount_textarea_text}"
-									   meal_textarea_text="@{meal_textarea_text}"
-									   amount_textinput_text="@{amount_textinput_text}"
-									   meal_button_text="{meal_button_text}"
-									   add_button_text="{add_button_text}"
-									   details_button_click_function="{popUpUnitList}"
-									   meal_button_click_function="{mealButtonClicked}"
-									   add_button_click_function="{addButtonClicked}"
-									   amountTextChangedFunction="{amountTextChanged}"
-									   mealButtonRequired="{mealButtonRequired}"
-									   >
-		</myComponents:AddFoodItemGroup>
+	<s:Group y="0" x="0" width="100%" height = "100%" >
+		<s:layout>
+			<s:VerticalLayout>
+			</s:VerticalLayout>
+		</s:layout>
+		
+		<!-- the food item description -->
+		<s:TextArea id="description_textarea"  width="100%" text="{description_textarea_text}" editable="false" creationComplete="details_button_fontsize = description_textarea.getStyle('fontSize')*0.8;"/>
+		
+		<!-- where we mention the amount of carbs that is in the chosen amount. I don't remember why I have set the fontsize variable -->
+		<s:Button id="details_button" width="100%" label="{details_button_text}" click="popUpUnitList()" fontSize="{details_button_fontsize}"/>
+		
+		<s:HGroup gap="6" width="100%">
+			<!-- just the text "Amount:" -->
+			<s:TextArea id="amount_textarea"   width="50%" editable="false" text="{amount_textarea_text}"/>
+			<!-- where the user can enter the chosen amount -->
+			<s:TextInput  restrict="0123456789.,"  id="amount_textinput"  width="50%" editable="true" text="@{amount_textinput_text}" change="amountTextChanged()" />
+		</s:HGroup>
+		<s:HGroup gap="6" width="100%">
+			<!-- just the text "Meal:" -->
+			<s:TextArea id="meal_textarea"  width = "50%" editable="false" text="{meal_textarea_text}"/>
+			<!-- the button to select another meal, and showing the currently selected meal -->
+			<s:Button id="meal_button" width = "50%"  label="{meal_button_text}" click="mealButtonClicked()"/>
+		</s:HGroup>
+		<!-- the button to add the fooditem to the currently selected meal -->
+		<s:HGroup  gap="6" width="100%" horizontalAlign="center">
+			<s:Button id="add_button" label="{add_button_text}" enabled="true" click="addButtonClicked()"/>
+		</s:HGroup>
+	</s:Group>
 	
 </s:View>
  
