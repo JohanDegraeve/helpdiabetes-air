@@ -21,7 +21,7 @@
 			import mx.managers.BrowserManager;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
-			import mx.rpc.http.HTTPService;
+			
 			
 			private var _authorizationCode:String;
 			
@@ -88,14 +88,15 @@
 			private function getAccessTokenAndRefreshTokenFault(event:IOErrorEvent):void {
 				loader.removeEventListener(ResultEvent.RESULT,getAccessTokenAndRefreshTokenResult);
 				loader.removeEventListener(FaultEvent.FAULT,getAccessTokenAndRefreshTokenFault);
-				var  resultEvent:IOErrorEvent = event;
 			}
 			
 			private function getAccessTokenAndRefreshTokenResult(event:Event):void {
 				loader.removeEventListener(ResultEvent.RESULT,getAccessTokenAndRefreshTokenResult);
 				loader.removeEventListener(FaultEvent.FAULT,getAccessTokenAndRefreshTokenFault);
-				var  resultEvent:Event = event;
+					
 			}
+			
+			
 			
 			
 		]]>
