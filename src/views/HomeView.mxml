@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="HomeView"
+		xmlns:s="library://ns.adobe.com/flex/spark" title="HomeView" 
 		initialize="init()" 
 		creationComplete="onCreationComplete()">
 	<fx:Declarations>
@@ -22,8 +22,8 @@
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("general","foodcounter"),
 				ResourceManager.getInstance().getString("general","tracking"),
-				ResourceManager.getInstance().getString("general","foodtable"),
-				ResourceManager.getInstance().getString("general","synchronize"),
+				/*ResourceManager.getInstance().getString("general","foodtable"),*/
+				/*ResourceManager.getInstance().getString("general","synchronize"),*/
 				ResourceManager.getInstance().getString("general","settings"),
 				ResourceManager.getInstance().getString("general","infoabout")
 			]);	
@@ -48,16 +48,16 @@
 						ModelLocator.getInstance().initializeTrackingViewTo = ModelLocator.getInstance().trackingList.length - 1;
 						navigator.pushView(TrackingView);
 						break;
-					case 2:
+					/*case 2:
 						navigator.pushView(FoodTableView);
 						break;
 					case 3:
 						navigator.pushView(SynchronizeView);
-						break;
-					case 4:
+						break;*/
+					case 2:
 						navigator.pushView(SettingsView);
 						break;
-					case 5:
+					case 3:
 						navigator.pushView(InfoAndHelpView);
 						break;
 				}
