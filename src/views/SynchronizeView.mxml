@@ -5,9 +5,6 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<s:navigationContent>
-		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
-	</s:navigationContent>
 	<fx:Script>
 		<![CDATA[
 			
@@ -28,12 +25,15 @@
 			private static var googleAuthUrl:String = "https://accounts.google.com/o/oauth2/token";
 
 			[Bindable]
+
 			private function get authorizationCode():String
+
 			{
 				return _authorizationCode;
 			}
 
 			private function set authorizationCode(value:String):void
+
 			{
 				_authorizationCode = value;
 				if (value == "") return;

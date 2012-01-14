@@ -110,9 +110,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 		]]>
 	</fx:Script>
-	<s:navigationContent>
-		<s:Button label="Back" id="backButton" click="navigator.popView()"/>
-	</s:navigationContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
 	</s:actionContent>

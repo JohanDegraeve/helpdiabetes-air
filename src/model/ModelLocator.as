@@ -186,6 +186,10 @@ package model
 
 		static private var _offSetSoThatTextIsInTheMiddle:Number=0;
 		
+		/**
+		 * application just started ?
+		 */
+		public var firstStartUp:Boolean = true;
 		
 
 		/**

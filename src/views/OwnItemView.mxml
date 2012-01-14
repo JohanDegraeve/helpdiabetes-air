@@ -21,7 +21,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	<s:navigationContent>
-		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
-	</s:navigationContent>
 </s:View>

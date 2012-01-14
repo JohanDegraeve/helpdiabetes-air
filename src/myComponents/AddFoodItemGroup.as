@@ -485,9 +485,6 @@ package myComponents
 				button_0 = new Button();button_1 = new Button();button_2 = new Button();button_3 = new Button();button_4 = new Button();button_5 = new Button();
 				button_6 = new Button();button_7 = new Button();button_8 = new Button();button_9 = new Button();button_DecimalPoint = new Button();button_DEL = new Button();
 				
-				//button_0.styleName = this;button_1.styleName = this;button_2.styleName = this;button_3.styleName = this;button_4.styleName = this;button_5.styleName = this;
-				//button_6.styleName = this;button_7.styleName = this;button_8.styleName = this;button_9.styleName = this;button_DecimalPoint.styleName = this;button_DEL.styleName = this;
-				
 				button_0.label = "0";button_1.label = "1";button_2.label = "2";button_3.label = "3";button_4.label = "4";button_5.label = "5";
 				button_6.label = "6";button_7.label = "7";button_8.label = "8";button_9.label = "9";button_DecimalPoint.label = ".";button_DEL.label = "<";
 				
@@ -568,9 +565,6 @@ package myComponents
 			if (!details_button) {
 				details_button = new Button();
 				details_button.styleName = this;
-				//details_button.editable = false;
-				//details_button.multiline = false;
-				//details_button.wordWrap = false;
 				details_button.label = details_button_text;
 				if (_details_button_click_function != null && mealButtonRequired)
 					details_button.addEventListener(flash.events.MouseEvent.CLICK,_details_button_click_function);
@@ -608,18 +602,12 @@ package myComponents
 				meal_button.styleName = this;
 				if (_meal_button_click_function != null && mealButtonRequired)
 					meal_button.addEventListener(MouseEvent.CLICK,_meal_button_click_function);
-				//meal_button.editable = false;
-				//meal_button.multiline = false;
-				//meal_button.wordWrap = false;
 				meal_button.label = meal_button_text;
 				addElement(meal_button);
 			}
 			if (!add_button) {
 				add_button = new Button();
 				add_button.styleName = this;
-				//add_button.editable = false;
-				//add_button.multiline = false;
-				//add_button.wordWrap = false;
 				if (_add_button_click_function != null) {
 					add_button.addEventListener(MouseEvent.CLICK,_add_button_click_function);
 				} 

@@ -127,9 +127,6 @@ view to show ModelLocator.getInstance().meals in a list
 			
 		]]>
 	</fx:Script>
-	<s:navigationContent>
-		<s:Button   label="Back" id="backButton" click="navigator.popView()"/>
-	</s:navigationContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
 	</s:actionContent>
