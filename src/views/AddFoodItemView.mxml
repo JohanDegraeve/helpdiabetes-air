@@ -25,7 +25,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		actionBarVisible="true" 
 		preinitialize="preInit()"
 		tabBarVisible="true"
-		title="AddFoodItemView" xmlns:myComponents="myComponents.*" xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:myComponents="myComponents.*" xmlns:mx="library://ns.adobe.com/flex/mx"
 		creationComplete="onCreationComplete()"
 		add="addHandler()"
 		remove="onRemove()"
@@ -96,7 +96,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 * used as context value when pushing the view SelectMealView<br>
 			 * when addHandler is called, the value of the return object will be check, if equal to CHANGE_MEAL_DATE_AND_TIME then not allowed to call checkLastMealUpdate
 			 */
-			private static const SELECT_MEAL:int = 1;
+			private static const SELECT_MEAL:int = 1; 
 			
 			/**
 			 * should there be a button that allows the user to change the meal ? 
@@ -115,7 +115,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					aSelectUnit = null;
 				} 
 			}
-
+			
 			private function onCreationComplete():void {
 				
 				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
@@ -126,7 +126,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					checkLastMealUpdateRequired = false;
 					mealButtonRequired=false;
 					meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
-					add_button_text = resourceManager.getString('general','save') 
+					add_button_text = resourceManager.getString('general','save');
+					title = resourceManager.getString('addfooditemview','screen_title_edit');
 				}
 				
 				//refresh the meals - checkLxstMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
@@ -238,6 +239,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				add_button_text = resourceManager.getString("addfooditemview","add_button");
 				_amount_textarea_text = resourceManager.getString("addfooditemview","amount");
 				amount_textinput_text = "0";
+				title = resourceManager.getString('addfooditemview','screen_title_add');
 			}
 			
 			/**

@@ -103,7 +103,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				exercisePicker = new elementFromListPicker();
 				exercisePicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, exerciseSelected);
 				exercisePicker.elements = unitList;
-				exercisePicker.labelText1 = resourceManager.getString('editexerciseeventview','select_exercise');
+				exercisePicker.labelText1 = resourceManager.getString('editexerciseeventview','select_intensity');
 				
 				PopUpManager.addPopUp(exercisePicker,UIComponent(this.parentApplication),true);
 				PopUpManager.centerPopUp(exercisePicker);
