@@ -293,36 +293,6 @@ package myComponents
 		}
 		
 		
-		//*********************
-		// the button to add the fooditem to the list of selected items
-		//*********************
-		private var _add_button_text:String;
-
-		public function get add_button_text():String
-		{
-			return _add_button_text;
-		}
-
-		public function set add_button_text(value:String):void
-		{
-			_add_button_text = value;
-			if (add_button) {
-				add_button.label = value;
-				invalidateDisplayList();
-			}
-		}
-		
-		private var add_button:Button;
-		
-		private var _add_button_click_function:Function;
-		
-		/**
-		 * the function that will be called when the button is clicked 
-		 */
-		public function get add_button_click_function():Function
-		{
-			return _add_button_click_function;
-		}
 		
 		private var _mealButtonRequired:Boolean = true;
 
@@ -339,9 +309,9 @@ package myComponents
 			if (meal_button) {
 				if (_mealButtonRequired) {
 					if (!meal_button.hasEventListener(MouseEvent.CLICK))
-						meal_button.addEventListener(flash.events.MouseEvent.CLICK,_add_button_click_function);
+						meal_button.addEventListener(flash.events.MouseEvent.CLICK,_meal_button_click_function);
 				}  else {
-					meal_button.removeEventListener(MouseEvent.CLICK,_add_button_click_function);
+					meal_button.removeEventListener(MouseEvent.CLICK,_meal_button_click_function);
 					removeElement(meal_button);
 				}
 			}
@@ -373,17 +343,6 @@ package myComponents
 		private var button_DEL:Button;
 		private var button_DecimalPoint:Button;
 
-		
-		/**
-		 * @private
-		 */
-		public function set add_button_click_function(value:Function):void
-		{
-			_add_button_click_function = value;
-			if (add_button) {
-				add_button.addEventListener(MouseEvent.CLICK,_add_button_click_function);
-			}
-		}
 		
 
 		/**
@@ -470,13 +429,10 @@ package myComponents
 
 			_height += textGap;//juist adding some gap
 			
-			var availableWidthForDigitButtons:int = Math.floor(containerWidth*0.7);
+			var availableWidthForDigitButtons:int = containerWidth;
 			var buttonHeight:int = Math.floor((containerHeight - _height - buttonGap * 4)/4);
 			buttonHeight = Math.min(buttonHeight,buttonMaximumHeight);
 
-			add_button.setLayoutBoundsSize(containerWidth - textGap * 2 - availableWidthForDigitButtons,buttonHeight);
-			add_button.setLayoutBoundsPosition(availableWidthForDigitButtons + textGap ,_height);
-			
 			var buttonWidth:int = Math.floor((availableWidthForDigitButtons - buttonGap * 4)/3);
 			buttonWidth = Math.min(buttonWidth,buttonMaximumWidth);
 			var leftOffset:int = Math.floor((availableWidthForDigitButtons - 3 * buttonWidth - 2 * buttonGap)/2);
@@ -604,15 +560,6 @@ package myComponents
 					meal_button.addEventListener(MouseEvent.CLICK,_meal_button_click_function);
 				meal_button.label = meal_button_text;
 				addElement(meal_button);
-			}
-			if (!add_button) {
-				add_button = new Button();
-				add_button.styleName = this;
-				if (_add_button_click_function != null) {
-					add_button.addEventListener(MouseEvent.CLICK,_add_button_click_function);
-				} 
-				add_button.label = add_button_text;
-				addElement(add_button);
 			}
 		}
 	}

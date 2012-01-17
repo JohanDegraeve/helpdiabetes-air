@@ -77,6 +77,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private var meal_button_text:String;
 			[Bindable]
 			private var add_button_text:String;
+			[Bindable]
+			private var back_label:String;
 			
 			[Bindable]
 			private var meals:ArrayCollection;
@@ -127,6 +129,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					mealButtonRequired=false;
 					meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
 					add_button_text = resourceManager.getString('general','save');
+					back_label = resourceManager.getString('general','back');
 					title = resourceManager.getString('addfooditemview','screen_title_edit');
 				}
 				
@@ -237,6 +240,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private function preInit():void {
 				meal_textarea_text = resourceManager.getString('addfooditemview','meal_button');
 				add_button_text = resourceManager.getString("addfooditemview","add_button");
+				back_label = resourceManager.getString('general','back');
 				_amount_textarea_text = resourceManager.getString("addfooditemview","amount");
 				amount_textinput_text = "0";
 				title = resourceManager.getString('addfooditemview','screen_title_add');
@@ -378,6 +382,12 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		]]>
 	</fx:Script>
 
+	<s:navigationContent>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+	</s:navigationContent>
+	<s:actionContent>
+		<s:Button label="{add_button_text}" click="addButtonClicked()"/>
+	</s:actionContent>
 	
 		<myComponents:AddFoodItemGroup id="addFoodItemGroup"
 									   y="0" x="0" width="100%" height = "100%" 
@@ -387,10 +397,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 									   meal_textarea_text="@{meal_textarea_text}"
 									   amount_textinput_text="@{amount_textinput_text}"
 									   meal_button_text="{meal_button_text}"
-									   add_button_text="{add_button_text}"
 									   details_button_click_function="{popUpUnitList}"
 									   meal_button_click_function="{mealButtonClicked}"
-									   add_button_click_function="{addButtonClicked}"
 									   amountTextChangedFunction="{amountTextChanged}"
 									   mealButtonRequired="{mealButtonRequired}"
 									   >
