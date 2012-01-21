@@ -33,6 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable] private var exerciseText3:String = "";
 			[Bindable] private var exerciseText4:String = "";
 			[Bindable] private var exerciseText5:String = "";
+			[Bindable]
+			private var back_label:String;
+
 			
 			private function onBackKeyPressed(event:Event):void {
 				Settings.getInstance().setSetting(Settings.SettingsExerciseType1,exerciseText1);
@@ -44,6 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function view1_initializeHandler(event:FlexEvent):void
 			{
+				back_label = resourceManager.getString('general','back');
 				exerciseText1 = Settings.getInstance().getSetting(Settings.SettingsExerciseType1);
 				exerciseText2 = Settings.getInstance().getSetting(Settings.SettingsExerciseType2);
 				exerciseText3 = Settings.getInstance().getSetting(Settings.SettingsExerciseType3);
@@ -57,7 +61,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<s:navigationContent>
-		<s:Button   label="Back" id="backButton" click="{onBackKeyPressed(event);navigator.popView()}"/>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
 	<s:Group y="0" x="0" width="100%" height = "100%"  left="5" top="5" right="5">
 		<s:layout>

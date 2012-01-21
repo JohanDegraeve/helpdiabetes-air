@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsMealTimesView"
+		xmlns:s="library://ns.adobe.com/flex/spark"
 		initialize="onInitialize()"
 		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Script>
@@ -40,6 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable] private var breakfastTime:String;
 			[Bindable] private var lunchTime:String;
 			[Bindable] private var snackTime:String;
+			[Bindable]
+			private var back_label:String;
 			private var dateOrTimePicker:TimePicker;
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -53,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
+				back_label = resourceManager.getString('general','back');
 				breakfastTime = timeformatter.format(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))));
 				lunchTime = timeformatter.format(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))));
 				snackTime = timeformatter.format(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))));
@@ -126,35 +129,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 ]]>
 	</fx:Script>
+	<s:navigationContent>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+	</s:navigationContent>
+
 	<s:Group y="0" x="0" width="100%" height = "100%"  left="5" top="5" right="5">
 		<s:layout>
-			<s:VerticalLayout>
+			<s:VerticalLayout >
 			</s:VerticalLayout>
 		</s:layout>
 		<s:TextArea y="0" x="0" width="100%" text="{resourceManager.getString('settingsmealtimesview','mealtimes')}" borderVisible="false" editable="false"/>
 		<s:Group id="breakfastUntilSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="breakfastUntilSettingClicked(event)">
 			<s:layout>
-				<s:HorizontalLayout>
+				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextArea  width="60%" text="{resourceManager.getString('settingsmealtimesview','breakfastuntil') }" editable="false" borderVisible="false"/>
-			<s:TextArea id="breakfastuntilTime" width="40%" text="@{breakfastTime}" editable="false" borderVisible="false" textAlign="center"/>
+			<s:Button id="breakfastuntilTime" width="40%" label="@{breakfastTime}" />
 		</s:Group>
 		<s:Group id="lunchUntilSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="lunchUntilSettingClicked(event)">
 			<s:layout>
-				<s:HorizontalLayout>
+				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextArea width="60%" text="{resourceManager.getString('settingsmealtimesview','lunchuntil') }" editable="false" borderVisible="false"/>
-			<s:TextArea id="lunchuntilTime" width="40%" text="@{lunchTime}" editable="false" borderVisible="false" textAlign="center"/>
+			<s:Button id="lunchuntilTime" width="40%" label="@{lunchTime}" />
 		</s:Group>
 		<s:Group id="snackUntilSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="snackUntilSettingClicked(event)">
 			<s:layout>
-				<s:HorizontalLayout>
+				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextArea width="60%" text="{resourceManager.getString('settingsmealtimesview','snackuntil') }" editable="false" borderVisible="false"/>
-			<s:TextArea id="snackuntilTime" width="40%" text="@{snackTime}" editable="false" borderVisible="false" textAlign="center"/>
+			<s:Button id="snackuntilTime" width="40%" label="@{snackTime}"/>
 		</s:Group>
 	</s:Group>
 </s:View>

@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*"
 		actionBarVisible="true" 
-		title="FoodCounterView"
 		initialize="init()" 
 		creationComplete="onCreationComplete()"
 		>

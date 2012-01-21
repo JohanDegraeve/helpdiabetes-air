@@ -130,7 +130,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
 					add_button_text = resourceManager.getString('general','save');
 					back_label = resourceManager.getString('general','back');
-					title = resourceManager.getString('addfooditemview','screen_title_edit');
+					title = "";//resourceManager.getString('addfooditemview','screen_title_edit');
 				}
 				
 				//refresh the meals - checkLxstMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
@@ -243,7 +243,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				back_label = resourceManager.getString('general','back');
 				_amount_textarea_text = resourceManager.getString("addfooditemview","amount");
 				amount_textinput_text = "0";
-				title = resourceManager.getString('addfooditemview','screen_title_add');
+				//title = resourceManager.getString('addfooditemview','screen_title_add');
 			}
 			
 			/**

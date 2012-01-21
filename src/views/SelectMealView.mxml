@@ -24,7 +24,6 @@ view to show ModelLocator.getInstance().meals in a list
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*"
-		title="SelectMealView"
 		creationComplete="onCreationComplete()" 
 		add="addHandler()" >
 	
@@ -42,6 +41,8 @@ view to show ModelLocator.getInstance().meals in a list
 			import myComponents.IListElement;
 			
 			import spark.events.IndexChangeEvent;
+			[Bindable]
+			private var back_label:String;
 
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();
@@ -59,6 +60,7 @@ view to show ModelLocator.getInstance().meals in a list
 			private static const ADD_NEW_MEAL:int=2
 			
 			private function onCreationComplete():void {
+				back_label = resourceManager.getString('general','back');
 				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
 				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
@@ -127,6 +129,10 @@ view to show ModelLocator.getInstance().meals in a list
 			
 		]]>
 	</fx:Script>
+	<s:navigationContent>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+	</s:navigationContent>
+
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
 	</s:actionContent>

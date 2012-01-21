@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable] private var medicinText3:String = "";
 			[Bindable] private var medicinText4:String = "";
 			[Bindable] private var medicinText5:String = "";
+			[Bindable]
+			private var back_label:String;
 			
 			private function onBackKeyPressed(event:Event):void {
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
@@ -43,6 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function view1_initializeHandler(event:FlexEvent):void
 			{
+				back_label = resourceManager.getString('general','back');
 				medicinText1 = Settings.getInstance().getSetting(Settings.SettingsInsulinType1);
 				medicinText2 = Settings.getInstance().getSetting(Settings.SettingsInsulinType2);
 				medicinText3 = Settings.getInstance().getSetting(Settings.SettingsInsulinType3);
@@ -56,7 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<s:navigationContent>
-		<s:Button   label="Back" id="backButton" click="{onBackKeyPressed(event);navigator.popView()}"/>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
 	<s:Group y="0" x="0" width="100%" height = "100%"  left="5" top="5" right="5">
 		<s:layout>

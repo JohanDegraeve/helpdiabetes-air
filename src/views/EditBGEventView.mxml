@@ -50,6 +50,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			private var timeText:String;
 			[Bindable]
+			private var back_label:String;
+
+			[Bindable]
 			private var meteringTexttext:String;
 			private var _currentDateAndTime:Date;
 			private function get currentDateAndTime():Date
@@ -181,6 +184,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 		]]>
 	</fx:Script>
+	<s:navigationContent>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+	</s:navigationContent>
+
 	<s:Rect width="100%" height="100%">
 		<s:fill>
 			<s:LinearGradient rotation="90">

@@ -19,6 +19,7 @@ package databaseclasses
 {
 	import flash.events.ErrorEvent;
 	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
