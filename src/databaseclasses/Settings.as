@@ -22,7 +22,7 @@ package databaseclasses
 	import flash.events.EventDispatcher;
 	
 	import mx.resources.ResourceManager;
-
+	
 	/**
 	 * Each time a new settings is defined, an additional constant should be defined, with default value and the array must be extended.<br>
 	 * The first constant is 0;<br>
@@ -162,6 +162,10 @@ package databaseclasses
 		 * default value = 23
 		 */
 		public static const SettingsDefaultExercise:int = 28;
+		/**
+		 * maximum size of trackingview, in days, default value  = 30;
+		 */
+		public static const SETTINGSMAXTRACKINGSIZE:int = 29;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -193,7 +197,8 @@ package databaseclasses
 			"exercise type 3 defined in constructor",
 			"exercise type 4 defined in constructor",
 			"exercise type 5 defined in constructor",
-			"23"//default exercise type, meaning exercise type 1
+			"23",//default exercise type, meaning exercise type 1
+			"30"//default length of trackingview, in days
 		];
 		
 		private static var instance:Settings = new Settings();

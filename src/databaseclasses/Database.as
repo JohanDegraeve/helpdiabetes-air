@@ -129,6 +129,17 @@ package databaseclasses
 		 */ 
 		private const CREATE_TABLE_SETTINGS:String = "CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY," +
 			"value TEXT, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
+		
+		private const DELETE_ROW_IN_TABLE_SELECTED_FOODITEMS_MATCHING_MEALEVENTID:String = 
+			"DELETE FROM selectedfooditems where mealevents_mealeventid = :mealevents_mealeventid";
+		private const DELETE_ROW_IN_TABLE_EXERCISEEVENTS:String = 
+			"DELETE FROM exerciseevents where exerciseeventid = :exerciseeventid";
+		private const DELETE_ROW_IN_TABLE_BLOODGLUCOSEEVENTS:String = 
+			"DELETE FROM bloodglucoseevents where bloodglucoseeventid = :bloodglucoseeventid";
+		private const DELETE_ROW_IN_TABLE_MEDICINEVENTS:String = 
+			"DELETE FROM medicinevents where medicineventid = :medicineventid";
+		private const DELETE_ROW_IN_TABLE_MEALEVENTS:String = 
+			"DELETE FROM mealevents where mealeventid = :mealeventid";
 		/**
 		 * SELECT * FROM settings 
 		 */
@@ -743,7 +754,7 @@ package databaseclasses
 		 * stores a unit in the database<br>
 		 * if dispatcher != null then an event will be dispatches when finished
 		 */
-		private function insertUnit(description:String,standardAmount:int,kcal:int,protein:Number,carbs:Number,fat:Number, fooditems_itemid:int,dispatcher:EventDispatcher):void {
+		private function insertUnit(description:String,standardAmount:int,kcal:int,protein:Number,carbs:Number,fat:Number, fooditems_itemid:Number,dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			localSqlStatement.sqlConnection = aConn;
 			localSqlStatement.text = INSERT_UNIT;
@@ -1319,7 +1330,7 @@ package databaseclasses
 		 * will add the mealevent to the database
 		 */
 		internal function createNewMealEvent(
-			mealEventId:int,
+			mealEventId:Number,
 			mealname:String,
 			lastmodifiedtimestamp:String,
 			insulinRatio:Number,
@@ -1448,8 +1459,8 @@ package databaseclasses
 		 * will add the Selected Item to the database
 		 */
 		internal function createNewSelectedItem(
-			selectedItemId:int,
-			mealEventId:int,
+			selectedItemId:Number,
+			mealEventId:Number,
 			itemDescription:String,
 			unitDescription:String,
 			standardAmount:int,
@@ -1522,7 +1533,7 @@ package databaseclasses
 		}
 		
 		
-		internal function updateMealEventLastModifiedTimeStamp(lastModifiedTimeStamp:Number,mealEventId:int,dispatcher:EventDispatcher):void {
+		internal function updateMealEventLastModifiedTimeStamp(lastModifiedTimeStamp:Number,mealEventId:Number,dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -1582,9 +1593,14 @@ package databaseclasses
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
 			var selectedFoodItems:ArrayCollection = new ArrayCollection();
-			var currentMealEventID:int;//used in the filterfunction for the selectedfooditems
+			var currentMealEventID:Number;//used in the filterfunction for the selectedfooditems
 			
 			selectedFoodItems.filterFunction = filterByMealEventId;
+			
+			//we will delete from the database any element that is older than Settings.SETTINGSMAXTRACKINGSIZE
+			//later on that should be moved to an archive database or archive table.
+			//so start with calculating the minimumTimeStamp
+			var minimumTimeStamp:Number = (new Date()).valueOf() - (new Number(Settings.getInstance().getSetting(Settings.SETTINGSMAXTRACKINGSIZE))) * 24 * 3600 * 1000;
 			
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
@@ -1612,13 +1628,13 @@ package databaseclasses
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
 				var tempObject:Object = localSqlStatement.getResult().data;
 				if (tempObject != null && tempObject is Array) {
-					for each ( var o:Object in tempObject ) {
+					for each (var o:Object in tempObject ) {
 						var newSelectedFoodItem:SelectedFoodItem = new SelectedFoodItem(
 							o.itemdescription as String,
 							new Unit(o.unitdescription as String,o.standardamount as int,o.kcal as int,o.protein as Number,o.carbs as Number,o.fat as Number),
 							o.chosenamount);
-						newSelectedFoodItem.selectedItemId = o.selectedfooditemid as int;
-						newSelectedFoodItem.mealEventId = o.mealevents_mealeventid as int;
+						newSelectedFoodItem.selectedItemId = o.selectedfooditemid as Number;
+						newSelectedFoodItem.mealEventId = o.mealevents_mealeventid as Number;
 						selectedFoodItems.addItem(newSelectedFoodItem);
 					}
 				}
@@ -1644,29 +1660,33 @@ package databaseclasses
 				
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
-						currentMealEventID = o.mealeventid as int;
-						selectedFoodItems.refresh();
-						var newMealEvent:MealEvent = new MealEvent(o.mealname as String,
-							o.insulinratio as Number,
-							o.correctionfactor as Number,
-							o.prevousBGlevel as Number,
-							o.creationtimestamp as Number,
-							null,
-							false,
-							new ArrayCollection(selectedFoodItems.toArray()),
-							o.mealeventid as Number,
-							o.lastmodifiedtimestamp  as Number);
-						ModelLocator.getInstance().trackingList.addItem(newMealEvent);
-						var creationTimeStampAsDate:Date = new Date(newMealEvent.timeStamp);
-						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
-						if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-							if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-						} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-							ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
+							deleteMealEvent(o.mealeventid as Number);
+						} else {
+							currentMealEventID = o.mealeventid as Number;
+							selectedFoodItems.refresh();
+							var newMealEvent:MealEvent = new MealEvent(o.mealname as String,
+								o.insulinratio as Number,
+								o.correctionfactor as Number,
+								o.prevousBGlevel as Number,
+								o.creationtimestamp as Number,
+								null,
+								false,
+								new ArrayCollection(selectedFoodItems.toArray()),
+								o.mealeventid as Number,
+								o.lastmodifiedtimestamp  as Number);
+							ModelLocator.getInstance().trackingList.addItem(newMealEvent);
+							var creationTimeStampAsDate:Date = new Date(newMealEvent.timeStamp);
+							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+							if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
 								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+									ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+									ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							}
 						}
 					}
 				}
@@ -1687,18 +1707,23 @@ package databaseclasses
 				
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
-						var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String,o.creationtimestamp as Number,false);
-						ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
-						var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
-						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
-						if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-							if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-						} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-							ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
+							deleteBloodGlucoseEvent(o.bloodglucoseeventid as Number);
+						} else {
+							
+							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String,o.creationtimestamp as Number,false);
+							ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
+							var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
+							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+							if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
 								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+									ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+									ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							}
 						}
 					}
 				}
@@ -1717,18 +1742,22 @@ package databaseclasses
 				
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
-						var newMedicinEvent:MedicinEvent = new MedicinEvent(o.amount as Number,o.medicinname as String,o.creationtimestamp as Number,false);
-						ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
-						var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
-						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
-						if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-							if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-						} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-							ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
+							deleteMedicinEvent(o.medicineventid as Number);
+						} else {
+							var newMedicinEvent:MedicinEvent = new MedicinEvent(o.amount as Number,o.medicinname as String,o.creationtimestamp as Number,false);
+							ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
+							var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
+							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+							if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
 								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+									ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+									ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							}
 						}
 					}
 				}
@@ -1748,18 +1777,22 @@ package databaseclasses
 				
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
-						var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.creationtimestamp as Number,false);
-						ModelLocator.getInstance().trackingList.addItem(newExerciseEvent);
-						var creationTimeStampAsDate:Date = new Date(newExerciseEvent.timeStamp);
-						var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
-						if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-							if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-						} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-							ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
+							deleteExerciseEvent(o.exerciseeventid as Number);
+						} else {
+							var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.creationtimestamp as Number,false);
+							ModelLocator.getInstance().trackingList.addItem(newExerciseEvent);
+							var creationTimeStampAsDate:Date = new Date(newExerciseEvent.timeStamp);
+							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+							if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
 								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
+									ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							} else if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
+								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
+									ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							}
 						}
 					}
 				}
@@ -1986,6 +2019,228 @@ package databaseclasses
 				}
 			}
 		}
-
+		
+		private function deleteMealEvent(mealEventId:Number,dispatcher:EventDispatcher = null):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = DELETE_ROW_IN_TABLE_MEALEVENTS;
+				localSqlStatement.parameters[":mealeventid"] = mealEventId;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, mealeventDeleted);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, mealeventDeletionFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database in unction deleteMealEvent in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			
+			function mealeventDeleted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealeventDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealeventDeletionFailed);
+				localSqlStatement.addEventListener(SQLEvent.RESULT,selectedFoodItemsDeleted);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,selectedFoodItemsDeletionFailed);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = DELETE_ROW_IN_TABLE_SELECTED_FOODITEMS_MATCHING_MEALEVENTID;
+				localSqlStatement.clearParameters();
+				localSqlStatement.parameters[":mealevents_mealeventid"] = mealEventId;
+				localSqlStatement.execute();
+			}
+			
+			function selectedFoodItemsDeleted (se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemsDeletionFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function selectedFoodItemsDeletionFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemsDeletionFailed);
+				trace("SelectedFoodItemsDeletionFailed. function deleteMealEvent in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function mealeventDeletionFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealeventDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealeventDeletionFailed);
+				trace("Mealeventdeletionfailed, function deleteMealEvent in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
+		
+		private function deleteMedicinEvent(medicinEventId:Number, dispatcher:EventDispatcher = null):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = DELETE_ROW_IN_TABLE_MEDICINEVENTS;
+				localSqlStatement.parameters[":medicineventid"] = medicinEventId;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, medicineventDeleted);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, medicineventDeletionFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database in unction deleteMealEvent in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function medicineventDeleted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicineventDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicineventDeletionFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function medicineventDeletionFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicineventDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicineventDeletionFailed);
+				trace("medicineventdeletionfailed, function delete Event in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
+		
+		private function deleteBloodGlucoseEvent(bloodglucoseEventId:Number, dispatcher:EventDispatcher = null):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = DELETE_ROW_IN_TABLE_BLOODGLUCOSEEVENTS;
+				localSqlStatement.parameters[":bloodglucoseeventid"] = bloodglucoseEventId;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, bloodglucoseeventDeleted);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, bloodglucoseeventDeletionFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database in unction deleteMealEvent in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function bloodglucoseeventDeleted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodglucoseeventDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodglucoseeventDeletionFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function bloodglucoseeventDeletionFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodglucoseeventDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodglucoseeventDeletionFailed);
+				trace("bloodglucoseeventdeletionfailed, function delete Event in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
+		
+		private function deleteExerciseEvent(exerciseEventId:Number, dispatcher:EventDispatcher = null):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = DELETE_ROW_IN_TABLE_EXERCISEEVENTS;
+				localSqlStatement.parameters[":exerciseeventid"] = exerciseEventId;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, exerciseeventDeleted);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, exerciseeventDeletionFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database in unction deleteMealEvent in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function exerciseeventDeleted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseeventDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseeventDeletionFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function exerciseeventDeletionFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseeventDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseeventDeletionFailed);
+				trace("exerciseeventdeletionfailed, function delete Event in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
 	} //class
 } //package

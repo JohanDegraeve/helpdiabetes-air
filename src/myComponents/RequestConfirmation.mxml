@@ -16,11 +16,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
-<!--
-user will enter an amount for something, could be amount of insulin for a specific type of meal
-needs to be shown as popup
-after creation and before showing set labelText and amount
--->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*">
 	<fx:Declarations>

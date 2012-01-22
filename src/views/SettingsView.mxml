@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsView"
+		xmlns:s="library://ns.adobe.com/flex/spark"
 		initialize="init()"
 		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
@@ -56,12 +56,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ResourceManager.getInstance().getString("settingsview","meal_times"),
 				ResourceManager.getInstance().getString("settingsview","bloodglucoseunit"),
 				ResourceManager.getInstance().getString("settingsview","medicin"),
-				ResourceManager.getInstance().getString("settingsview","exercise")
+				ResourceManager.getInstance().getString("settingsview","exercise"),
+				ResourceManager.getInstance().getString("settingsview","database")
 			]);	
 			
 			private function init():void {
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
+				title =  ResourceManager.getInstance().getString("settingsview","settings");
 			}
 
 			private function selectBloodGlucoseUnit():void {
@@ -110,6 +112,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						break;
 					case 4:
 						navigator.pushView(SettingsExerciseView);
+						break;
+					case 5:
+						navigator.pushView(SettingsDatabaseView);
 						break;
 				}
 			}
