@@ -66,12 +66,9 @@ package databaseclasses
 		private var globalDispatcher:EventDispatcher;
 		
 		private var sampleDbFileName:String;
-		private const dbFileName:String = "foodfile.db";
-		private  var dbFile:File  ;
+		private static const dbFileName:String = "foodfile.db";
+		private  static var dbFile:File  ;
 		private var xmlFileName:String;
-		private var foodFileName:String;
-		//private var fooditemList:XMLList;
-		
 		
 		private const CREATE_TABLE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS fooditems (itemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"description TEXT NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
@@ -199,10 +196,6 @@ package databaseclasses
 		 */
 		public function Database()
 		{
-			foodFileName = "foodfile-" + ResourceManager.getInstance().getString("general","TableLanguage");
-			sampleDbFileName = foodFileName + "-sample.db";
-			xmlFileName = foodFileName + ".xml";
-			
 			if (instance != null) {
 				throw new Error("Database class can only be accessed through Database.getInstance()");	
 			}
@@ -224,7 +217,7 @@ package databaseclasses
 		{
 			var success:Boolean = false;
 			dbFile  = File.applicationStorageDirectory.resolvePath(dbFileName);
-			if ( this.dbFile ) 
+			if ( dbFile ) 
 			{				
 				if ( this.aConn && this.aConn.connected )
 				{
@@ -234,14 +227,14 @@ package databaseclasses
 				var fs:FileStream = new FileStream();
 				try 
 				{
-					fs.open(this.dbFile,FileMode.UPDATE);
+					fs.open(dbFile,FileMode.UPDATE);
 					while ( fs.bytesAvailable )	
 					{
 						fs.writeByte(Math.random() * Math.pow(2,32));						
 					}
 					trace("writing complete");
 					fs.close();
-					this.dbFile.deleteFile();
+					dbFile.deleteFile();
 					trace("deletion complete");					
 					success = true;
 				}
@@ -938,7 +931,13 @@ package databaseclasses
 		private  function createDatabaseFromAssets(targetFile:File):Boolean 			
 		{
 			var isSuccess:Boolean = true; 
+
+			var foodFileName:String;
+			foodFileName = "foodfile-" + ResourceManager.getInstance().getString("general","TableLanguage");
+			sampleDbFileName = foodFileName + "-sample.db";
+			xmlFileName = foodFileName + ".xml";
 			
+
 			var sampleFile:File = File.applicationDirectory.resolvePath("assets/database/" + sampleDbFileName);
 			if ( !sampleFile.exists )
 			{
@@ -1600,7 +1599,7 @@ package databaseclasses
 			//we will delete from the database any element that is older than Settings.SETTINGSMAXTRACKINGSIZE
 			//later on that should be moved to an archive database or archive table.
 			//so start with calculating the minimumTimeStamp
-			var minimumTimeStamp:Number = (new Date()).valueOf() - (new Number(Settings.getInstance().getSetting(Settings.SETTINGSMAXTRACKINGSIZE))) * 24 * 3600 * 1000;
+			var minimumTimeStamp:Number = (new Date()).valueOf() - (new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE))) * 24 * 3600 * 1000;
 			
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
@@ -2241,6 +2240,23 @@ package databaseclasses
 					dispatcher.dispatchEvent(event);
 				}
 			}
+		}
+		
+		/**
+		 * return true if database already exists, false in the other case
+		 */
+		public static function databaseExists():Boolean {
+			//this.globalDispatcher = dispatcher;
+			dbFile  = File.applicationStorageDirectory.resolvePath(dbFileName);
+			var sqlConnection:SQLConnection = new SQLConnection();
+			try {
+				sqlConnection.open(dbFile, SQLMode.READ);
+				sqlConnection.close();
+				return true;
+			} catch (error:SQLError) {
+				return false;
+			}
+			return true;//should never come here
 		}
 	} //class
 } //package

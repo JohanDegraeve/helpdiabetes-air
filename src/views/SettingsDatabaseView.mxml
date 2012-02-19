@@ -29,7 +29,7 @@
 			
 			private function trackingSizeClicked(event:Event):void  {
 				amountPicker = new AmountPicker();
-				amountPicker.amount = Settings.getInstance().getSetting(Settings.SETTINGSMAXTRACKINGSIZE);
+				amountPicker.amount = Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE);
 				amountPicker.maxNonDecimalDigits = 3;
 				amountPicker.decimalDigits = 0;
 				//amountPicker.labelText1 = resourceManager.getString('editmedicineventview','amount_of_units');
@@ -50,7 +50,7 @@
 					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					trackingsizeButton.label = (event.newValue as Number).toString();
-					Settings.getInstance().setSetting(Settings.SETTINGSMAXTRACKINGSIZE,trackingsizeButton.label );
+					Settings.getInstance().setSetting(Settings.SettingsMAXTRACKINGSIZE,trackingsizeButton.label );
 				}
 			}
 		]]>
@@ -69,7 +69,7 @@
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextArea  width="60%" text="{resourceManager.getString('settingsdatabaseview','trackingviewsize') }" editable="false" borderVisible="false"/>
-			<s:Button id="trackingsizeButton" width="40%" label="{Settings.getInstance().getSetting(Settings.SETTINGSMAXTRACKINGSIZE)}"  />
+			<s:Button id="trackingsizeButton" width="40%" label="{Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)}"  />
 		</s:Group>
 	</s:Group>
 </s:View>

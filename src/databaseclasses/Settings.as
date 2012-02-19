@@ -21,6 +21,7 @@ package databaseclasses
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
+	import mx.core.UIComponent;
 	import mx.resources.ResourceManager;
 	
 	/**
@@ -165,7 +166,12 @@ package databaseclasses
 		/**
 		 * maximum size of trackingview, in days, default value  = 30;
 		 */
-		public static const SETTINGSMAXTRACKINGSIZE:int = 29;
+		public static const SettingsMAXTRACKINGSIZE:int = 29;
+		/**
+		 * localeChain to be used for choosing translations. The locale chain is a string here <br>
+		 * Example if localeChain = ["en_US","nl_NL"], then the setting here is "en_US,nl_NL"
+		 */
+		public static const SettingsLOCALECHAIN_asString:int = 30;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -198,7 +204,8 @@ package databaseclasses
 			"exercise type 4 defined in constructor",
 			"exercise type 5 defined in constructor",
 			"23",//default exercise type, meaning exercise type 1
-			"30"//default length of trackingview, in days
+			"30",//default length of trackingview, in days
+			"en_US,nl_NL"//just a default value  
 		];
 		
 		private static var instance:Settings = new Settings();
@@ -234,7 +241,7 @@ package databaseclasses
 		}
 		
 		/**
-		 * Set the setting specified by the setting id, database will also be updated asynchronously
+		 * Set the setting specified by the setting id, database will also be updated asynchronously<br>
 		 */
 		public function setSetting(settingId:int, newValue:String):void {
 			var dispatcher:EventDispatcher = new EventDispatcher();
@@ -248,7 +255,6 @@ package databaseclasses
 			function settingInsertionFailure(se:Event):void {
 				settings[settingId] = oldValue;
 			}
-			
 		}
 		
 		/**
@@ -258,7 +264,7 @@ package databaseclasses
 			return settings.length;
 		}
 		
-		internal function setSettingWithoutDatabaseUpdate(settingId:int, newValue:String):void {
+		public function setSettingWithoutDatabaseUpdate(settingId:int, newValue:String):void {
 			settings[settingId] = newValue;
 		}
 		

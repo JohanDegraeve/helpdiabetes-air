@@ -63,7 +63,7 @@ package model
 		 *  foodTables is an array of an array of strings <br>
 		* each row consists of array of strings :<br>
 		* - the language field as used by the application, not visible to the user <br>
-		* - the language of the table, for display on screens to the user, language itself should be in the user's language based on locale<br>
+		* - the language of the table, for display on screens to the user, language itself should be in the user's language based on settings<br>
 		* - a description of the table, for display on screens to the user, should be in the user's language based on locale <br>
 		* The table is read via some public functions <br>
 		* It is initialized in the constructor <br>
@@ -225,10 +225,7 @@ package model
 					ResourceManager.getInstance().getString("general","DutchTable")),
 				new Array("en",
 					ResourceManager.getInstance().getString("general","english"),
-					ResourceManager.getInstance().getString("general","NorwegianTableInEnglish")),
-				new Array("fr",
-					ResourceManager.getInstance().getString("general","french"),
-					ResourceManager.getInstance().getString("general","FrenchTableAxelle"))
+					ResourceManager.getInstance().getString("general","NorwegianTableInEnglish"))
 			);
             
 			//create the sort for the trackinglist and the meals
@@ -252,9 +249,7 @@ package model
 			if (instance == null) instance = new ModelLocator();
 			return instance;
 		}
-		
-		/** application constants **/
-		
+				
 		public function getListOfFoodTableLanguages():Array {
 		
 			var returnvalue:Array = new Array();

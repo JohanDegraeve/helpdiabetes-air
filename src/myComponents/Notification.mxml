@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 initialize="onInit()">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			
+			private var _notificationText:String;
+
+			[Bindable]
+			public function get notificationText():String
+			{
+				return _notificationText;
+			}
+
+			public function set notificationText(value:String):void
+			{
+				_notificationText = value;
+			}
+
+			private function onInit():void {
+				addEventListener(Event.REMOVED_FROM_STAGE,removedFromStageNotViaOkButton);
+			}
+
+			private function okClicked():void {
+				removeEventListener(Event.REMOVED_FROM_STAGE,removedFromStageNotViaOkButton);
+				PopUpManager.removePopUp(this);
+				
+				var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
+				dispatchEvent(dpe);
+			}
+			
+			private function removedFromStageNotViaOkButton(event:Event):void {
+				okClicked();
+			}
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer>
+		<s:layout>
+			<s:VerticalLayout paddingLeft="5" paddingRight="5" paddingTop="5" paddingBottom="5"/>
+		</s:layout>
+		<s:TextArea id="notificationTextArea" text="{notificationText}">
+			
+		</s:TextArea>
+			<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
+				<s:Button width="100%" height="60" label="{resourceManager.getStringArray('general','ok')}" click="okClicked()"/>
+			</s:VGroup>
+	</s:BorderContainer> 
+</s:Group>

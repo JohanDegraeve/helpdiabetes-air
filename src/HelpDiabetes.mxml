@@ -17,14 +17,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <s:TabbedViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
-							xmlns:s="library://ns.adobe.com/flex/spark"
-							initialize="initApplication()"
-							applicationDPI="160" 
-							>
+								  xmlns:s="library://ns.adobe.com/flex/spark"
+								  initialize="initApplication()"
+								  applicationDPI="160" 
+								  >
 	<fx:Style source="HelpDiabetes.css"/>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	<fx:Metadata>
+		[ResourceBundle("helpdiabetes")]
+	</fx:Metadata>
 	<fx:Style source="assets/style.css"/>
 	<fx:Script>
 		<![CDATA[
@@ -34,8 +37,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
+			import mx.core.UIComponent;
+			import mx.managers.PopUpManager;
+			
+			import myComponents.Notification;
+			import myComponents.PickerEvent;
+			import myComponents.elementFromListPicker;
 			
 			private var  foodItems:ArrayCollection;
+			
+			private var notificationPopUp:Notification;
+			
+			private var elementPicker:elementFromListPicker;
 			
 			/**
 			 * just here to make sure an instance off the modellocator is held throughout the existance of the application, so it's intialized only once<br>
@@ -48,23 +61,88 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private function initApplication():void {
 				var dispatcher:EventDispatcher = new EventDispatcher();
-				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
-				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
-				/********* DELETE THIS**********/
-				//Database.getInstance().deleteDatabase();
-				/********* DELETE THIS**********/
+				var thisObject:DisplayObject =  this;
+				if (Database.databaseExists()) {
+					onReturn();
+				} else {
+					notificationPopUp = new Notification();
+					notificationPopUp.notificationText = resourceManager.getString('helpdiabetes','infoaboutlanguageselection')
+					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
+					PopUpManager.addPopUp(notificationPopUp, this, true);
+					PopUpManager.centerPopUp(notificationPopUp);
+				}
+				
+				function okClicked(event: PickerEvent) {
+					if (notificationPopUp != null)
+						if (notificationPopUp.hasEventListener(PickerEvent.PICKER_SET)) {
+							notificationPopUp.removeEventListener(PickerEvent.PICKER_SET, okClicked);
+						}
+					elementPicker = new elementFromListPicker();
+					elementPicker.elements = new ArrayCollection([
+						resourceManager.getString('general','english'),
+						resourceManager.getString('general','dutch')]);
+					elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, onReturn);
+					elementPicker.addEventListener(Event.REMOVED_FROM_STAGE,onReturn);
+					elementPicker.labelText1 = resourceManager.getString('general','choose_language');
+					
+					PopUpManager.addPopUp(elementPicker,thisObject,true);
+					PopUpManager.centerPopUp(elementPicker);
+				}
+				
+				function onReturn(event: Event = null): void
+				{
+					if (elementPicker != null) {
+						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
+							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, onReturn);
+							elementPicker.removeEventListener(Event.REMOVED_FROM_STAGE,onReturn);
+						}
+						PopUpManager.removePopUp(elementPicker);
+					}
+					
+					//we initialize first the localechain in the settngs to the current localechain
+					var localeChainAsString:String;
+					for (var i:int = 0;i <resourceManager.localeChain.length;i++) {
+						localeChainAsString += resourceManager.localeChain[i];
+					}
+					
+					//if event is a unitchangedevent, it means we got here after user clicked a language, so we'll change now the settings
+					//if event is not a unitchaged event, it means this application doesn't start first the first itme, so a database already existed and user didn't have to pick a preferred language
+					if (event is UnitChangedEvent)  {
+						if ((event as UnitChangedEvent).index == 0) {
+							resourceManager.localeChain = ["en_US","nl_NL"];
+							localeChainAsString = "en_US,nl_NL";
+						}
+						if ((event as UnitChangedEvent).index == 1) {
+							resourceManager.localeChain = ["nl_NL","en_US"];
+							localeChainAsString = "nl_NL,en_US";
+						}
+					}
+					
+					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
+					Settings.getInstance().setSettingWithoutDatabaseUpdate(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
 
-				Database.getInstance().init(dispatcher);
+					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
+					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
+					Database.getInstance().init(dispatcher);
+				}
 				
 				function onInitResult(event:Event):void
 				{
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
+					
+					//time to check if localechain has a new value retrieved from the database
+					var localeChainAsString:String = Settings.getInstance().getSetting(Settings.SettingsLOCALECHAIN_asString);
+					var localeChainAsArray:Array = localeChainAsString.split(",");
+					resourceManager.localeChain = [];
+					for (var j:int = 0;j < localeChainAsArray.length; j++) {
+						resourceManager.localeChain.push(localeChainAsArray[j]);
+					}
+					
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
 					Database.getInstance().getAllFoodItemDescriptions(dispatcher);
 				}
-				
 				
 				function onInitError(event:Event):void
 				{	
@@ -73,9 +151,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 				
 				function retrieveFoodItemList(de:DatabaseEvent):void {
-					
 					foodItems = new ArrayCollection();
-
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
 					
@@ -87,7 +163,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						ModelLocator.getInstance().foodItemList = foodItems;
 					} 
 				}
-
+				
 				function onRetrieveListError(event:Event):void
 				{	
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
@@ -95,7 +171,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 				
 			}
-
+			
 		]]>
 	</fx:Script>
 	
@@ -103,5 +179,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:ViewNavigator label="Tracking" width="100%" height="100%" firstView="views.TrackingView"/>
 	<s:ViewNavigator label="Settings" width="100%" height="100%" firstView="views.SettingsView"/>
 	<s:ViewNavigator label="InfoAbout" width="100%" height="100%" firstView="views.InfoAndHelpView"/>
-
+	
 </s:TabbedViewNavigatorApplication>
