@@ -41,6 +41,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			[ResourceBundle("settingsview")]
 			
+			private var menuList:ArrayCollection = 	new ArrayCollection([
+				ResourceManager.getInstance().getString("settingsview","bolus_calculation"),
+				ResourceManager.getInstance().getString("settingsview","meal_times"),
+				ResourceManager.getInstance().getString("settingsview","bloodglucoseunit"),
+				ResourceManager.getInstance().getString("settingsview","medicin"),
+				ResourceManager.getInstance().getString("settingsview","exercise"),
+				ResourceManager.getInstance().getString("settingsview","database"),
+				ResourceManager.getInstance().getString("settingsview","language")
+			]);	
+			
 			private function onBackKeyPressed(event:Event):void {
 				if (elementPicker != null) {
 					if (elementPicker.isPopUp) {
@@ -51,21 +61,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				} 
 			}
 			
-			private var menuList:ArrayCollection = 	new ArrayCollection([
-				ResourceManager.getInstance().getString("settingsview","bolus_calculation"),
-				ResourceManager.getInstance().getString("settingsview","meal_times"),
-				ResourceManager.getInstance().getString("settingsview","bloodglucoseunit"),
-				ResourceManager.getInstance().getString("settingsview","medicin"),
-				ResourceManager.getInstance().getString("settingsview","exercise"),
-				ResourceManager.getInstance().getString("settingsview","database")
-			]);	
-			
 			private function init():void {
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
 				title =  ResourceManager.getInstance().getString("settingsview","settings");
 			}
-
+			
 			private function selectBloodGlucoseUnit():void {
 				var unitList:ArrayCollection = new ArrayCollection();
 				unitList .addItem(ResourceManager.getInstance().getString("general","mgperdl"));
@@ -91,7 +92,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					settingsList.selectedIndex = -1;
 				}
 			}
-
+			
 			/**
 			 * will popup a view corresponding to the selected menu
 			 */
@@ -116,6 +117,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					case 5:
 						navigator.pushView(SettingsDatabaseView);
 						break;
+					case 6:
+						elementPicker = new elementFromListPicker();
+						elementPicker.elements = new ArrayCollection([
+							resourceManager.getString('general','english'),
+							resourceManager.getString('general','dutch')]);
+						elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, languageSelected);
+						//elementPicker.addEventListener(Event.REMOVED_FROM_STAGE,onReturn);
+						elementPicker.labelText1 = resourceManager.getString('general','choose_language');
+						
+						PopUpManager.addPopUp(elementPicker,UIComponent(this.parentApplication),true);
+						PopUpManager.centerPopUp(elementPicker);
+						break;
+				}
+				
+				function languageSelected(event: Event = null): void
+				{
+					if (elementPicker != null) {
+						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
+							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, languageSelected);
+						}
+						PopUpManager.removePopUp(elementPicker);
+					}
+					
+					var localeChainAsString:String;
+					//copied some code from HelpDiabetes.mxml
+					if (event is UnitChangedEvent)  {
+						if ((event as UnitChangedEvent).index == 0) {
+							resourceManager.localeChain = ["en_US","nl_NL"];
+							localeChainAsString = "en_US,nl_NL";
+						}
+						if ((event as UnitChangedEvent).index == 1) {
+							resourceManager.localeChain = ["nl_NL","en_US"];
+							localeChainAsString = "nl_NL,en_US";
+						}
+					}
+					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
+					Settings.getInstance().setSetting(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
 				}
 			}
 		]]>
