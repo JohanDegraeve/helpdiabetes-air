@@ -247,38 +247,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:TextArea y="0" x="0" width="100%" text="{resourceManager.getString('editmedicineventview','addmedicinevent')}" borderVisible="false" editable="false"/>
 		<s:Group id="insulinTypeGroup" y="0" x="0" width="100%" click="insulinTypeGroupClicked(event)">
 			<s:layout>
-				<s:HorizontalLayout>
+				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextArea  id="insulinTypeText" width="40%" text="{resourceManager.getString('editmedicineventview','medicin')}" editable="false" borderVisible="false"/>
-			<s:TextArea id="medicinNameTextField" width="60%" text="@{medicinName}" editable="false" borderVisible="false" textAlign="center"/>
+			<s:Button id="medicinNameTextField" width="60%" label="@{medicinName}" />
 		</s:Group>
 		<s:Group id="amountGroup" y="0" x="0" width="100%" click="amountGroupClicked(event)">
 			<s:layout>
-				<s:HorizontalLayout>
+				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextArea  id="amountGroupText" width="30%" text="{resourceManager.getString('editmedicineventview','amount')}" editable="false" borderVisible="false"/>
-			<s:TextArea id="amount" width="70%" text="@{amountText}" editable="false" borderVisible="false" textAlign="center"/>
+			<s:Button id="amount" width="70%" label="@{amountText}" />
 		</s:Group>
 		<s:Group id="datumGroup" y="0" x="0" width="100%" click="datumClicked(event)">
 			<s:layout>
-				<s:HorizontalLayout>
+				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextArea  id="datumtext"  width="30%" text="{resourceManager.getString('general','date')}" editable="false" borderVisible="false"/>
-			<s:TextArea id="datum" width="70%" text="@{dateText}" editable="false" borderVisible="false" textAlign="center"/>
+			<s:Button id="datum" width="70%" label="@{dateText}" />
 		</s:Group>
 		<s:Group id="timeGroup" y="0" x="0" width="100%" click="timeClicked(event)">
 			<s:layout>
-				<s:HorizontalLayout>
+				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextArea  id="timetext"  width="30%" text="{resourceManager.getString('general','time')}" editable="false" borderVisible="false"/>
-			<s:TextArea id="time" width="70%" text="@{timeText}" editable="false" borderVisible="false" textAlign="center"/>
+			<s:Button id="time" width="70%" label="@{timeText}" />
 		</s:Group>
 		<s:Group id="okGroup" y="0" x="0" width="100%" click="okClicked(event)">
-			<s:TextArea  id="okButton"  textAlign="center" width="100%" text="{resourceManager.getString('addfooditemview','add_button')}" editable="false" borderVisible="false"/>
+			<s:Button  id="okButton"   width="100%" label="{resourceManager.getString('addfooditemview','add_button')}" />
 		</s:Group>
 	</s:Group>
 
