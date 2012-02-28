@@ -46,16 +46,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var aSelectUnit:elementFromListPicker;
 
-			[Bindable]
-			private var back_label:String;
-			
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();
 			}
 			
 			private function onCreationComplete():void {
-				back_label = resourceManager.getString('general','back');
-				
 				if (ModelLocator.getInstance().initializeTrackingView) {
 					ModelLocator.getInstance().initializeTrackingView = false;
 					trackinglist.ensureIndexIsVisible(ModelLocator.getInstance().trackingList.length - 1);
@@ -116,9 +111,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
 	</s:actionContent>
-	<s:navigationContent>
-		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
-	</s:navigationContent>
 	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().trackingList}"
 			click="onListElementClicked(event)"
