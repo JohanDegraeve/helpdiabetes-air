@@ -62,8 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			/**
-			 * what I achieve here is that after HomeView is created, the dummyView will be pushed<br>
-			 * When dummyView is popped, then data will be a boolean value being set to true, in which case dummyView will not be pushed again. 
+			 * what I achieve here is that after HomeView is created, the dummyView will be pushed, but only the first time<br>
 			 */
 			private function onCreationComplete():void {
 				if (!ModelLocator.getInstance().firstStartUp)
@@ -74,8 +73,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			
 			private function selectFoodItem(event:IndexChangeEvent):void {
-				data = new Object();
-				data.searchtext = searchtext.text;
+				//data = new Object();
+				//data.searchtext = searchtext.text;
 				navigator.pushView(AddFoodItemView,ModelLocator.getInstance().foodItemList.getItemAt(event.newIndex));
 			}
 			
