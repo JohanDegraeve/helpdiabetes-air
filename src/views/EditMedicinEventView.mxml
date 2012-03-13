@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
 		initialize="onInitialize()"
+		creationComplete="onCreationComplete()"
 		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -60,19 +61,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var amountText:String = "0";
 			[Bindable]
 			private var back_label:String;
+			[Bindable]
+			private var add_label:String;
+			
+			/**
+			 * if true then this view is created for a new mealevent 
+			 */
+			private var newMealEvent:Boolean;
+			
+			/**
+			 * stores the medicinevent in case it's an existing event that is being modified, used also in case a new event is created 
+			 */
+			private var theMedicinEvent:MedicinEvent;
 
-			private var _currentDateAndTime:Date;
-			private function get currentDateAndTime():Date
+			private var _eventDateAndTime:Date;
+			private function get eventDateAndTime():Date
 			{
-				return _currentDateAndTime;
+				return _eventDateAndTime;
 			}
-			private function set currentDateAndTime(value:Date):void
+			private function set eventDateAndTime(value:Date):void
 			{
-				_currentDateAndTime = value;
-				dateText = dateformatter.format(_currentDateAndTime);
-				timeText = timeformatter.format(_currentDateAndTime);
+				_eventDateAndTime = value;
+				dateText = dateformatter.format(_eventDateAndTime);
+				timeText = timeformatter.format(_eventDateAndTime);
 			}
 			
+			private function onCreationComplete():void {
+				if (data is MedicinEvent) {
+					theMedicinEvent = data as MedicinEvent;
+					eventDateAndTime = new Date((data as MedicinEvent).timeStamp);
+					dateText = dateformatter.format(_eventDateAndTime);
+					timeText = timeformatter.format(_eventDateAndTime);
+					medicinName = (data as MedicinEvent).medicinName;
+					amountText = (new Number((data as MedicinEvent).amount)).toString();
+					add_label = resourceManager.getString('addfooditemview','save_button');
+					newMealEvent = false;
+				}
+			}
 			
 			private function onBackKeyPressed(event:Event):void {
 				if (medicinPicker != null) {
@@ -100,11 +125,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 
 			private function onInitialize():void {
-				currentDateAndTime = new Date();
-				dateText = dateformatter.format(_currentDateAndTime);
-				timeText = timeformatter.format(_currentDateAndTime);
+				//setting initial values, will be overwritten in oncreationcomplete if data is an medicinevent
+				eventDateAndTime = new Date();
+				dateText = dateformatter.format(_eventDateAndTime);
+				timeText = timeformatter.format(_eventDateAndTime);
 				medicinName = Settings.getInstance().getSetting(parseInt(Settings.getInstance().getSetting(Settings.SettingsDefaultMedicin)));
 				back_label = resourceManager.getString('general','back');
+				add_label = resourceManager.getString('addfooditemview','add_button')
+				newMealEvent = true;
 			}
 
 			private function insulinTypeGroupClicked(e:MouseEvent = null):void {
@@ -158,7 +186,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function datumClicked(e:MouseEvent = null):void {
 				dateOrTimePicker  = new DatePicker();
-				(dateOrTimePicker as DatePicker).currentDate = currentDateAndTime;
+				(dateOrTimePicker as DatePicker).currentDate = eventDateAndTime;
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				PopUpManager.addPopUp(dateOrTimePicker, this, true);
@@ -175,12 +203,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
-				currentDateAndTime = (event.newValue as Date);
+				eventDateAndTime = (event.newValue as Date);
 			}
 			
 			private function timeClicked(e:MouseEvent = null):void {
 				dateOrTimePicker = new TimePicker();
-				(dateOrTimePicker as TimePicker).currentTime = currentDateAndTime;
+				(dateOrTimePicker as TimePicker).currentTime = eventDateAndTime;
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				PopUpManager.addPopUp(dateOrTimePicker, this, true);
@@ -188,13 +216,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
-				var newMedicinEvent:MedicinEvent = new MedicinEvent(
-					parseInt(amountText),
-					medicinName,
-					currentDateAndTime.valueOf());
-				ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
+				if (newMealEvent) {
+					theMedicinEvent = new MedicinEvent(
+						parseInt(amountText),
+						medicinName,
+						eventDateAndTime.valueOf());
+					ModelLocator.getInstance().trackingList.addItem(theMedicinEvent);
+				} else {
+					theMedicinEvent.updateMedicinEvent(medicinName,parseInt(amountText));
+				}
 				
-				var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
+				var creationTimeStampAsDate:Date = new Date(theMedicinEvent.timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);
 				if (creationTimeStampAsDate.valueOf() > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
 					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.getInstance().oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
@@ -278,7 +310,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:Button id="time" width="70%" label="@{timeText}" />
 		</s:Group>
 		<s:Group id="okGroup" y="0" x="0" width="100%" click="okClicked(event)">
-			<s:Button  id="okButton"   width="100%" label="{resourceManager.getString('addfooditemview','add_button')}" />
+			<s:Button  id="okButton"   width="100%" label="{add_label}" />
 		</s:Group>
 	</s:Group>
 

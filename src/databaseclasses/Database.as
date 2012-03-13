@@ -177,6 +177,7 @@ package databaseclasses
 			":fat, :lastmodifiedtimestamp)";
 		private const UPDATE_INSULINRATIO_IN_MEAL_EVENT:String = "UPDATE mealevents set insulinratio = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE mealeventid = :id";
 		private const UPDATE_CHOSENAMOUNT_IN_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set chosenamount = :value,lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE selectedfooditemid = :id";
+		private const UPDATE_MEDICINEVENT:String="UPDATE medicinevents set amount = :amount, medicinname = :medicinname, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE medicineventid = :id";
 		
 		/**
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
@@ -1744,7 +1745,7 @@ package databaseclasses
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
 							deleteMedicinEvent(o.medicineventid as Number);
 						} else {
-							var newMedicinEvent:MedicinEvent = new MedicinEvent(o.amount as Number,o.medicinname as String,o.creationtimestamp as Number,false);
+							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number,o.medicinname as String,o.creationtimestamp as Number,false,o.medicineventid as Number);
 							ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
 							var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -1907,8 +1908,8 @@ package databaseclasses
 		 * new medicin event will be added to the database<br>
 		 * here the medicineventid will get the value of current date and time as Number 
 		 */
-		internal function createNewMedicinEvent(amount:int,medicin:String, timeStamp:Number,dispatcher:EventDispatcher):void {
-			var localSqlStatement:SQLStatement = new SQLStatement()
+		internal function createNewMedicinEvent(amount:int,medicin:String, timeStamp:Number,dispatcher:EventDispatcher = null,medicineventid:Number = Number.NaN):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
@@ -1921,28 +1922,28 @@ package databaseclasses
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_MEDICINEVENT;
 				//(bloodglucoseeventid, unit, creationtimestamp, value)
-				localSqlStatement.parameters[":medicineventid"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":medicineventid"] = (isNaN(medicineventid) ? (new Date()).valueOf() : medicineventid);
 				localSqlStatement.parameters[":amount"] = amount;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":medicinname"] = medicin;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
-				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventCreated);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, medicinEventCreationFailed);
+				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventUpdated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, medicinEventUpdateFailed);
 				localSqlStatement.execute();
 			}
 			
-			function medicinEventCreated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventCreationFailed);
+			function medicinEventUpdated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventUpdateFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
 				}
 			}
 			
-			function medicinEventCreationFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventCreationFailed);
+			function medicinEventUpdateFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventUpdateFailed);
 				trace("Failed to create a medicinEvent. Database0091");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1954,6 +1955,62 @@ package databaseclasses
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
 				trace("Failed to open the database. Database0092");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
+		
+		/**
+		* medicinevent with specified medicineventid is updated with new values for timestamp, amount and medicinname
+		*/ 	
+		internal function updateMedicinEvent(medicinEventId:Number/*,newTimeStamp:Number*/,newAmount:int,newMedicinName:String,dispatcher:EventDispatcher = null):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = UPDATE_MEDICINEVENT;
+				localSqlStatement.parameters[":id"] = medicinEventId;
+				localSqlStatement.parameters[":amount"] = newAmount;
+				//localSqlStatement.parameters[":creationtimestamp"] = newTimeStamp;
+				localSqlStatement.parameters[":medicinname"] = newMedicinName;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventUpdated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, medicinEventUpdateFailed);
+				localSqlStatement.execute();
+			}
+			
+			function medicinEventUpdated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventUpdateFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function medicinEventUpdateFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventUpdateFailed);
+				trace("Failed to update a medicinEvent. Database0100");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0101");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);
