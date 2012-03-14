@@ -218,12 +218,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function okClicked(e:MouseEvent = null):void {
 				if (newMealEvent) {
 					theMedicinEvent = new MedicinEvent(
-						parseInt(amountText),
+						new Number(amountText),
 						medicinName,
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theMedicinEvent);
 				} else {
-					theMedicinEvent.updateMedicinEvent(medicinName,parseInt(amountText));
+					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText));
 				}
 				
 				var creationTimeStampAsDate:Date = new Date(theMedicinEvent.timeStamp);

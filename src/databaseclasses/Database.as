@@ -1965,7 +1965,7 @@ package databaseclasses
 		/**
 		* medicinevent with specified medicineventid is updated with new values for timestamp, amount and medicinname
 		*/ 	
-		internal function updateMedicinEvent(medicinEventId:Number/*,newTimeStamp:Number*/,newAmount:int,newMedicinName:String,dispatcher:EventDispatcher = null):void {
+		internal function updateMedicinEvent(medicinEventId:Number/*,newTimeStamp:Number*/,newAmount:Number,newMedicinName:String,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);

@@ -48,9 +48,9 @@ package databaseclasses
 			return _medicinName;
 		}
 
-		private var _amount:int;
+		private var _amount:Number;
 
-		public function get amount():int
+		public function get amount():Number
 		{
 			return _amount;
 		}
@@ -60,7 +60,7 @@ package databaseclasses
 		 * creates a medicin event and stores it immediately in the database if storeInDatabase = true<br>
 		 * if creationTimeStamp = null, then current date and time is used
 		 */
-		public function MedicinEvent( amount:int, medicin:String, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true, medicineventid:Number = NaN)
+		public function MedicinEvent( amount:Number, medicin:String, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true, medicineventid:Number = NaN)
 		{
 			this._medicinName = medicin;
 			this.eventid = medicineventid;
@@ -92,7 +92,7 @@ package databaseclasses
 		/**
 		 * will update the medicinevent in the database with the new values for timeStamp, medicinName and amount
 		 */
-		public function updateMedicinEvent(newMedicinName:String,newAmount:int):void {
+		public function updateMedicinEvent(newMedicinName:String,newAmount:Number):void {
 			_amount = newAmount;
 			_medicinName = newMedicinName;
 			Database.getInstance().updateMedicinEvent(this.eventid,/*_timeStamp,*/_amount,_medicinName);
