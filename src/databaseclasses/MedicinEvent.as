@@ -90,7 +90,7 @@ package databaseclasses
 		}
 		
 		/**
-		 * will update the medicinevent in the database with the new values for timeStamp, medicinName and amount
+		 * will update the medicinevent in the database with the new values for medicinName and amount
 		 */
 		public function updateMedicinEvent(newMedicinName:String,newAmount:Number):void {
 			_amount = newAmount;

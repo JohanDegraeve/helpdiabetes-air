@@ -34,6 +34,18 @@ package databaseclasses
 			return _level;
 		}
 
+		private var _eventid:Number;
+		
+		internal function get eventid():Number
+		{
+			return _eventid;
+		}
+		
+		internal function set eventid(value:Number):void
+		{
+			_eventid = value;
+		}
+
 		private var _comment:String;
 
 		public function get comment():String
@@ -41,9 +53,10 @@ package databaseclasses
 			return _comment;
 		}
 		
-		public function ExerciseEvent(level:String,comment:String,creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true)
+		public function ExerciseEvent(level:String,comment:String,creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true, exerciseeventid:Number = NaN)
 		{
 			this._level = level;
+			this.eventid = exerciseeventid;
 			this._comment = comment;
 			if (!isNaN(creationTimeStamp))
 				_timeStamp = creationTimeStamp;
@@ -51,7 +64,7 @@ package databaseclasses
 				_timeStamp = (new Date()).valueOf();
 			
 			if (storeInDatabase)
-				Database.getInstance().createNewExerciseEvent(level,comment,_timeStamp,null);
+				Database.getInstance().createNewExerciseEvent(level,comment,_timeStamp,null,exerciseeventid);
 		}
 		
 		public function get timeStamp():Number
@@ -59,6 +72,16 @@ package databaseclasses
 			return _timeStamp;
 		}
 		
+		/**
+		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
+		 * if newComment = null then an empty string will be used
+		 */
+		public function updateExerciseEvent(newLevel:String,newComment:String = null):void {
+			_level = newLevel;
+			_comment = (newComment == null ? "":newComment);
+			Database.getInstance().updateExerciseEvent(this.eventid,newLevel,_comment);
+		}
+
 		public function listElementRendererFunction():ClassFactory
 		{
 			return new ClassFactory(ExerciseEventItemRenderer);
