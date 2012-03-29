@@ -27,21 +27,47 @@ package databaseclasses
 	{
 		private var _timeStamp:Number;
 		private var _bloodGlucoseLevel:int;
+		private var _eventid:Number;
+		
+		internal function get eventid():Number
+		{
+			return _eventid;
+		}
+		
+		internal function set eventid(value:Number):void
+		{
+			_eventid = value;
+		}
+		
+		private var _unit:String;
+
+		public function get unit():String
+		{
+			return _unit;
+		}
+
+		public function set unit(value:String):void
+		{
+			_unit = value;
+		}
+
 		
 		/**
 		 * creates a bloodglucose event and stores it immediately in the database if storeInDatabase = true<br>
 		 * unit is a textstring denoting the unit used, mgperdl, or ... <br>
 		 * if creationTimeStamp = null, then curren date and time is used
 		 */
-		public function BloodGlucoseEvent(glucoseLevel:int, unit:String, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true)
+		public function BloodGlucoseEvent(glucoseLevel:int, unit:String, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true, bloodglucoseEventId = Number.NaN)
 		{
 			this._bloodGlucoseLevel = glucoseLevel;	
+			this._unit = unit;
+			this.eventid = bloodglucoseEventId;
 			if (!isNaN(creationTimeStamp))
 				_timeStamp = creationTimeStamp;
 			else
 				_timeStamp = (new Date()).valueOf();
 			if (storeInDatabase)
-				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,unit,null);
+				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,unit,null,bloodglucoseEventId);
 		}
 		
 		
@@ -63,6 +89,16 @@ package databaseclasses
 		private function set timeStamp(value:Number):void
 		{
 			_timeStamp = value;
+		}
+		
+		/**
+		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
+		 * if newComment = null then an empty string will be used
+		 */
+		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:int):void {
+			unit = newUnit;
+			_bloodGlucoseLevel = newBloodGlucoseLevel;
+			Database.getInstance().updateBloodGlucoseEvent(this.eventid,unit,_bloodGlucoseLevel);
 		}
 		
 		public function listElementRendererFunction():ClassFactory

@@ -179,6 +179,7 @@ package databaseclasses
 		private const UPDATE_CHOSENAMOUNT_IN_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set chosenamount = :value,lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE selectedfooditemid = :id";
 		private const UPDATE_MEDICINEVENT:String="UPDATE medicinevents set amount = :amount, medicinname = :medicinname, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE medicineventid = :id";
 		private const UPDATE_EXERCISEEVENT:String="UPDATE exerciseevents set level = :level, comment_2 = :comment_2, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE exerciseeventid = :id";
+		private const UPDATE_BLOODGLUCOSEEVENT:String="UPDATE bloodglucoseevents set unit = :unit, value = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE bloodglucoseeventid = :id";
 		
 		/**
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
@@ -1400,9 +1401,9 @@ package databaseclasses
 		
 		/**
 		 * new bloodglucoselevel event will be added to the database<br>
-		 * here the bloodglucoseeventid will get the value of current date and time as Number 
+		 * here the bloodglucoseeventid will get the value of current date and time as Number if 
 		 */
-		internal function createNewBloodGlucoseEvent(level:int,timeStamp:Number,unit:String,dispatcher:EventDispatcher):void {
+		internal function createNewBloodGlucoseEvent(level:int,timeStamp:Number,unit:String,dispatcher:EventDispatcher = null, bloodglucoseeventid:Number = Number.NaN):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -1416,7 +1417,7 @@ package databaseclasses
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_BLOODGLUCOSEEVENT;
 				//(bloodglucoseeventid, unit, creationtimestamp, value)
-				localSqlStatement.parameters[":bloodglucoseeventid"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":bloodglucoseeventid"] = (isNaN(bloodglucoseeventid) ? (new Date()).valueOf() : bloodglucoseeventid);
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":value"] = level;
@@ -1712,7 +1713,7 @@ package databaseclasses
 							deleteBloodGlucoseEvent(o.bloodglucoseeventid as Number);
 						} else {
 							
-							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String,o.creationtimestamp as Number,false);
+							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String,o.creationtimestamp as Number,false, o.bloodglucoseeventid as Number);
 							ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
 							var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2133,6 +2134,63 @@ package databaseclasses
 			}
 		}
 
+		
+		/**
+		 * bloodglucoseevent with specified bloodglucoseeventid is updated with new values  level and unit
+		 */ 	
+		internal function updateBloodGlucoseEvent(bloodglucoseEventId:Number,unit:String,bloodGlucoseLevel:int,dispatcher:EventDispatcher = null):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = UPDATE_BLOODGLUCOSEEVENT;
+				localSqlStatement.parameters[":id"] = bloodglucoseEventId;
+				localSqlStatement.parameters[":unit"] = unit;
+				localSqlStatement.parameters[":value"] = bloodGlucoseLevel;
+				//localSqlStatement.parameters[":creationtimestamp"] = newTimeStamp;
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				localSqlStatement.addEventListener(SQLEvent.RESULT, bloodglucoseEventUpdated);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, bloodglucoseEventUpdateFailed);
+				localSqlStatement.execute();
+			}
+			
+			function bloodglucoseEventUpdated(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodglucoseEventUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodglucoseEventUpdateFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function bloodglucoseEventUpdateFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodglucoseEventUpdated);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodglucoseEventUpdateFailed);
+				trace("Failed to update a bloodglucoseEvent. Database0110");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database. Database0111");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
+		
 		
 		private function deleteMealEvent(mealEventId:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();

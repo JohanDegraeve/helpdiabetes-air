@@ -38,41 +38,63 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import mx.managers.PopUpManager;
 			
+			import myComponents.AmountPicker;
 			import myComponents.DatePicker;
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.PickerEvent;
 			import myComponents.TimePicker;
-			import myComponents.AmountPicker;
 			
+			private var theBloodGlucoseEvent:BloodGlucoseEvent;
 			private var dateOrTimePicker:Group;
+			private var _eventDateAndTime:Date;
+			private function get eventDateAndTime():Date
+			{
+				return _eventDateAndTime;
+			}
+			private function set eventDateAndTime(value:Date):void
+			{
+				_eventDateAndTime = value;
+				dateText = dateformatter.format(_eventDateAndTime);
+				timeText = timeformatter.format(_eventDateAndTime);
+			}
+			
+			private var unit:String;
 			
 			private var amountPicker:AmountPicker;
 			[Bindable]
-			private var meteringResultText:String = "100";
+			private var meteringResultText:String;
 			[Bindable]
 			private var dateText:String ;
 			[Bindable]
 			private var timeText:String;
 			[Bindable]
 			private var back_label:String;
+
+			[Bindable]
+			private var add_label:String;
 			
+			/**
+			 * if true then this view is created for a new mealevent 
+			 */
+			private var newBloodGlucoseEvent:Boolean;
+			
+
 			[Bindable]
 			private var meteringTexttext:String;
-			private var _currentDateAndTime:Date;
-			private function get currentDateAndTime():Date
-			{
-				return _currentDateAndTime;
-			}
-
-			private function set currentDateAndTime(value:Date):void
-			{
-				_currentDateAndTime = value;
-				dateText = dateformatter.format(_currentDateAndTime);
-				timeText = timeformatter.format(_currentDateAndTime);
-			}
 			
 			private function onCreationComplete(): void {
 				back_label = resourceManager.getString('general','back');
+				if (data is BloodGlucoseEvent) {
+					theBloodGlucoseEvent = data as BloodGlucoseEvent;
+					eventDateAndTime = new Date(theBloodGlucoseEvent.timeStamp);
+					dateText = dateformatter.format(_eventDateAndTime);
+					timeText = timeformatter.format(_eventDateAndTime);
+					unit = theBloodGlucoseEvent.unit;
+					meteringTexttext = resourceManager.getString('editbgeventview','value') + ' (' + unit + ')';
+					meteringResultText = (new Number(theBloodGlucoseEvent.bloodGlucoseLevel)).toString();
+					add_label = resourceManager.getString('addfooditemview','save_button');
+					newBloodGlucoseEvent = false;
+				}
 			}
 			
 			private function meteringResultClicked(e:MouseEvent = null):void {
@@ -119,7 +141,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function datumClicked(e:MouseEvent = null):void {
 				dateOrTimePicker  = new DatePicker();
-				(dateOrTimePicker as DatePicker).currentDate = currentDateAndTime;
+				(dateOrTimePicker as DatePicker).currentDate = eventDateAndTime;
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				PopUpManager.addPopUp(dateOrTimePicker, this, true);
@@ -127,8 +149,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
-				currentDateAndTime = new Date();
-				meteringTexttext = resourceManager.getString('editbgeventview','value') + ' (' + resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT)) + ')'
+				//setting initial values, will be overwritten in oncreationcomplete if data is an medicinevent
+				eventDateAndTime = new Date();
+				dateText = dateformatter.format(_eventDateAndTime);
+				timeText = timeformatter.format(_eventDateAndTime);
+				unit =  resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
+				meteringTexttext = resourceManager.getString('editbgeventview','value') + ' (' +unit  + ')';
+				meteringResultText = "100";
+				add_label = resourceManager.getString('addfooditemview','add_button');
+				newBloodGlucoseEvent = true;
+				back_label = resourceManager.getString('general','back');
 			}
 			
 			private function onTimeOrDateCancel(event: PickerEvent): void
@@ -141,12 +171,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
-				currentDateAndTime = (event.newValue as Date);
+				eventDateAndTime = (event.newValue as Date);
 			}
 			
 			private function timeClicked(e:MouseEvent = null):void {
 				dateOrTimePicker = new TimePicker();
-				(dateOrTimePicker as TimePicker).currentTime = currentDateAndTime;
+				(dateOrTimePicker as TimePicker).currentTime = eventDateAndTime;
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				PopUpManager.addPopUp(dateOrTimePicker, this, true);
@@ -154,12 +184,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
-				var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(
-					parseInt(meteringResultText),
-					resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT)),currentDateAndTime.valueOf());
-				ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
+				if (newBloodGlucoseEvent) {
+					theBloodGlucoseEvent = new BloodGlucoseEvent(
+						new Number(meteringResultText),
+						unit,
+						eventDateAndTime.valueOf());
+					ModelLocator.getInstance().trackingList.addItem(theBloodGlucoseEvent);
+				} else {
+					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText));
+				}
+
 				
-				var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
+				var creationTimeStampAsDate:Date = new Date(theBloodGlucoseEvent.timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);
 				if (creationTimeStampAsDate.valueOf() > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
 					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.getInstance().oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
@@ -237,7 +273,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:Button id="time" width="75%" label="@{timeText}" />
 		</s:Group>
 		<s:Group id="okGroup" y="0" x="0" width="100%" height="100%" maxHeight="50" click="okClicked(event)">
-			<s:Button  id="okButton"   width="100%" label="{resourceManager.getString('addfooditemview','add_button')}" />
+			<s:Button  id="okButton"   width="100%" label="{add_label}" />
 		</s:Group>
 	</s:Group>
 </s:View>

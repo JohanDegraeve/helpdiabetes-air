@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.BloodGlucoseEvent;
 			import databaseclasses.ExerciseEvent;
 			import databaseclasses.MealEvent;
 			import databaseclasses.MedicinEvent;
@@ -72,6 +73,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					navigator.pushView(EditMedicinEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex));
 				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is ExerciseEvent) {
 					navigator.pushView(EditExerciseEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex));
+				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is BloodGlucoseEvent) {
+					navigator.pushView(EditBGEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex));
 				}
 			}
 			
