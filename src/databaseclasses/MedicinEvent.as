@@ -79,7 +79,7 @@ package databaseclasses
 			return _timeStamp;
 		}
 		
-		private function set timeStamp(value:Number):void
+		public function set timeStamp(value:Number):void
 		{
 			_timeStamp = value;
 		}
@@ -91,11 +91,14 @@ package databaseclasses
 		
 		/**
 		 * will update the medicinevent in the database with the new values for medicinName and amount
+		 * if newCreationTimeStamp =  Number.NaN then (creation)timeStamp is not updated
 		 */
-		public function updateMedicinEvent(newMedicinName:String,newAmount:Number):void {
+		public function updateMedicinEvent(newMedicinName:String,newAmount:Number,newCreationTimeStamp:Number = Number.NaN):void {
 			_amount = newAmount;
 			_medicinName = newMedicinName;
-			Database.getInstance().updateMedicinEvent(this.eventid,/*_timeStamp,*/_amount,_medicinName);
+			if (!isNaN(newCreationTimeStamp))
+				timeStamp = newCreationTimeStamp;
+			Database.getInstance().updateMedicinEvent(this.eventid,/*_timeStamp,*/_amount,_medicinName,timeStamp);
 		}
 	}
 }

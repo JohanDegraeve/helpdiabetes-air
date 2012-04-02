@@ -177,9 +177,9 @@ package databaseclasses
 			":fat, :lastmodifiedtimestamp)";
 		private const UPDATE_INSULINRATIO_IN_MEAL_EVENT:String = "UPDATE mealevents set insulinratio = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE mealeventid = :id";
 		private const UPDATE_CHOSENAMOUNT_IN_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set chosenamount = :value,lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE selectedfooditemid = :id";
-		private const UPDATE_MEDICINEVENT:String="UPDATE medicinevents set amount = :amount, medicinname = :medicinname, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE medicineventid = :id";
-		private const UPDATE_EXERCISEEVENT:String="UPDATE exerciseevents set level = :level, comment_2 = :comment_2, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE exerciseeventid = :id";
-		private const UPDATE_BLOODGLUCOSEEVENT:String="UPDATE bloodglucoseevents set unit = :unit, value = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE bloodglucoseeventid = :id";
+		private const UPDATE_MEDICINEVENT:String="UPDATE medicinevents set amount = :amount, medicinname = :medicinname, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE medicineventid = :id";
+		private const UPDATE_EXERCISEEVENT:String="UPDATE exerciseevents set level = :level, comment_2 = :comment_2, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE exerciseeventid = :id";
+		private const UPDATE_BLOODGLUCOSEEVENT:String="UPDATE bloodglucoseevents set unit = :unit, value = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE bloodglucoseeventid = :id";
 		
 		/**
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
@@ -1967,7 +1967,7 @@ package databaseclasses
 		/**
 		* medicinevent with specified medicineventid is updated with new values for timestamp, amount and medicinname
 		*/ 	
-		internal function updateMedicinEvent(medicinEventId:Number/*,newTimeStamp:Number*/,newAmount:Number,newMedicinName:String,dispatcher:EventDispatcher = null):void {
+		internal function updateMedicinEvent(medicinEventId:Number,newAmount:Number,newMedicinName:String,newCreationTimeStamp:Number, dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -1982,7 +1982,7 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_MEDICINEVENT;
 				localSqlStatement.parameters[":id"] = medicinEventId;
 				localSqlStatement.parameters[":amount"] = newAmount;
-				//localSqlStatement.parameters[":creationtimestamp"] = newTimeStamp;
+				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;
 				localSqlStatement.parameters[":medicinname"] = newMedicinName;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventUpdated);
@@ -2081,7 +2081,7 @@ package databaseclasses
 		/**
 		 * exerciseevent with specified exerciseeventid is updated with new values for timestamp, level and comment
 		 */ 	
-		internal function updateExerciseEvent(exerciseEventId:Number,newLevel:String,newComment_2:String,dispatcher:EventDispatcher = null):void {
+		internal function updateExerciseEvent(exerciseEventId:Number,newLevel:String,newComment_2:String,newCreationTimeStamp:Number, dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -2096,7 +2096,7 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_EXERCISEEVENT;
 				localSqlStatement.parameters[":id"] = exerciseEventId;
 				localSqlStatement.parameters[":level"] = newLevel;
-				//localSqlStatement.parameters[":creationtimestamp"] = newTimeStamp;
+				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;
 				localSqlStatement.parameters[":comment_2"] = newComment_2;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, exerciseEventUpdated);
@@ -2138,7 +2138,7 @@ package databaseclasses
 		/**
 		 * bloodglucoseevent with specified bloodglucoseeventid is updated with new values  level and unit
 		 */ 	
-		internal function updateBloodGlucoseEvent(bloodglucoseEventId:Number,unit:String,bloodGlucoseLevel:int,dispatcher:EventDispatcher = null):void {
+		internal function updateBloodGlucoseEvent(bloodglucoseEventId:Number,unit:String,bloodGlucoseLevel:int,newCreationTimeStamp:Number, dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -2154,7 +2154,7 @@ package databaseclasses
 				localSqlStatement.parameters[":id"] = bloodglucoseEventId;
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":value"] = bloodGlucoseLevel;
-				//localSqlStatement.parameters[":creationtimestamp"] = newTimeStamp;
+				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 				localSqlStatement.addEventListener(SQLEvent.RESULT, bloodglucoseEventUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, bloodglucoseEventUpdateFailed);

@@ -191,9 +191,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theBloodGlucoseEvent);
 				} else {
-					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText));
+					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText), eventDateAndTime.valueOf());
 				}
-
 				
 				var creationTimeStampAsDate:Date = new Date(theBloodGlucoseEvent.timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);

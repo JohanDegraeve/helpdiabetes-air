@@ -184,7 +184,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theExerciseEvent);
 				} else {
-					theExerciseEvent.updateExerciseEvent(exerciseName,null);
+					theExerciseEvent.updateExerciseEvent(exerciseName,null,eventDateAndTime.valueOf());
 				}
 				
 

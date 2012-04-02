@@ -40,6 +40,25 @@ package myComponents
 		
 		private var _glucoseLevel:String;
 		
+		private var _unit:String;
+
+		public function get unit():String
+		{
+			return _unit;
+		}
+
+		public function set unit(value:String):void
+		{
+			if (_unit == value)
+				return;
+			_unit = value;
+			if (glucoseLevelDisplay != null) {
+				glucoseLevelDisplay.text = _glucoseLevel;
+				invalidateSize();
+			}
+		}
+
+		
 		//private static var _bloodGlucoseCalculatedHeight:Number = 30;
 		//private static var _bloodGlucosePreferredHeight:Number = 0;
 		
@@ -75,10 +94,12 @@ package myComponents
 				return;
 			_glucoseLevel = value;
 			if (glucoseLevelDisplay != null) {
-				glucoseLevelDisplay.text = _glucoseLevel;
+				glucoseLevelDisplay.text = glucoseLevel + " " + unit;
 				invalidateSize();
 			}
 		}
+		
+		
 		
 		private static var _bloodGlucseEventBGColorDark:* = 0;
 		private static var _bloodGlucseEventBGColorLight:* = 0;
@@ -113,6 +134,7 @@ package myComponents
 				+ " " + resourceManager.getString('editbgeventview','glucose');
 			
 			glucoseLevel = (value as BloodGlucoseEvent).bloodGlucoseLevel.toString();
+			unit = (value as BloodGlucoseEvent).unit;
 		}
 		
 		override protected function createChildren():void {
@@ -145,7 +167,7 @@ package myComponents
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
 			var glucoseLevelDisplayWidth:Number = Math.max(getElementPreferredWidth(glucoseLevelDisplay), MINIMUM_AMOUNT_WIDTH);
 			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - glucoseLevelDisplayWidth);
-			glucoseLevelDisplay.text = glucoseLevel + " " + resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
+			glucoseLevelDisplay.text = glucoseLevel + " " + unit;
 			glucoseLevelDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(glucoseLevelDisplay));
 
 			setElementSize(labelDisplay,labelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);

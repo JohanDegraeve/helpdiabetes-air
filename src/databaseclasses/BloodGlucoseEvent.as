@@ -86,19 +86,23 @@ package databaseclasses
 			return _timeStamp;
 		}
 
-		private function set timeStamp(value:Number):void
+		public function set timeStamp(value:Number):void
 		{
 			_timeStamp = value;
 		}
 		
 		/**
 		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
-		 * if newComment = null then an empty string will be used
+		 * if newComment = null then an empty string will be used<br>
+		 * if newCreationTimeStamp = null or Number.NaN then (creation)timeStamp is not updated
 		 */
-		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:int):void {
+		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:int,newCreationTimeStamp:Number = Number.NaN):void {
 			unit = newUnit;
 			_bloodGlucoseLevel = newBloodGlucoseLevel;
-			Database.getInstance().updateBloodGlucoseEvent(this.eventid,unit,_bloodGlucoseLevel);
+			if (!isNaN(newCreationTimeStamp)) {
+				timeStamp = newCreationTimeStamp;
+			}
+			Database.getInstance().updateBloodGlucoseEvent(this.eventid,unit,_bloodGlucoseLevel, timeStamp);
 		}
 		
 		public function listElementRendererFunction():ClassFactory

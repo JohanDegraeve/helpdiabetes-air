@@ -129,7 +129,7 @@ package myComponents
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
 			var amountDisplayWidth:Number = Math.max(getElementPreferredWidth(amountDisplay), MINIMUM_AMOUNT_WIDTH);
 			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth);
-			amountDisplay.text = amount + " " + resourceManager.getString('editmedicineventview','units');
+			amountDisplay.text = amount + " " + resourceManager.getString('general','units');
 			amountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(amountDisplay));
 			
 			setElementSize(labelDisplay,labelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);

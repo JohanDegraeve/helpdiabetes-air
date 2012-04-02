@@ -223,7 +223,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theMedicinEvent);
 				} else {
-					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText));
+					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText),eventDateAndTime.valueOf());
 				}
 				
 				var creationTimeStampAsDate:Date = new Date(theMedicinEvent.timeStamp);

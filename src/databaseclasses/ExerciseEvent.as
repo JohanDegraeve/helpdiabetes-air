@@ -72,14 +72,22 @@ package databaseclasses
 			return _timeStamp;
 		}
 		
+		public function set timeStamp(newTimeStamp:Number):void
+		{
+			 _timeStamp = newTimeStamp;
+		}
+		
 		/**
 		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
 		 * if newComment = null then an empty string will be used
+		 * if newCreationTimeStamp = null or Number.NaN then (creation)timeStamp is not updated
 		 */
-		public function updateExerciseEvent(newLevel:String,newComment:String = null):void {
+		public function updateExerciseEvent(newLevel:String,newComment:String = null,newCreationTimeStamp:Number = Number.NaN):void {
 			_level = newLevel;
 			_comment = (newComment == null ? "":newComment);
-			Database.getInstance().updateExerciseEvent(this.eventid,newLevel,_comment);
+			if (!isNaN(newCreationTimeStamp))
+				timeStamp = newCreationTimeStamp;
+			Database.getInstance().updateExerciseEvent(this.eventid,newLevel,_comment, timeStamp);
 		}
 
 		public function listElementRendererFunction():ClassFactory
