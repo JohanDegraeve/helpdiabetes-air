@@ -46,6 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var  foodItems:ArrayCollection;
 			
+			
 			private var notificationPopUp:Notification;
 			
 			private var elementPicker:elementFromListPicker;
@@ -60,6 +61,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
 			 */
 			private function initApplication():void {
+				
+
 				var dispatcher:EventDispatcher = new EventDispatcher();
 				var thisObject:DisplayObject =  this;
 				if (Database.databaseExists()) {
@@ -117,7 +120,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							localeChainAsString = "nl_NL,en_US";
 						}
 					}
-					
 					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
 					Settings.getInstance().setSettingWithoutDatabaseUpdate(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
 
@@ -138,6 +140,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					for (var j:int = 0;j < localeChainAsArray.length; j++) {
 						resourceManager.localeChain.push(localeChainAsArray[j]);
 					}
+					
+					//time to set the labels
+					modelLocator.resetLabels();
 					
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
@@ -175,9 +180,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		]]>
 	</fx:Script>
 	
-	<s:ViewNavigator label="FoodCounter" width="100%" height="100%" firstView="views.FoodCounterView"/>
-	<s:ViewNavigator label="Tracking" width="100%" height="100%" firstView="views.TrackingView"/>
-	<s:ViewNavigator label="Settings" width="100%" height="100%" firstView="views.SettingsView"/>
-	<s:ViewNavigator label="InfoAbout" width="100%" height="100%" firstView="views.InfoAndHelpView"/>
+	<s:ViewNavigator label="{ModelLocator.getInstance().mealLabel}" width="100%" height="100%" firstView="views.FoodCounterView"/>
+	<s:ViewNavigator label="{ModelLocator.getInstance().logbookLabel}" width="100%" height="100%" firstView="views.TrackingView"/>
+	<s:ViewNavigator label="{ModelLocator.getInstance().settingsLabel}" width="100%" height="100%" firstView="views.SettingsView"/>
+	<s:ViewNavigator label="{ModelLocator.getInstance().infoaboutLabel}" width="100%" height="100%" firstView="views.InfoAndHelpView"/>
 	
 </s:TabbedViewNavigatorApplication>

@@ -28,6 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
 			
+			import model.ModelLocator;
+			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			import mx.managers.PopUpManager;
@@ -154,6 +156,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
 					Settings.getInstance().setSetting(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
+					
+					//also reset the labels in the tabs
+					ModelLocator.getInstance().resetLabels();
 				}
 			}
 		]]>
