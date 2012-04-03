@@ -75,7 +75,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				timeFormatter.useUTC = false;
 				timeFormatter.setStyle("locale",Capabilities.language.substr(0,2));
 				
-				dateTimeAndMealName_text = mealEvent.mealName + " - " + timeFormatter.format(mealEvent.timeStamp) + " - " + dateFormatter.format(mealEvent.timeStamp);
+				//dateTimeAndMealName_text = mealEvent.mealName + " - " + timeFormatter.format(mealEvent.timeStamp) + " - " + dateFormatter.format(mealEvent.timeStamp);
+				dateTimeAndMealName_text = dateFormatter.format(mealEvent.timeStamp) + " - " + timeFormatter.format(mealEvent.timeStamp) + 
+									"\n" +  mealEvent.mealName +
+									"  -  " + Math.round(mealEvent.totalCarbs) + " " + resourceManager.getString('general','gram_of_carbs_short');
 				if (mealEvent.insulinRatio != 0) {
 					insulinAmount_text = resourceManager.getString('general','calculated_insulin_amount') + " " + ((Math.round(mealEvent.calculatedInsulinAmount * 10))/10).toString();
 					insulinRatio_text = resourceManager.getString('editmealeventview','insulinRatioUsed') + " " + mealEvent.insulinRatio;
