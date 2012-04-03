@@ -62,7 +62,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private function initApplication():void {
 				
-
+				modelLocator.resetLabels();
+				
 				var dispatcher:EventDispatcher = new EventDispatcher();
 				var thisObject:DisplayObject =  this;
 				if (Database.databaseExists()) {
