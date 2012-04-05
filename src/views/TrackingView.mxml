@@ -19,8 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*" 
-		backKeyPressed="onBackKeyPressed(event)"
-		creationComplete="onCreationComplete()"
+		creationComplete="onCreationComplete()" actionBarVisible="false"
 		initialize="onInitialize()"
 		>
 	<fx:Declarations>
@@ -43,13 +42,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
-			import mx.managers.PopUpManager;
 			
 			import myComponents.IListElement;
 			import myComponents.elementFromListPicker;
 			
-			private var aSelectUnit:elementFromListPicker;
-
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();
 			}
@@ -78,53 +74,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 			}
 			
-			/**
-			 * pop up for list of possible trackingevents that can be added
-			 */ 
-			private function addButtonClicked(e:MouseEvent = null):void {
-				//if (!hasEventListener(ViewNavigatorEvent.REMOVING))
-				//this.addEventListener(ViewNavigatorEvent.REMOVING,onRemoving);	//necessary for handling the back button in android
-				
-				var trackingEventList:ArrayCollection = new ArrayCollection();
-				trackingEventList .addItem(resourceManager.getString('trackingview','glucoseevent'));
-				trackingEventList .addItem(resourceManager.getString('trackingview','medicinevent'));
-				trackingEventList .addItem(resourceManager.getString('trackingview','exerciseevent'));
-
-				aSelectUnit = new elementFromListPicker();
-				aSelectUnit.addEventListener(UnitChangedEvent.ITEM_SELECTED, trackingEventSelected);
-				aSelectUnit.elements = trackingEventList;
-				
-				PopUpManager.addPopUp(aSelectUnit,UIComponent(this.parentApplication),true);
-				PopUpManager.centerPopUp(aSelectUnit);
-				
-			}
-			
-			private function trackingEventSelected(event:UnitChangedEvent):void {
-				aSelectUnit.removeEventListener(UnitChangedEvent.ITEM_SELECTED,trackingEventSelected);
-				PopUpManager.removePopUp(aSelectUnit);
-				if (event.index == 0)
-					navigator.pushView(EditBGEventView);
-				else if (event.index == 1)
-					navigator.pushView(EditMedicinEventView);
-				else if (event.index == 2)
-					navigator.pushView(EditExerciseEventView);
-			}
-
-			private function onBackKeyPressed(event:Event):void {
-				if (aSelectUnit != null) {
-					if (aSelectUnit.isPopUp) {
-						PopUpManager.removePopUp(aSelectUnit);
-						event.preventDefault();
-					}
-					aSelectUnit = null;
-				} 
-			}			
-
 		]]>
 	</fx:Script>
-	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
-	</s:actionContent>
 	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().trackingList}"
 			click="onListElementClicked(event)"

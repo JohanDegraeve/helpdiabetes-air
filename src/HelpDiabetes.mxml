@@ -181,9 +181,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		]]>
 	</fx:Script>
 	
-	<s:ViewNavigator label="{ModelLocator.getInstance().mealLabel}" width="100%" height="100%" firstView="views.FoodCounterView"/>
-	<s:ViewNavigator label="{ModelLocator.getInstance().logbookLabel}" width="100%" height="100%" firstView="views.TrackingView"/>
-	<s:ViewNavigator label="{ModelLocator.getInstance().settingsLabel}" width="100%" height="100%" firstView="views.SettingsView"/>
-	<s:ViewNavigator label="{ModelLocator.getInstance().infoaboutLabel}" width="100%" height="100%" firstView="views.InfoAndHelpView"/>
+	<s:ViewNavigator icon="@Embed('assets/nomeal.JPG')"   width="100%" height="100%" firstView="views.FoodCounterView"/>
+	<s:ViewNavigator icon="@Embed('assets/notracking.JPG')"  width="100%" height="100%" firstView="views.TrackingView"/>
+	<s:ViewNavigator icon="@Embed('assets/nomedicines.JPG')"   width="100%" height="100%" firstView="views.EditMedicinEventView"/>
+	<s:ViewNavigator icon="@Embed('assets/noglucose.JPG')"  width="100%" height="100%" firstView="views.EditBGEventView"/>
+	<s:ViewNavigator icon="@Embed('assets/noexercise.JPG')"   width="100%" height="100%" firstView="views.EditExerciseEventView"/>
+	<s:ViewNavigator icon="@Embed('assets/nosettings.JPG')"   width="100%" height="100%" firstView="views.SettingsView"/>
 	
 </s:TabbedViewNavigatorApplication>

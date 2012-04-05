@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
 		initialize="onInitialize()"
-		creationComplete="onCreationComplete()"
+		creationComplete="onCreationComplete()" actionBarVisible="false"
 		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -96,7 +96,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					amountText = (new Number((data as MedicinEvent).amount)).toString();
 					add_label = resourceManager.getString('addfooditemview','save_button');
 					newMealEvent = false;
-				}
+					actionBarVisible = true;
+				} 
 			}
 			
 			private function onBackKeyPressed(event:Event):void {
