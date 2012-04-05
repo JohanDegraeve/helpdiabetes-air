@@ -38,14 +38,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
+			import mx.events.IndexChangedEvent;
 			import mx.managers.PopUpManager;
 			
 			import myComponents.Notification;
 			import myComponents.PickerEvent;
 			import myComponents.elementFromListPicker;
 			
+			import spark.events.IndexChangeEvent;
+			
 			private var  foodItems:ArrayCollection;
 			
+			[Bindable]
+			[Embed(source='assets/meal.JPG')]
+			private var mealIcon:Class;
+			[Bindable]
+			[Embed(source='assets/exercise.JPG')]
+			private var exerciseIcon:Class;
+			[Bindable]
+			[Embed(source='assets/glucose.JPG')]
+			private var glucoseIcon:Class;
+			[Bindable]
+			[Embed(source='assets/tracking.JPG')]
+			private var trackingIcon:Class;
+			[Bindable]
+			[Embed(source='assets/medicines.JPG')]
+			private var medicinesIcon:Class;
+			[Bindable]
+			[Embed(source='assets/settings.JPG')]
+			private var settingsIcon:Class;
+			[Bindable]
+			[Embed(source='assets/nomeal.JPG')]
+			private var nomealIcon:Class;
+			[Bindable]
+			[Embed(source='assets/noexercise.JPG')]
+			private var noexerciseIcon:Class;
+			[Bindable]
+			[Embed(source='assets/noglucose.JPG')]
+			private var noglucoseIconno:Class;
+			[Bindable]
+			[Embed(source='assets/notracking.JPG')]
+			private var notrackingIcon:Class;
+			[Bindable]
+			[Embed(source='assets/nosettings.JPG')]
+			private var nosettingsIcon:Class;
+			[Bindable]
+			[Embed(source='assets/nomedicines.JPG')]
+			private var nomedicinesIcon:Class;
 			
 			private var notificationPopUp:Notification;
 			
@@ -61,6 +100,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
 			 */
 			private function initApplication():void {
+				
+				tabbedNavigator.addEventListener(IndexChangeEvent.CHANGE, changeIcon);
+				
 				
 				modelLocator.resetLabels();
 				
@@ -123,7 +165,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
 					Settings.getInstance().setSettingWithoutDatabaseUpdate(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
-
+					
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
 					Database.getInstance().init(dispatcher);
@@ -176,6 +218,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
 				}
 				
+			}
+			
+			protected function changeIcon(event:IndexChangeEvent):void {
+				(navigators[0] as ViewNavigator).icon = nomealIcon;
+				(navigators[1] as ViewNavigator).icon = notrackingIcon;
+				(navigators[2] as ViewNavigator).icon = nomedicinesIcon;
+				(navigators[3] as ViewNavigator).icon = noglucoseIconno;
+				(navigators[4] as ViewNavigator).icon = noexerciseIcon;
+				(navigators[5] as ViewNavigator).icon = nosettingsIcon;
+				switch (event.newIndex) {
+					case (0): 
+						(navigators[0] as ViewNavigator).icon = mealIcon;
+						break;
+					case(1):
+						(navigators[1] as ViewNavigator).icon = trackingIcon;
+						break;
+					case(2):
+						(navigators[2] as ViewNavigator).icon = medicinesIcon;
+						break;
+					case(3):
+						(navigators[3] as ViewNavigator).icon = glucoseIcon;
+						break;
+					case(4):
+						(navigators[4] as ViewNavigator).icon = exerciseIcon;
+						break;
+					case(5):
+						(navigators[5] as ViewNavigator).icon = settingsIcon;
+						break;
+				}
 			}
 			
 		]]>
