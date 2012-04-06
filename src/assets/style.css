@@ -59,3 +59,17 @@ s|BorderContainer {
 	borderWeight:4;
 	cornerRadius:10
 }
+
+s|TabbedViewNavigator #tabBar
+{
+	chromeColor:#5C89C7  ; /* gives the tabnavigator buttons our special color*/
+}
+
+
+
+s|ActionBar
+{
+	chromeColor: #5C89C7; /* gives our action bar our special color*/ 
+	defaultButtonAppearance: beveled; /* ios style action bar buttons*/ 
+	
+}

@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Style source="assets/style.css"/>
 	<fx:Script>
 		<![CDATA[
+
 			import databaseclasses.*;
 			import databaseclasses.FoodItem;
 			
@@ -50,41 +51,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var  foodItems:ArrayCollection;
 			
 			[Bindable]
-			[Embed(source='assets/meal.JPG')]
+			[Embed(source='assets/ic_tab_meal_selected.png')]
 			private var mealIcon:Class;
 			[Bindable]
-			[Embed(source='assets/exercise.JPG')]
+			[Embed(source='assets/ic_tab_exercise_selected.png')]
 			private var exerciseIcon:Class;
 			[Bindable]
-			[Embed(source='assets/glucose.JPG')]
+			[Embed(source='assets/ic_tab_glucose_selected.png')]
 			private var glucoseIcon:Class;
 			[Bindable]
-			[Embed(source='assets/tracking.JPG')]
+			[Embed(source='assets/ic_tab_tracking_selected.png')]
 			private var trackingIcon:Class;
 			[Bindable]
-			[Embed(source='assets/medicines.JPG')]
+			[Embed(source='assets/ic_tab_medicine_selected.png')]
 			private var medicinesIcon:Class;
 			[Bindable]
-			[Embed(source='assets/settings.JPG')]
+			[Embed(source='assets/ic_tab_settings_selected.png')]
 			private var settingsIcon:Class;
 			[Bindable]
-			[Embed(source='assets/nomeal.JPG')]
+			[Embed(source='assets/ic_tab_meal_unselected.png')]
 			private var nomealIcon:Class;
 			[Bindable]
-			[Embed(source='assets/noexercise.JPG')]
+			[Embed(source='assets/ic_tab_exercise_unselected.png')]
 			private var noexerciseIcon:Class;
 			[Bindable]
-			[Embed(source='assets/noglucose.JPG')]
+			[Embed(source='assets/ic_tab_glucose_unselected.png')]
 			private var noglucoseIconno:Class;
 			[Bindable]
-			[Embed(source='assets/notracking.JPG')]
+			[Embed(source='assets/ic_tab_tracking_unselected.png')]
 			private var notrackingIcon:Class;
 			[Bindable]
-			[Embed(source='assets/nosettings.JPG')]
+			[Embed(source='assets/ic_tab_settings_unselected.png')]
 			private var nosettingsIcon:Class;
+			
 			[Bindable]
-			[Embed(source='assets/nomedicines.JPG')]
+			[Embed(source='assets/ic_tab_medicine_unselected.png')]
 			private var nomedicinesIcon:Class;
+			
 			
 			private var notificationPopUp:Notification;
 			
@@ -95,6 +98,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * It doesn't necessarily need to be used, you can also use modelLocator.getInstance()
 			 */
 			public var modelLocator:ModelLocator = ModelLocator.getInstance();
+			
+
 			
 			/**   
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
@@ -252,11 +257,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		]]>
 	</fx:Script>
 	
-	<s:ViewNavigator icon="@Embed('assets/nomeal.JPG')"   width="100%" height="100%" firstView="views.FoodCounterView"/>
-	<s:ViewNavigator icon="@Embed('assets/notracking.JPG')"  width="100%" height="100%" firstView="views.TrackingView"/>
-	<s:ViewNavigator icon="@Embed('assets/nomedicines.JPG')"   width="100%" height="100%" firstView="views.EditMedicinEventView"/>
-	<s:ViewNavigator icon="@Embed('assets/noglucose.JPG')"  width="100%" height="100%" firstView="views.EditBGEventView"/>
-	<s:ViewNavigator icon="@Embed('assets/noexercise.JPG')"   width="100%" height="100%" firstView="views.EditExerciseEventView"/>
-	<s:ViewNavigator icon="@Embed('assets/nosettings.JPG')"   width="100%" height="100%" firstView="views.SettingsView"/>
+	<s:ViewNavigator icon="@Embed('assets/ic_tab_meal_unselected.png')"   width="100%" height="100%" firstView="views.FoodCounterView"/>
+	<s:ViewNavigator icon="@Embed('assets/ic_tab_tracking_unselected.png')"  width="100%" height="100%" firstView="views.TrackingView"/>
+	<s:ViewNavigator icon="@Embed('assets/ic_tab_medicine_unselected.png')"   width="100%" height="100%" firstView="views.EditMedicinEventView"/>
+	<s:ViewNavigator icon="@Embed('assets/ic_tab_glucose_unselected.png')"  width="100%" height="100%" firstView="views.EditBGEventView"/>
+	<s:ViewNavigator icon="@Embed('assets/ic_tab_exercise_unselected.png')"   width="100%" height="100%" firstView="views.EditExerciseEventView"/>
+	<s:ViewNavigator icon="@Embed('assets/ic_tab_settings_unselected.png')"   width="100%" height="100%" firstView="views.SettingsView"/>
 	
 </s:TabbedViewNavigatorApplication>
