@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 								  xmlns:s="library://ns.adobe.com/flex/spark"
 								  initialize="initApplication()" 
 								  applicationDPI="160" 
+								  skinClass="skins.ApplicationSkin"
 								  >
 	<fx:Style source="HelpDiabetes.css"/>
 	<fx:Declarations>
@@ -31,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Style source="assets/style.css"/>
 	<fx:Script>
 		<![CDATA[
-
+			
 			import databaseclasses.*;
 			import databaseclasses.FoodItem;
 			
@@ -99,7 +100,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			public var modelLocator:ModelLocator = ModelLocator.getInstance();
 			
-
+			
+			
 			
 			/**   
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 

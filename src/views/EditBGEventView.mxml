@@ -233,16 +233,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
 	
-	<s:Rect width="100%" height="100%">
-		<s:fill>
-			<s:LinearGradient rotation="90">
-				<s:entries>
-					<s:GradientEntry color="{styleManager.getStyleDeclaration('.backGroundColorInLists').getStyle('bloodGlucoseEventBackGroundDark')}" ratio="0" alpha="1"/>
-					<s:GradientEntry color="{styleManager.getStyleDeclaration('.backGroundColorInLists').getStyle('bloodGlucoseEventBackGroundLight')}" ratio="1" alpha="1"/>
-				</s:entries>
-			</s:LinearGradient>
-		</s:fill>
-	</s:Rect>		
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
 		<s:layout>
 			<s:VerticalLayout>

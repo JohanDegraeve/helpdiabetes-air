@@ -96,7 +96,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:TextInput id="searchtext" text="{searchtext_text}" width="100%" change="searchTextChanged()" />
 		
 	</s:titleContent>
-	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0"
+	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.ListItemRenderer"
 			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem">
 	</s:List>
 </s:View>

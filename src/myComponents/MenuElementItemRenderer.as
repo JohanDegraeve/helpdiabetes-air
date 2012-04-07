@@ -80,8 +80,18 @@ package myComponents
 		override protected function drawBackground(unscaledWidth:Number, 
 												   unscaledHeight:Number):void
 		{
-			super.drawBackground(unscaledWidth, unscaledHeight);
-			// do any drawing for the background of the item renderer here      		
+			//super.drawBackground(unscaledWidth, unscaledHeight);
+			// do any drawing for the background of the item renderer here   
+			if(itemIndex % 2 == 0) {
+				graphics.beginFill(styleManager.getStyleDeclaration(".listAlternatingColors").getStyle("color1"),1);
+			}
+				
+			else {
+				graphics.beginFill(styleManager.getStyleDeclaration(".listAlternatingColors").getStyle("color2"),1);
+			}
+			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+			graphics.endFill();
+				
 		}
 		
 		/**
