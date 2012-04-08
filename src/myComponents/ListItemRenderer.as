@@ -11,7 +11,11 @@ package myComponents
 		
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
-			//don't draw anything, goal is that there's no background
+			//only draw a border line
+			graphics.lineStyle(1, 0, 0.75);
+			graphics.moveTo(0,unscaledHeight - 1);
+			graphics.lineTo(unscaledWidth,unscaledHeight - 1);
+			graphics.endFill();
 		}
 	}
 }
