@@ -125,7 +125,7 @@ package myComponents
 			_amount_textinput_text = value;
 			if (amount_textinput) {
 				var myStyleSheet:StyleSheet = new StyleSheet();
-				myStyleSheet.parseCSS(defaultAmountOverwritten ? "p {color:#000000;}":"p {color:#9F9E9E;}");
+				myStyleSheet.parseCSS(defaultAmountOverwritten ? "p {font-style:normal;}":"p {font-style:italic;}");
 				amount_textinput.styleSheet = myStyleSheet;
 				amount_textinput.htmlText = "<p>"+value+"</p>";
 			}
@@ -411,9 +411,9 @@ package myComponents
 
 			amount_textinput.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredAmountTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
 			amount_textinput.setLayoutBoundsPosition(textGap + preferredAmountTextAreaWidth + textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
-			_height += ModelLocator.StyleableTextFieldCalculatedHeight;
+			//_height += ModelLocator.StyleableTextFieldCalculatedHeight;
 
-			_height += textGap;//juist adding some gap
+			//_height += textGap;//juist adding some gap
 
 			var preferredMealTextAreaWidth:int = meal_textarea.getPreferredBoundsWidth();
 			meal_textarea.setLayoutBoundsSize(preferredMealTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
@@ -533,7 +533,7 @@ package myComponents
 				amount_textinput.multiline = false;
 				amount_textinput.wordWrap = false;
 				amount_textinput.text = amount_textinput_text;
-				addElement(amount_textinput);
+				//addElement(amount_textinput);
 			}
 			if (!amount_textarea) {
 				amount_textarea = new StyleableTextField();
@@ -542,7 +542,7 @@ package myComponents
 				amount_textarea.multiline = false;
 				amount_textarea.wordWrap = false;
 				amount_textarea.text = amount_textarea_text;
-				addElement(amount_textarea);
+				//addElement(amount_textarea);
 			}
 			if (!meal_textarea) {
 				meal_textarea = new StyleableTextField();

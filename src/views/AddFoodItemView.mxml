@@ -127,7 +127,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (data is SelectedFoodItem) {
 					checkLastMealUpdateRequired = false;
 					mealButtonRequired=false;
-					meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
+					meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " : " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
 					add_button_text = resourceManager.getString('general','save');
 					back_label = resourceManager.getString('general','back');
 					title = "";//resourceManager.getString('addfooditemview','screen_title_edit');
@@ -165,7 +165,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						/* here the details text with the amounts of grams, fat, ... is created */
 						//details_button_fontsize = description_textarea.getStyle("fontSize")*0.8;
 						details_button_text = createDetailsButtonText(0,-1);
-						if (retrievedFoodItem.getUnit(0).standardAmount != 100)
+						//if (retrievedFoodItem.getUnit(0).standardAmount != 100) /* commented out on 8/04 */
 							amount_textinput_text = retrievedFoodItem.getUnit(0).standardAmount.toString();
 						selectedUnit = 0; 
 						
@@ -373,10 +373,11 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					chosenAmount = standardAmount;
 				return chosenAmount + " " +
 					retrievedFoodItem.getUnit(index).unitDescription + " : " +
-					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_carbs_short") + ", " +
+					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_carbs_short") + "";
+					/* ", " +
 					(Math.round(retrievedFoodItem.getUnit(index).fat/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_fat") + ", " +
 					(Math.round(retrievedFoodItem.getUnit(index).protein/standardAmount*chosenAmount  *10)/10)+ " " +  resourceManager.getString("general","gram_of_protein") + ", " +
-					(Math.round(retrievedFoodItem.getUnit(index).kcal/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","kilocalories") + ".";
+					(Math.round(retrievedFoodItem.getUnit(index).kcal/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","kilocalories") + ".";*/
 			}
 			
 		]]>

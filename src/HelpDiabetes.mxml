@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 								  xmlns:s="library://ns.adobe.com/flex/spark"
 								  initialize="initApplication()" 
 								  applicationDPI="160" 
+								  splashScreenImage="@Embed('assets/ic_launcher.png')"
+								  splashScreenScaleMode="letterbox"
 								  skinClass="skins.ApplicationSkin"
 								  >
 	<fx:Style source="HelpDiabetes.css"/>

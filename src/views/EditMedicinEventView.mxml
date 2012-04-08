@@ -255,6 +255,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				ModelLocator.getInstance().trackingList.refresh();
 				navigator.popView();
+				
 			}
 		]]>
 	</fx:Script>
