@@ -28,6 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import myComponents.PickerEvent;
 			
+			import spark.events.TextOperationEvent;
+			
 			[Bindable] private var exerciseText1:String = "";
 			[Bindable] private var exerciseText2:String = "";
 			[Bindable] private var exerciseText3:String = "";
@@ -55,6 +57,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				exerciseText5 = Settings.getInstance().getSetting(Settings.SettingsExerciseType5);
 			}
 			
+			protected function type1_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType1,exerciseText1);
+			}
+			
+			protected function type2_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType2,exerciseText2);
+			}
+			
+			protected function type3_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType3,exerciseText3);
+			}
+			
+			protected function type4_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType4,exerciseText4);
+			}
+			
+			protected function type5_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsExerciseType5,exerciseText5);
+			}
+			
+
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -68,11 +97,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:TextInput id="type1" text="@{exerciseText1}" editable="true" borderVisible="false" textAlign="left" />
-		<s:TextInput id="type2" text="@{exerciseText2}" editable="true" borderVisible="false" textAlign="left"/>
-		<s:TextInput id="type3" text="@{exerciseText3}" editable="true" borderVisible="false" textAlign="left"/>
-		<s:TextInput id="type4" text="@{exerciseText4}" editable="true" borderVisible="false" textAlign="left"/>
-		<s:TextInput id="type5" text="@{exerciseText5}" editable="true" borderVisible="false" textAlign="left"/>
+		<s:TextInput id="type1" text="@{exerciseText1}" editable="true" borderVisible="false" textAlign="left"  change="type1_changeHandler(event)"/>
+		<s:TextInput id="type2" text="@{exerciseText2}" editable="true" borderVisible="false" textAlign="left"  change="type2_changeHandler(event)"/>
+		<s:TextInput id="type3" text="@{exerciseText3}" editable="true" borderVisible="false" textAlign="left"  change="type3_changeHandler(event)"/>
+		<s:TextInput id="type4" text="@{exerciseText4}" editable="true" borderVisible="false" textAlign="left"  change="type4_changeHandler(event)"/>
+		<s:TextInput id="type5" text="@{exerciseText5}" editable="true" borderVisible="false" textAlign="left"  change="type5_changeHandler(event)"/>
 	</s:Group>
 	
 </s:View>

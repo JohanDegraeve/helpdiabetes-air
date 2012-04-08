@@ -25,7 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import databaseclasses.Settings;
 			
 			import mx.events.FlexEvent;
+			
 			import myComponents.PickerEvent;
+			
+			import spark.events.TextOperationEvent;
 			
 			[Bindable] private var medicinText1:String = "";
 			[Bindable] private var medicinText2:String = "";
@@ -53,6 +56,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				medicinText5 = Settings.getInstance().getSetting(Settings.SettingsInsulinType5);
 			}
 			
+			protected function type1_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
+			}
+			
+			protected function type2_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsInsulinType2,medicinText2);
+			}
+			
+			protected function type3_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsInsulinType3,medicinText3);
+			}
+			
+			protected function type4_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsInsulinType4,medicinText4);
+			}
+			
+			protected function type5_changeHandler(event:TextOperationEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsInsulinType5,medicinText5);
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -66,11 +94,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-			<s:TextInput id="type1" text="@{medicinText1}" editable="true" borderVisible="false" textAlign="left" />
-			<s:TextInput id="type2" text="@{medicinText2}" editable="true" borderVisible="false" textAlign="left"/>
-			<s:TextInput id="type3" text="@{medicinText3}" editable="true" borderVisible="false" textAlign="left"/>
-			<s:TextInput id="type4" text="@{medicinText4}" editable="true" borderVisible="false" textAlign="left"/>
-			<s:TextInput id="type5" text="@{medicinText5}" editable="true" borderVisible="false" textAlign="left"/>
+			<s:TextInput id="type1" text="@{medicinText1}" editable="true" borderVisible="false" textAlign="left" change="type1_changeHandler(event)"/>
+			<s:TextInput id="type2" text="@{medicinText2}" editable="true" borderVisible="false" textAlign="left" change="type2_changeHandler(event)"/>
+			<s:TextInput id="type3" text="@{medicinText3}" editable="true" borderVisible="false" textAlign="left" change="type3_changeHandler(event)"/>
+			<s:TextInput id="type4" text="@{medicinText4}" editable="true" borderVisible="false" textAlign="left" change="type4_changeHandler(event)"/>
+			<s:TextInput id="type5" text="@{medicinText5}" editable="true" borderVisible="false" textAlign="left" change="type5_changeHandler(event)"/>
 	</s:Group>
 
 </s:View>

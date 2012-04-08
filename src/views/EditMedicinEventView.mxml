@@ -67,7 +67,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			/**
 			 * if true then this view is created for a new mealevent 
 			 */
-			private var newMealEvent:Boolean;
+			private var newMedicinEvent:Boolean;
 			
 			/**
 			 * stores the medicinevent in case it's an existing event that is being modified, used also in case a new event is created 
@@ -95,7 +95,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					medicinName = (data as MedicinEvent).medicinName;
 					amountText = (new Number((data as MedicinEvent).amount)).toString();
 					add_label = resourceManager.getString('addfooditemview','save_button');
-					newMealEvent = false;
+					newMedicinEvent = false;
 					actionBarVisible = true;
 				} 
 			}
@@ -133,7 +133,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				medicinName = Settings.getInstance().getSetting(parseInt(Settings.getInstance().getSetting(Settings.SettingsDefaultMedicin)));
 				back_label = resourceManager.getString('general','back');
 				add_label = resourceManager.getString('addfooditemview','add_button')
-				newMealEvent = true;
+				newMedicinEvent = true;
 			}
 
 			private function insulinTypeGroupClicked(e:MouseEvent = null):void {
@@ -217,7 +217,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
-				if (newMealEvent) {
+				if (newMedicinEvent) {
 					theMedicinEvent = new MedicinEvent(
 						new Number(amountText),
 						medicinName,
