@@ -270,7 +270,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
 		<s:layout>
-			<s:VerticalLayout>
+			<s:VerticalLayout >
 			</s:VerticalLayout>
 		</s:layout>
 		<s:TextArea y="0" x="0" width="100%" text="{resourceManager.getString('editmedicineventview','addmedicinevent')}" borderVisible="false" editable="false"/>
@@ -279,36 +279,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="insulinTypeText" width="40%" text="{resourceManager.getString('editmedicineventview','medicin')}" editable="false" borderVisible="false"/>
-			<s:Button id="medicinNameTextField" width="60%" label="@{medicinName}" />
+			<s:TextArea  id="insulinTypeText" height="50" width="40%" text="{resourceManager.getString('editmedicineventview','medicin')}" editable="false" borderVisible="false"/>
+			<s:Button id="medicinNameTextField" height="50" width="60%" label="@{medicinName}" />
 		</s:Group>
-		<s:Group id="amountGroup" y="0" x="0" width="100%" click="amountGroupClicked(event)">
+		<s:Group id="amountGroup"  y="0" x="0" width="100%" click="amountGroupClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="amountGroupText" width="30%" text="{resourceManager.getString('editmedicineventview','amount')}" editable="false" borderVisible="false"/>
-			<s:Button id="amount" width="70%" label="@{amountText}" />
+			<s:TextArea  id="amountGroupText" height="50" width="70%" text="{resourceManager.getString('editmedicineventview','amount')}" editable="false" borderVisible="false"/>
+			<s:Button id="amount" height="50" width="30%" label="@{amountText}" />
 		</s:Group>
 		<s:Group id="datumGroup" y="0" x="0" width="100%" click="datumClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="datumtext"  width="30%" text="{resourceManager.getString('general','date')}" editable="false" borderVisible="false"/>
-			<s:Button id="datum" width="70%" label="@{dateText}" />
+			<s:TextArea  id="datumtext" height="50" width="30%" text="{resourceManager.getString('general','date')}" editable="false" borderVisible="false"/>
+			<s:Button id="datum" height="50" width="70%" label="@{dateText}" />
 		</s:Group>
 		<s:Group id="timeGroup" y="0" x="0" width="100%" click="timeClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="timetext"  width="30%" text="{resourceManager.getString('general','time')}" editable="false" borderVisible="false"/>
-			<s:Button id="time" width="70%" label="@{timeText}" />
+			<s:TextArea  id="timetext" height="50" width="30%" text="{resourceManager.getString('general','time')}" editable="false" borderVisible="false"/>
+			<s:Button id="time" height="50" width="70%" label="@{timeText}" />
 		</s:Group>
 		<s:Group id="okGroup" y="0" x="0" width="100%" click="okClicked(event)">
-			<s:Button  id="okButton"   width="100%" label="{add_label}" />
+			<s:Button  id="okButton" height="50"   width="100%" label="{add_label}" />
 		</s:Group>
 	</s:Group>
-
 </s:View>

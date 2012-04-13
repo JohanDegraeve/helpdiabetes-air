@@ -240,27 +240,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="intensity"  width="40%" text="{resourceManager.getString('editexerciseeventview','intensity')}" editable="false" borderVisible="false"/>
-			<s:Button id="exerciseNameTextField" width="60%" label="@{exerciseName}" />
+			<s:TextArea  id="intensity" height="50"  width="40%" text="{resourceManager.getString('editexerciseeventview','intensity')}" editable="false" borderVisible="false"/>
+			<s:Button id="exerciseNameTextField" height="50" width="60%" label="@{exerciseName}" />
 		</s:Group>
 		<s:Group id="datumGroup" y="0" x="0" width="100%" click="datumClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="datumtext"  width="40%" text="{resourceManager.getString('general','date')}" editable="false" borderVisible="false"/>
-			<s:Button id="datum" width="60%" label="@{dateText}" />
+			<s:TextArea  id="datumtext" height="50" width="40%" text="{resourceManager.getString('general','date')}" editable="false" borderVisible="false"/>
+			<s:Button id="datum" height="50" width="60%" label="@{dateText}" />
 		</s:Group>
 		<s:Group id="timeGroup" y="0" x="0" width="100%" click="timeClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="timetext"  width="40%" text="{resourceManager.getString('general','time')}" editable="false" borderVisible="false"/>
-			<s:Button id="time" width="60%" label="@{timeText}" />
+			<s:TextArea  id="timetext" height="50" width="40%" text="{resourceManager.getString('general','time')}" editable="false" borderVisible="false"/>
+			<s:Button id="time" height="50" width="60%" label="@{timeText}" />
 		</s:Group>
 		<s:Group id="okGroup" y="0" x="0" width="100%" click="okClicked(event)">
-			<s:Button  id="okButton" width="100%" label="{add_label}" />
+			<s:Button  id="okButton" height="50" width="100%" label="{add_label}" />
 		</s:Group>
 	</s:Group>
 </s:View>
