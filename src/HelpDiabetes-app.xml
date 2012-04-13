@@ -162,12 +162,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<!-- <contentType></contentType> -->
 			
 			<!-- The icon to display for the file type. Optional. -->
-			<!-- <icon>
-				<image16x16></image16x16>
-				<image32x32></image32x32>
-				<image48x48></image48x48>
-				<image128x128></image128x128>
-			</icon> -->
+	<icon>
+		<image29x29><![CDATA[assets/HelpdiabetesButton_29x29.png]]></image29x29>
+		<image36x36><![CDATA[assets/HelpdiabetesButton_36x36.png]]></image36x36>
+		<image48x48><![CDATA[assets/HelpdiabetesButton_48x48.png]]></image48x48>
+		<image57x57><![CDATA[assets/HelpdiabetesButton_57x57.png]]></image57x57>
+		<image72x72><![CDATA[assets/HelpdiabetesButton_72x72.png]]></image72x72>
+		<image114x114><![CDATA[assets/HelpdiabetesButton_114x114.png]]></image114x114>
+		<image512x512><![CDATA[assets/HelpdiabetesButton_512x512.png]]></image512x512>
+	</icon>
 			
 		<!-- </fileType> -->
 	<!-- </fileTypes> -->
