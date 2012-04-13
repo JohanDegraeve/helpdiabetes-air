@@ -45,6 +45,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.PickerEvent;
 			import myComponents.TimePicker;
 			
+			import spark.components.TabbedViewNavigator;
+			import spark.components.ViewNavigator;
+			
 			private var theBloodGlucoseEvent:BloodGlucoseEvent;
 			private var dateOrTimePicker:Group;
 			private var _eventDateAndTime:Date;
@@ -223,7 +226,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				
 				ModelLocator.getInstance().trackingList.refresh();
-				navigator.popView();
+				ModelLocator.getInstance().trackingList.refresh();
+				//switch to the tracking view
+				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
+				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
 			}
 			
 			
