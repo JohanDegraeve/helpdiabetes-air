@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <!--
 goal is to have label with multiple lines
 copied spark.skins.spark.buttonskin where I removed the maxdisplayedlines but also increased top and bottom in the Label<brt>
-had to remove also lowlight and highlight
+had to remove also lowlight and highlight and some more ...
 -->
 <s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
 			 xmlns:s="library://ns.adobe.com/flex/spark"

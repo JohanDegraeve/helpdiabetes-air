@@ -94,11 +94,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-			<s:TextInput id="type1" text="@{medicinText1}" editable="true" borderVisible="false" textAlign="left" change="type1_changeHandler(event)"/>
-			<s:TextInput id="type2" text="@{medicinText2}" editable="true" borderVisible="false" textAlign="left" change="type2_changeHandler(event)"/>
-			<s:TextInput id="type3" text="@{medicinText3}" editable="true" borderVisible="false" textAlign="left" change="type3_changeHandler(event)"/>
-			<s:TextInput id="type4" text="@{medicinText4}" editable="true" borderVisible="false" textAlign="left" change="type4_changeHandler(event)"/>
-			<s:TextInput id="type5" text="@{medicinText5}" editable="true" borderVisible="false" textAlign="left" change="type5_changeHandler(event)"/>
+			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type1" text="@{medicinText1}" editable="true" borderVisible="false" textAlign="left" change="type1_changeHandler(event)" />
+			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type2" text="@{medicinText2}" editable="true" borderVisible="false" textAlign="left" change="type2_changeHandler(event)"/>
+			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type3" text="@{medicinText3}" editable="true" borderVisible="false" textAlign="left" change="type3_changeHandler(event)"/>
+			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type4" text="@{medicinText4}" editable="true" borderVisible="false" textAlign="left" change="type4_changeHandler(event)"/>
+			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type5" text="@{medicinText5}" editable="true" borderVisible="false" textAlign="left" change="type5_changeHandler(event)"/>
 	</s:Group>
 
 </s:View>
