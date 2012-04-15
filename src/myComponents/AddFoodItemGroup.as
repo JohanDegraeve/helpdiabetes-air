@@ -28,9 +28,12 @@ package myComponents
 	import mx.validators.NumberValidator;
 	import mx.validators.ValidationResult;
 	
+	import skins.ButtonWithLabelOnTwoLinesSkin;
+	
 	import spark.components.Button;
 	import spark.components.DataGroup;
 	import spark.components.Group;
+	import spark.components.Label;
 	import spark.components.supportClasses.GroupBase;
 	import spark.components.supportClasses.StyleableTextField;
 	import spark.globalization.StringTools;
@@ -38,6 +41,8 @@ package myComponents
 	
 	public class AddFoodItemGroup extends Group
 	{
+		private var maxContainerHeight:int;//introduced because it seems that during different runs of updatedisplaylist, the containerwidth is increasing
+		
 		//*********************
 		// textfield with description area
 		//*********************
@@ -343,8 +348,6 @@ package myComponents
 		private var button_DEL:Button;
 		private var button_DecimalPoint:Button;
 
-		
-
 		/**
 		 * the width is set during updatedisplaylist, and used in measure
 		 */
@@ -360,6 +363,7 @@ package myComponents
 		public function AddFoodItemGroup()
 		{
 			super();
+			
 			if (!buttonSizesKnown) {
 				buttonMinimumWidth = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonMinimumWidth");
 				buttonMaximumWidth = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonMaximumWidth");
@@ -386,8 +390,9 @@ package myComponents
 		}
 		
 		override protected function updateDisplayList(containerWidth:Number, containerHeight:Number):void {
-			//super.updateDisplayList(containerWidth,containerHeight);
-		
+			if (maxContainerHeight == 0)
+				maxContainerHeight = containerHeight;
+			
 			var oldwidth:Number = _width;
 			var oldheight:Number = _height;
 			_width=containerWidth;
@@ -402,35 +407,33 @@ package myComponents
 			details_button.setLayoutBoundsSize(containerWidth - textGap * 2,preferredButtonHeight);
 			details_button.setLayoutBoundsPosition(textGap,_height);
 			_height += preferredButtonHeight;
-			
 			_height += textGap;//juist adding some gap
 
-			var preferredAmountTextAreaWidth:int = amount_textarea.getPreferredBoundsWidth();
-			amount_textarea.setLayoutBoundsSize(preferredAmountTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
-			amount_textarea.setLayoutBoundsPosition(textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
+			//amount_textarea.setLayoutBoundsSize(containerWidth - textGap * 2,ModelLocator.StyleableTextFieldCalculatedHeight);
+			//amount_textarea.setLayoutBoundsPosition(textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
 
-			amount_textinput.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredAmountTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
-			amount_textinput.setLayoutBoundsPosition(textGap + preferredAmountTextAreaWidth + textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
+			//amount_textinput.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredAmountTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
+			//amount_textinput.setLayoutBoundsPosition(textGap + preferredAmountTextAreaWidth + textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
 			//_height += ModelLocator.StyleableTextFieldCalculatedHeight;
 
 			//_height += textGap;//juist adding some gap
 
-			var preferredMealTextAreaWidth:int = meal_textarea.getPreferredBoundsWidth();
-			meal_textarea.setLayoutBoundsSize(preferredMealTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
-			meal_textarea.setLayoutBoundsPosition(textGap,_height 
-				+ ModelLocator.offSetSoThatTextIsInTheMiddle + 
-				/* to make sure the text of the textarea is nicely aligned with the text in the mealbutton */(preferredButtonHeight - ModelLocator.StyleableTextFieldCalculatedHeight)/2);
+			//var preferredMealTextAreaWidth:int = meal_textarea.getPreferredBoundsWidth();
+			//meal_textarea.setLayoutBoundsSize(containerWidth - textGap * 2,ModelLocator.StyleableTextFieldCalculatedHeight);
+			//meal_textarea.setLayoutBoundsPosition(textGap,_height 
+			//	+ ModelLocator.offSetSoThatTextIsInTheMiddle + 
+				/* to make sure the text of the textarea is nicely aligned with the text in the mealbutton *//*(preferredButtonHeight - ModelLocator.StyleableTextFieldCalculatedHeight)/2);*/
 			
 			if (mealButtonRequired) {
-				meal_button.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredMealTextAreaWidth,preferredButtonHeight);
-				meal_button.setLayoutBoundsPosition(textGap + preferredMealTextAreaWidth + textGap,_height);
+				preferredButtonHeight = meal_button.getPreferredBoundsHeight();
+				meal_button.setLayoutBoundsSize(containerWidth - textGap * 2,preferredButtonHeight);
+				meal_button.setLayoutBoundsPosition( textGap,_height);
 			}
 			_height += preferredButtonHeight;
-
 			_height += textGap;//juist adding some gap
 			
 			var availableWidthForDigitButtons:int = containerWidth;
-			var buttonHeight:int = Math.floor((containerHeight - _height - buttonGap * 4)/4);
+			var buttonHeight:int = Math.floor((maxContainerHeight - _height - buttonGap * 4)/4);
 			buttonHeight = Math.min(buttonHeight,buttonMaximumHeight);
 
 			var buttonWidth:int = Math.floor((availableWidthForDigitButtons - buttonGap * 4)/3);
@@ -451,36 +454,36 @@ package myComponents
 				button_3.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_4.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_5.addEventListener(MouseEvent.CLICK,digitButtonClicked);
 				button_6.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_7.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_8.addEventListener(MouseEvent.CLICK,digitButtonClicked);
 				button_9.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DecimalPoint.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DEL.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-				
-				button_0.setLayoutBoundsSize(buttonWidth, buttonHeight);button_1.setLayoutBoundsSize(buttonWidth, buttonHeight);button_2.setLayoutBoundsSize(buttonWidth, buttonHeight);button_3.setLayoutBoundsSize(buttonWidth, buttonHeight);
-				button_4.setLayoutBoundsSize(buttonWidth, buttonHeight);button_5.setLayoutBoundsSize(buttonWidth, buttonHeight);button_6.setLayoutBoundsSize(buttonWidth, buttonHeight);button_7.setLayoutBoundsSize(buttonWidth, buttonHeight);
-				button_8.setLayoutBoundsSize(buttonWidth, buttonHeight);button_9.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DecimalPoint.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DEL.setLayoutBoundsSize(buttonWidth, buttonHeight);
-				
-				button_1.setLayoutBoundsPosition(leftOffset ,_height);
-				button_2.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
-				button_3.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
-				_height += buttonHeight + buttonGap  ;
-				button_4.setLayoutBoundsPosition(leftOffset ,_height);
-				button_5.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
-				button_6.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
-				_height += buttonHeight + buttonGap  ;
-				button_7.setLayoutBoundsPosition(leftOffset ,_height);
-				button_8.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
-				button_9.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
-				_height += buttonHeight + buttonGap  ;
-				button_DecimalPoint.setLayoutBoundsPosition(leftOffset ,_height);
-				button_0.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
-				button_DEL.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
-				_height += buttonHeight + buttonGap  ;
 			} else {
-				//we don't need to recreate all buttons because they already exist, but we do need to continue calculating _height
-				//here I just repeated all increase of _height as done in case buttons are created
-				_height += buttonHeight + buttonGap;
-				_height += buttonHeight + buttonGap;
-				_height += buttonHeight + buttonGap;
-				_height += buttonHeight + buttonGap;  
 			}
+
+			button_0.setLayoutBoundsSize(buttonWidth, buttonHeight);button_1.setLayoutBoundsSize(buttonWidth, buttonHeight);button_2.setLayoutBoundsSize(buttonWidth, buttonHeight);button_3.setLayoutBoundsSize(buttonWidth, buttonHeight);
+			button_4.setLayoutBoundsSize(buttonWidth, buttonHeight);button_5.setLayoutBoundsSize(buttonWidth, buttonHeight);button_6.setLayoutBoundsSize(buttonWidth, buttonHeight);button_7.setLayoutBoundsSize(buttonWidth, buttonHeight);
+			button_8.setLayoutBoundsSize(buttonWidth, buttonHeight);button_9.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DecimalPoint.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DEL.setLayoutBoundsSize(buttonWidth, buttonHeight);
 			
+			button_1.setLayoutBoundsPosition(leftOffset ,_height);
+			button_2.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+			button_3.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+			_height += buttonHeight + buttonGap  ;
+			button_4.setLayoutBoundsPosition(leftOffset ,_height);
+			button_5.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+			button_6.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+			_height += buttonHeight + buttonGap  ;
+			button_7.setLayoutBoundsPosition(leftOffset ,_height);
+			button_8.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+			button_9.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+			_height += buttonHeight + buttonGap  ;
+			button_DecimalPoint.setLayoutBoundsPosition(leftOffset ,_height);
+			button_0.setLayoutBoundsPosition(leftOffset + buttonGap + buttonWidth,_height);
+			button_DEL.setLayoutBoundsPosition(leftOffset + (buttonGap + buttonWidth)*2 ,_height);
+			
+			//here I just repeated all increase of _height as done in case buttons are created
+			_height += buttonHeight + buttonGap  ;
+			_height += buttonHeight + buttonGap;
+			_height += buttonHeight + buttonGap;
+			_height += buttonHeight + buttonGap;
+			_height += buttonHeight + buttonGap;  
+
 			if ((oldwidth != _width) || (oldheight != _height))
 				invalidateSize();
 		}
@@ -521,6 +524,7 @@ package myComponents
 			if (!details_button) {
 				details_button = new Button();
 				details_button.styleName = this;
+				details_button.setStyle('skinClass', Class(skins.ButtonWithLabelOnTwoLinesSkin));
 				details_button.label = details_button_text;
 				if (_details_button_click_function != null && mealButtonRequired)
 					details_button.addEventListener(flash.events.MouseEvent.CLICK,_details_button_click_function);
@@ -551,7 +555,7 @@ package myComponents
 				meal_textarea.multiline = false;
 				meal_textarea.wordWrap = false;
 				meal_textarea.text = meal_textarea_text;
-				addElement(meal_textarea);
+				//addElement(meal_textarea);
 			}
 			if (!meal_button && mealButtonRequired) {
 				meal_button = new Button();
