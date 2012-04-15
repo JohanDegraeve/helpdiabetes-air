@@ -16,6 +16,11 @@ package myComponents
 			graphics.moveTo(0,unscaledHeight - 1);
 			graphics.lineTo(unscaledWidth,unscaledHeight - 1);
 			graphics.endFill();
+			if (down) {
+				graphics.beginFill(0, 0.25);
+				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+				graphics.endFill();
+			}
 		}
 	}
 }
