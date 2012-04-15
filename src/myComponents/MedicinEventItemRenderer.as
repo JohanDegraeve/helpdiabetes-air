@@ -147,6 +147,8 @@ package myComponents
 			graphics.beginGradientFill(GradientType.LINEAR, backGroundColors, alphas, ratios, matrix);
 			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 			graphics.endFill();
+			
+			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
 		}
 	}
 }

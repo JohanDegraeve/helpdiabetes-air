@@ -136,6 +136,12 @@ package myComponents
 			graphics.beginFill(    ((itemCounter++)%2 == 0) ? _mealEventBGColorDark:_mealEventBGColorLight, 1);
 			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 			graphics.endFill();
+
+			if (down) {
+				graphics.beginFill(0, 0.25);
+				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+				graphics.endFill();
+			}
 		}
 		
 

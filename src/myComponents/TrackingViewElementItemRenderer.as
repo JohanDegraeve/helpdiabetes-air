@@ -37,8 +37,18 @@ package myComponents
 		 * if Item is null, then the implementation should try to calculate the height for the own data property<br>
 		 */
 		public function getHeight(item:TrackingViewElement = null):Number {
-			return 0;			
+			return 0;				
 		}
+		
+		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
+		{
+			if (down) {
+				graphics.beginFill(0, 0.25);
+				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+				graphics.endFill();
+			}
+		}
+
 		
 		/**
 		 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and override getHeight and getWidth and calculate the 
