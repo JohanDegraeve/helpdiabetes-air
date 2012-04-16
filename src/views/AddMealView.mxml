@@ -98,7 +98,7 @@ view to add a new meal
 				date_button_text = dateformatter.format(_currentDateAndTime);
 				time_button_text = timeformatter.format(_currentDateAndTime);
 				if (!_userChangedMealName)
-					mealname_textarea_text = resourceManager.getString('addmealview','meal') + " " + timeformatter.format(currentDateAndTime);
+					mealname_textarea_text = resourceManager.getString('addmealview','meal') ;
 			}
 			
 			private function onCreationComplete():void {
@@ -184,7 +184,7 @@ view to add a new meal
 		</s:layout>
 		
 		<!-- the mealname -->
-		<s:TextArea id="meal_name"  width="100%" text="@{mealname_textarea_text}" editable="true" change="{_userChangedMealName = true}" />
+		<s:TextArea id="meal_name" contentBackgroundColor="0xDCDCDC" borderVisible="false" width="100%" text="@{mealname_textarea_text}" editable="true" change="{_userChangedMealName = true}" />
 		
 		<!-- the date -->
 		<s:Button id="date_button" width="100%" label="{date_button_text}" click="dateClicked()" />

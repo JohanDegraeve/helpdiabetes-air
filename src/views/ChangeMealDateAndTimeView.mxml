@@ -172,7 +172,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 		</s:layout>
 		
 		<!-- the mealname -->
-		<s:TextArea id="meal_name"  width="100%" text="{mealname_textarea_text}" editable="false" />
+		<s:TextInput contentBackgroundAlpha="0" color="black" borderVisible="false" textAlign="left" id="meal_name"  width="100%" text="{mealname_textarea_text}" editable="true" />
 		
 		<!-- the date -->
 		<s:Button id="date_button" width="100%" label="{date_button_text}" click="dateClicked()" />
