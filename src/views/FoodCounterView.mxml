@@ -28,9 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+	
+	
 	<fx:Metadata>
 		[ResourceBundle("foodcounterview")]
 	</fx:Metadata>
+	
 	<fx:Script>
 		<![CDATA[
 			import model.ModelLocator;

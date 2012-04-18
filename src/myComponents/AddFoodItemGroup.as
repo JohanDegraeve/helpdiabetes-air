@@ -440,23 +440,6 @@ package myComponents
 			buttonWidth = Math.min(buttonWidth,buttonMaximumWidth);
 			var leftOffset:int = Math.floor((availableWidthForDigitButtons - 3 * buttonWidth - 2 * buttonGap)/2);
 			
-			if (button_0 == null) {
-				button_0 = new Button();button_1 = new Button();button_2 = new Button();button_3 = new Button();button_4 = new Button();button_5 = new Button();
-				button_6 = new Button();button_7 = new Button();button_8 = new Button();button_9 = new Button();button_DecimalPoint = new Button();button_DEL = new Button();
-				
-				button_0.label = "0";button_1.label = "1";button_2.label = "2";button_3.label = "3";button_4.label = "4";button_5.label = "5";
-				button_6.label = "6";button_7.label = "7";button_8.label = "8";button_9.label = "9";button_DecimalPoint.label = ".";button_DEL.label = "<";
-				
-				addElement(button_0);addElement(button_1);addElement(button_2);addElement(button_3);addElement(button_4);addElement(button_5);
-				addElement(button_6);addElement(button_7);addElement(button_8);addElement(button_9);addElement(button_DEL);addElement(button_DecimalPoint);
-				
-				button_0.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_1.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_2.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-				button_3.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_4.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_5.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-				button_6.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_7.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_8.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-				button_9.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DecimalPoint.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DEL.addEventListener(MouseEvent.CLICK,digitButtonClicked);
-			} else {
-			}
-
 			button_0.setLayoutBoundsSize(buttonWidth, buttonHeight);button_1.setLayoutBoundsSize(buttonWidth, buttonHeight);button_2.setLayoutBoundsSize(buttonWidth, buttonHeight);button_3.setLayoutBoundsSize(buttonWidth, buttonHeight);
 			button_4.setLayoutBoundsSize(buttonWidth, buttonHeight);button_5.setLayoutBoundsSize(buttonWidth, buttonHeight);button_6.setLayoutBoundsSize(buttonWidth, buttonHeight);button_7.setLayoutBoundsSize(buttonWidth, buttonHeight);
 			button_8.setLayoutBoundsSize(buttonWidth, buttonHeight);button_9.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DecimalPoint.setLayoutBoundsSize(buttonWidth, buttonHeight);button_DEL.setLayoutBoundsSize(buttonWidth, buttonHeight);
@@ -565,6 +548,22 @@ package myComponents
 				meal_button.label = meal_button_text;
 				addElement(meal_button);
 			}
+			if (button_0 == null) {
+				button_0 = new Button();button_1 = new Button();button_2 = new Button();button_3 = new Button();button_4 = new Button();button_5 = new Button();
+				button_6 = new Button();button_7 = new Button();button_8 = new Button();button_9 = new Button();button_DecimalPoint = new Button();button_DEL = new Button();
+				
+				button_0.label = "0";button_1.label = "1";button_2.label = "2";button_3.label = "3";button_4.label = "4";button_5.label = "5";
+				button_6.label = "6";button_7.label = "7";button_8.label = "8";button_9.label = "9";button_DecimalPoint.label = ".";button_DEL.label = "<";
+				
+				addElement(button_0);addElement(button_1);addElement(button_2);addElement(button_3);addElement(button_4);addElement(button_5);
+				addElement(button_6);addElement(button_7);addElement(button_8);addElement(button_9);addElement(button_DEL);addElement(button_DecimalPoint);
+				
+				button_0.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_1.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_2.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+				button_3.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_4.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_5.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+				button_6.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_7.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_8.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+				button_9.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DecimalPoint.addEventListener(MouseEvent.CLICK,digitButtonClicked);button_DEL.addEventListener(MouseEvent.CLICK,digitButtonClicked);
+			} 
+
 		}
 	}
 }
