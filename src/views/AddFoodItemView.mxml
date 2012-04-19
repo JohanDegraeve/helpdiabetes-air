@@ -147,7 +147,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					if (checkLastMealUpdateRequired)
 						checkLastMealUpdate();
 					meal_button_text = 	 
-						(((new Date()).getDate() == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).getDate()) ? 
+						(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
 							"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
 						+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
 						+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
@@ -209,7 +209,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
 				meal_button_text = 	 
-					(((new Date()).getDate() == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).getDate()) ? 
+					(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
 						"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
 					+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
 					+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
@@ -218,7 +218,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private function onSelectedMealInitialized(e:flash.events.Event):void {
 				checkLastMealUpdate();
 				meal_button_text = 	 
-					(((new Date()).getDate() == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).getDate()) ? 
+					(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
 						"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
 					+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
 					+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;

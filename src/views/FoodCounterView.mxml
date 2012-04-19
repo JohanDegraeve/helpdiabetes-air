@@ -36,10 +36,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.Database;
+			import databaseclasses.DatabaseEvent;
+			import databaseclasses.FoodItem;
+			import databaseclasses.Settings;
+			import databaseclasses.UnitChangedEvent;
+			
 			import model.ModelLocator;
 			
+			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
+			
+			import myComponents.Notification;
+			import myComponents.PickerEvent;
+			import myComponents.elementFromListPicker;
 			
 			import spark.events.IndexChangeEvent;
 			import spark.events.ViewNavigatorEvent;
@@ -55,6 +67,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var excelSorting:ExcelSorting;
 			
+			private var notificationPopUp:Notification;
+			
+			private var elementPicker:elementFromListPicker;
+			private var  foodItems:ArrayCollection;
+
 			
 			private function init():void {
 				/* add event listener for clicking item */
@@ -69,6 +86,132 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					return;
 				ModelLocator.getInstance().firstStartUp = false;
 				navigator.pushView(dummyView);
+				
+				var dispatcher:EventDispatcher = new EventDispatcher();
+				var thisObject:DisplayObject =  this;
+				if (Database.databaseExists()) {
+					onReturn();
+				} else {
+					notificationPopUp = new Notification();
+					notificationPopUp.notificationText = resourceManager.getString('helpdiabetes','infoaboutlanguageselection')
+					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
+					PopUpManager.addPopUp(notificationPopUp, thisObject, true);
+					PopUpManager.centerPopUp(notificationPopUp);
+					/*elementPicker = new elementFromListPicker();
+					elementPicker.elements = new ArrayCollection([
+						resourceManager.getString('general','english'),
+						resourceManager.getString('general','dutch')]);
+					elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, okClicked);
+					elementPicker.addEventListener(Event.REMOVED_FROM_STAGE,okClicked);
+					elementPicker.labelText1 = resourceManager.getString('general','choose_language');
+					
+					PopUpManager.addPopUp(elementPicker,thisObject,true);
+					PopUpManager.centerPopUp(elementPicker);*/
+				}
+				
+				function okClicked(event: PickerEvent):void {
+					if (notificationPopUp != null) {
+						PopUpManager.removePopUp(notificationPopUp);
+						if (notificationPopUp.hasEventListener(PickerEvent.PICKER_SET)) {
+							notificationPopUp.removeEventListener(PickerEvent.PICKER_SET, okClicked);
+						}
+					}
+					elementPicker = new elementFromListPicker();
+					elementPicker.elements = new ArrayCollection([
+						resourceManager.getString('general','english'),
+						resourceManager.getString('general','dutch')]);
+					elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, onReturn);
+					elementPicker.addEventListener(Event.REMOVED_FROM_STAGE,onReturn);
+					elementPicker.labelText1 = resourceManager.getString('general','choose_language');
+					
+					PopUpManager.addPopUp(elementPicker,thisObject,true);
+					PopUpManager.centerPopUp(elementPicker);
+				}
+				
+				function onReturn(event: Event = null): void
+				{
+					if (elementPicker != null) {
+						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
+							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, onReturn);
+							elementPicker.removeEventListener(Event.REMOVED_FROM_STAGE,onReturn);
+						}
+						PopUpManager.removePopUp(elementPicker);
+					}
+					
+					//we initialize first the localechain in the settngs to the current localechain
+					var localeChainAsString:String;
+					for (var i:int = 0;i <resourceManager.localeChain.length;i++) {
+						localeChainAsString += resourceManager.localeChain[i];
+					}
+					
+					//if event is a unitchangedevent, it means we got here after user clicked a language, so we'll change now the settings
+					//if event is not a unitchaged event, it means this application doesn't start first the first itme, so a database already existed and user didn't have to pick a preferred language
+					if (event is UnitChangedEvent)  {
+						if ((event as UnitChangedEvent).index == 0) {
+							resourceManager.localeChain = ["en_US","nl_NL"];
+							localeChainAsString = "en_US,nl_NL";
+						}
+						if ((event as UnitChangedEvent).index == 1) {
+							resourceManager.localeChain = ["nl_NL","en_US"];
+							localeChainAsString = "nl_NL,en_US";
+						}
+					}
+					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
+					Settings.getInstance().setSettingWithoutDatabaseUpdate(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
+					
+					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
+					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
+					Database.getInstance().init(dispatcher);
+				}
+				
+				function onInitResult(event:Event):void
+				{
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
+					
+					//time to check if localechain has a new value retrieved from the database
+					var localeChainAsString:String = Settings.getInstance().getSetting(Settings.SettingsLOCALECHAIN_asString);
+					var localeChainAsArray:Array = localeChainAsString.split(",");
+					resourceManager.localeChain = [];
+					for (var j:int = 0;j < localeChainAsArray.length; j++) {
+						resourceManager.localeChain.push(localeChainAsArray[j]);
+					}
+					
+					//time to set the labels
+					ModelLocator.getInstance().resetLabels();
+					
+					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
+					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
+					Database.getInstance().getAllFoodItemDescriptions(dispatcher);
+				}
+				
+				function onInitError(event:Event):void
+				{	
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
+				}
+				
+				function retrieveFoodItemList(de:DatabaseEvent):void {
+					foodItems = new ArrayCollection();
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
+					
+					if (de.data && de.data is Array) {
+						for each ( var o:Object in de.data )
+						{
+							foodItems.addItem(new FoodItem(o.description as String, new ArrayCollection(), o.itemid as int));
+						}
+						ModelLocator.getInstance().foodItemList = foodItems;
+					} 
+				}
+				
+				function onRetrieveListError(event:Event):void
+				{	
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
+				}
+				
+				
 			}
 
 			
