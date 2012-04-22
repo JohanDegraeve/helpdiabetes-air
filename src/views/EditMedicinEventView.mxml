@@ -273,41 +273,66 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout >
 			</s:VerticalLayout>
 		</s:layout>
-		<s:Label y="0" x="0" width="100%" text="{resourceManager.getString('editmedicineventview','addmedicinevent')}" />
+		<s:Label y="0" x="0" width="100%" text="{resourceManager.getString('editmedicineventview','addmedicinevent')}" height="100%" maxHeight="75"  textAlign="center" verticalAlign="middle"/>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
 		<s:Group id="insulinTypeGroup" y="0" x="0" width="100%" click="insulinTypeGroupClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  id="insulinTypeText" height="50" width="40%" text="{resourceManager.getString('editmedicineventview','medicin')}" />
-			<s:Button id="medicinNameTextField" height="50" width="60%" label="@{medicinName}" />
+			<s:Label  id="insulinTypeText" height="47" width="40%" text="{resourceManager.getString('editmedicineventview','medicin')}" verticalAlign="middle"/>
+			<s:Button id="medicinNameTextField" height="47" width="60%" label="@{medicinName}" />
 		</s:Group>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
 		<s:Group id="amountGroup"  y="0" x="0" width="100%" click="amountGroupClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  id="amountGroupText" height="50" width="70%" text="{resourceManager.getString('editmedicineventview','amount')}" />
-			<s:Button id="amount" height="50" width="30%" label="@{amountText}" />
+			<s:Label  id="amountGroupText" height="47" width="70%" text="{resourceManager.getString('editmedicineventview','amount')}"  verticalAlign="middle"/>
+			<s:Button id="amount" height="47" width="30%" label="@{amountText}" />
 		</s:Group>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
 		<s:Group id="datumGroup" y="0" x="0" width="100%" click="datumClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  id="datumtext" height="50" width="30%" text="{resourceManager.getString('general','date')}" />
-			<s:Button id="datum" height="50" width="70%" label="@{dateText}" />
+			<s:Label  id="datumtext" height="47" width="30%" text="{resourceManager.getString('general','date')}"  verticalAlign="middle"/>
+			<s:Button id="datum" height="47" width="70%" label="@{dateText}" />
 		</s:Group>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
 		<s:Group id="timeGroup" y="0" x="0" width="100%" click="timeClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  id="timetext" height="50" width="30%" text="{resourceManager.getString('general','time')}" />
-			<s:Button id="time" height="50" width="70%" label="@{timeText}" />
+			<s:Label  id="timetext" height="47" width="30%" text="{resourceManager.getString('general','time')}"  verticalAlign="middle"/>
+			<s:Button id="time" height="47" width="70%" label="@{timeText}" />
 		</s:Group>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
 		<s:Group id="okGroup" y="0" x="0" width="100%" click="okClicked(event)">
-			<s:Button  id="okButton" height="50"   width="100%" label="{add_label}" />
+			<s:Button  id="okButton" height="47"   width="100%" label="{add_label}" />
 		</s:Group>
 	</s:Group>
 </s:View>

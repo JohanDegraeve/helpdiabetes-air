@@ -220,7 +220,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:Label  y="0" x="0" width="100%" height="100%" maxHeight="100" text="{resourceManager.getString('settingsboluscalculationview','explainingtext')}"/>
+		<s:Label  y="0" x="0" width="100%"  text="{resourceManager.getString('settingsboluscalculationview','explainingtext')}"/>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
 		<s:Group id="breakfastSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="breakfastSettingClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
@@ -229,6 +234,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:Label  width="60%" text="{resourceManager.getString('general','breakfast') }" />
 			<s:Button id="breakfastRatio" width="40%" label="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST)}"  />
 		</s:Group>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
 		<s:Group id="lunchSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="lunchSettingClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
@@ -237,6 +247,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:Label width="60%" text="{resourceManager.getString('general','lunch') }" />
 			<s:Button id="lunchRatio" width="40%" label="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_LUNCH)}" />
 		</s:Group>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
 		<s:Group id="snackSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="snackSettingClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
@@ -245,6 +260,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:Label width="60%" text="{resourceManager.getString('general','snack') }" />
 			<s:Button id="snackRatio" width="40%" label="{Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SNACK)}" />
 		</s:Group>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
 		<s:Group id="supperSetting" y="0" x="0" width="100%" height = "100%" maxHeight="50" click="supperSettingClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
