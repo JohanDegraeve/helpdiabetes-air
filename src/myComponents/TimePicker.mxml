@@ -207,7 +207,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			}
 		]]>
 	</fx:Script>
-	<s:BorderContainer >
+	<s:BorderContainer>
 		
 		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
 			<s:Label text="{timeFormatter.format(currentTime)}" width="100%" styleName="textColorInPickerOnDarkBackground"/>

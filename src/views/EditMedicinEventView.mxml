@@ -273,13 +273,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout >
 			</s:VerticalLayout>
 		</s:layout>
-		<s:TextArea y="0" x="0" width="100%" text="{resourceManager.getString('editmedicineventview','addmedicinevent')}" borderVisible="false" editable="false"/>
+		<s:Label y="0" x="0" width="100%" text="{resourceManager.getString('editmedicineventview','addmedicinevent')}" />
 		<s:Group id="insulinTypeGroup" y="0" x="0" width="100%" click="insulinTypeGroupClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="insulinTypeText" height="50" width="40%" text="{resourceManager.getString('editmedicineventview','medicin')}" editable="false" borderVisible="false"/>
+			<s:Label  id="insulinTypeText" height="50" width="40%" text="{resourceManager.getString('editmedicineventview','medicin')}" />
 			<s:Button id="medicinNameTextField" height="50" width="60%" label="@{medicinName}" />
 		</s:Group>
 		<s:Group id="amountGroup"  y="0" x="0" width="100%" click="amountGroupClicked(event)">
@@ -287,7 +287,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="amountGroupText" height="50" width="70%" text="{resourceManager.getString('editmedicineventview','amount')}" editable="false" borderVisible="false"/>
+			<s:Label  id="amountGroupText" height="50" width="70%" text="{resourceManager.getString('editmedicineventview','amount')}" />
 			<s:Button id="amount" height="50" width="30%" label="@{amountText}" />
 		</s:Group>
 		<s:Group id="datumGroup" y="0" x="0" width="100%" click="datumClicked(event)">
@@ -295,7 +295,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="datumtext" height="50" width="30%" text="{resourceManager.getString('general','date')}" editable="false" borderVisible="false"/>
+			<s:Label  id="datumtext" height="50" width="30%" text="{resourceManager.getString('general','date')}" />
 			<s:Button id="datum" height="50" width="70%" label="@{dateText}" />
 		</s:Group>
 		<s:Group id="timeGroup" y="0" x="0" width="100%" click="timeClicked(event)">
@@ -303,7 +303,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  id="timetext" height="50" width="30%" text="{resourceManager.getString('general','time')}" editable="false" borderVisible="false"/>
+			<s:Label  id="timetext" height="50" width="30%" text="{resourceManager.getString('general','time')}" />
 			<s:Button id="time" height="50" width="70%" label="@{timeText}" />
 		</s:Group>
 		<s:Group id="okGroup" y="0" x="0" width="100%" click="okClicked(event)">

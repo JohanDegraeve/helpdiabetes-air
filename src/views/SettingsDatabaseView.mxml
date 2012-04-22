@@ -68,7 +68,7 @@
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextArea  width="60%" text="{resourceManager.getString('settingsdatabaseview','trackingviewsize') }" editable="false" borderVisible="false"/>
+			<s:Label  width="60%" text="{resourceManager.getString('settingsdatabaseview','trackingviewsize') }" />
 			<s:Button id="trackingsizeButton" width="40%" label="{Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)}"  />
 		</s:Group>
 	</s:Group>
