@@ -10,8 +10,8 @@ s|Application {fontSize:20pt}
 }
 
 .trackingItemHeights {
-	offsetToPutTextInTheMiddle:15;
-	bloodglucoseevent:40pt;
+	offsetToPutTextInTheMiddle:13;
+	trackingevent:40pt;/* height for standard events like bloodglucoseevent..*/
 }
 
 /* typically for text that should be smaller than normal text */
@@ -23,20 +23,6 @@ s|Application {fontSize:20pt}
 	paddingRight:4pt;
 }
 
-.backGroundColorInLists {/* colors used in background of list elements */
-	darkBlueLight:#CCCCFE; /* used in daylineitemrenderer , there's always a light and a dark side for each color , used in gradient fill*/ 
-	darkBlueDark:#3333FF; /* used in daylineitemrenderer , there's always a light and a dark side for each color , used in gradient fill*/
- 	lightBlueLight:#0CD9F8; /* used in daylineitemrenderer , there's always a light and a dark side for each color , used in gradient fill*/
-	lightBlueDark:#5C939B; /* used in daylineitemrenderer , there's always a light and a dark side for each color , used in gradient fill*/
-	mealEventBackGroundLight:#FFFFFF; /*back ground color for mealevent in trackingview*/
-	mealEventBackGroundDark:#BCD7C6; /*back ground color for mealevent in trackingview*/	
-	bloodGlucoseEventBackGroundLight:#FFFFFF; /*back ground color for bloodglucose in trackingview*/
-	bloodGlucoseEventBackGroundDark:#FFDDED; /*back ground color for boodglucose in trackingview*/	
-	medicinEventBackGroundDark:#FFA663;
-	medicinEventBackGroundLight:#FFFFFF;
-	exerciseEventBackGroundDark:#DAB7FF;
-	exerciseEventBackGroundLight:#FFFFFF;
-}
 
 .removePaddingBottomForStyleableTextField {
 	/* StyleableTextFIeld seems to have a large paddingBottom which I was not able to remove so what i did : */

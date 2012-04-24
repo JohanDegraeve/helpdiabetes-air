@@ -30,7 +30,7 @@ package myComponents
 
 	public class MedicinEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("bloodglucoseevent");
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("trackingevent");
 		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
 		
 		private static var MINIMUM_AMOUNT_WIDTH:int = 100;
@@ -53,11 +53,13 @@ package myComponents
 		private var _amount:String;
 
 		private function get amount():String
+
 		{
 			return _amount;
 		}
 
 		private function set amount(value:String):void
+
 		{
 			if (value == _amount)
 				return;
@@ -69,21 +71,9 @@ package myComponents
 			}
 		}
 
-		private static var _medicinEventBGColorDark:* = 0;
-		private static var _medicinEventBGColorLight:* = 0;
-		private static var backGroundColors:Array ;
-		private static var alphas:Array = [1, 1];
-		private static var ratios:Array = [0, 255];
-		private static var matrix:Matrix = new Matrix();
-		
 		public function MedicinEventItemRenderer()
 		{
 			super();
-			if (_medicinEventBGColorDark == 0) {
-				_medicinEventBGColorDark = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("medicinEventBackGroundDark");
-				_medicinEventBGColorLight = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("medicinEventBackGroundLight");
-				backGroundColors = [_medicinEventBGColorDark, _medicinEventBGColorLight];
-			}
 		}
 
 		override public function set data(value:Object):void {
@@ -141,11 +131,6 @@ package myComponents
 		
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
-			matrix.createGradientBox(unscaledWidth, unscaledHeight, Math.PI / 2, 0, 0);
-			graphics.beginGradientFill(GradientType.LINEAR, backGroundColors, alphas, ratios, matrix);
-			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
-			graphics.endFill();
-			
 			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
 		}
 	}

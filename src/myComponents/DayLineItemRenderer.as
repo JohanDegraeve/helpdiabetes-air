@@ -63,30 +63,6 @@ package myComponents
 		 */
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
-			var darkBlueLight:* = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("darkBlueLight");
-			var darkBlueDark:* = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("darkBlueDark");
-			var lightBlueLight:* = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("lightBlueLight");
-			var lightBlueDark:* = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("lightBlueDark");
-			
-			var darkBackGroundColors:Array = [darkBlueDark, darkBlueLight];
-			var lightBackGroundColors:Array = [lightBlueDark, lightBlueLight];
-			var alphas:Array = [1, 1];
-			var ratios:Array = [0, 255];
-			var matrix:Matrix = new Matrix();
-			
-			// draw the heading gradient first
-			var backGroundColors:Array = lightBackGroundColors;
-			if (data)
-				if (data is DayLine) {
-					var day:Number = new Date((data as DayLine).timeStamp).day;
-					if (day == 0 || day == 6)
-						backGroundColors = darkBackGroundColors;
-				}
-			matrix.createGradientBox(unscaledWidth, unscaledHeight, Math.PI / 2, 0, 0);
-			graphics.beginGradientFill(GradientType.LINEAR, backGroundColors, alphas, ratios, matrix);
-			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
-			graphics.endFill();
-			
 			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
 		}
 	}

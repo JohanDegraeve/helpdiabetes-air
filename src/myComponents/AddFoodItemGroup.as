@@ -41,7 +41,7 @@ package myComponents
 	
 	public class AddFoodItemGroup extends Group
 	{
-		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("bloodglucoseevent");
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("trackingevent");
 		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
 		
 		private var maxContainerHeight:int;//introduced because it seems that during different runs of updatedisplaylist, the containerwidth is increasing
@@ -412,20 +412,6 @@ package myComponents
 			_height += preferredButtonHeight;
 			_height += textGap;//juist adding some gap
 
-			//amount_textarea.setLayoutBoundsSize(containerWidth - textGap * 2,ModelLocator.StyleableTextFieldCalculatedHeight);
-			//amount_textarea.setLayoutBoundsPosition(textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
-
-			//amount_textinput.setLayoutBoundsSize(containerWidth - textGap * 3 - preferredAmountTextAreaWidth,ModelLocator.StyleableTextFieldCalculatedHeight);
-			//amount_textinput.setLayoutBoundsPosition(textGap + preferredAmountTextAreaWidth + textGap,_height + ModelLocator.offSetSoThatTextIsInTheMiddle);
-			//_height += ModelLocator.StyleableTextFieldCalculatedHeight;
-
-			//_height += textGap;//juist adding some gap
-
-			//var preferredMealTextAreaWidth:int = meal_textarea.getPreferredBoundsWidth();
-			//meal_textarea.setLayoutBoundsSize(containerWidth - textGap * 2,ModelLocator.StyleableTextFieldCalculatedHeight);
-			//meal_textarea.setLayoutBoundsPosition(textGap,_height 
-			//	+ ModelLocator.offSetSoThatTextIsInTheMiddle + 
-				/* to make sure the text of the textarea is nicely aligned with the text in the mealbutton *//*(preferredButtonHeight - ModelLocator.StyleableTextFieldCalculatedHeight)/2);*/
 			
 			if (mealButtonRequired) {
 				preferredButtonHeight = meal_button.getPreferredBoundsHeight();

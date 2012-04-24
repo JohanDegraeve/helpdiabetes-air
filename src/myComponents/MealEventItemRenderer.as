@@ -63,6 +63,7 @@ package myComponents
 		 * defines if the selected fooditems are to be shown or not. 
 		 */
 		private function get mealExtended():Boolean
+
 		{
 			return _mealExtended;
 		}
@@ -70,7 +71,9 @@ package myComponents
 		/**
 		 * @private
 		 */
+
 		private function set mealExtended(value:Boolean):void
+
 		{
 			_mealExtended = value;
 		}
@@ -95,6 +98,7 @@ package myComponents
 		private var _carbAmount:String;
 
 		private function get carbAmount():String
+
 		{
 			return _carbAmount;
 		}
@@ -103,6 +107,7 @@ package myComponents
 		 * sets _carbAmount, if carbAmountDisplay not null then also invalidateSize() is called
 		 */
 		private function set carbAmount(value:String):void
+
 		{
 			if (value == _carbAmount)
 				return;
@@ -206,14 +211,6 @@ package myComponents
 		//all variables to maintain previous heights, if changed then invalidatesize must be called.
 		private var previousY:Number = 0;
 		
-		private static var _mealEventBGColorDark:* = 0;
-		private static var _mealEventBGColorLight:* = 0;
-		private static var backGroundColors:Array ;
-		private static var alphas:Array = [1, 1];
-		private static var ratios:Array = [0, 255];
-		private static var matrix:Matrix = new Matrix();
-
-		
 		//variables to calculate the width and height of a mealevent rendered with this renderer
 		//preferred values are values obtained with method getPreferredHeight
 		//calculated values are values obtained with object-name.height
@@ -221,21 +218,25 @@ package myComponents
 		//calculated values needs to be used to calculate the real heigh, eg val calculating currentY
 		private static var _carbAmountCalculatedHeight:Number = 0;
 		public static function get carbAmountCalculatedHeight():Number
+
 		{
 			return _carbAmountCalculatedHeight;
 		}
 		private static var _carbAmountPreferredHeight:Number = 0;
 		public static function get carbAmountPreferredHeight():Number
+
 		{
 			return _carbAmountPreferredHeight;
 		}
 		private static var _insulinAmountCalculatedHeight:Number = 0;
 		public static function get insulinAmountCalculatedHeight():Number
+
 		{
 			return _insulinAmountCalculatedHeight;
 		}
 		private static var _insulinAmountPreferredHeight:Number = 0;
 		public static function get insulinAmountPreferredHeight():Number
+
 		{
 			return _insulinAmountPreferredHeight;
 		}
@@ -259,6 +260,7 @@ package myComponents
 		 * if styleabletextfield is added, then paddingbottom is too high, next element will be uplifted by an amount of pixels which is upLiftForNextField.
 		 */
 		public static function get upLiftForNextField():int
+
 		{
 			return _upLiftForNextField;
 		}
@@ -276,11 +278,6 @@ package myComponents
 			if (_upLiftForNextField == 0)
 				_upLiftForNextField = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
 			addEventListener(MouseEvent.CLICK,elementClicked);
-			if (_mealEventBGColorDark == 0) {
-				_mealEventBGColorDark = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("mealEventBackGroundDark");
-				_mealEventBGColorLight = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("mealEventBackGroundLight");
-				backGroundColors = [_mealEventBGColorDark, _mealEventBGColorLight];
-			}
 		}
 		
 		private function elementClicked(event:Event):void {
@@ -562,11 +559,6 @@ package myComponents
 		 */
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
-			matrix.createGradientBox(unscaledWidth, unscaledHeight, Math.PI / 2, 0, 0);
-			graphics.beginGradientFill(GradientType.LINEAR, backGroundColors, alphas, ratios, matrix);
-			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
-			graphics.endFill();
-			
 			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
 		}
 		

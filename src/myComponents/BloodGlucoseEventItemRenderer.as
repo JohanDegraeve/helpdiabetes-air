@@ -30,7 +30,7 @@ package myComponents
 
 	public class BloodGlucoseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("bloodglucoseevent");
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("trackingevent");
 		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
 		
 		//*****************//
@@ -46,11 +46,13 @@ package myComponents
 		private var _unit:String;
 
 		public function get unit():String
+
 		{
 			return _unit;
 		}
 
 		public function set unit(value:String):void
+
 		{
 			if (_unit == value)
 				return;
@@ -84,6 +86,7 @@ package myComponents
 		 * the bloodglucose level in a string
 		 */
 		private function get glucoseLevel():String
+
 		{
 			return _glucoseLevel;
 		}
@@ -91,7 +94,9 @@ package myComponents
 		/**
 		 * @private
 		 */
+
 		private function set glucoseLevel(value:String):void
+
 		{
 			if (_glucoseLevel == value)
 				return;
@@ -104,22 +109,9 @@ package myComponents
 		
 		
 		
-		private static var _bloodGlucseEventBGColorDark:* = 0;
-		private static var _bloodGlucseEventBGColorLight:* = 0;
-		private static var backGroundColors:Array ;
-		private static var alphas:Array = [1, 1];
-		private static var ratios:Array = [0, 255];
-		private static var matrix:Matrix = new Matrix();
-		
 		public function BloodGlucoseEventItemRenderer()
 		{
 			super();
-			if (_bloodGlucseEventBGColorDark == 0) {
-				_bloodGlucseEventBGColorDark = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("bloodGlucoseEventBackGroundDark");
-				_bloodGlucseEventBGColorLight = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("bloodGlucoseEventBackGroundLight");
-				backGroundColors = [_bloodGlucseEventBGColorDark, _bloodGlucseEventBGColorLight];
-			}
-
 		}
 		
 		override public function set data(value:Object):void {
@@ -182,11 +174,6 @@ package myComponents
 		 */
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
-			matrix.createGradientBox(unscaledWidth, unscaledHeight, Math.PI / 2, 0, 0);
-			graphics.beginGradientFill(GradientType.LINEAR, backGroundColors, alphas, ratios, matrix);
-			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
-			graphics.endFill();
-			
 			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
 		}
 		

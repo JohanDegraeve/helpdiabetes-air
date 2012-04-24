@@ -30,7 +30,7 @@ package myComponents
 
 	public class ExerciseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("bloodglucoseevent");
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("trackingevent");
 		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
 		
 		private var exerciseLevelDisplay:StyleableTextField;
@@ -38,11 +38,13 @@ package myComponents
 		private var _exerciseLevel:String;
 
 		public function get exerciseLevel():String
+
 		{
 			return _exerciseLevel;
 		}
 
 		public function set exerciseLevel(value:String):void
+
 		{
 			if (_exerciseLevel == value)
 				return;
@@ -68,21 +70,9 @@ package myComponents
 		 */
 		private static const GAP_HORIZONTAL_MINIMUM:int = 5;
 
-		private static var _exerciseEventBGColorDark:* = 0;
-		private static var _exerciseEventBGColorLight:* = 0;
-		private static var backGroundColors:Array ;
-		private static var alphas:Array = [1, 1];
-		private static var ratios:Array = [0, 255];
-		private static var matrix:Matrix = new Matrix();
-
 		public function ExerciseEventItemRenderer()
 		{
 			super();
-			if (_exerciseEventBGColorDark == 0) {
-				_exerciseEventBGColorDark = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("exerciseEventBackGroundDark");
-				_exerciseEventBGColorLight = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("exerciseEventBackGroundLight");
-				backGroundColors = [_exerciseEventBGColorDark, _exerciseEventBGColorLight];
-			}
 		}
 		
 		override public function set data(value:Object):void {
@@ -146,11 +136,6 @@ package myComponents
 
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
-			matrix.createGradientBox(unscaledWidth, unscaledHeight, Math.PI / 2, 0, 0);
-			graphics.beginGradientFill(GradientType.LINEAR, backGroundColors, alphas, ratios, matrix);
-			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
-			graphics.endFill();
-			
 			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
 		}
 	}

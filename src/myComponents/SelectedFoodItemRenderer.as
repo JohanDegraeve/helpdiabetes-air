@@ -57,6 +57,7 @@ package myComponents
 		 * the text for the amountOfCarbsEtcText styleable textfield
 		 */
 		private function get amountOfCarbsEtcText():String
+
 		{
 			return _amountOfCarbsEtcText;
 		}
@@ -106,9 +107,6 @@ package myComponents
 		private  static var  paddingTop:Number  ;
 		private  static var  paddingBottom:Number;
 		
-		private static var _mealEventBGColorDark:* = 0;
-		private static var _mealEventBGColorLight:* = 0;
-		
 		public function SelectedFoodItemRenderer()
 		{
 			super();
@@ -118,11 +116,6 @@ package myComponents
 				 paddingTop    = styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("paddingTop");
 				 paddingBottom = styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("paddingBottom");
 			}
-			if (_mealEventBGColorDark == 0) {
-				_mealEventBGColorDark = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("mealEventBackGroundDark");
-				_mealEventBGColorLight = styleManager.getStyleDeclaration(".backGroundColorInLists").getStyle("mealEventBackGroundLight");
-			}
-
 		}
 		
 		/**
@@ -130,13 +123,6 @@ package myComponents
 		 */
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
-			var itemCounter:int = 0;
-			while ((((parent as DataGroup).dataProvider.getItemAt(itemCounter) as SelectedFoodItem) != _selectedFoodItem) && (itemCounter < (parent as DataGroup).dataProvider.length))
-				itemCounter ++;
-			graphics.beginFill(    ((itemCounter++)%2 == 0) ? _mealEventBGColorDark:_mealEventBGColorLight, 1);
-			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
-			graphics.endFill();
-
 			if (down) {
 				graphics.beginFill(0, 0.25);
 				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
