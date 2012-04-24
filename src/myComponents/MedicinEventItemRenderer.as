@@ -30,6 +30,9 @@ package myComponents
 
 	public class MedicinEventItemRenderer extends TrackingViewElementItemRenderer
 	{
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("bloodglucoseevent");
+		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		
 		private static var MINIMUM_AMOUNT_WIDTH:int = 100;
 		
 		/**
@@ -118,12 +121,7 @@ package myComponents
 		}
 
 		override public function getHeight(item:TrackingViewElement = null):Number {
-			if (item == null)
-				item = (this.data as MedicinEvent);
-			if (item == null) //parameter was null and this.data is also null, so there's nothing to calculate
-				return 0;
-			
-			return ModelLocator.StyleableTextFieldCalculatedHeight;
+			return itemHeight;
 		}
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -132,13 +130,13 @@ package myComponents
 			amountDisplay.text = amount + " " + resourceManager.getString('general','units');
 			amountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(amountDisplay));
 			
-			setElementSize(labelDisplay,labelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
-			setElementSize(amountDisplay,amountDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
+			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
+			setElementSize(amountDisplay,amountDisplayWidth,itemHeight);
 			labelDisplay.truncateToFit();
 			amountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,ModelLocator.offSetSoThatTextIsInTheMiddle);
-			setElementPosition(amountDisplay,unscaledWidth - PADDING_RIGHT - amountDisplayWidth,ModelLocator.offSetSoThatTextIsInTheMiddle);
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,offsetToPutTextInTheMiddle);
+			setElementPosition(amountDisplay,unscaledWidth - PADDING_RIGHT - amountDisplayWidth,offsetToPutTextInTheMiddle);
 		}
 		
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void

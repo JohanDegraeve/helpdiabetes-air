@@ -9,6 +9,11 @@ s|Application {fontSize:20pt}
 	color:white
 }
 
+.trackingItemHeights {
+	offsetToPutTextInTheMiddle:15;
+	bloodglucoseevent:40pt;
+}
+
 /* typically for text that should be smaller than normal text */
 .fontSizeForSubElements {
 	fontSize:16pt;

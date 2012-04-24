@@ -33,6 +33,9 @@ package myComponents
 	 */
 	public class DayLineItemRendererWithTotalAmount extends DayLineItemRenderer 
 	{
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("bloodglucoseevent");
+		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		
 		/**
 		 * total amount for the day of carbs, protein, kilocalories or fat, depending on the user's preference
 		 */
@@ -80,14 +83,6 @@ package myComponents
 		 * the calculated amount for the day
 		 */
 		private var carbAmountDisplay:StyleableTextField;
-		
-		//variables to calculate the width and height of a mealevent rendered with this renderer
-		//preferred values are values obtained with method getPreferredHeight
-		//calculated values are values obtained with object-name.height
-		//preferred values needs to be used in  method setelementsize
-		//calculated values needs to be used to calculate the real heigh, eg val calculating currentY
-		private static var _carbAmountCalculatedHeight:Number = 0;
-		private static var _carbAmountPreferredHeight:Number = 0;
 		
 		/**
 		 * constructor 
@@ -176,32 +171,20 @@ package myComponents
 		
 		// Override layoutContents() to lay out the item renderer.
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
-			//labelDisplay.commitStyles();
-			//carbAmountDisplay.commitStyles();
-			
-			//carbamount should have a minimum displaylength - labeldisplay will be shortened if needed
-			//and then we'll extend carbamount if still possible
 			var carbAmountDisplayWidth:Number = Math.max(getElementPreferredWidth(carbAmountDisplay), MINIMUM_AMOUNT_WIDTH);
 			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth);
 			
 			carbAmountDisplay.text = Math.round(new Number(totalAmount)) + " " + resourceManager.getString('general','gram_of_carbs_short');
 			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
 
-			if (_carbAmountCalculatedHeight == 0) {//which means also _carbAmountPreferredHeight == 0
-				_carbAmountPreferredHeight = getElementPreferredHeight(carbAmountDisplay);
-				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
-				_carbAmountCalculatedHeight = labelDisplay.height;
-				ModelLocator.StyleableTextFieldCalculatedHeight = _carbAmountCalculatedHeight;
-				ModelLocator.StyleableTextFieldPreferredHeight = _carbAmountPreferredHeight;
-			} else 
-				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
-
-			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,_carbAmountPreferredHeight);
+			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
+			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,itemHeight);
+			
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,ModelLocator.offSetSoThatTextIsInTheMiddle);
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,ModelLocator.offSetSoThatTextIsInTheMiddle);
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,offsetToPutTextInTheMiddle);
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,offsetToPutTextInTheMiddle);
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {
@@ -212,7 +195,7 @@ package myComponents
 			if (item == null) //parameter was null and this.data is also null, so there's nothing to calculate
 				return 0;
 			
-			return _carbAmountCalculatedHeight ;
+			return itemHeight ;
 		}
 
 	}

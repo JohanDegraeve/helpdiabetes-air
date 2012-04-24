@@ -30,6 +30,9 @@ package myComponents
 
 	public class BloodGlucoseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("bloodglucoseevent");
+		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		
 		//*****************//
 		// the display fields //
 		// labelDisplay will be used to shown the first field with timestamp , amount in glucoseLevel will be on the right
@@ -156,12 +159,7 @@ package myComponents
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {
-			if (item == null)
-				item = (this.data as BloodGlucoseEvent);
-			if (item == null) //parameter was null and this.data is also null, so there's nothing to calculate
-				return 0;
-			
-			return ModelLocator.StyleableTextFieldCalculatedHeight;
+			return itemHeight;
 		}
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -170,13 +168,13 @@ package myComponents
 			glucoseLevelDisplay.text = glucoseLevel + " " + unit;
 			glucoseLevelDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(glucoseLevelDisplay));
 
-			setElementSize(labelDisplay,labelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
-			setElementSize(glucoseLevelDisplay,glucoseLevelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
+			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
+			setElementSize(glucoseLevelDisplay,glucoseLevelDisplayWidth,itemHeight);
 			labelDisplay.truncateToFit();
 			glucoseLevelDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,ModelLocator.offSetSoThatTextIsInTheMiddle);
-			setElementPosition(glucoseLevelDisplay,unscaledWidth - PADDING_RIGHT - glucoseLevelDisplayWidth,ModelLocator.offSetSoThatTextIsInTheMiddle);
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,offsetToPutTextInTheMiddle);
+			setElementPosition(glucoseLevelDisplay,unscaledWidth - PADDING_RIGHT - glucoseLevelDisplayWidth,offsetToPutTextInTheMiddle);
 		}
 		
 		/**

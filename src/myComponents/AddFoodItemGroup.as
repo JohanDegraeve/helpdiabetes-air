@@ -41,6 +41,9 @@ package myComponents
 	
 	public class AddFoodItemGroup extends Group
 	{
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("bloodglucoseevent");
+		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		
 		private var maxContainerHeight:int;//introduced because it seems that during different runs of updatedisplaylist, the containerwidth is increasing
 		
 		//*********************
@@ -399,9 +402,9 @@ package myComponents
 			_height = 0;
 
 			description_textarea.truncateToFit();
-			description_textarea.setLayoutBoundsSize(containerWidth - textGap * 2 ,ModelLocator.StyleableTextFieldCalculatedHeight);
-			description_textarea.setLayoutBoundsPosition(textGap,ModelLocator.offSetSoThatTextIsInTheMiddle);
-			_height = ModelLocator.StyleableTextFieldCalculatedHeight;
+			description_textarea.setLayoutBoundsSize(containerWidth - textGap * 2 ,itemHeight);
+			description_textarea.setLayoutBoundsPosition(textGap,offsetToPutTextInTheMiddle);
+			_height = itemHeight;
 			
 			var preferredButtonHeight:int = details_button.getPreferredBoundsHeight();
 			details_button.setLayoutBoundsSize(containerWidth - textGap * 2,preferredButtonHeight);

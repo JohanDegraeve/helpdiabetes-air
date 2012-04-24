@@ -133,23 +133,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:VerticalLayout>
 			</s:layout>
 			<s:TextArea id="dateTimeAndMealName" width="100%" text="{dateTimeAndMealName_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" 
-						updateComplete="{dateTimeAndMealName.height = dateTimeAndMealName.scroller.viewport.contentHeight + 2}"/>
+						/>
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0x000000" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:TextArea includeIn="insulinAmount"  id="insulinAmount" width="100%" text="{insulinAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
-						updateComplete="{ insulinAmount.height = insulinAmount.scroller.viewport.contentHeight + 2 }"/>
+						/>
 			<s:TextArea includeIn="insulinAmount" id="insulinRatio" width="100%" text="{insulinRatio_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
-						updateComplete="{insulinRatio.height = insulinRatio.scroller.viewport.contentHeight + 2 }"/>
+						/>
 			<s:Line includeIn="insulinAmount" width="100%"  >
 				<s:stroke>
 					<s:SolidColorStroke color="0x000000" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:TextArea id="selectedItemsTitle" width="100%" text="{resourceManager.getString('editmealeventview','selecteditems')}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
-						updateComplete="{selectedItemsTitle.height = selectedItemsTitle.scroller.viewport.contentHeight + 2}"/>
+						/>
 			<s:List id="fooditemlist" width="100%"  height="100%" useVirtualLayout="false" dataProvider="{mealEvent.selectedFoodItems}" contentBackgroundAlpha="0" 
 					labelFunction="displaySelectedItem" itemRendererFunction="itemRendererFunction" />
 		</s:Group>

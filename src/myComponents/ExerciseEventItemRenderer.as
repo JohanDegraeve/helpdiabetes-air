@@ -30,9 +30,9 @@ package myComponents
 
 	public class ExerciseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		/**
-		 * 
-		 */
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("bloodglucoseevent");
+		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		
 		private var exerciseLevelDisplay:StyleableTextField;
 		
 		private var _exerciseLevel:String;
@@ -119,12 +119,7 @@ package myComponents
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {
-			if (item == null)
-				item = (this.data as ExerciseEvent);
-			if (item == null) //parameter was null and this.data is also null, so there's nothing to calculate
-				return 0;
-			
-			return ModelLocator.StyleableTextFieldCalculatedHeight;
+			return itemHeight;
 		}
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -134,13 +129,13 @@ package myComponents
 			exerciseLevelDisplay.text = exerciseLevel ;
 			exerciseLevelDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(exerciseLevelDisplay));
 			
-			setElementSize(labelDisplay,labelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
-			setElementSize(exerciseLevelDisplay,exerciseLevelDisplayWidth,ModelLocator.StyleableTextFieldPreferredHeight);
+			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
+			setElementSize(exerciseLevelDisplay,exerciseLevelDisplayWidth,itemHeight);
 			labelDisplay.truncateToFit();
 			exerciseLevelDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,ModelLocator.offSetSoThatTextIsInTheMiddle);
-			setElementPosition(exerciseLevelDisplay,unscaledWidth - PADDING_RIGHT - exerciseLevelDisplayWidth,ModelLocator.offSetSoThatTextIsInTheMiddle);
+			setElementPosition(labelDisplay,0 + PADDING_LEFT,offsetToPutTextInTheMiddle);
+			setElementPosition(exerciseLevelDisplay,unscaledWidth - PADDING_RIGHT - exerciseLevelDisplayWidth,offsetToPutTextInTheMiddle);
 			
 			/*
 			setElementSize(labelDisplay,unscaledWidth - PADDING_LEFT - PADDING_RIGHT,ModelLocator.StyleableTextFieldPreferredHeight);
