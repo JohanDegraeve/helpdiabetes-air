@@ -61,11 +61,11 @@ package myComponents
 		/**
 		 * padding left 
 		 */
-		private static const PADDING_LEFT:int = 5;
+		private static const PADDING_LEFT:int = 15;
 		/**
 		 * padding right 
 		 */
-		private static const PADDING_RIGHT:int = 5;
+		private static const PADDING_RIGHT:int = 15;
 		/**
 		 * minimum gap between two elements, horizontal
 		 */

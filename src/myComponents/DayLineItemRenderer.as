@@ -48,6 +48,7 @@ package myComponents
 				dateFormatter.useUTC = false;
 				dateFormatter.setStyle("locale",Capabilities.language.substr(0,2));
 			}
+			setStyle("color","white");
 		}
 		
 		/**
@@ -63,6 +64,10 @@ package myComponents
 		 */
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
+			graphics.beginFill(0x213A5C, 1);
+			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+			graphics.endFill();
+
 			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
 		}
 	}
