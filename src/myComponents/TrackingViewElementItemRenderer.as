@@ -17,6 +17,7 @@
  */
 package myComponents
 {
+	import spark.components.IconItemRenderer;
 	import spark.components.LabelItemRenderer;
 
 	/**
@@ -24,7 +25,7 @@ package myComponents
 	 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and override getHeight and getWidth and calculate the 
 	 * height and width for the parameter item.<br>
 	 */
-	public class TrackingViewElementItemRenderer extends LabelItemRenderer
+	public class TrackingViewElementItemRenderer extends IconItemRenderer
 	{
 		
 		public function TrackingViewElementItemRenderer() 

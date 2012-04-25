@@ -70,20 +70,23 @@ view to show ModelLocator.getInstance().meals in a list
 			
 			private function mealselected(event:IndexChangeEvent):void {
 				
-				//should we not do that also when ui is closed via back key ?
-				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
-				ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
-				
-				//if it's a future meal without mealevent, we'll ask to user to enter start date and time of the meal
-				var theMeal:Meal = ModelLocator.getInstance().meals.getItemAt(event.newIndex) as Meal;
-				if (theMeal.hasMealEvent() || (theMeal.timeStamp < (new Date()).valueOf())) {
-					ModelLocator.getInstance().selectedMeal = event.newIndex;
-					navigator.popView();
-				} else {
+				if (ModelLocator.getInstance().meals.getItemAt(event.newIndex)  is Meal) {
+					//should we not do that also when ui is closed via back key ?
+					ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
+					ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
+					meallist.removeEventListener(Event.CHANGE,mealselected);
 					
-					navigator.pushView(ChangeMealDateAndTimeView,{
-						meal:theMeal
-					},CHANGE_MEAL_DATE_AND_TIME);
+					//if it's a future meal without mealevent, we'll ask to user to enter start date and time of the meal
+					var theMeal:Meal = ModelLocator.getInstance().meals.getItemAt(event.newIndex) as Meal;
+					if (theMeal.hasMealEvent() || (theMeal.timeStamp < (new Date()).valueOf())) {
+						ModelLocator.getInstance().selectedMeal = event.newIndex;
+						navigator.popView();
+					} else {
+						
+						navigator.pushView(ChangeMealDateAndTimeView,{
+							meal:theMeal
+						},CHANGE_MEAL_DATE_AND_TIME);
+					}
 				}
 			}
 			

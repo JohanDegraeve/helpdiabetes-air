@@ -49,6 +49,7 @@ package myComponents
 				dateFormatter.setStyle("locale",Capabilities.language.substr(0,2));
 			}
 			setStyle("color","white");
+			setStyle("textAlign","center");
 		}
 		
 		/**
@@ -56,7 +57,7 @@ package myComponents
 		 */
 		override public function set data(value:Object):void {
 			super.data = value;
-			labelDisplay.text = dateFormatter.format((value as DayLine).timeStamp);
+			label= dateFormatter.format((value as DayLine).timeStamp);
 		}
 		
 		/**
@@ -68,7 +69,7 @@ package myComponents
 			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 			graphics.endFill();
 
-			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
+			//super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
 		}
 	}
 }
