@@ -41,8 +41,8 @@ package myComponents
 	
 	public class AddFoodItemGroup extends Group
 	{
-		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("trackingevent");
-		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItems").getStyle("trackingeventHeight");
+		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItems").getStyle("offsetToPutTextInTheMiddle");
 		
 		private var maxContainerHeight:int;//introduced because it seems that during different runs of updatedisplaylist, the containerwidth is increasing
 		

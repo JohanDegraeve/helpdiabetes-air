@@ -9,9 +9,11 @@ s|Application {fontSize:20pt}
 	color:white
 }
 
-.trackingItemHeights {
-	offsetToPutTextInTheMiddle:13;
-	trackingevent:40pt;/* height for standard events like bloodglucoseevent..*/
+.trackingItems {
+	offsetToPutTextInTheMiddle:12;
+	trackingeventHeight:40pt;/* height for standard events like bloodglucoseevent..*/
+	iconWidth:36;
+	iconHeight:36;	
 }
 
 /* typically for text that should be smaller than normal text */

@@ -26,12 +26,24 @@ package myComponents
 	
 	import model.ModelLocator;
 	
+	import mx.graphics.BitmapFillMode;
+	import mx.graphics.BitmapScaleMode;
+	
+	import spark.components.Image;
 	import spark.components.supportClasses.StyleableTextField;
+	import spark.primitives.BitmapImage;
 
 	public class BloodGlucoseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("trackingevent");
-		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		private var image:Image;
+		[Embed(source="assets/ic_tab_glucose_selected_35x35.png")]
+		[Bindable]
+		public var icon:Class;
+		
+		static private var itemHeight:int;
+		static private var offsetToPutTextInTheMiddle:int;
+		static private var iconHeight:int;
+		static private var iconWidth:int;
 		
 		//*****************//
 		// the display fields //
@@ -112,6 +124,12 @@ package myComponents
 		public function BloodGlucoseEventItemRenderer()
 		{
 			super();
+			if (itemHeight ==  0) {
+				itemHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("trackingeventHeight");
+				offsetToPutTextInTheMiddle = styleManager.getStyleDeclaration(".trackingItems").getStyle("offsetToPutTextInTheMiddle");
+				iconWidth = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconWidth");
+				iconHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconHeight");
+			}
 		}
 		
 		override public function set data(value:Object):void {
@@ -126,7 +144,7 @@ package myComponents
 				(date.hours.toString().length == 1 ? "0":"") + 	date.hours 
 				+ ":"  
 				+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes 
-				+ " " + resourceManager.getString('editbgeventview','glucose');
+				;
 			
 			glucoseLevel = (value as BloodGlucoseEvent).bloodGlucoseLevel.toString();
 			unit = (value as BloodGlucoseEvent).unit;
@@ -134,6 +152,15 @@ package myComponents
 		
 		override protected function createChildren():void {
 			super.createChildren();
+			
+			if (!image) {
+				image = new Image();
+				//image.smooth = true;
+				//image.scaleMode = BitmapScaleMode.ZOOM;
+				image.fillMode = BitmapFillMode.CLIP;
+				image.source = icon;
+				addChild(image);
+			}
 			
 			if (!glucoseLevelDisplay) {
 				glucoseLevelDisplay = new StyleableTextField();
@@ -156,17 +183,19 @@ package myComponents
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
 			var glucoseLevelDisplayWidth:Number = Math.max(getElementPreferredWidth(glucoseLevelDisplay), MINIMUM_AMOUNT_WIDTH);
-			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - glucoseLevelDisplayWidth);
-			glucoseLevelDisplay.text = glucoseLevel + " " + unit;
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - glucoseLevelDisplayWidth - iconWidth);
+			glucoseLevelDisplay.text = glucoseLevel + " " + unit ;
 			glucoseLevelDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(glucoseLevelDisplay));
 
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
 			setElementSize(glucoseLevelDisplay,glucoseLevelDisplayWidth,itemHeight);
+			setElementSize(image,iconWidth,iconHeight);
 			labelDisplay.truncateToFit();
 			glucoseLevelDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,offsetToPutTextInTheMiddle);
+			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);
 			setElementPosition(glucoseLevelDisplay,unscaledWidth - PADDING_RIGHT - glucoseLevelDisplayWidth,offsetToPutTextInTheMiddle);
+			setElementPosition(image,0,0);
 		}
 		
 		/**

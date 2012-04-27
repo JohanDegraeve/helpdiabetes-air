@@ -33,8 +33,8 @@ package myComponents
 	 */
 	public class DayLineItemRendererWithTotalAmount extends DayLineItemRenderer 
 	{
-		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("trackingevent");
-		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItems").getStyle("trackingeventHeight");
+		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItems").getStyle("offsetToPutTextInTheMiddle");
 		
 		/**
 		 * total amount for the day of carbs, protein, kilocalories or fat, depending on the user's preference

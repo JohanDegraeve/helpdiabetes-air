@@ -26,14 +26,22 @@ package myComponents
 	
 	import model.ModelLocator;
 	
+	import mx.graphics.BitmapFillMode;
+	
+	import spark.components.Image;
 	import spark.components.supportClasses.StyleableTextField;
 
 	public class MedicinEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("trackingevent");
-		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		private var image:Image;
+		[Embed(source = "assets/ic_tab_medicine_selected_35x35.png")]
+		public static var icon:Class;
 		
-		private static var MINIMUM_AMOUNT_WIDTH:int = 100;
+		static private var itemHeight:int;
+		static private var offsetToPutTextInTheMiddle:int;
+		static private var iconHeight:int;
+		static private var iconWidth:int;
+		
 		
 		/**
 		 * padding left 
@@ -74,6 +82,12 @@ package myComponents
 		public function MedicinEventItemRenderer()
 		{
 			super();
+			if (itemHeight ==  0) {
+				itemHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("trackingeventHeight");
+				offsetToPutTextInTheMiddle = styleManager.getStyleDeclaration(".trackingItems").getStyle("offsetToPutTextInTheMiddle");
+				iconWidth = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconWidth");
+				iconHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconHeight");
+			}
 		}
 
 		override public function set data(value:Object):void {
@@ -95,6 +109,15 @@ package myComponents
 		override protected function createChildren():void {
 			super.createChildren();
 			
+			if (!image) {
+				image = new Image();
+				//image.smooth = true;
+				//image.scaleMode = BitmapScaleMode.ZOOM;
+				image.fillMode = BitmapFillMode.CLIP;
+				image.source = icon;
+				addChild(image);
+			}
+			
 			if (!amountDisplay) {
 				amountDisplay = new StyleableTextField();
 				amountDisplay.styleName = this;
@@ -103,11 +126,6 @@ package myComponents
 				amountDisplay.wordWrap = false;
 				addChild(amountDisplay);
 			}
-			if (MINIMUM_AMOUNT_WIDTH == 0) {
-				// calculate MINIMUM_CARB_AMOUNT_WIDTH
-				var textLineMetricx:TextLineMetrics = this.measureText("999");
-				MINIMUM_AMOUNT_WIDTH = textLineMetricx.width;
-			}
 		}
 
 		override public function getHeight(item:TrackingViewElement = null):Number {
@@ -115,18 +133,20 @@ package myComponents
 		}
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
-			var amountDisplayWidth:Number = Math.max(getElementPreferredWidth(amountDisplay), MINIMUM_AMOUNT_WIDTH);
-			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth);
-			amountDisplay.text = amount + " " + resourceManager.getString('general','units');
+			amountDisplay.text = amount + " " + resourceManager.getString('trackingview','internationalunit');
+			var amountDisplayWidth:Number = getElementPreferredWidth(amountDisplay);
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth - iconWidth);
 			amountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(amountDisplay));
 			
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
 			setElementSize(amountDisplay,amountDisplayWidth,itemHeight);
+			setElementSize(image,iconWidth,iconHeight);
 			labelDisplay.truncateToFit();
 			amountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,offsetToPutTextInTheMiddle);
+			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);
 			setElementPosition(amountDisplay,unscaledWidth - PADDING_RIGHT - amountDisplayWidth,offsetToPutTextInTheMiddle);
+			setElementPosition(image,0,0);
 		}
 		
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void

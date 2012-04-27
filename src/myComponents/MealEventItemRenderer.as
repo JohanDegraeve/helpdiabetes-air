@@ -33,9 +33,11 @@ package myComponents
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
+	import mx.graphics.BitmapFillMode;
 	
 	import spark.components.Application;
 	import spark.components.IconItemRenderer;
+	import spark.components.Image;
 	import spark.components.Label;
 	import spark.components.LabelItemRenderer;
 	import spark.components.supportClasses.StyleableTextField;
@@ -56,6 +58,15 @@ package myComponents
 	 */
 	public class MealEventItemRenderer extends TrackingViewElementItemRenderer
 	{
+		
+		private var image:Image;
+		[Embed(source = "assets/ic_tab_meal_selected_35x35.png")]
+		public static var icon:Class;
+		
+		static private var itemHeight:int;
+		static private var offsetToPutTextInTheMiddle:int;
+		static private var iconHeight:int;
+		static private var iconWidth:int;
 		
 		private var _mealExtended:Boolean = false;
 
@@ -273,6 +284,14 @@ package myComponents
 		public function MealEventItemRenderer()
 		{
 			super();
+
+			if (itemHeight ==  0) {
+				itemHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("trackingeventHeight");
+				offsetToPutTextInTheMiddle = styleManager.getStyleDeclaration(".trackingItems").getStyle("offsetToPutTextInTheMiddle");
+				iconWidth = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconWidth");
+				iconHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconHeight");
+			}
+
 			insulinAmount = null;
 			gramkh = resourceManager.getString('general','gram_of_carbs_short');
 			if (_upLiftForNextField == 0)
@@ -326,6 +345,15 @@ package myComponents
 		 */
 		override protected function createChildren():void {
 			super.createChildren();
+			
+			if (!image) {
+				image = new Image();
+				//image.smooth = true;
+				//image.scaleMode = BitmapScaleMode.ZOOM;
+				image.fillMode = BitmapFillMode.CLIP;
+				image.source = icon;
+				addChild(image);
+			}
 			
 			if (!carbAmountDisplay) {
 				carbAmountDisplay = new StyleableTextField();
@@ -389,16 +417,16 @@ package myComponents
 			//and then we'll extend carbamount if still possible
 			//NEED TO CHECK ONCE WITH DEBUGGER IF THIS IS ALWAYS EQUAL TO MINIMUM_CARB_AMOUNT_WIDTH - I THINK SO BECAUSE HERE carbAmountDisplay has no text yet
 			var carbAmountDisplayWidth:Number = Math.max(getElementPreferredWidth(carbAmountDisplay), MINIMUM_CARB_AMOUNT_WIDTH_LARGE_FONT);//that value is used later on also while creating field for selectedmealitems
-			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth);
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth  - iconWidth);
 			carbAmountDisplay.text = carbAmount + " " + gramkh;
 			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
 			
 			if (_carbAmountCalculatedHeight == 0) {//which means also _carbAmountPreferredHeight == 0
 				_carbAmountPreferredHeight = getElementPreferredHeight(carbAmountDisplay);
-				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
+				setElementSize(labelDisplay,labelDisplayWidth + iconWidth,_carbAmountPreferredHeight);
 				_carbAmountCalculatedHeight = labelDisplay.height;
 			} else 
-				setElementSize(labelDisplay,labelDisplayWidth,_carbAmountPreferredHeight);
+				setElementSize(labelDisplay,labelDisplayWidth + iconWidth,_carbAmountPreferredHeight);
 			
 			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,_carbAmountPreferredHeight);
 			labelDisplay.truncateToFit();
@@ -406,7 +434,7 @@ package myComponents
 			
 			if (theMiddleOfCarbAmountField == 0)
 				theMiddleOfCarbAmountField = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,theMiddleOfCarbAmountField);
+			setElementPosition(labelDisplay,0 + iconWidth ,theMiddleOfCarbAmountField);
 			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,theMiddleOfCarbAmountField);
 			var currentY:Number = _carbAmountCalculatedHeight - _upLiftForNextField;
 			
@@ -426,6 +454,9 @@ package myComponents
 				setElementSize(insulinDetails,0,0);
 			}
 			
+			setElementSize(image,iconWidth,iconHeight);
+			setElementPosition(image,0,0);
+
 			if (mealExtended)  {
 				if (selectedMealsDescriptionStrings == null) {
 					if (renderedMealEvent.selectedFoodItems != null) 

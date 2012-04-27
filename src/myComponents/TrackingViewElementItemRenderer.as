@@ -25,7 +25,7 @@ package myComponents
 	 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and override getHeight and getWidth and calculate the 
 	 * height and width for the parameter item.<br>
 	 */
-	public class TrackingViewElementItemRenderer extends IconItemRenderer
+	public class TrackingViewElementItemRenderer extends LabelItemRenderer
 	{
 		
 		public function TrackingViewElementItemRenderer() 

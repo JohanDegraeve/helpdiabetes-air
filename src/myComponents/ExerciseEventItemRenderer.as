@@ -26,12 +26,21 @@ package myComponents
 	
 	import model.ModelLocator;
 	
+	import mx.graphics.BitmapFillMode;
+	
+	import spark.components.Image;
 	import spark.components.supportClasses.StyleableTextField;
 
 	public class ExerciseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		private var itemHeight:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("trackingevent");
-		private var offsetToPutTextInTheMiddle:int = styleManager.getStyleDeclaration(".trackingItemHeights").getStyle("offsetToPutTextInTheMiddle");
+		private var image:Image;
+		[Embed(source = "assets/ic_tab_exercise_selected_35x35.png")]
+		public static var icon:Class;
+
+		static private var itemHeight:int;
+		static private var offsetToPutTextInTheMiddle:int;
+		static private var iconHeight:int;
+		static private var iconWidth:int;
 		
 		private var exerciseLevelDisplay:StyleableTextField;
 		
@@ -73,6 +82,12 @@ package myComponents
 		public function ExerciseEventItemRenderer()
 		{
 			super();
+			if (itemHeight ==  0) {
+				itemHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("trackingeventHeight");
+				offsetToPutTextInTheMiddle = styleManager.getStyleDeclaration(".trackingItems").getStyle("offsetToPutTextInTheMiddle");
+				iconWidth = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconWidth");
+				iconHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconHeight");
+			}
 		}
 		
 		override public function set data(value:Object):void {
@@ -92,6 +107,15 @@ package myComponents
 		
 		override protected function createChildren():void {
 			super.createChildren();
+			
+			if (!image) {
+				image = new Image();
+				//image.smooth = true;
+				//image.scaleMode = BitmapScaleMode.ZOOM;
+				image.fillMode = BitmapFillMode.CLIP;
+				image.source = icon;
+				addChild(image);
+			}
 			
 			if (!exerciseLevelDisplay) {
 				exerciseLevelDisplay = new StyleableTextField();
@@ -115,17 +139,19 @@ package myComponents
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
 			
 			var exerciseLevelDisplayWidth:Number = Math.max(getElementPreferredWidth(exerciseLevelDisplay), MINIMUM_AMOUNT_WIDTH);
-			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - exerciseLevelDisplayWidth);
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - exerciseLevelDisplayWidth  - iconWidth);
 			exerciseLevelDisplay.text = exerciseLevel ;
 			exerciseLevelDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(exerciseLevelDisplay));
 			
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
 			setElementSize(exerciseLevelDisplay,exerciseLevelDisplayWidth,itemHeight);
+			setElementSize(image,iconWidth,iconHeight);
 			labelDisplay.truncateToFit();
 			exerciseLevelDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,offsetToPutTextInTheMiddle);
+			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);
 			setElementPosition(exerciseLevelDisplay,unscaledWidth - PADDING_RIGHT - exerciseLevelDisplayWidth,offsetToPutTextInTheMiddle);
+			setElementPosition(image,0,0);
 			
 			/*
 			setElementSize(labelDisplay,unscaledWidth - PADDING_LEFT - PADDING_RIGHT,ModelLocator.StyleableTextFieldPreferredHeight);
