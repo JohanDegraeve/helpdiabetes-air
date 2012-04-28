@@ -64,8 +64,6 @@ package myComponents
 			}
 		}
 
-		private static var MINIMUM_AMOUNT_WIDTH:int = 100;
-		
 		/**
 		 * padding left 
 		 */
@@ -99,8 +97,8 @@ package myComponents
 			label = 
 				(date.hours.toString().length == 1 ? "0":"") + 	date.hours 
 				+ ":"  
-				+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes 
-				+ " " + resourceManager.getString('editexerciseeventview','exercise');
+				+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes; 
+				//+ " " + resourceManager.getString('editexerciseeventview','exercise');
 			
 			exerciseLevel = (value as ExerciseEvent).level;
 		}
@@ -125,11 +123,6 @@ package myComponents
 				exerciseLevelDisplay.wordWrap = false;
 				addChild(exerciseLevelDisplay);
 			}
-			if (MINIMUM_AMOUNT_WIDTH == 0) {
-				// calculate MINIMUM_CARB_AMOUNT_WIDTH
-				var textLineMetricx:TextLineMetrics = this.measureText("piece of text");
-				MINIMUM_AMOUNT_WIDTH = textLineMetricx.width;
-			}
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {
@@ -137,11 +130,9 @@ package myComponents
 		}
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
-			
-			var exerciseLevelDisplayWidth:Number = Math.max(getElementPreferredWidth(exerciseLevelDisplay), MINIMUM_AMOUNT_WIDTH);
-			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - exerciseLevelDisplayWidth  - iconWidth);
+			var labelDisplayWidth:Number = getElementPreferredWidth(labelDisplay);
 			exerciseLevelDisplay.text = exerciseLevel ;
-			exerciseLevelDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(exerciseLevelDisplay));
+			var exerciseLevelDisplayWidth:Number  = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT - iconWidth, getElementPreferredWidth(exerciseLevelDisplay));
 			
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
 			setElementSize(exerciseLevelDisplay,exerciseLevelDisplayWidth,itemHeight);

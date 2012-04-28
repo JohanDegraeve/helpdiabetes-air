@@ -19,7 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*" 
-		creationComplete="onCreationComplete()" actionBarVisible="false"
+		actionBarVisible="false"
+		creationComplete="onCreationComplete()" 
 		initialize="onInitialize()"
 		>
 	<fx:Declarations>
@@ -63,6 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onListElementClicked(event:MouseEvent):void {
+				var temp:int = (event.currentTarget as List).selectedIndex;
 				if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
 					navigator.pushView(EditMealEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex)); 					
 				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MedicinEvent) {
