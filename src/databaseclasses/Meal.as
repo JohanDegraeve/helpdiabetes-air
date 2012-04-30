@@ -58,8 +58,8 @@ package databaseclasses
 		public function Meal(newMealName:String = null,newMealEvent:MealEvent = null,newTimeStamp:Number = Number.NaN)
 		{
 			if (((newMealName == null) && (newMealEvent == null)) || ((newMealName != null) && (newMealEvent != null)))
-			 	throw new Error("Meal must be craeted with either mealName or MealEvent equal to null. At least one parameter must be not null");	
-            if (newMealName != null) {
+				throw new Error("Meal must be craeted with either mealName or MealEvent equal to null. At least one parameter must be not null");	
+			if (newMealName != null) {
 				_mealName = newMealName;
 				if (!isNaN(newTimeStamp)) {
 					_timeStamp = newTimeStamp;
@@ -74,22 +74,22 @@ package databaseclasses
 				_mealName = _mealEvent._mealName;
 			}
 		}
-
+		
 		public function get mealName():String
 		{
 			return _mealName;
 		}
-
+		
 		public function set mealName(value:String):void
 		{
 			_mealName = value;
 		}
-
+		
 		public function get mealEvent():MealEvent
 		{
 			return _mealEvent;
 		}
-
+		
 		internal function set mealEvent(value:MealEvent):void
 		{
 			_mealEvent = value;
@@ -114,7 +114,7 @@ package databaseclasses
 			if (!isNaN(timeStamp))
 				this._timeStamp = timeStamp;
 			else ;//no need to set or change the timestamp because it's already been set during meal creation, if it's the first selecteditem being added then the timestamp will be set to current timestamp a bit later
-
+			
 			var nowAsNumber:Number = (now.hours * 3600 + now.minutes * 60 + now.seconds)*1000;
 			if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
 				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST));
@@ -138,7 +138,7 @@ package databaseclasses
 			function previousBloodGlucoseEventRetrieved(de:DatabaseEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
-			
+				
 				var previousBGEvent:BloodGlucoseEvent = null;
 				if (de != null) {
 					if (de.data != null) {
@@ -178,8 +178,8 @@ package databaseclasses
 				Settings.getInstance().setSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION, (new Date()).valueOf().toString());
 				Settings.getInstance().setSetting(Settings.SettingLAST_MEAL_ID,_mealEvent.mealEventId.toString());
 			}
-				
-		    function mealEventCreationError(de:DatabaseEvent):void {
+			
+			function mealEventCreationError(de:DatabaseEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
 				trace("Error while creating mealeevent. Meal.as 0002");
@@ -192,7 +192,87 @@ package databaseclasses
 			}
 			
 		}
+		
+		/**
+		 * deletes a selected food item from the meal, if it is the last selectedfooditem in the mealevent then also the mealevent will be deleted<br>
+		 * Also deletion from database <br>
+		 * - selectedFoodItem : the selectedfooditem to be deleted<br>
+		 * If the  meal does not have the specified selectedfooditem then this function does nothing but trace an error<br>
+		 * - dispatcher is used to dispatch the result
+		 */
+		public function deleteSelectedFoodItem(selectedFoodItem:SelectedFoodItem, dispatcher:EventDispatcher = null):void {
+			if (_mealEvent == null) {
+				trace ("error in deletedSelectedFoodItem, the  meal does not have a mealEvent");
+				return;
+			}
+			if (_mealEvent.selectedFoodItems == null) {
+				trace ("error in deletedSelectedFoodItem, the meal has a mealEvent but the selectedFOodItems array is nul");
+				return;
+			}
+			if (selectedFoodItem.mealEventId != _mealEvent.mealEventId) {
+				trace ("error in deletedSelectedFoodItem, the specified selectedfooditem does not belong to the  mealevent in this meal");
+				return;
+			}
 
+			_mealEvent.removeSelectedFoodItem(selectedFoodItem);
+
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,deletionSelectedFoodItemFailed);
+			Database.getInstance().deleteSelectedFoodItem(selectedFoodItem._selectedItemId,localdispatcher);
+			
+			function selectedFoodItemDeleted(de:DatabaseEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,deletionSelectedFoodItemFailed);
+				if (_mealEvent.selectedFoodItems.length == 0) {
+					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventDeletedFromDB);
+					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventDeletionFromDBFailed);
+					Database.getInstance().deleteMealEvent(_mealEvent.mealEventId,localdispatcher);
+					ModelLocator.getInstance().trackingList.removeItemAt(ModelLocator.getInstance().trackingList.getItemIndex(_mealEvent));
+					ModelLocator.getInstance().trackingList.refresh();
+					if (dispatcher != null) {
+						var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+						dispatcher.dispatchEvent(event);
+					}
+				} else {
+					mealEventDeletedFromDB(null);
+				}
+			}
+			
+			function mealEventDeletedFromDB(de:DatabaseEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventDeletedFromDB);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventDeletionFromDBFailed);
+				if (de != null) {
+				} else 
+					_mealEvent == null;
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			function mealEventDeletionFromDBFailed(de:DatabaseEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventDeletedFromDB);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventDeletionFromDBFailed);
+				trace("Error while deleting mealeventin meal.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function deletionSelectedFoodItemFailed(de:DatabaseEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,deletionSelectedFoodItemFailed);
+				trace("Error while deleting selectedfooditem. Meal.as 0010");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+		}
+		
 		/**
 		 * as Meal implements IListElement, it shoud have a timestamp<br>
 		 * it doesn't necessarly be to be equal to the time of creation, it can also be created as future meal, in which case the value will be entered by the user
@@ -223,6 +303,6 @@ package databaseclasses
 		{
 			return new ClassFactory(MealItemRenderer);
 		}
-
+		
 	}
 }

@@ -62,6 +62,7 @@ package databaseclasses
 		 */ 
 		private var _lastModifiedTimeStamp:Number;
 		
+		[Bindable]
 		private var _selectedFoodItems:ArrayCollection;
 
 		/**
@@ -455,6 +456,14 @@ package databaseclasses
 					ij = _selectedFoodItems.length;
 				}
 			}
+		}
+		
+		/**
+		 * deletes the selectedFoodItem, no deletion from the database 
+		 */
+		public function removeSelectedFoodItem(selectedFoodItemToRemove:SelectedFoodItem):void {
+			_selectedFoodItems.removeItemAt(selectedFoodItems.getItemIndex(selectedFoodItemToRemove));
+			recalculateTotals();
 		}
 	}
 }

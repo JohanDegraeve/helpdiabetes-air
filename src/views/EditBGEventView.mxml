@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
 		backKeyPressed="onBackKeyPressed(event)"
 		creationComplete="onCreationComplete()"
-		actionBarVisible="false"
+		actionBarVisible="true"
 		initialize="onInitialize()">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -43,11 +43,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.DatePicker;
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.PickerEvent;
+			import myComponents.RequestConfirmation;
 			import myComponents.TimePicker;
 			
 			import spark.components.TabbedViewNavigator;
 			import spark.components.ViewNavigator;
 			
+			private var confirmationPicker:RequestConfirmation;
 			private var theBloodGlucoseEvent:BloodGlucoseEvent;
 			private var dateOrTimePicker:Group;
 			private var _eventDateAndTime:Date;
@@ -74,9 +76,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			private var back_label:String;
 
-			[Bindable]
-			private var add_label:String;
-			
 			/**
 			 * if true then this view is created for a new mealevent 
 			 */
@@ -96,9 +95,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					unit = theBloodGlucoseEvent.unit;
 					meteringTexttext = resourceManager.getString('editbgeventview','value') + ' (' + unit + ')';
 					meteringResultText = (new Number(theBloodGlucoseEvent.bloodGlucoseLevel)).toString();
-					add_label = resourceManager.getString('addfooditemview','save_button');
 					newBloodGlucoseEvent = false;
-					actionBarVisible="true";
+					backButton.visible=true;
+					TrashButton.visible = true;
 				}
 			}
 			
@@ -142,6 +141,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 					dateOrTimePicker = null;
 				} 
+				if (confirmationPicker != null) {
+					if (confirmationPicker.isPopUp) {
+						PopUpManager.removePopUp(confirmationPicker);
+						event.preventDefault();
+					}
+				}
 			}
 			
 			private function datumClicked(e:MouseEvent = null):void {
@@ -161,9 +166,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				unit =  resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
 				meteringTexttext = resourceManager.getString('editbgeventview','value') + ' (' +unit  + ')';
 				meteringResultText = "100";
-				add_label = resourceManager.getString('addfooditemview','add_button');
 				newBloodGlucoseEvent = true;
 				back_label = resourceManager.getString('general','back');
+				TrashButton.visible = false;
 			}
 			
 			private function onTimeOrDateCancel(event: PickerEvent): void
@@ -226,18 +231,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				
 				ModelLocator.getInstance().trackingList.refresh();
-				ModelLocator.getInstance().trackingList.refresh();
 				//switch to the tracking view
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
 			}
 			
+			private function deleteEvent(e:MouseEvent = null):void {
+				confirmationPicker = new RequestConfirmation();
+				confirmationPicker.labelText1 = resourceManager.getString('general','delete_event');
+				confirmationPicker.addEventListener(PickerEvent.PICKER_SET, onYesClicked);
+				confirmationPicker.addEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+				
+				PopUpManager.addPopUp(confirmationPicker, this, true);
+				PopUpManager.centerPopUp(confirmationPicker);
+				
+				function onYesClicked(event: PickerEvent): void
+				{
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+					theBloodGlucoseEvent.deleteEvent();
+					ModelLocator.getInstance().trackingList.removeItemAt(ModelLocator.getInstance().trackingList.getItemIndex(theBloodGlucoseEvent));
+					//switch to the tracking view
+					(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
+					((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
+				}
+				
+				function onNoClicked(event: PickerEvent): void
+				{
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+				}
+			}
 			
 		]]>
 	</fx:Script>
 	<s:navigationContent>
-		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+		<s:Button  visible="false" label="{back_label}" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>
+		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" click="okClicked(event)"/>
+	</s:actionContent>
 	
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
 		<s:layout>
@@ -289,8 +323,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:SolidColorStroke color="0xcccccc" weight="1"/>
 			</s:stroke>
 		</s:Line>	
-		<s:Group id="okGroup" y="0" x="0" width="100%" click="okClicked(event)">
-			<s:Button  id="okButton" height="47"   width="100%" label="{add_label}" />
-		</s:Group>
 	</s:Group>
 </s:View>

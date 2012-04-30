@@ -53,6 +53,8 @@ s|BorderContainer {
 	cornerRadius:10
 }
 
+
+
 s|TabbedViewNavigator #tabBar
 {/* tabbar will used a customized tabbartabskin, to have the background with gradient color */
 	/*chromeColor:#8EADD8  ; /* gives the tabnavigator buttons our special color*/
@@ -74,7 +76,6 @@ s|ActionBar
 {
 	chromeColor: #5C89C7; /* gives our action bar our special color*/ 
 	defaultButtonAppearance: beveled; /* ios style action bar buttons*/ 
-	
 }
 
 s|View {

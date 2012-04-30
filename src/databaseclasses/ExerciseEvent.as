@@ -94,5 +94,13 @@ package databaseclasses
 		{
 			return new ClassFactory(ExerciseEventItemRenderer);
 		}
+		
+		/**
+		 * delete the event from the database<br>
+		 * once delted this event should not be used anymore
+		 */
+		public function deleteEvent():void {
+			Database.getInstance().deleteMedicinEvent(this.eventid);
+		}
 	}
 }

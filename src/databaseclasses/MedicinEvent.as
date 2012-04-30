@@ -100,5 +100,13 @@ package databaseclasses
 				timeStamp = newCreationTimeStamp;
 			Database.getInstance().updateMedicinEvent(this.eventid,/*_timeStamp,*/_amount,_medicinName,timeStamp);
 		}
+		
+		/**
+		 * delete the event from the database<br>
+		 * once delted this event should not be used anymore
+		 */
+		public function deleteEvent():void {
+			Database.getInstance().deleteMedicinEvent(this.eventid);
+		}
 	}
 }

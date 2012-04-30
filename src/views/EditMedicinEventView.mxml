@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
 		initialize="onInitialize()"
-		creationComplete="onCreationComplete()" actionBarVisible="false"
+		creationComplete="onCreationComplete()" actionBarVisible="true"
 		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -44,6 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.DatePicker;
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.PickerEvent;
+			import myComponents.RequestConfirmation;
 			import myComponents.TimePicker;
 			import myComponents.elementFromListPicker;
 			
@@ -53,6 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var amountPicker:AmountPicker;
 			private var medicinPicker:elementFromListPicker;
 			private var dateOrTimePicker:Group;
+			private var confirmationPicker:RequestConfirmation;
 
 			[Bindable]
 			private var medicinName:String;
@@ -64,8 +66,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var amountText:String = "0";
 			[Bindable]
 			private var back_label:String;
-			[Bindable]
-			private var add_label:String;
 			
 			/**
 			 * if true then this view is created for a new mealevent 
@@ -97,9 +97,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					timeText = timeformatter.format(_eventDateAndTime);
 					medicinName = (data as MedicinEvent).medicinName;
 					amountText = (new Number((data as MedicinEvent).amount)).toString();
-					add_label = resourceManager.getString('addfooditemview','save_button');
 					newMedicinEvent = false;
-					actionBarVisible = true;
+					backButton.visible=true;
+					TrashButton.visible = true;
 				} 
 			}
 			
@@ -125,7 +125,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 					amountPicker = null;
 				} 
-	
+				if (confirmationPicker != null) {
+					if (confirmationPicker.isPopUp) {
+						PopUpManager.removePopUp(confirmationPicker);
+						event.preventDefault();
+					}
+				}
 			}
 
 			private function onInitialize():void {
@@ -135,8 +140,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				timeText = timeformatter.format(_eventDateAndTime);
 				medicinName = Settings.getInstance().getSetting(parseInt(Settings.getInstance().getSetting(Settings.SettingsDefaultMedicin)));
 				back_label = resourceManager.getString('general','back');
-				add_label = resourceManager.getString('addfooditemview','add_button')
 				newMedicinEvent = true;
+				TrashButton.visible = false;
 			}
 
 			private function insulinTypeGroupClicked(e:MouseEvent = null):void {
@@ -257,16 +262,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				
 				ModelLocator.getInstance().trackingList.refresh();
-				ModelLocator.getInstance().trackingList.refresh();
 				//switch to the tracking view
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
 			}
+			
+			private function deleteEvent(e:MouseEvent = null):void {
+				confirmationPicker = new RequestConfirmation();
+				confirmationPicker.labelText1 = resourceManager.getString('general','delete_event');
+				confirmationPicker.addEventListener(PickerEvent.PICKER_SET, onYesClicked);
+				confirmationPicker.addEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+				
+				PopUpManager.addPopUp(confirmationPicker, this, true);
+				PopUpManager.centerPopUp(confirmationPicker);
+				
+				function onYesClicked(event: PickerEvent): void
+				{
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+					theMedicinEvent.deleteEvent();
+					ModelLocator.getInstance().trackingList.removeItemAt(ModelLocator.getInstance().trackingList.getItemIndex(theMedicinEvent));
+					//switch to the tracking view
+					(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
+					((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
+				}
+				
+				function onNoClicked(event: PickerEvent): void
+				{
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+				}
+			}
 		]]>
 	</fx:Script>
 	<s:navigationContent>
-		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+		<s:Button  visible="false" label="{back_label}" id="backButton" click="navigator.popView()"/>
 	</s:navigationContent>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>
+		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" click="okClicked(event)"/>
+	</s:actionContent>
 
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
 		<s:layout>
@@ -331,8 +366,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:SolidColorStroke color="0xcccccc" weight="1"/>
 			</s:stroke>
 		</s:Line>	
-		<s:Group id="okGroup" y="0" x="0" width="100%" click="okClicked(event)">
-			<s:Button  id="okButton" height="47"   width="100%" label="{add_label}" />
-		</s:Group>
 	</s:Group>
 </s:View>

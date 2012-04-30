@@ -137,6 +137,8 @@ package databaseclasses
 			"DELETE FROM medicinevents where medicineventid = :medicineventid";
 		private const DELETE_ROW_IN_TABLE_MEALEVENTS:String = 
 			"DELETE FROM mealevents where mealeventid = :mealeventid";
+		private const DELETE_ROW_IN_TABLE_SELECTED_FOODITEMS_MATCHING_SELECTEDFOODITEMID:String = 
+			"DELETE FROM selectedfooditems where selectedfooditemid = :selectedfooditemid";
 		/**
 		 * SELECT * FROM settings 
 		 */
@@ -2019,7 +2021,7 @@ package databaseclasses
 				}
 			}
 		}
-		
+				
 		/**
 		 * new exercise event will be added to the database<br>
 		 * here the exerciseeventid will get the value of current date and time as Number 
@@ -2192,7 +2194,7 @@ package databaseclasses
 		}
 		
 		
-		private function deleteMealEvent(mealEventId:Number,dispatcher:EventDispatcher = null):void {
+		internal function deleteMealEvent(mealEventId:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -2265,7 +2267,7 @@ package databaseclasses
 			}
 		}
 		
-		private function deleteMedicinEvent(medicinEventId:Number, dispatcher:EventDispatcher = null):void {
+		internal function deleteMedicinEvent(medicinEventId:Number, dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -2408,6 +2410,59 @@ package databaseclasses
 				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseeventDeleted);
 				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseeventDeletionFailed);
 				trace("exerciseeventdeletionfailed, function delete Event in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+		}
+		
+		/**
+		 * deletes the selectedfooditem from the database, nothing changes to the mealevent or meal that has this selectedfooditem 
+		 */
+		internal function deleteSelectedFoodItem(selectedFoodItemId:Number, dispatcher:EventDispatcher = null):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			if (openSQLConnection(localdispatcher))
+				onOpenResult(null);
+			
+			function onOpenResult(se:SQLEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = DELETE_ROW_IN_TABLE_SELECTED_FOODITEMS_MATCHING_SELECTEDFOODITEMID;
+				localSqlStatement.parameters[":selectedfooditemid"] = selectedFoodItemId;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, selectedFoodItemDeleted);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, selectedFoodItemDeletionFailed);
+				localSqlStatement.execute();
+			}
+			
+			function onOpenError(see:SQLErrorEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("Failed to open the database in function deleteSelectedFoodItem in Database.as");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function selectedFoodItemDeleted(se:SQLEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
+			}
+			
+			function selectedFoodItemDeletionFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
+				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
+				trace("selectedFoodItemDeletionFailed, function deleteSelectedFoodItem in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);

@@ -132,6 +132,7 @@ package myComponents
 		
 
 		override public function set data(value:Object):void {
+			if (value == null) return;//had to do this since revision 214, deleting a selectedfooditem in addfooditemview
 			_selectedFoodItem = value as SelectedFoodItem;
 			labelDisplayText =  _selectedFoodItem.chosenAmount + " " + _selectedFoodItem.unit.unitDescription + " " + _selectedFoodItem.itemDescription;
 			amountOfCarbsEtcText = (Math.round((_selectedFoodItem.chosenAmount * _selectedFoodItem.unit.carbs / _selectedFoodItem.unit.standardAmount)*10))/10 + " " + resourceManager.getString('general','gram_of_carbs');
