@@ -266,7 +266,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		]]>
 	</fx:Script>
 	<s:navigationContent>
-		<s:Button  visible="false" label="{back_label}" id="backButton" click="navigator.popView()"/>
+		<s:Button  visible="false" label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>

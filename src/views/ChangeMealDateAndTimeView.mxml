@@ -162,7 +162,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 	</fx:Script>
 	
 	<s:navigationContent>
-		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 
 	<s:Group y="0" x="0" width="100%" height = "100%" >

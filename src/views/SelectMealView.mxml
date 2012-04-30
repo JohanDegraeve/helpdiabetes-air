@@ -133,7 +133,7 @@ view to show ModelLocator.getInstance().meals in a list
 		]]>
 	</fx:Script>
 	<s:navigationContent>
-		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 
 	<s:actionContent>

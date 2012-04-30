@@ -116,7 +116,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		]]>
 	</fx:Script>
 	<s:navigationContent>
-		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 
 	<s:Scroller width="100%" height="100%">

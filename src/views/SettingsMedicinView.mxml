@@ -47,6 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			protected function view1_initializeHandler(event:FlexEvent):void
+
 			{
 				back_label = resourceManager.getString('general','back');
 				medicinText1 = Settings.getInstance().getSetting(Settings.SettingsInsulinType1);
@@ -57,12 +58,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			protected function type1_changeHandler(event:TextOperationEvent):void
+
 			{
+
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
+
 			}
 			
 			protected function type2_changeHandler(event:TextOperationEvent):void
+
 			{
+
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType2,medicinText2);
 			}
 			
@@ -87,7 +93,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<s:navigationContent>
-		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()"/>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:Group y="0" x="0" width="100%" height = "100%"  left="5" top="5" right="5">
 		<s:layout>
