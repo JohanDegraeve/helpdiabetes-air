@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
-		backKeyPressed="onBackKeyPressed(event)"
+		backKeyPressed="onBackKeyPressed(event)"  deactivate="{navigator.popToFirstView()}"
 		creationComplete="onCreationComplete()"
 		actionBarVisible="true"
 		initialize="onInitialize()">
@@ -75,29 +75,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var timeText:String;
 			[Bindable]
 			private var back_label:String;
-
+			
 			/**
 			 * if true then this view is created for a new mealevent 
 			 */
 			private var newBloodGlucoseEvent:Boolean;
 			
-
+			
 			[Bindable]
 			private var meteringTexttext:String;
 			
 			private function onCreationComplete(): void {
 				back_label = resourceManager.getString('general','back');
-				if (data is BloodGlucoseEvent) {
-					theBloodGlucoseEvent = data as BloodGlucoseEvent;
-					eventDateAndTime = new Date(theBloodGlucoseEvent.timeStamp);
-					dateText = dateformatter.format(_eventDateAndTime);
-					timeText = timeformatter.format(_eventDateAndTime);
-					unit = theBloodGlucoseEvent.unit;
-					meteringTexttext = resourceManager.getString('editbgeventview','value') + ' (' + unit + ')';
-					meteringResultText = (new Number(theBloodGlucoseEvent.bloodGlucoseLevel)).toString();
-					newBloodGlucoseEvent = false;
-					backButton.visible=true;
-					TrashButton.visible = true;
+				if (data is BloodGlucoseEvent) {//coming from trackingview
+					if (TrackingView.popToFirstViewNecessary())
+						navigator.popToFirstView();
+					else {
+						theBloodGlucoseEvent = data as BloodGlucoseEvent;
+						eventDateAndTime = new Date(theBloodGlucoseEvent.timeStamp);
+						dateText = dateformatter.format(_eventDateAndTime);
+						timeText = timeformatter.format(_eventDateAndTime);
+						unit = theBloodGlucoseEvent.unit;
+						meteringTexttext = resourceManager.getString('editbgeventview','value') + ' (' + unit + ')';
+						meteringResultText = (new Number(theBloodGlucoseEvent.bloodGlucoseLevel)).toString();
+						newBloodGlucoseEvent = false;
+						backButton.visible=true;
+						TrashButton.visible = true;
+					}
 				}
 			}
 			

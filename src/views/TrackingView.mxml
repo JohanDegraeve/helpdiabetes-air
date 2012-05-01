@@ -47,6 +47,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.IListElement;
 			import myComponents.elementFromListPicker;
 			
+			private static var lastClickOnTrackingView:Number;
+
+			/**
+			 * Will be used by views pushed by Trackingview (eg editbgeventview), if true then when the pushed view is opened, it will call poptofirstview<br>
+			 * This is to force for instance, that when a user has opened trackingview, click on editbgeventview, more than 15 minutes later goes again to tracking view,
+			 * to allow that automatically the trackingview will be shown again<br>
+			 * To check how it is determined whether true or false, is returned, check the code of get popToFirstViewNecessary<br>
+			 * It is necessary that the views that can be pushed by trackingview, call this method each time they are initialized and if pushed by trackingview, or reactivated ?
+			 */
+			public static function popToFirstViewNecessary():Boolean
+			{
+				if (isNaN(lastClickOnTrackingView)) {
+					lastClickOnTrackingView = (new Date()).valueOf();
+					return false;
+				}
+				if ((new Date()).valueOf() > lastClickOnTrackingView + 15 * 60 * 1000) {
+					lastClickOnTrackingView = (new Date()).valueOf();
+					return true;
+				} 
+				lastClickOnTrackingView = (new Date()).valueOf();
+				return false;
+			}
+
+			
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();
 			}
