@@ -62,7 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					lastClickOnTrackingView = (new Date()).valueOf();
 					return false;
 				}
-				if ((new Date()).valueOf() > lastClickOnTrackingView + 1 * 60 * 1000) {
+				if ((new Date()).valueOf() > lastClickOnTrackingView + 15 * 60 * 1000) {
 					lastClickOnTrackingView = (new Date()).valueOf();
 					return true;
 				} 
