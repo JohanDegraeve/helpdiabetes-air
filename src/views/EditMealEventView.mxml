@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		initialize="onInitialize()"
+		deactivate="{if (navigator != null) navigator.popToFirstView()}"
 		>
 	<fx:Declarations>
 	</fx:Declarations>
@@ -69,36 +70,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
-				back_label = resourceManager.getString('general','back');
-				dateFormatter = new DateTimeFormatter();
-				dateFormatter.dateTimePattern = resourceManager.getString('general','datepattern');
-				dateFormatter.useUTC = false;
-				dateFormatter.setStyle("locale",Capabilities.language.substr(0,2));
-				timeFormatter = new DateTimeFormatter();
-				timeFormatter.dateTimePattern = resourceManager.getString('general','timepattern');
-				timeFormatter.useUTC = false;
-				timeFormatter.setStyle("locale",Capabilities.language.substr(0,2));
-				
-				dateTimeAndMealName_text = dateFormatter.format(mealEvent.timeStamp) + " - " + timeFormatter.format(mealEvent.timeStamp) + 
-									"\n" +  mealEvent.mealName +
-									"  -  " + Math.round(mealEvent.totalCarbs) + " " + resourceManager.getString('general','gram_of_carbs_short');
-				if (mealEvent.insulinRatio != 0) {
-					insulinAmount_text = resourceManager.getString('general','calculated_insulin_amount') + " " + ((Math.round(mealEvent.calculatedInsulinAmount * 10))/10).toString();
-					insulinRatio_text = resourceManager.getString('editmealeventview','insulinRatioUsed') + " " + mealEvent.insulinRatio;
-				} else insulinAmount_text = null;
-				
-				for (var mealCounter:int = ModelLocator.getInstance().meals.length - 1;mealCounter >=0 ; mealCounter--) {
-					if (ModelLocator.getInstance().meals.getItemAt(mealCounter) is Meal) {
-						if ((ModelLocator.getInstance().meals.getItemAt(mealCounter) as Meal).mealEvent == mealEvent) {
-							ModelLocator.getInstance().selectedMeal = mealCounter;						
-							fooditemlist.addEventListener(Event.CHANGE,onClick);
-							mealCounter = -1;
+				if (TrackingView.popToFirstViewNecessary())
+					navigator.popToFirstView();
+				else {
+					back_label = resourceManager.getString('general','back');
+					dateFormatter = new DateTimeFormatter();
+					dateFormatter.dateTimePattern = resourceManager.getString('general','datepattern');
+					dateFormatter.useUTC = false;
+					dateFormatter.setStyle("locale",Capabilities.language.substr(0,2));
+					timeFormatter = new DateTimeFormatter();
+					timeFormatter.dateTimePattern = resourceManager.getString('general','timepattern');
+					timeFormatter.useUTC = false;
+					timeFormatter.setStyle("locale",Capabilities.language.substr(0,2));
+					
+					dateTimeAndMealName_text = dateFormatter.format(mealEvent.timeStamp) + " - " + timeFormatter.format(mealEvent.timeStamp) + 
+						"\n" +  mealEvent.mealName +
+						"  -  " + Math.round(mealEvent.totalCarbs) + " " + resourceManager.getString('general','gram_of_carbs_short');
+					if (mealEvent.insulinRatio != 0) {
+						insulinAmount_text = resourceManager.getString('general','calculated_insulin_amount') + " " + ((Math.round(mealEvent.calculatedInsulinAmount * 10))/10).toString();
+						insulinRatio_text = resourceManager.getString('editmealeventview','insulinRatioUsed') + " " + mealEvent.insulinRatio;
+					} else insulinAmount_text = null;
+					
+					for (var mealCounter:int = ModelLocator.getInstance().meals.length - 1;mealCounter >=0 ; mealCounter--) {
+						if (ModelLocator.getInstance().meals.getItemAt(mealCounter) is Meal) {
+							if ((ModelLocator.getInstance().meals.getItemAt(mealCounter) as Meal).mealEvent == mealEvent) {
+								ModelLocator.getInstance().selectedMeal = mealCounter;						
+								fooditemlist.addEventListener(Event.CHANGE,onClick);
+								mealCounter = -1;
+							}
 						}
 					}
+					
+					if (mealEvent.insulinRatio != 0)
+						currentState="insulinAmount"
 				}
-				
-				if (mealEvent.insulinRatio != 0)
-					currentState="insulinAmount"
 			}
 			
 			private function displaySelectedItem(item:Object):String {

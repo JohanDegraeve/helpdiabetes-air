@@ -31,6 +31,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		remove="onRemove()"
 		title=""
 		backKeyPressed="onBackKeyPressed(event)"
+		deactivate="{if (navigator != null) navigator.popToFirstView()}"
 		>
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','shortdatepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -126,9 +127,15 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 				
 				if (data is SelectedFoodItem) {
-					checkLastMealUpdateRequired = false;
-					mealButtonRequired=false;
-					meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " : " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
+					if (TrackingView.popToFirstViewNecessary()) {
+						navigator.popToFirstView();
+						return;
+					}
+					else {
+						checkLastMealUpdateRequired = false;
+						mealButtonRequired=false;
+						meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " : " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
+					}
 				}
 				
 				//refresh the meals - checkLxstMealUpdateRequired is used here, if checkLastMealUpdateRequired is false, then probably the previous screen was SelectedMealView so there's
