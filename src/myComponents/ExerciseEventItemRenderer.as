@@ -133,11 +133,11 @@ package myComponents
 			var labelDisplayWidth:Number = getElementPreferredWidth(labelDisplay);
 			exerciseLevelDisplay.text = exerciseLevel ;
 			var exerciseLevelDisplayWidth:Number  = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT - iconWidth, getElementPreferredWidth(exerciseLevelDisplay));
-			
+			labelDisplayWidth = unscaledWidth;//setting back to maximum value, because it seems when there was a missing gap between labeldisplaywidt and glucosedisplaywidt, then click item doesn't work in trackingview
+
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
 			setElementSize(exerciseLevelDisplay,exerciseLevelDisplayWidth,itemHeight);
 			setElementSize(image,iconWidth,iconHeight);
-			labelDisplay.truncateToFit();
 			exerciseLevelDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);

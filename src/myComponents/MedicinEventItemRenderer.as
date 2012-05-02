@@ -137,6 +137,8 @@ package myComponents
 			var amountDisplayWidth:Number = getElementPreferredWidth(amountDisplay);
 			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth - iconWidth);
 			amountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(amountDisplay));
+			if (iconWidth + labelDisplayWidth + amountDisplayWidth + PADDING_RIGHT + GAP_HORIZONTAL_MINIMUM < unscaledWidth)
+				labelDisplayWidth = unscaledWidth;//same reason as in exerciseventitemrenderer and bgeventitemrender but this works better
 			
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
 			setElementSize(amountDisplay,amountDisplayWidth,itemHeight);
