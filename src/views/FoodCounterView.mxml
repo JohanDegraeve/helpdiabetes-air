@@ -22,7 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:myComponents="myComponents.*"
 		actionBarVisible="true" 
 		initialize="init()" 
+		add="addHandler()"
 		creationComplete="onCreationComplete()"
+		
 		>
 	
 	<fx:Declarations>
@@ -41,6 +43,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import databaseclasses.FoodItem;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
+			
+			import flash.utils.getTimer;
 			
 			import model.ModelLocator;
 			
@@ -62,9 +66,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			public var listOfOptionsArray:Array ;
 			
-			[Bindable]
-			private var searchtext_text:String;
-			
 			private var excelSorting:ExcelSorting;
 			
 			private var notificationPopUp:Notification;
@@ -72,6 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var elementPicker:elementFromListPicker;
 			private var  foodItems:ArrayCollection;
 
+			private var timer:Timer;
 			
 			private function init():void {
 				/* add event listener for clicking item */
@@ -96,16 +98,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
 					PopUpManager.addPopUp(notificationPopUp, thisObject, true);
 					PopUpManager.centerPopUp(notificationPopUp);
-					/*elementPicker = new elementFromListPicker();
-					elementPicker.elements = new ArrayCollection([
-						resourceManager.getString('general','english'),
-						resourceManager.getString('general','dutch')]);
-					elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, okClicked);
-					elementPicker.addEventListener(Event.REMOVED_FROM_STAGE,okClicked);
-					elementPicker.labelText1 = resourceManager.getString('general','choose_language');
-					
-					PopUpManager.addPopUp(elementPicker,thisObject,true);
-					PopUpManager.centerPopUp(elementPicker);*/
 				}
 				
 				function okClicked(event: PickerEvent):void {
@@ -209,15 +201,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
 				}
-				
-				
 			}
 
 			
 			private function selectFoodItem(event:IndexChangeEvent):void {
-				//data = new Object();
-				//data.searchtext = searchtext.text;
-				navigator.pushView(AddFoodItemView,ModelLocator.getInstance().foodItemList.getItemAt(event.newIndex));
+				data = new Object();
+				data.searchtext = searchtext.text;//we pass the searchtext to addfooditemview. Addfooditemview will return the searchtext or an empty string when popped
+				data.foodItem = ModelLocator.getInstance().foodItemList.getItemAt(event.newIndex);
+				navigator.pushView(AddFoodItemView,data);
 			}
 			
 			private function searchTextChanged():void {
@@ -225,17 +216,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					excelSorting = new ExcelSorting(ModelLocator.getInstance().foodItemList);
 				var result:int = excelSorting.getFirstMatchingItem(searchtext.text);
 				fooditemlist.ensureIndexIsVisible(fooditemlist.dataProvider.length - 1);
-				fooditemlist.ensureIndexIsVisible(result);
+				fooditemlist.ensureIndexIsVisible(result);				
 			}
 			
 			private function displayFoodItem(item:Object):String {
 				return item.itemDescription;
 			}
+			
+			private function addHandler():void {
+				if (navigator.poppedViewReturnedObject != null) {
+					if (navigator.poppedViewReturnedObject.object.searchText) {
+						searchtext.text = navigator.poppedViewReturnedObject.object.searchText;
+						timer = new Timer(200, 1);
+						timer.addEventListener(TimerEvent.TIMER,timerEnd);
+						timer.start();
+					}
+				}
+				
+				function timerEnd():void {
+					searchTextChanged();
+				}
+			}
+
 		]]>
 	</fx:Script>
 	
 	<s:titleContent>
-		<s:TextInput id="searchtext" text="{searchtext_text}" width="100%" change="searchTextChanged()"/>
+		<s:TextInput id="searchtext"  width="100%" change="searchTextChanged()"/>
 		
 	</s:titleContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.ListItemRenderer"

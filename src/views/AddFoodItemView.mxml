@@ -97,6 +97,11 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private var DEFAULT_SIZE_OF_LONGEST_TEXT:int = 50;
 			
 			/**
+			 * if addfooditemview was created via foodcounterview, then this field will contain the searchtext that was added in the datafield 
+			 */
+			private var searchText:String;
+			
+			/**
 			 * used as context value when pushing the view SelectMealView<br>
 			 * when addHandler is called, the value of the return object will be check, if equal to CHANGE_MEAL_DATE_AND_TIME then not allowed to call checkLastMealUpdate
 			 */
@@ -121,12 +126,16 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			}
 			
 			private function onCreationComplete():void {
-				
 				//this is to know hen selectedMeal Changed, in that case also the text shown in the meal button needs to change
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealInitialized);
 				
-				if (data is SelectedFoodItem) {
+				if (data.searchtext)
+					searchText = data.searchtext;
+				else
+					searchText = "";
+				
+				if (data.selectedFoodItem) {
 					if (TrackingView.popToFirstViewNecessary()) {
 						navigator.popToFirstView();
 						return;
@@ -156,13 +165,13 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				}
 				
-				if (data is FoodItem) {
+				if (data.foodItem) {
 					//addfooditemview has been created vi foodcounter view, so initial setup is necessary
 					TrashButton.visible = false;
 					var dispatcher:EventDispatcher = new EventDispatcher();
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
-					Database.getInstance().getUnitList((data as FoodItem) ,dispatcher);
+					Database.getInstance().getUnitList((data.foodItem) ,dispatcher);
 					
 					
 					function unitListRetrieved (event:DatabaseEvent):void {
@@ -170,7 +179,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 						
 						//retrieved fooditem does not have a valid itemid, meaning it can not be used to manage the database
-						retrievedFoodItem = new FoodItem((data as FoodItem).itemDescription,event.data as ArrayCollection,0);
+						retrievedFoodItem = new FoodItem((data.foodItem).itemDescription,event.data as ArrayCollection,0);
 						description_textarea_text = retrievedFoodItem.itemDescription;
 						/* here the details text with the amounts of grams, fat, ... is created */
 						//details_button_fontsize = description_textarea.getStyle("fontSize")*0.8;
@@ -195,12 +204,12 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 						dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 					}
-				} else if (data is SelectedFoodItem) {
+				} else if (data.selectedFoodItem) {
 					//addfooditemview created via tracking => click on mealevent => click on selectedfooditem
-					retrievedFoodItem = new FoodItem((data as SelectedFoodItem).itemDescription,new ArrayCollection([(data as SelectedFoodItem).unit]),0);
+					retrievedFoodItem = new FoodItem((data.selectedFoodItem).itemDescription,new ArrayCollection([(data.selectedFoodItem).unit]),0);
 					description_textarea_text = retrievedFoodItem.itemDescription;
-					details_button_text = createDetailsButtonText(0,(data as SelectedFoodItem).chosenAmount);
-					amount_textinput_text = (data as SelectedFoodItem).chosenAmount.toString();;
+					details_button_text = createDetailsButtonText(0,(data.selectedFoodItem).chosenAmount);
+					amount_textinput_text = (data.selectedFoodItem).chosenAmount.toString();;
 					selectedUnit = 0;
 					TrashButton.visible = true;
 				} else { 
@@ -269,11 +278,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 * pop up for unitlist
 			 */ 
 			private function popUpUnitList(e:MouseEvent = null):void {
-				//if (!hasEventListener(ViewNavigatorEvent.REMOVING))
-				//this.addEventListener(ViewNavigatorEvent.REMOVING,onRemoving);	//necessary for handling the back button in android
-				
 				var unitList:ArrayCollection = new ArrayCollection();
-				unitList .addItem((retrievedFoodItem.getUnit(0) as Unit).unitDescription);
+				unitList.addItem((retrievedFoodItem.getUnit(0) as Unit).unitDescription);
 				for (var i:int = 1; i < retrievedFoodItem.getNumberOfUnits();i++)
 					unitList.addItem((retrievedFoodItem.getUnit(i) as Unit).unitDescription);
 				
@@ -306,14 +312,15 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private function addButtonClicked(e:MouseEvent = null):void {
 				
 				navigator.popView();
+				searchText = "";
 				
 				//first of all when amount = "", set it to 0
 				if (amount_textinput_text =="")
 					amount_textinput_text ="0";
 				
-				if (data is SelectedFoodItem) {
+				if (data.selectedFoodItem) {
 					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent
-						.updateSelectedFoodItemChosenAmount(data as SelectedFoodItem,new Number(amount_textinput_text));
+						.updateSelectedFoodItemChosenAmount(data.selectedFoodItem,new Number(amount_textinput_text));
 				} else {
 					//- get the selected meal (which may or may not already include a mealevent
 					//- create a selectedfooditem and add it
@@ -322,7 +329,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						new SelectedFoodItem(retrievedFoodItem.itemDescription,
 							retrievedFoodItem.getUnit(selectedUnit),
 							new Number(amount_textinput_text)));
-					
 				}
 				var creationTimeStampAsDate:Date = new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);
@@ -386,6 +392,14 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
 			}
 			
+			/**
+			 * returns the searchtext, so foodcounterview can search again on the searchtext, may have been reset to empty string
+			 */
+			override public function createReturnObject():Object {
+				var returnObject:Object = new Object();
+				returnObject.searchText = searchText;
+				return returnObject;
+			}
 			
 			private function createDetailsButtonText(index:int, chosenAmount:Number):String {
 				var standardAmount:Number = retrievedFoodItem.getUnit(index).standardAmount;
@@ -401,7 +415,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				var length:int = (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.selectedFoodItems.length;
 				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
 				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
-				(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).deleteSelectedFoodItem(data as SelectedFoodItem,localdispatcher);
+				(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).deleteSelectedFoodItem(data.selectedFoodItem,localdispatcher);
 				navigator.popView();
 				
 				function selectedFoodItemDeleted(de:DatabaseEvent):void {

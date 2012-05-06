@@ -42,7 +42,6 @@ package myComponents
 	import spark.components.LabelItemRenderer;
 	import spark.components.supportClasses.StyleableTextField;
 	
-	import views.SelectMealView;
 	import views.TemplatesView;
 	
 	/**

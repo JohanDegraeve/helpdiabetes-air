@@ -116,7 +116,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function onClick(event:IndexChangeEvent):void {
 				data = mealEvent;
-				navigator.pushView(AddFoodItemView,mealEvent.selectedFoodItems.getItemAt(event.newIndex),null,null);
+				var dataToPass:Object = new Object();
+				dataToPass.selectedFoodItem = mealEvent.selectedFoodItems.getItemAt(event.newIndex);
+				navigator.pushView(AddFoodItemView,dataToPass,null,null);
 			}
 		]]>
 	</fx:Script>
