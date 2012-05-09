@@ -175,7 +175,7 @@ package myComponents
 			//the next added field is _amountOfCarbsEtc which may have multiple lines, however, assuming it's only one line, it would have the same size as insulinAmount
 			//this values are static in MealEventItemRenderer
 			if (previousY == 0) {
-				measuredHeight = MealEventItemRenderer.carbAmountCalculatedHeight - MealEventItemRenderer.upLiftForNextField /*+ MealEventItemRenderer.insulinAmountCalculatedHeight*/;
+				measuredHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("trackingeventHeight") - MealEventItemRenderer.upLiftForNextField /*+ MealEventItemRenderer.insulinAmountCalculatedHeight*/;
 				previousY = measuredHeight;
 			} else
 				measuredHeight = previousY;

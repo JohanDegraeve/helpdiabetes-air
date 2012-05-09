@@ -12,6 +12,7 @@ s|Application {fontSize:20pt}
 .trackingItems {
 	offsetToPutTextInTheMiddle:12;
 	trackingeventHeight:40pt;/* height for standard events like bloodglucoseevent..*/
+	selectedMealHeight:30pt;
 	iconWidth:36;
 	iconHeight:36;	
 }

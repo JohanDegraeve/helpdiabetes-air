@@ -63,6 +63,7 @@ package myComponents
 		public static var icon:Class;
 		
 		static private var itemHeight:int;
+		static private var selectedMealHeight:int;
 		static private var offsetToPutTextInTheMiddle:int;
 		static private var iconHeight:int;
 		static private var iconWidth:int;
@@ -221,42 +222,6 @@ package myComponents
 		//all variables to maintain previous heights, if changed then invalidatesize must be called.
 		private var previousY:Number = 0;
 		
-		//variables to calculate the width and height of a mealevent rendered with this renderer
-		//preferred values are values obtained with method getPreferredHeight
-		//calculated values are values obtained with object-name.height
-		//preferred values needs to be used in  method setelementsize
-		//calculated values needs to be used to calculate the real heigh, eg val calculating currentY
-		private static var _carbAmountCalculatedHeight:Number = 0;
-		public static function get carbAmountCalculatedHeight():Number
-
-		{
-			return _carbAmountCalculatedHeight;
-		}
-		private static var _carbAmountPreferredHeight:Number = 0;
-		public static function get carbAmountPreferredHeight():Number
-
-		{
-			return _carbAmountPreferredHeight;
-		}
-		private static var _insulinAmountCalculatedHeight:Number = 0;
-		public static function get insulinAmountCalculatedHeight():Number
-
-		{
-			return _insulinAmountCalculatedHeight;
-		}
-		private static var _insulinAmountPreferredHeight:Number = 0;
-		public static function get insulinAmountPreferredHeight():Number
-
-		{
-			return _insulinAmountPreferredHeight;
-		}
-		private static var _selectedMealCalculatedHeight:Number = 0;
-		private static var _selectedMealPreferredHeight:Number = 0;
-		
-		private static var theMiddleOfCarbAmountField:Number = 0;
-		private static var theMiddleOfSelectedItemField:Number = 0;
-		private static var theMiddleOfInsulinField:Number = 0;
-		
 		/**
 		 * the mealevent being rendered is stored here 
 		 */
@@ -286,6 +251,7 @@ package myComponents
 
 			if (itemHeight ==  0) {
 				itemHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("trackingeventHeight");
+				selectedMealHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("selectedMealHeight");
 				offsetToPutTextInTheMiddle = styleManager.getStyleDeclaration(".trackingItems").getStyle("offsetToPutTextInTheMiddle");
 				iconWidth = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconWidth");
 				iconHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconHeight");
@@ -420,35 +386,21 @@ package myComponents
 			carbAmountDisplay.text = carbAmount + " " + gramkh;
 			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
 			
-			if (_carbAmountCalculatedHeight == 0) {//which means also _carbAmountPreferredHeight == 0
-				_carbAmountPreferredHeight = getElementPreferredHeight(carbAmountDisplay);
-				setElementSize(labelDisplay,labelDisplayWidth + iconWidth,_carbAmountPreferredHeight);
-				_carbAmountCalculatedHeight = labelDisplay.height;
-			} else 
-				setElementSize(labelDisplay,labelDisplayWidth + iconWidth,_carbAmountPreferredHeight);
+			setElementSize(labelDisplay,labelDisplayWidth + iconWidth,itemHeight);
 			
-			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,_carbAmountPreferredHeight);
+			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,itemHeight);
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
-			if (theMiddleOfCarbAmountField == 0)
-				theMiddleOfCarbAmountField = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2
-			setElementPosition(labelDisplay,0 + iconWidth ,theMiddleOfCarbAmountField);
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,theMiddleOfCarbAmountField);
-			var currentY:Number = _carbAmountCalculatedHeight - _upLiftForNextField;
+			setElementPosition(labelDisplay,0 + iconWidth ,offsetToPutTextInTheMiddle);
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,offsetToPutTextInTheMiddle);
+			var currentY:Number = itemHeight - _upLiftForNextField;
 			
 		    if (insulinAmount != null && insulinDetails != null) {
 				insulinDetails.text = resourceManager.getString('general','calculated_insulin_amount') + " " + insulinAmount;
-				if (_insulinAmountCalculatedHeight == 0) {
-					_insulinAmountPreferredHeight = getElementPreferredHeight(insulinDetails);	
-					setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,_insulinAmountPreferredHeight);
-					_insulinAmountCalculatedHeight = insulinDetails.height;
-				} else
-					setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,_insulinAmountPreferredHeight);
-				if (theMiddleOfInsulinField == 0)
-					theMiddleOfInsulinField = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2
-				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY + theMiddleOfInsulinField );
-				currentY += _insulinAmountCalculatedHeight -_upLiftForNextField;
+				setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,itemHeight);
+				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY + offsetToPutTextInTheMiddle );
+				currentY += itemHeight -_upLiftForNextField;
 			} else {
 				setElementSize(insulinDetails,0,0);
 			}
@@ -478,7 +430,7 @@ package myComponents
 				if (selectedMealsDescriptionStyleableTextFields == null || selectedMealsDescriptionStyleableTextFields.length == 0)
 					createSelectedMealDescriptionStyleableTextFields(selectedMealsDescriptionStrings.length);
 				for (var m:int; m < selectedMealsCarbAmountStyleableTextFields.length; m++) { 
-					//resuing some variables already defined while calculating labelDisplay and carbAmountDisplay
+					//reusing some variables already defined while calculating labelDisplay and carbAmountDisplay
 					carbAmountDisplayWidth = Math.max(getElementPreferredWidth(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField),MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT);
 					//carbAmountDisplayWidth = MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT;
 					(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField).text = selectedMealsDescriptionStrings.getItemAt(m) as String;
@@ -486,25 +438,17 @@ package myComponents
 					
 					(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField).text = (selectedMealsCarbAmountStrings.getItemAt(m) as String)  +  " " + gramkh;
 					carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField));
-					if (_selectedMealCalculatedHeight == 0) { //which means also _selectedMealPreferredHeight == 0
-						_selectedMealPreferredHeight = getElementPreferredHeight((selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField));
-						setElementSize(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,carbAmountDisplayWidth,_selectedMealPreferredHeight);
-						_selectedMealCalculatedHeight = (selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField).height;
-					} else 
-						setElementSize(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,carbAmountDisplayWidth,_selectedMealPreferredHeight);
+					setElementSize(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,carbAmountDisplayWidth,selectedMealHeight);
 					
-					setElementSize(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,labelDisplayWidth,_selectedMealPreferredHeight);
+					setElementSize(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,labelDisplayWidth,selectedMealHeight);
 					
 					(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField).truncateToFit();
 					(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField).truncateToFit();
 					
-					if (theMiddleOfSelectedItemField == 0)
-						theMiddleOfSelectedItemField = (_carbAmountCalculatedHeight - _carbAmountPreferredHeight)/2
+					setElementPosition(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,0 + PADDING_LEFT,currentY + offsetToPutTextInTheMiddle);
+					setElementPosition(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,currentY + offsetToPutTextInTheMiddle);
 					
-					setElementPosition(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,0 + PADDING_LEFT,currentY + theMiddleOfSelectedItemField);
-					setElementPosition(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,currentY + theMiddleOfSelectedItemField);
-					
-					currentY += _selectedMealCalculatedHeight - _upLiftForNextField;
+					currentY += selectedMealHeight - _upLiftForNextField;
 				}
 			} 
 			
@@ -565,16 +509,16 @@ package myComponents
 			
 			var returnValue:int = 0;
 			//height of label and carbAmount
-			returnValue += _carbAmountCalculatedHeight - _upLiftForNextField;
+			returnValue += itemHeight - _upLiftForNextField;
 			if ((item as MealEvent).insulinRatio != 0) {
-				returnValue += _insulinAmountCalculatedHeight - _upLiftForNextField;
+				returnValue += itemHeight - _upLiftForNextField;
 			}
 			
 			//height of different selectedmeals, only if mealExtended is true 
 			if (getMealExtendedValue(item as MealEvent)) {
 				if ((item as MealEvent).selectedFoodItems != null) {
 					if ((item as MealEvent).selectedFoodItems.length > 0)
-						returnValue += (_selectedMealCalculatedHeight - _upLiftForNextField) * (item as MealEvent).selectedFoodItems.length;
+						returnValue += (selectedMealHeight - _upLiftForNextField) * (item as MealEvent).selectedFoodItems.length;
 				}
 			}
 
@@ -597,20 +541,11 @@ package myComponents
 				return true;
 			var returnValue:Boolean = false;
 			
-			if (ModelLocator.getInstance().meals == null) {
-				//happens in case we get here view dummyview
-				return true;				
-			}
-			
 			if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent != null) {
 				if (mealEvent.mealEventId == (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.mealEventId) {
 					returnValue = true;
 					mealEvent.extendedInTrackingView = true;
 				}
-			}
-			if (mealEvent.mealEventId == -5) {
-				returnValue = true;//this is for the dummyView
-				mealEvent.extendedInTrackingView = true;
 			}
 			return returnValue;
 		}

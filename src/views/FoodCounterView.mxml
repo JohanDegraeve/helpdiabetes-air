@@ -233,6 +233,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				}
 				
+				/* why working with this timer : because when doing the searchtextchanged immediately, then it has no effect,
+				* probably because the list is not even drawn when addHandler is called, by applying this delay of 200 ms, searchTextchanged is called after 200 ms, giving the list 200 ms time to be displayed
+				**/
 				function timerEnd():void {
 					searchTextChanged();
 				}
