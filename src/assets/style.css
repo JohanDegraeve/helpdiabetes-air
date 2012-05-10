@@ -26,7 +26,6 @@ s|Application {fontSize:18pt}
 	paddingRight:4pt;
 }
 
-
 .removePaddingBottomForStyleableTextField {
 	/* StyleableTextFIeld seems to have a large paddingBottom which I was not able to remove so what i did : */
 	/* when a StyleableTextField is positioned, then the next field will be uplifted with a predefined number of pixels, so the next field actually overlaps the previous field */
@@ -44,6 +43,7 @@ s|Application {fontSize:18pt}
 	buttonMaximumHeight:80;/* the maximum height of such a button */
 	buttonGap:2;/* gap between buttons, between last row of buttons and bottom, between first row of buttons and last field above*/
 	textGap:5;/* gap to be used between left side and any textfield, between textfield and right side, and between textfields */
+	buttonNumberFontSize:25pt;
 }
 
 s|BorderContainer {

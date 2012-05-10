@@ -307,8 +307,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  id="datumtext" height="47"  width="25%" text="{resourceManager.getString('general','date')}" verticalAlign="middle"/>
-			<s:Button id="datum" height="47"  width="75%" label="@{dateText}" />
+			<s:Label  id="datumtext" height="47"  width="30%" text="{resourceManager.getString('general','date')}" verticalAlign="middle"/>
+			<s:Button id="datum" height="47"  width="70%" label="@{dateText}" />
 		</s:Group>
 		<s:Line width="100%">
 			<s:stroke>
@@ -320,8 +320,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  id="timetext" height="47"  width="25%" text="{resourceManager.getString('general','time')}" verticalAlign="middle"/>
-			<s:Button id="time" height="47" width="75%" label="@{timeText}" />
+			<s:Label  id="timetext" height="47"  width="30%" text="{resourceManager.getString('general','time')}" verticalAlign="middle"/>
+			<s:Button id="time" height="47" width="70%" label="@{timeText}" />
 		</s:Group>
 		<s:Line width="100%">
 			<s:stroke>

@@ -361,6 +361,11 @@ package myComponents
 		private var _height:Number;
 		
 		/**
+		 * fontsize to use in the numberbuttons
+		 */
+		private var buttonFontSize:int;
+		
+		/**
 		 * constructor, nothing special about it, calls super 
 		 */
 		public function AddFoodItemGroup()
@@ -374,6 +379,7 @@ package myComponents
 				buttonMaximumHeight = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonMaximumHeight");
 				buttonGap = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonGap");
 				textGap = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("textGap");
+				buttonFontSize = styleManager.getStyleDeclaration(".addFoodItemGroup").getStyle("buttonNumberFontSize");
 			}
 		}
 		
@@ -543,6 +549,10 @@ package myComponents
 				
 				button_0.label = "0";button_1.label = "1";button_2.label = "2";button_3.label = "3";button_4.label = "4";button_5.label = "5";
 				button_6.label = "6";button_7.label = "7";button_8.label = "8";button_9.label = "9";button_DecimalPoint.label = ".";button_DEL.label = "<";
+				button_0.setStyle("fontSize",buttonFontSize);button_1.setStyle("fontSize",buttonFontSize);button_2.setStyle("fontSize",buttonFontSize);
+				button_3.setStyle("fontSize",buttonFontSize);button_4.setStyle("fontSize",buttonFontSize);button_5.setStyle("fontSize",buttonFontSize);
+				button_6.setStyle("fontSize",buttonFontSize);button_7.setStyle("fontSize",buttonFontSize);button_8.setStyle("fontSize",buttonFontSize);
+				button_9.setStyle("fontSize",buttonFontSize);button_DecimalPoint.setStyle("fontSize",buttonFontSize);button_DEL.setStyle("fontSize",buttonFontSize);
 				
 				addElement(button_0);addElement(button_1);addElement(button_2);addElement(button_3);addElement(button_4);addElement(button_5);
 				addElement(button_6);addElement(button_7);addElement(button_8);addElement(button_9);addElement(button_DEL);addElement(button_DecimalPoint);
