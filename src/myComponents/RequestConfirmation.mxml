@@ -71,8 +71,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<s:BorderContainer>
 		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
-			<s:Label text="{labelText1}" width="100%" styleName="textColorInPickerOnDarkBackground" />
-			<s:Label text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<s:Label includeInLayout="{labelText1 != ''}" text="{labelText1}" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<s:Label includeInLayout="{labelText2 != ''}" text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0xcccccc" weight="3"/>
@@ -80,8 +80,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			</s:Line>
 			<s:BorderContainer width="100%" backgroundColor="0xcccccc" minHeight="0">
 				<s:HGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
-					<s:Button width="100%" height="100%" minHeight="60" label="{resourceManager.getStringArray('general','yes')}" click="yesClicked()"/>
-					<s:Button width="100%" height="100%" minHeight="60" label="{resourceManager.getStringArray('general','no')}" click="noClicked()"/>
+					<s:Button width="100%" height="100%" minHeight="60" minWidth="70" label="{resourceManager.getStringArray('general','yes')}" click="yesClicked()"/>
+					<s:Button width="100%" height="100%" minHeight="60" minWidth="70" label="{resourceManager.getStringArray('general','no')}" click="noClicked()"/>
 				</s:HGroup>
 			</s:BorderContainer>
 		</s:VGroup>

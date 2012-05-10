@@ -398,9 +398,9 @@ package myComponents
 			
 		    if (insulinAmount != null && insulinDetails != null) {
 				insulinDetails.text = resourceManager.getString('general','calculated_insulin_amount') + " " + insulinAmount;
-				setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,itemHeight);
+				setElementSize(insulinDetails,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,selectedMealHeight);
 				setElementPosition(insulinDetails,0 + PADDING_LEFT,currentY + offsetToPutTextInTheMiddle );
-				currentY += itemHeight -_upLiftForNextField;
+				currentY += selectedMealHeight -_upLiftForNextField;
 			} else {
 				setElementSize(insulinDetails,0,0);
 			}

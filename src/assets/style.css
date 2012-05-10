@@ -2,7 +2,7 @@
 @namespace s "library://ns.adobe.com/flex/spark";
 @namespace mx "library://ns.adobe.com/flex/mx";
 
-s|Application {fontSize:20pt} 
+s|Application {fontSize:18pt} 
 
 /* picker is for instance datepicker, timepicker, amountpicker */
 .textColorInPickerOnDarkBackground {
@@ -10,9 +10,9 @@ s|Application {fontSize:20pt}
 }
 
 .trackingItems {
-	offsetToPutTextInTheMiddle:12;
-	trackingeventHeight:40pt;/* height for standard events like bloodglucoseevent..*/
-	selectedMealHeight:30pt;
+	offsetToPutTextInTheMiddle:10;
+	trackingeventHeight:36pt;/* height for standard events like bloodglucoseevent..*/
+	selectedMealHeight:25pt; /* also used in other places */
 	iconWidth:36;
 	iconHeight:36;	
 }
@@ -20,8 +20,8 @@ s|Application {fontSize:20pt}
 /* typically for text that should be smaller than normal text */
 .fontSizeForSubElements {
 	fontSize:16pt;
-	paddingTop:4pt;	/* not yet used */
-    paddingBottom:4pt; /* not yet used */
+	paddingTop:4pt;	
+    paddingBottom:4pt; 
 	paddingLeft:4pt;
 	paddingRight:4pt;
 }

@@ -51,10 +51,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			[Bindable]
 			private var insulinAmount_text:String;
+			
 			[Bindable]
-			private var insulinRatio_text:String;
+			private var carbAmount_text:String;
+			[Bindable]
+			private var proteinAmount_text:String;
+			[Bindable]
+			private var kilocalorieAmount_text:String;
+			[Bindable]
+			private var fatAmount_text:String;
 			
 			private var mealEvent:MealEvent;
+			
 			[Bindable]
 			private var selectedFoodItems:ArrayCollection;
 			[Bindable]
@@ -83,12 +91,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					timeFormatter.useUTC = false;
 					timeFormatter.setStyle("locale",Capabilities.language.substr(0,2));
 					
-					dateTimeAndMealName_text = dateFormatter.format(mealEvent.timeStamp) + " - " + timeFormatter.format(mealEvent.timeStamp) + 
-						"\n" +  mealEvent.mealName +
-						"  -  " + Math.round(mealEvent.totalCarbs) + " " + resourceManager.getString('general','gram_of_carbs_short');
+					dateTimeAndMealName_text = dateFormatter.format(mealEvent.timeStamp) + " - " + timeFormatter.format(mealEvent.timeStamp) + " " + mealEvent.mealName ;
+					carbAmount_text = Math.round(mealEvent.totalCarbs) + " " + resourceManager.getString('general','gram_of_carbs_short');
+					proteinAmount_text = Math.round(mealEvent.totalProtein) + " " + resourceManager.getString('general','gram_of_protein');
+					fatAmount_text = Math.round(mealEvent.totalFat) + " " + resourceManager.getString('general','gram_of_fat');
+					kilocalorieAmount_text = Math.round(mealEvent.totalKilocalories) + " " + resourceManager.getString('general','kilocalories');
+					
 					if (mealEvent.insulinRatio != 0) {
-						insulinAmount_text = resourceManager.getString('general','calculated_insulin_amount') + " " + ((Math.round(mealEvent.calculatedInsulinAmount * 10))/10).toString();
-						insulinRatio_text = resourceManager.getString('editmealeventview','insulinRatioUsed') + " " + mealEvent.insulinRatio;
+						insulinAmount_text =  ((Math.round(mealEvent.calculatedInsulinAmount * 10))/10).toString() + 
+							" " + 
+							resourceManager.getString('editmealeventview','unitsofinsulin') + 
+							", " + resourceManager.getString('editmealeventview','insulinRatioUsed')
+							+ " " + mealEvent.insulinRatio;
 					} else insulinAmount_text = null;
 					
 					for (var mealCounter:int = ModelLocator.getInstance().meals.length - 1;mealCounter >=0 ; mealCounter--) {
@@ -102,7 +116,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 					
 					if (mealEvent.insulinRatio != 0)
-						currentState="insulinAmount"
+						currentState="insulinAmount";
 				}
 			}
 			
@@ -132,23 +146,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:VerticalLayout gap="0">
 				</s:VerticalLayout>
 			</s:layout>
-			<s:TextArea id="dateTimeAndMealName" width="100%" height="70" text="{dateTimeAndMealName_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"/>
+			<s:TextArea id="dateTimeAndMealName" width="100%" text="{dateTimeAndMealName_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('trackingeventHeight')}"/>
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0x000000" weight="1"/>
 				</s:stroke>
 			</s:Line>
-			<s:TextArea includeIn="insulinAmount"  id="insulinAmount" width="100%" text="{insulinAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
-						/>
-			<s:TextArea includeIn="insulinAmount" id="insulinRatio" width="100%" text="{insulinRatio_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
-						/>
-			<s:Line includeIn="insulinAmount" width="100%"  >
+			
+			<s:TextArea id="carbAmount" width="100%" paddingTop="0" paddingBottom="0" text="{carbAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight')}"/>
+			<s:TextArea id="proteinAmount" width="100%" paddingTop="0" paddingBottom="0" text="{proteinAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight')}"/>
+			<s:TextArea id="fatAmount" width="100%" paddingTop="0" paddingBottom="0" text="{fatAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight')}"/>
+			<s:TextArea id="kilocalorieAmount" width="100%" paddingTop="0" paddingBottom="0"  text="{kilocalorieAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight')}"/>
+			
+			<s:TextArea includeIn="insulinAmount"  id="insulinAmount" width="100%" paddingTop="0" paddingBottom="0"  text="{insulinAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight')}"/>
+			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0x000000" weight="1"/>
 				</s:stroke>
 			</s:Line>
-			<s:TextArea id="selectedItemsTitle" width="100%" text="{resourceManager.getString('editmealeventview','selecteditems')}"  editable="false" borderVisible="false" contentBackgroundAlpha="0"
-						/>
+			
 			<s:List id="fooditemlist" width="100%"  height="100%" useVirtualLayout="false" dataProvider="{selectedFoodItems}" contentBackgroundAlpha="0" 
 					labelFunction="displaySelectedItem" itemRendererFunction="itemRendererFunction" />
 		</s:Group>

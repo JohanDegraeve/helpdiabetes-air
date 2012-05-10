@@ -249,7 +249,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		
 	</s:titleContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.ListItemRenderer"
-			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem">
+			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem"
+			scrollSnappingMode="leadingEdge">
 	</s:List>
 </s:View>
 
