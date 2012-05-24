@@ -29,20 +29,6 @@ package databaseclasses
 		
 		private var _medicinName:String;
 		
-		private var _eventid:Number;
-
-		internal function get eventid():Number
-		{
-			return _eventid;
-		}
-
-		internal function set eventid(value:Number):void
-		{
-			_eventid = value;
-		}
-		
-		
-
 		public function get medicinName():String
 		{
 			return _medicinName;

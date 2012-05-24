@@ -29,16 +29,6 @@ package databaseclasses
 		private var _bloodGlucoseLevel:int;
 		private var _eventid:Number;
 		
-		internal function get eventid():Number
-		{
-			return _eventid;
-		}
-		
-		internal function set eventid(value:Number):void
-		{
-			_eventid = value;
-		}
-		
 		private var _unit:String;
 
 		public function get unit():String

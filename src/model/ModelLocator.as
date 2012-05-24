@@ -89,6 +89,26 @@ package model
 		 * initialized to -1 which means invalid value
 		 */
 		private var _selectedMeal:int = -1;
+		
+		private var _trackingEventToShow:int = 0;
+
+		/**
+		 * index to the tracking event to show when going to trackingview 
+		 */
+		public function get trackingEventToShow():int
+		{
+			return _trackingEventToShow;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set trackingEventToShow(value:int):void
+		{
+			_trackingEventToShow = value;
+		}
+
+		
 		/**
 		 * used for event dispatching, when selectedMeal changes, except when chaning from value -1<br>
 		 */
@@ -260,7 +280,7 @@ package model
 		public function getMealEventFromTrackingList(mealEventId:Number):MealEvent {
 			for (var i:int = trackingList.length - 1;i >= 0; i--) {
 				if (trackingList.getItemAt(i) is MealEvent)
-					if (((trackingList.getItemAt(i)) as MealEvent).mealEventId == mealEventId)
+					if (((trackingList.getItemAt(i)) as MealEvent).eventid == mealEventId)
 						return (trackingList.getItemAt(i) as MealEvent);
 			}
 			return null;
@@ -280,6 +300,7 @@ package model
 		 * initialized to -1 which means invalid value, it's the database initialization that will set it to a valid value<br>
 		 * When the value is initialized by database.init (ie change from value -1), then an event will be dispatched ModelLocator.SELECTEDMEAL_INITIALIZED<br>
 		 * When the value is changed (ie change from value different from -1), then an event will be dispatched ModelLocator.SELECTEDMEAL_CHANGED<br>
+		 * When selectedMeal is changed, then also tarckingEventToShow gets the new value
 		 */
 		public function set selectedMeal(value:int):void
 		{
@@ -289,6 +310,8 @@ package model
 			} else {
 				_selectedMeal = value;
 				this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_CHANGED));
+				if ((meals.getItemAt(_selectedMeal) as Meal).mealEvent)
+					trackingEventToShow = trackingList.getItemIndex((meals.getItemAt(_selectedMeal) as Meal).mealEvent);
 			}
 		}
 		

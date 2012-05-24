@@ -176,7 +176,7 @@ package databaseclasses
 					ModelLocator.getInstance().trackingList.refresh();
 				}
 				Settings.getInstance().setSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION, (new Date()).valueOf().toString());
-				Settings.getInstance().setSetting(Settings.SettingLAST_MEAL_ID,_mealEvent.mealEventId.toString());
+				Settings.getInstance().setSetting(Settings.SettingLAST_MEAL_ID,_mealEvent.eventid.toString());
 			}
 			
 			function mealEventCreationError(de:DatabaseEvent):void {
@@ -209,7 +209,7 @@ package databaseclasses
 				trace ("error in deletedSelectedFoodItem, the meal has a mealEvent but the selectedFOodItems array is nul");
 				return;
 			}
-			if (selectedFoodItem.mealEventId != _mealEvent.mealEventId) {
+			if (selectedFoodItem.mealEventId != _mealEvent.eventid) {
 				trace ("error in deletedSelectedFoodItem, the specified selectedfooditem does not belong to the  mealevent in this meal");
 				return;
 			}
@@ -228,7 +228,7 @@ package databaseclasses
 				if (_mealEvent.selectedFoodItems.length == 0) {
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventDeletedFromDB);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventDeletionFromDBFailed);
-					Database.getInstance().deleteMealEvent(_mealEvent.mealEventId,localdispatcher);
+					Database.getInstance().deleteMealEvent(_mealEvent.eventid,localdispatcher);
 					ModelLocator.getInstance().trackingList.removeItemAt(ModelLocator.getInstance().trackingList.getItemIndex(_mealEvent));
 					ModelLocator.getInstance().trackingList.refresh();
 					if (dispatcher != null) {

@@ -20,9 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*" 
 		actionBarVisible="false"
-		creationComplete="onCreationComplete()" 
-		initialize="onInitialize()"
-		>
+		initialize="onInitialize()">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -80,11 +78,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				title=resourceManager.getString('trackingview','title');
 			}
 			
-			private function onCreationComplete():void {
-					trackinglist.ensureIndexIsVisible(ModelLocator.getInstance().trackingList.length - 1);
-			}
-			
 			private function onListElementClicked(event:MouseEvent):void {
+				data = new Object();
+				data.selectedIndex = (event.currentTarget as List).selectedIndex;
 				if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
 					navigator.pushView(EditMealEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex)); 					
 				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MedicinEvent) {
@@ -99,7 +95,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Script>
 	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().trackingList}"
-			click="onListElementClicked(event)" 
+			click="onListElementClicked(event)"
 			itemRendererFunction="getItemRenderer">
 		<s:layout>
 			<myComponents:TrackingViewLayout useVirtualLayout="true" />

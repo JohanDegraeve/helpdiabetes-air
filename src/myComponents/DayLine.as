@@ -31,9 +31,10 @@ package myComponents
 		/**
 		 * creates a dayline with timeStamp, time will be set to 00:00 in the morning 0 seconds 0 milliseconds 
 		 */
-		public function DayLine( timeStamp:Number)
+		public function DayLine(timeStamp:Number)
 		{
 			this.timeStamp = timeStamp;
+			eventid = (new Date()).valueOf();
 		}
 		
 		public function get timeStamp():Number {

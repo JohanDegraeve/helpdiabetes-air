@@ -542,7 +542,7 @@ package myComponents
 			var returnValue:Boolean = false;
 			
 			if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent != null) {
-				if (mealEvent.mealEventId == (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.mealEventId) {
+				if (mealEvent.eventid == (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.eventid) {
 					returnValue = true;
 					mealEvent.extendedInTrackingView = true;
 				}

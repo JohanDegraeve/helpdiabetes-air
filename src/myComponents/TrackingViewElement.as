@@ -19,12 +19,27 @@ package myComponents
 {
 	/**
 	 * a superclass for the object types that can be element in the trackingview<br>
-	 * it's doing nothing, it's just here to be able to create a getHeight and getWidth method in the TrackingViewElementItemRenderer, with a single parameter 
+	 *  it's just here to be able to create a getHeight and getWidth method in the TrackingViewElementItemRenderer, with a single parameter<br>
+	 * also the eventid is defined here 
 	 */
 	public class TrackingViewElement
 	{
 		public function TrackingViewElement()
 		{
 		}
+		
+		private var _eventid:Number;
+		
+		public function get eventid():Number
+		{
+			return _eventid;
+		}
+		
+		public function set eventid(value:Number):void
+		{
+			_eventid = value;
+		}
+		
+
 	}
 }

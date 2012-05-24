@@ -53,10 +53,7 @@ package databaseclasses
 		 * - the most recent bloodglucsoeevent before the mealevent is used
 		 */ 
 		private var _previousBGlevel:int;
-		/**
-		 * the mealeventid
-		 */ 
-		private var _mealEventId:Number;
+
 		/**
 		 * the lastmodifiedtimestamp
 		 */ 
@@ -151,19 +148,19 @@ package databaseclasses
 			}
 
 			if (!databaseStorage) {
-				this._mealEventId = mealEventId;
+				this.eventid = mealEventId;
 				this._selectedFoodItems = selectedFoodItems;
 				recalculateTotals();
 			}
 			else  {
-				_mealEventId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
+				eventid = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
 				_selectedFoodItems = new ArrayCollection();
 								
 				var localDispatcher:EventDispatcher = new EventDispatcher();
 				localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
 				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
-				Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, (_mealEventId + 1).toString());
-				Database.getInstance().createNewMealEvent(_mealEventId,
+				Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, (eventid + 1).toString());
+				Database.getInstance().createNewMealEvent(eventid,
 					mealName,
 					_lastModifiedTimeStamp.valueOf().toString(),
 					insulinRatio,
@@ -184,7 +181,7 @@ package databaseclasses
 			function mealEventCreationFailed (errorEvent:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
-				Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, _mealEventId.toString());
+				Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, eventid.toString());
 				trace("Error while storing mealevent in database. MealEvent.as 0001");
 				if (dispatcher != null) {
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
@@ -195,7 +192,7 @@ package databaseclasses
 		internal function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,dispatcher:EventDispatcher = null):void {
 			_selectedFoodItems.addItem(selectedFoodItem);
 			selectedFoodItem.selectedItemId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_SELECTEDITEM_ID));
-			selectedFoodItem.mealEventId = this._mealEventId;
+			selectedFoodItem.mealEventId = this.eventid;
 			
 			var localDispatcher:EventDispatcher = new EventDispatcher();
 			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
@@ -203,7 +200,7 @@ package databaseclasses
 			
 			Database.getInstance().createNewSelectedItem(
 				selectedFoodItem._selectedItemId,
-				this._mealEventId,
+				this.eventid,
 				selectedFoodItem.itemDescription,
 				selectedFoodItem.unit.unitDescription,
 				selectedFoodItem.unit.standardAmount,
@@ -230,7 +227,7 @@ package databaseclasses
 				recalculateTotals();
 				
 				_lastModifiedTimeStamp = (new Date()).valueOf();
-				Database.getInstance().updateMealEventLastModifiedTimeStamp(_lastModifiedTimeStamp,_mealEventId,localDispatcher);	
+				Database.getInstance().updateMealEventLastModifiedTimeStamp(_lastModifiedTimeStamp,eventid,localDispatcher);	
 			}
 				
 			function timeStampUpdated(event:DatabaseEvent):void {
@@ -376,7 +373,7 @@ package databaseclasses
 				this._insulinRatio = 0;
 			else
 				this._insulinRatio = value;
-			Database.getInstance().updateInsulineRatio(this.mealEventId,value,null);
+			Database.getInstance().updateInsulineRatio(this.eventid,value,null);
 			recalculateInsulinAmount();
 		}
 
@@ -416,14 +413,6 @@ package databaseclasses
 			return _calculatedInsulinAmount;
 		}
 
-		/**
-		 * the mealeventid
-		 */
-		public function get mealEventId():Number
-		{
-			return _mealEventId;
-		}
-		
 		/**
 		 * recalculates total carbs, kilocalories, protein and fat<br>
 		 * also recalculates insulinamount 

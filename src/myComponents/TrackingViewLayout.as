@@ -38,8 +38,19 @@ package myComponents
 		
 		private var _lastIndexInView:int;
 		private var _firstIndexInView:int;
-		private var yToIndex:Vector.<int>; 
-		private var indexToY:Vector.<int>; 
+		static private var _yToIndex:Vector.<int>; 
+		static private var _indexToY:Vector.<int>; 
+
+		/**
+		 * indexToY returns the y coordinate of object with specified index
+		 */
+		public static function getIndexToY(index:int):int
+		{
+			if (_indexToY == null)
+				return 0;
+			return _indexToY[index];
+		}
+
 		private var _currentFirstIndexInView:int;
 		private var _currentLastIndexInView:int;
 		private var _firstUpdateDisplayList:Boolean=true;
@@ -61,8 +72,8 @@ package myComponents
 			var count:int = dataProvider.length;
 			
 			var elementHeight:Number;
-			yToIndex = new Vector.<int>();
-			indexToY = new Vector.<int>();
+			_yToIndex = new Vector.<int>();
+			_indexToY = new Vector.<int>();
 			var d:Object ;
 			//loop though all the elements elements
 			for (var i:int = 0; i < count; i++) {
@@ -86,12 +97,12 @@ package myComponents
 		private function addToVectorY(index:int, startHeight:Number, elementHeight:Number):void {
 			var end:int = startHeight + elementHeight ;
 			for (var i:int = startHeight; i < end; i++) {
-				yToIndex[i] = index;
+				_yToIndex[i] = index;
 			}
 		}
 		
 		private function addToVectorIndex(index:int, y:int):void {
-			indexToY[index] = y;
+			_indexToY[index] = y;
 		}
 		
 		override protected function scrollPositionChanged():void {
@@ -124,20 +135,20 @@ package myComponents
 			var i1:int;
 			if (y0 < 0) {
 				i0 = 0;
-				i1 = yToIndex.length - 1 > g.height ? yToIndex[g.height + 1]  : g.numElements - 1;
+				i1 = _yToIndex.length - 1 > g.height ? _yToIndex[g.height + 1]  : g.numElements - 1;
 				setIndexInView(i0,i1);
 				return;	
 			}
 			
-			if (y1 < yToIndex.length - 1) {
-				i0 = yToIndex[Math.floor(y0)];
-				i1 = yToIndex[Math.ceil(y1)];
+			if (y1 < _yToIndex.length - 1) {
+				i0 = _yToIndex[Math.floor(y0)];
+				i1 = _yToIndex[Math.ceil(y1)];
 			} else {
-				if (yToIndex.length - 1 - g.height < 0)
+				if (_yToIndex.length - 1 - g.height < 0)
 					i0 = 0;
 				else
-					i0 = yToIndex[yToIndex.length - 1 - g.height];
-				i1 = yToIndex[yToIndex.length - 1];
+					i0 = _yToIndex[_yToIndex.length - 1 - g.height];
+				i1 = _yToIndex[_yToIndex.length - 1];
 			}
 			setIndexInView(i0,i1);
 			if (i0 < _currentFirstIndexInView || i1 > _currentLastIndexInView) {
@@ -155,19 +166,17 @@ package myComponents
 			//provide the initial values, based on selectedmeal
 			if (_firstUpdateDisplayList) {
 				_firstUpdateDisplayList = false;
-				if (indexToY[indexToY.length - 1] < containerHeight) {
+				if (_indexToY[_indexToY.length - 1] < containerHeight) {
 					_firstIndexInView = 0;					
 				} else {
-					var firstMealEventToShow:Number;
+					var firstEventToShow:Number;
 					try {
-						firstMealEventToShow = (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.mealEventId;
+						firstEventToShow = (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().trackingEventToShow) as TrackingViewElement).eventid;
 						for (var trackingCounter:int = ModelLocator.getInstance().trackingList.length - 1; trackingCounter >= 0;trackingCounter--) {
-							if (ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) is MealEvent) {
-								if ((ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) as MealEvent).mealEventId == firstMealEventToShow) {
+								if ((ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) as TrackingViewElement).eventid == firstEventToShow) {
 									_firstIndexInView = trackingCounter;
 									trackingCounter = -1;
 								}
-							}
 						}
 					} catch (erObject:TypeError) {
 						//this happens when mealEvent is null, which can be eg when going the tracking a mealtime after having created the latest meal, in this case, we'll simply set the _firstindex to lastelement
@@ -175,10 +184,10 @@ package myComponents
 						_firstIndexInView = ModelLocator.getInstance().trackingList.length - 1;
 					}
 					if (_firstIndexInView) {//firstindex found, so we can set the scrollrect
-						if (indexToY[indexToY.length - 1] - indexToY[_firstIndexInView] < containerHeight) {
-							verticalScrollPosition = 	indexToY[indexToY.length - 1] - containerHeight;						
+						if (_indexToY[_indexToY.length - 1] - _indexToY[_firstIndexInView] < containerHeight) {
+							verticalScrollPosition = 	_indexToY[_indexToY.length - 1] - containerHeight;						
 						} else {
-							verticalScrollPosition = indexToY[_firstIndexInView] - 100;
+							verticalScrollPosition = _indexToY[_firstIndexInView] - 100;
 						}
 					}
 				}
@@ -198,9 +207,9 @@ package myComponents
 			do  {
 				element = layoutTarget.getVirtualElementAt(count);
 				
-				elementHeight = indexToY[count + 1] - indexToY[count];//there's always a count + 1 element because I've added an extra el
+				elementHeight = _indexToY[count + 1] - _indexToY[count];//there's always a count + 1 element because I've added an extra el
 				element.setLayoutBoundsSize(layoutTarget.width, elementHeight);
-				element.setLayoutBoundsPosition(0, indexToY[count ]);
+				element.setLayoutBoundsPosition(0, _indexToY[count ]);
 
 				
 				count++;
@@ -209,17 +218,17 @@ package myComponents
 			//now add one additional element before the first, to make scrolling a bit more performant
 			if (_currentFirstIndexInView > 0) {
 				element = layoutTarget.getVirtualElementAt(_currentFirstIndexInView - 1);
-				elementHeight = indexToY[_currentFirstIndexInView] - indexToY[_currentFirstIndexInView - 1];
+				elementHeight = _indexToY[_currentFirstIndexInView] - _indexToY[_currentFirstIndexInView - 1];
 				element.setLayoutBoundsSize(layoutTarget.width, elementHeight);
-				element.setLayoutBoundsPosition(0, indexToY[_currentFirstIndexInView - 1]);
+				element.setLayoutBoundsPosition(0, _indexToY[_currentFirstIndexInView - 1]);
 				_currentFirstIndexInView--;
 			}
 			//add an additional element after the last
 			if (_currentLastIndexInView <  (layoutTarget as DataGroup).dataProvider.length - 1) {
 				element = layoutTarget.getVirtualElementAt(_currentLastIndexInView + 1);
-				elementHeight = indexToY[_currentLastIndexInView + 2] - indexToY[_currentLastIndexInView + 1];
+				elementHeight = _indexToY[_currentLastIndexInView + 2] - _indexToY[_currentLastIndexInView + 1];
 				element.setLayoutBoundsSize(layoutTarget.width, elementHeight);
-				element.setLayoutBoundsPosition(0,  indexToY[_currentLastIndexInView +1]);
+				element.setLayoutBoundsPosition(0,  _indexToY[_currentLastIndexInView +1]);
 				_currentLastIndexInView++;
 			}
 		}

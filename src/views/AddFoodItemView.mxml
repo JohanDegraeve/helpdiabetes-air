@@ -59,7 +59,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
 			
-			import myComponents.DayLine;
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
@@ -265,7 +264,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					for (var l:int = 0;l < ModelLocator.getInstance().meals.length; l++) {
 						if (ModelLocator.getInstance().meals.getItemAt(l) is Meal) {
 							if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).hasMealEvent()) {
-								if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).mealEvent.mealEventId == new Number(Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID))) {
+								if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).mealEvent.eventid == new Number(Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID))) {
 									ModelLocator.getInstance().selectedMeal = l;
 									l = ModelLocator.getInstance().meals.length;
 								}
