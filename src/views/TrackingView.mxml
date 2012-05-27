@@ -19,8 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*" 
-		actionBarVisible="false"
-		initialize="onInitialize()">
+		actionBarVisible="false">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -67,20 +66,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				lastClickOnTrackingView = (new Date()).valueOf();
 				return false;
 			}
-
 			
 			private function getItemRenderer(item:Object):ClassFactory {
 				var temp:Object = ModelLocator.getInstance().trackingList;
 				return (item as IListElement).listElementRendererFunction();
 			}
 			
-			private function onInitialize():void {
-				title=resourceManager.getString('trackingview','title');
-			}
-			
 			private function onListElementClicked(event:MouseEvent):void {
-				data = new Object();
-				data.selectedIndex = (event.currentTarget as List).selectedIndex;
+				ModelLocator.getInstance().trackingEventToShow = (event.currentTarget as List).selectedIndex;
 				if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
 					navigator.pushView(EditMealEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex)); 					
 				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MedicinEvent) {

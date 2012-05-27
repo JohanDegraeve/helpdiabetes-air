@@ -310,9 +310,9 @@ package model
 			} else {
 				_selectedMeal = value;
 				this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_CHANGED));
-				if ((meals.getItemAt(_selectedMeal) as Meal).mealEvent)
-					trackingEventToShow = trackingList.getItemIndex((meals.getItemAt(_selectedMeal) as Meal).mealEvent);
 			}
+			if ((meals.getItemAt(_selectedMeal) as Meal).mealEvent)
+				trackingEventToShow = trackingList.getItemIndex((meals.getItemAt(_selectedMeal) as Meal).mealEvent);
 		}
 		
 		/**
