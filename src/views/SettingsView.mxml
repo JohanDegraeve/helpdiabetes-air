@@ -36,11 +36,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
 			
+			import myComponents.AlertPopUp;
+			import myComponents.PickerEvent;
 			import myComponents.elementFromListPicker;
 			
 			import spark.events.IndexChangeEvent;
+			import spark.events.PopUpEvent;
 			
 			private var elementPicker:elementFromListPicker;
+			private var alertPopUp:AlertPopUp;
 			
 			[ResourceBundle("settingsview")]
 			
@@ -51,7 +55,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ResourceManager.getInstance().getString("settingsview","medicin"),
 				ResourceManager.getInstance().getString("settingsview","exercise"),
 				ResourceManager.getInstance().getString("settingsview","database"),
-				ResourceManager.getInstance().getString("settingsview","language")
+				ResourceManager.getInstance().getString("settingsview","language"),
+				ResourceManager.getInstance().getString("settingsview","infoabout")
 			]);	
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -126,13 +131,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							resourceManager.getString('general','english'),
 							resourceManager.getString('general','dutch')]);
 						elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, languageSelected);
-						//elementPicker.addEventListener(Event.REMOVED_FROM_STAGE,onReturn);
 						elementPicker.labelText1 = resourceManager.getString('general','choose_language');
 						
 						PopUpManager.addPopUp(elementPicker,UIComponent(this.parentApplication),true);
 						PopUpManager.centerPopUp(elementPicker);
 						break;
+					case 7:
+						alertPopUp = new AlertPopUp();
+						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+						var textToShow:String = 
+							resourceManager.getString('settingsview','version') + 
+							resourceManager.getString('settingsview','copyright') +
+							resourceManager.getString('settingsview','infoabouttext');
+						alertPopUp.show(this,textToShow);
+						break;
 				}
+				
+				function okClicked(event: PopUpEvent):void {
+					if (alertPopUp != null) {
+						PopUpManager.removePopUp(alertPopUp);
+						if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+							alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+						}
+					}
+				}
+
 				
 				function languageSelected(event: Event = null): void
 				{

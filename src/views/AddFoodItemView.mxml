@@ -338,6 +338,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						new SelectedFoodItem(retrievedFoodItem.itemDescription,
 							retrievedFoodItem.getUnit(selectedUnit),
 							new Number(amount_textinput_text)));
+					ModelLocator.getInstance().trackingEventToShow = 
+						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.eventid;
 				}
 				var creationTimeStampAsDate:Date = new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);

@@ -23,9 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		actionBarVisible="true" 
 		initialize="init()" 
 		add="addHandler()"
-		creationComplete="onCreationComplete()"
-		
-		>
+		creationComplete="onCreationComplete()">
 	
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -53,11 +51,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
 			
+			import myComponents.AlertPopUp;
 			import myComponents.Notification;
 			import myComponents.PickerEvent;
 			import myComponents.elementFromListPicker;
 			
 			import spark.events.IndexChangeEvent;
+			import spark.events.PopUpEvent;
 			import spark.events.ViewNavigatorEvent;
 			import spark.skins.spark.DefaultItemRenderer;
 			
@@ -74,6 +74,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var  foodItems:ArrayCollection;
 
 			private var timer:Timer;
+			private var licensePopUp:AlertPopUp;
+			private var thisView:View;
+			private var firstStartUp:Boolean = false;
 			
 			private function init():void {
 				/* add event listener for clicking item */
@@ -84,6 +87,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * check if database already exists and if language already initialized
 			 */
 			private function onCreationComplete():void {
+				thisView = this;
 				if (!ModelLocator.getInstance().firstStartUp)
 					return;
 				ModelLocator.getInstance().firstStartUp = false;
@@ -93,6 +97,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (Database.databaseExists()) {
 					onReturn();
 				} else {
+					firstStartUp = true;
 					notificationPopUp = new Notification();
 					notificationPopUp.notificationText = resourceManager.getString('helpdiabetes','infoaboutlanguageselection')
 					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
@@ -174,6 +179,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
 					Database.getInstance().getAllFoodItemDescriptions(dispatcher);
+					
+					if (firstStartUp) {
+						licensePopUp = new AlertPopUp();
+						licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
+						var textToShow:String = 
+							resourceManager.getString('settingsview','version') + 
+							resourceManager.getString('settingsview','copyright') +
+							resourceManager.getString('settingsview','infoabouttext');
+						licensePopUp.show(thisView,textToShow);
+					}
+
 				}
 				
 				function onInitError(event:Event):void
@@ -194,6 +210,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 						ModelLocator.getInstance().foodItemList = foodItems;
 					} 
+					
+				}
+				
+				function licenseAccepted(event: PopUpEvent):void {
+					if (licensePopUp != null) {
+						PopUpManager.removePopUp(licensePopUp);
+						if (licensePopUp.hasEventListener(PopUpEvent.CLOSE)) {
+							licensePopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+						}
+					}
 				}
 				
 				function onRetrieveListError(event:Event):void

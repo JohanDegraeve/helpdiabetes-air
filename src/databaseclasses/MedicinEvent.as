@@ -46,7 +46,7 @@ package databaseclasses
 		 * creates a medicin event and stores it immediately in the database if storeInDatabase = true<br>
 		 * if creationTimeStamp = null, then current date and time is used
 		 */
-		public function MedicinEvent( amount:Number, medicin:String, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true, medicineventid:Number = NaN)
+		public function MedicinEvent( amount:Number, medicin:String, medicineventid:Number, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true)
 		{
 			this._medicinName = medicin;
 			this.eventid = medicineventid;
@@ -57,7 +57,7 @@ package databaseclasses
 				_timeStamp = (new Date()).valueOf();
 			
 			if (storeInDatabase)
-				Database.getInstance().createNewMedicinEvent(amount, medicin, _timeStamp,null,medicineventid);
+				Database.getInstance().createNewMedicinEvent(amount, medicin, _timeStamp,medicineventid,null);
 		}
 		
 		public function get timeStamp():Number

@@ -47,7 +47,7 @@ package databaseclasses
 		 * unit is a textstring denoting the unit used, mgperdl, or ... <br>
 		 * if creationTimeStamp = null, then curren date and time is used
 		 */
-		public function BloodGlucoseEvent(glucoseLevel:int, unit:String, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true, bloodglucoseEventId:Number = Number.NaN)
+		public function BloodGlucoseEvent(glucoseLevel:int, unit:String, bloodglucoseEventId:Number, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true )
 		{
 			this._bloodGlucoseLevel = glucoseLevel;	
 			this._unit = unit;
@@ -57,7 +57,7 @@ package databaseclasses
 			else
 				_timeStamp = (new Date()).valueOf();
 			if (storeInDatabase)
-				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,unit,null,bloodglucoseEventId);
+				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,unit,bloodglucoseEventId,null);
 		}
 		
 		

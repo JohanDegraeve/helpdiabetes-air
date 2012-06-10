@@ -41,7 +41,7 @@ package databaseclasses
 			return _comment;
 		}
 		
-		public function ExerciseEvent(level:String,comment:String,creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true, exerciseeventid:Number = NaN)
+		public function ExerciseEvent(level:String,comment:String, exerciseeventid:Number,creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true)
 		{
 			this._level = level;
 			this.eventid = exerciseeventid;
@@ -52,7 +52,7 @@ package databaseclasses
 				_timeStamp = (new Date()).valueOf();
 			
 			if (storeInDatabase)
-				Database.getInstance().createNewExerciseEvent(level,comment,_timeStamp,null,exerciseeventid);
+				Database.getInstance().createNewExerciseEvent(level,comment,_timeStamp,exerciseeventid,null);
 		}
 		
 		public function get timeStamp():Number

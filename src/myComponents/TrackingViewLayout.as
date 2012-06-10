@@ -171,7 +171,7 @@ package myComponents
 				} else {
 					var firstEventToShow:Number;
 					try {
-						firstEventToShow = (ModelLocator.getInstance().trackingList.getItemAt(ModelLocator.getInstance().trackingEventToShow) as TrackingViewElement).eventid;
+						firstEventToShow = ModelLocator.getInstance().trackingEventToShow;
 						for (var trackingCounter:int = ModelLocator.getInstance().trackingList.length - 1; trackingCounter >= 0;trackingCounter--) {
 								if ((ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) as TrackingViewElement).eventid == firstEventToShow) {
 									_firstIndexInView = trackingCounter;

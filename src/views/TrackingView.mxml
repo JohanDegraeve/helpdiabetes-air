@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Metadata>
 		[ResourceBundle("trackingview")]
-		[ResourceBundle("general")]
 	</fx:Metadata>
 	
 	<fx:Script>
@@ -42,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.core.UIComponent;
 			
 			import myComponents.IListElement;
+			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
 			
 			private static var lastClickOnTrackingView:Number;
@@ -68,12 +68,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function getItemRenderer(item:Object):ClassFactory {
-				var temp:Object = ModelLocator.getInstance().trackingList;
 				return (item as IListElement).listElementRendererFunction();
 			}
 			
 			private function onListElementClicked(event:MouseEvent):void {
-				ModelLocator.getInstance().trackingEventToShow = (event.currentTarget as List).selectedIndex;
+				ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) as TrackingViewElement).eventid;
 				if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
 					navigator.pushView(EditMealEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex)); 					
 				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MedicinEvent) {

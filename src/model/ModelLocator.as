@@ -33,6 +33,7 @@ package model
 	import mx.resources.ResourceManager;
 	
 	import myComponents.DayLine;
+	import myComponents.TrackingViewElement;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
@@ -82,7 +83,7 @@ package model
 		/**
 		 * list of meals, mainly used in addfooditem, and also somewhere else, being reset each time addfooditem is opened
 		 */
-		private var _meals:ArrayCollection ;
+		private var _meals:ArrayCollection;
 
 		/**
 		 * index to the currently selected meal in meals<br>
@@ -90,20 +91,25 @@ package model
 		 */
 		private var _selectedMeal:int = -1;
 		
-		private var _trackingEventToShow:int = 0;
+		private var _trackingEventToShow:Number = -1;
 
 		/**
-		 * index to the tracking event to show when going to trackingview 
+		 * eventid of to the tracking event to show when going to trackingview<br>
+		 * initially set to -1, in the get trackingeventToShow, when still on -1 it will be set to the event id of the last event in the trackinglist, except when 
+		 * there are no elements in the trackinglist, then it stays -1
 		 */
-		public function get trackingEventToShow():int
+		public function get trackingEventToShow():Number
 		{
+			if (_trackingEventToShow == -1)
+				if (trackingList.length > 0)
+					_trackingEventToShow = (trackingList.getItemAt(trackingList.length -1) as TrackingViewElement).eventid;
 			return _trackingEventToShow;
 		}
 
 		/**
 		 * @private
 		 */
-		public function set trackingEventToShow(value:int):void
+		public function set trackingEventToShow(value:Number):void
 		{
 			_trackingEventToShow = value;
 		}
@@ -312,7 +318,7 @@ package model
 				this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_CHANGED));
 			}
 			if ((meals.getItemAt(_selectedMeal) as Meal).mealEvent)
-				trackingEventToShow = trackingList.getItemIndex((meals.getItemAt(_selectedMeal) as Meal).mealEvent);
+				trackingEventToShow = ((meals.getItemAt(_selectedMeal) as Meal).mealEvent).eventid;
 		}
 		
 		/**

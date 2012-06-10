@@ -1403,9 +1403,8 @@ package databaseclasses
 		
 		/**
 		 * new bloodglucoselevel event will be added to the database<br>
-		 * here the bloodglucoseeventid will get the value of current date and time as Number if 
 		 */
-		internal function createNewBloodGlucoseEvent(level:int,timeStamp:Number,unit:String,dispatcher:EventDispatcher = null, bloodglucoseeventid:Number = Number.NaN):void {
+		internal function createNewBloodGlucoseEvent(level:int,timeStamp:Number,unit:String,bloodglucoseeventid:Number, dispatcher:EventDispatcher = null ):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -1419,7 +1418,7 @@ package databaseclasses
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_BLOODGLUCOSEEVENT;
 				//(bloodglucoseeventid, unit, creationtimestamp, value)
-				localSqlStatement.parameters[":bloodglucoseeventid"] = (isNaN(bloodglucoseeventid) ? (new Date()).valueOf() : bloodglucoseeventid);
+				localSqlStatement.parameters[":bloodglucoseeventid"] =  bloodglucoseeventid;
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":value"] = level;
@@ -1715,7 +1714,7 @@ package databaseclasses
 							deleteBloodGlucoseEvent(o.bloodglucoseeventid as Number);
 						} else {
 							
-							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String,o.creationtimestamp as Number,false, o.bloodglucoseeventid as Number);
+							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String, o.bloodglucoseeventid as Number, o.creationtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
 							var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -1749,7 +1748,7 @@ package databaseclasses
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
 							deleteMedicinEvent(o.medicineventid as Number);
 						} else {
-							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number,o.medicinname as String,o.creationtimestamp as Number,false,o.medicineventid as Number);
+							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number,o.medicinname as String,o.medicineventid as Number,o.creationtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
 							var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -1784,7 +1783,7 @@ package databaseclasses
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
 							deleteExerciseEvent(o.exerciseeventid as Number);
 						} else {
-							var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.creationtimestamp as Number,false,o.exerciseeventid as Number);
+							var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.exerciseeventid as Number,o.creationtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newExerciseEvent);
 							var creationTimeStampAsDate:Date = new Date(newExerciseEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -1912,7 +1911,7 @@ package databaseclasses
 		 * new medicin event will be added to the database<br>
 		 * here the medicineventid will get the value of current date and time as Number 
 		 */
-		internal function createNewMedicinEvent(amount:int,medicin:String, timeStamp:Number,dispatcher:EventDispatcher = null,medicineventid:Number = Number.NaN):void {
+		internal function createNewMedicinEvent(amount:int,medicin:String, timeStamp:Number,medicineventid:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -1926,7 +1925,7 @@ package databaseclasses
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_MEDICINEVENT;
 				//(bloodglucoseeventid, unit, creationtimestamp, value)
-				localSqlStatement.parameters[":medicineventid"] = (isNaN(medicineventid) ? (new Date()).valueOf() : medicineventid);
+				localSqlStatement.parameters[":medicineventid"] = medicineventid;
 				localSqlStatement.parameters[":amount"] = amount;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":medicinname"] = medicin;
@@ -2026,7 +2025,7 @@ package databaseclasses
 		 * new exercise event will be added to the database<br>
 		 * here the exerciseeventid will get the value of current date and time as Number 
 		 */
-		internal function createNewExerciseEvent(level:String, comment:String, timeStamp:Number,dispatcher:EventDispatcher = null, exerciseeventid:Number = Number.NaN):void {
+		internal function createNewExerciseEvent(level:String, comment:String, timeStamp:Number, exerciseeventid:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -2044,7 +2043,7 @@ package databaseclasses
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":comment_2"] = comment;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
-				localSqlStatement.parameters[":exerciseeventid"] = (isNaN(exerciseeventid) ? (new Date()).valueOf() : exerciseeventid);
+				localSqlStatement.parameters[":exerciseeventid"] = exerciseeventid;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, exerciseEventCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, exerciseEventCreationFailed);
 				localSqlStatement.execute();

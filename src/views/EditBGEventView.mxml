@@ -203,6 +203,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theBloodGlucoseEvent = new BloodGlucoseEvent(
 						new Number(meteringResultText),
 						unit,
+						eventDateAndTime.valueOf(),
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theBloodGlucoseEvent);
 				} else {
@@ -236,7 +237,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				
 				ModelLocator.getInstance().trackingList.refresh();
-				//switch to the tracking view
+				//switch to the tracking view and set trackingeventtoshow to this event
+				ModelLocator.getInstance().trackingEventToShow = theBloodGlucoseEvent.eventid;
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
 			}
