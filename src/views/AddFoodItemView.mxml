@@ -62,6 +62,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
+			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
 			
 			import spark.components.Label;
@@ -424,6 +425,11 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private function deleteEvent(e:MouseEvent = null):void {//should only be called in case the trash button is available, meaning a selectedfooditem is being deleted from an existing meal
 				var localdispatcher:EventDispatcher;
 				var length:int 
+
+				//in case we it is the last selectedfooditem being deleted, then also the mealevent will be deleted
+				//we need to make sure the previous tracking event is visible so we store the itemindex
+				var trackinglistPointer:Number = ModelLocator.getInstance().trackingList.getItemIndex(
+					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent);
 				
 				confirmationPicker = new RequestConfirmation();
 				confirmationPicker.labelText1 = resourceManager.getString('general','delete_event');
@@ -457,6 +463,11 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
 					if (length == 1) {
 						//it was the last selectedfooditem which was being deleted, so we need to pop also the view editmealeventview
+						//but make sure the previous item is visible
+						if (trackinglistPointer > 0)
+							ModelLocator.getInstance().trackingEventToShow = 
+								(ModelLocator.getInstance().trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;						
+
 						navigator.popView();
 					}
 				}

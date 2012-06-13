@@ -96,6 +96,11 @@ package databaseclasses
 		{
 			_mealEventId = value;
 		}
+		
+		public function getMealEventId():int
+		{
+			return _mealEventId;
+		}
 
 
 	}

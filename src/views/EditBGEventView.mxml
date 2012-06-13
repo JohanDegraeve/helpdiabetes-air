@@ -46,6 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
 			import myComponents.TimePicker;
+			import myComponents.TrackingViewElement;
 			
 			import spark.components.TabbedViewNavigator;
 			import spark.components.ViewNavigator;
@@ -257,7 +258,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					theBloodGlucoseEvent.deleteEvent();
-					ModelLocator.getInstance().trackingList.removeItemAt(ModelLocator.getInstance().trackingList.getItemIndex(theBloodGlucoseEvent));
+					//we need to make sure the previous tracking event is visible so we store the itemindex
+					var trackinglistPointer:Number = ModelLocator.getInstance().trackingList.getItemIndex(theBloodGlucoseEvent);
+					//now delete it
+					ModelLocator.getInstance().trackingList.removeItemAt(trackinglistPointer);
+					//and now make sure the previous item is visible
+					if (trackinglistPointer > 0)
+						ModelLocator.getInstance().trackingEventToShow = 
+							(ModelLocator.getInstance().trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;						
 					//switch to the tracking view
 					(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 					((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
