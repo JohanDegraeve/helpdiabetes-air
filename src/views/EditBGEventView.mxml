@@ -171,7 +171,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				timeText = timeformatter.format(_eventDateAndTime);
 				unit =  resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
 				meteringTexttext = resourceManager.getString('editbgeventview','value') + ' (' +unit  + ')';
-				meteringResultText = "100";
+				meteringResultText = 
+					(Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mgperdl" ? "100" : "5");
 				newBloodGlucoseEvent = true;
 				back_label = resourceManager.getString('general','back');
 				TrashButton.visible = false;
