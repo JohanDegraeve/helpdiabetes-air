@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
 		initialize="onInitialize()"
 		creationComplete="onCreationComplete()" actionBarVisible="true"
-		deactivate="{if (navigator != null) navigator.popToFirstView()}"
 		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>

@@ -31,7 +31,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		remove="onRemove()"
 		title=""
 		backKeyPressed="onBackKeyPressed(event)"
-		deactivate="{if (navigator != null) navigator.popToFirstView()}"
 		>
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','shortdatepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -168,15 +167,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (ModelLocator.getInstance().selectedMeal >= 0) {
 					if (checkLastMealUpdateRequired)
 						checkLastMealUpdate();
-					meal_button_text = 	 
-						(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
-							"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
-						+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
-						+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
-				}
+					meal_button_text = 	 initMealButtonText();				}
 				
 				if (data.foodItem) {
-					//addfooditemview has been created vi foodcounter view, so initial setup is necessary
+					//addfooditemview has been created via foodcounter view, so initial setup is necessary
 					TrashButton.visible = false;
 					var dispatcher:EventDispatcher = new EventDispatcher();
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
@@ -233,20 +227,11 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
-				meal_button_text = 	 
-					(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
-						"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
-					+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
-					+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
-			}
+				meal_button_text = 	 initMealButtonText();			}
 			
 			private function onSelectedMealInitialized(e:flash.events.Event):void {
 				checkLastMealUpdate();
-				meal_button_text = 	 
-					(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
-						"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
-					+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
-					+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+				meal_button_text = 	 initMealButtonText();
 			}
 			
 			/**
@@ -314,6 +299,32 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						//set it to empty string, this allows the user to immediately start typing an amount
 						//amount_textinput_text = "";
 				}
+			}
+			
+			private function initMealButtonText():String {
+				var returnValue:String = " ";
+				if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null) {
+					//mealevent is null, so we will check if the current time is later than the timestamp of the meal, ie the timestamp that normally meal would start if we would 
+					//just take defalt starttimes
+					if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp < (new Date()).valueOf()) {
+						returnValue = 
+							timeformatter.format((new Date()).valueOf()) + " - "
+							+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+					} else {
+						returnValue = 
+						(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
+							"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
+						+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
+							+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+					}
+				} else {
+					returnValue = 
+					(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
+						"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
+					+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
+						+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+				}
+				return returnValue;
 			}
 			
 			/**

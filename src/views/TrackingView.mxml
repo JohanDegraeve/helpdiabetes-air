@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*" 
+		initialize="onInitialize()"
 		actionBarVisible="false">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -46,6 +47,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private static var lastClickOnTrackingView:Number;
 
+			private function onInitialize():void {
+				lastClickOnTrackingView = (new Date()).valueOf();
+			}
+			
 			/**
 			 * Will be used by views pushed by Trackingview (eg editbgeventview), if true then when the pushed view is opened, it will call poptofirstview<br>
 			 * This is to force for instance, that when a user has opened trackingview, click on editbgeventview, more than 15 minutes later goes again to tracking view,

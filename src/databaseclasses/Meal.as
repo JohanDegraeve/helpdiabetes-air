@@ -149,7 +149,7 @@ package databaseclasses
 					}
 				} 
 				if (_mealEvent == null) {
-					//it's the first selectedfooditem, and if no timestamp was supplied , and if it's not a future meal then set _timestamp to current time
+					//it's the first selectedfooditem, and if no timestamp was supplied then set _timestamp to current time
 					if (isNaN(timeStamp)) {
 						if (((new Date()).valueOf() - _timeStamp) > 0) {
 							_timeStamp = (new Date()).valueOf();
