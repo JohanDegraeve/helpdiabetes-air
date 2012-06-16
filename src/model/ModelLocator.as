@@ -220,7 +220,10 @@ package model
 					ResourceManager.getInstance().getString("general","DutchTable")),
 				new Array("en",
 					ResourceManager.getInstance().getString("general","english"),
-					ResourceManager.getInstance().getString("general","NorwegianTableInEnglish"))
+					ResourceManager.getInstance().getString("general","NorwegianTableInEnglish")),
+				new Array("fr",
+					ResourceManager.getInstance().getString("general","french"),
+					ResourceManager.getInstance().getString("general","FrenchAxelle"))
 			);
             
 			//create the sort for the trackinglist and the meals

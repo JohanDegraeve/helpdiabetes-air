@@ -205,7 +205,7 @@ package databaseclasses
 			"exercise type 5 defined in constructor",
 			"23",//default exercise type, meaning exercise type 1
 			"30",//default length of trackingview, in days
-			"en_US,nl_NL"//just a default value  
+			"en_US,nl_NL,fr_FR"//just a default value  
 		];
 		
 		private static var instance:Settings = new Settings();
