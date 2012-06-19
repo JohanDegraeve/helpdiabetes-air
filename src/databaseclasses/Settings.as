@@ -172,6 +172,10 @@ package databaseclasses
 		 * Example if localeChain = ["en_US","nl_NL"], then the setting here is "en_US,nl_NL"
 		 */
 		public static const SettingsLOCALECHAIN_asString:int = 30;
+		/**
+		 * to maintain the first startup of the app, never is never started up before
+		 */
+		public static const SettingsFirstStartUp:int=31;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -205,7 +209,8 @@ package databaseclasses
 			"exercise type 5 defined in constructor",
 			"23",//default exercise type, meaning exercise type 1
 			"30",//default length of trackingview, in days
-			"en_US,nl_NL,fr_FR"//just a default value  
+			"en_US,nl_NL,fr_FR",//just a default value,  
+			"never"
 		];
 		
 		private static var instance:Settings = new Settings();

@@ -23,17 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		actionBarVisible="true" 
 		initialize="init()" 
 		add="addHandler()"
-		creationComplete="onCreationComplete()">
+		creationComplete="onCreationComplete()" xmlns:analytics="com.google.analytics.*">
 	
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
-		<analytics:FlexTracker
-			xmlns:analytics="com.google.analytics.components.*"
-			id="tracker"
-			account="UA-111-222"
-			mode="AS3"
-			visualDebug="false"
-			/>
 	</fx:Declarations>
 	
 	<fx:Metadata>
@@ -42,6 +35,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			import com.google.analytics.GATracker;
+			
 			import databaseclasses.Database;
 			import databaseclasses.DatabaseEvent;
 			import databaseclasses.FoodItem;
@@ -68,6 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.skins.spark.DefaultItemRenderer;
 			
 			import utilities.ExcelSorting;
+			import utilities.MyGATracker;
 			
 			[Bindable]
 			public var listOfOptionsArray:Array ;
@@ -84,14 +81,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var thisView:View;
 			private var firstStartUp:Boolean = false;
 			
+			public var tracker:AnalyticsTracker;
+			
 			private function init():void {
 				/* add event listener for clicking item */
 				fooditemlist.addEventListener(Event.CHANGE,selectFoodItem);
 			}
 			
-			/**
-			 * check if database already exists and if language already initialized
-			 */
 			private function onCreationComplete():void {
 				thisView = this;
 				if (!ModelLocator.getInstance().firstStartUp)
@@ -242,6 +238,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			
 			private function selectFoodItem(event:IndexChangeEvent):void {
+				tracker = new MyGATracker( this, "UA-32712857-1", "AS3", false );
+				tracker.trackPageview( "FoodCounterView-itemSelected" );
+
 				data = new Object();
 				data.searchtext = searchtext.text;//we pass the searchtext to addfooditemview. Addfooditemview will return the searchtext or an empty string when popped
 				data.foodItem = ModelLocator.getInstance().foodItemList.getItemAt(event.newIndex);
