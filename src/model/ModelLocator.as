@@ -239,8 +239,6 @@ package model
 			// at initialization, there's no dayline existing in the tracking, so initialize to something very big
 			youngestDayLineStoredInTrackingList = 5000000000000;
 			
-			if (Settings.getInstance().getSetting(Settings.SettingsFirstStartUp) == "never")
-				Settings.getInstance().setSetting(Settings.SettingsFirstStartUp,((new Date()).valueOf().toString()));
 		}
 		
 		public function resetLabels():void {

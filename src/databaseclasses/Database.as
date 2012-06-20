@@ -1255,8 +1255,7 @@ package databaseclasses
 				aConn.removeEventListener(SQLEvent.OPEN, onConnOpen);
 				aConn.removeEventListener(SQLErrorEvent.ERROR, onConnError);	
 				if (dispatcher != null) {
-					var event2:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					dispatcher.dispatchEvent(event2);
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.RESULT_EVENT));
 				}
 			}
 			
@@ -1266,8 +1265,7 @@ package databaseclasses
 				aConn.removeEventListener(SQLEvent.OPEN, onConnOpen);
 				aConn.removeEventListener(SQLErrorEvent.ERROR, onConnError);
 				if (dispatcher != null) {
-					var event2:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
-					dispatcher.dispatchEvent(event2);
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 				}
 			}
 		}

@@ -210,7 +210,7 @@ package databaseclasses
 			"23",//default exercise type, meaning exercise type 1
 			"30",//default length of trackingview, in days
 			"en_US,nl_NL,fr_FR",//just a default value,  
-			"never"
+			"firsttartuptime defined in constructor"//firststartuptime, will be set in constructor
 		];
 		
 		private static var instance:Settings = new Settings();
@@ -220,6 +220,10 @@ package databaseclasses
 			if (instance != null) {
 				throw new Error("Settings class can only be accessed through Settings.getInstance()");	
 			}
+			//all settings are being set to initial values, be aware that in case there are already settings in the database
+			//then the settings array will be reset during database opening.
+			//There's already a database if it's not the first startup
+			// in other words, if this is the first startup, then these are the values
 			settings[SettingsInsulinType1] = ResourceManager.getInstance().getString('editmedicineventview','insulintype1');
 			settings[SettingsInsulinType2] = ResourceManager.getInstance().getString('editmedicineventview','insulintype2');
 			settings[SettingsInsulinType3] = ResourceManager.getInstance().getString('editmedicineventview','insulintype3');
@@ -230,6 +234,7 @@ package databaseclasses
 			settings[SettingsExerciseType3] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype3');
 			settings[SettingsExerciseType4] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype4');
 			settings[SettingsExerciseType5] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype5');
+			settings[SettingsFirstStartUp] = (new Date()).valueOf().toString();
 			instance = this;
 		}
 		
