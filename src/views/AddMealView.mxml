@@ -22,6 +22,7 @@ view to add a new meal
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		creationComplete="onCreationComplete()"
+		initialize="init()"
 		backKeyPressed="view1_backKeyPressedHandler(event)">
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','datepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -33,6 +34,8 @@ view to add a new meal
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			
 			import databaseclasses.Meal;
 			
 			import model.ModelLocator;
@@ -46,6 +49,8 @@ view to add a new meal
 			import myComponents.TimePicker;
 			
 			import org.osmf.events.TimeEvent;
+			
+			import utilities.MyGATracker;
 			[Bindable]
 			private var mealname_textarea_text:String;
 			[Bindable]
@@ -88,6 +93,13 @@ view to add a new meal
 			 */
 			private var _userChangedMealName:Boolean;
 
+			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
+			
+			private function init():void {
+				trackerId = resourceManager.getString('analytics','trackeraccount');
+			}
+			
 			/**
 			 * its the actual date off the meal
 			 */
@@ -142,6 +154,10 @@ view to add a new meal
 			}
 
 			private function okClicked():void {
+				if (!tracker)
+					tracker = new MyGATracker( this, trackerId, "AS3", false );
+				tracker.trackPageview( "AddMealView-newMealCreated" );
+
 				var newMeal:Meal = new Meal(mealname_textarea_text,null,currentDateAndTime.valueOf());
 				newMealIndex = ModelLocator.getInstance().addMeal(newMeal);
 				mealAdded = true;

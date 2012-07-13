@@ -24,6 +24,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		preinitialize="preInit()"
+		initialize="init()"
 		creationComplete="onCreationComplete()"
 		backKeyPressed="view1_backKeyPressedHandler(event)">
 	<fx:Declarations>
@@ -43,6 +44,8 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 	
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			
 			import databaseclasses.Meal;
 			
 			import model.ModelLocator;
@@ -54,6 +57,8 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			import myComponents.DatePicker;
 			import myComponents.PickerEvent;
 			import myComponents.TimePicker;
+			
+			import utilities.MyGATracker;
 			
 			[Bindable]
 			private var mealname_textarea_text:String;
@@ -78,6 +83,13 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			 */
 			private var selectedMealIndex:int;
 
+			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
+			
+			private function init():void {
+				trackerId = resourceManager.getString('analytics','trackeraccount');
+			}
+			
 			private function preInit():void {
 				ok_button_text = resourceManager.getString('general','ok');
 			}
@@ -133,6 +145,10 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			 * refresh the meals list, and pop two views so that we return back to addfooditemview
 			 */
 			private function okClicked():void {
+				if (!tracker)
+					tracker = new MyGATracker( this, trackerId, "AS3", false );
+				tracker.trackPageview( "ChangeMealDateAndTimeView-OkClicked" );
+
 				mealChosen = true;
 				navigator.popView();
 			}

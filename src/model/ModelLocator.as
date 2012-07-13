@@ -483,11 +483,13 @@ package model
 		}
 		
 		/**
-		 * sets selectedMeal to the second meal that is one of the standards meals
+		 * sets selectedMeal to the second meal that is one of the standards meals<br>
+		 * returns the new value
 		 */
-		public function resetSelectedMeal():void {
+		public function resetSelectedMeal():int {
 			//initiailize selectedMeal to the second meal that is one of the standards meal
 			selectedMeal = getRefreshedSelectedMeal();
+			return selectedMeal;
 		}
 		
 		public function getCurrentlySelectedMeal():Meal {
@@ -523,7 +525,7 @@ package model
 		}
 		
 		/**
-		 * updates insulinratio for all mealevents in trackinglist, with timeStamp > asOfDateAndTime and time of day  between fromTime and toTime whereby ,
+		 * updates insulinratio for all mealevents in trackinglist, with timeStamp >= asOfDateAndTime and time of day  between fromTime and toTime whereby ,
 		 * asOfDateAndTime is ms since 1st of January 1970 UTC<br>
 		 * <br>fromTime and toTime are local time, as example :<br>
 		 * if it's here in Belgium 10:03, then this value = (10*3600 + 3*60)*1000, no matter what the utc time is.<br>

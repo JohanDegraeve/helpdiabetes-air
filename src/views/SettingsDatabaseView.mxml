@@ -11,6 +11,8 @@
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			
 			import databaseclasses.Settings;
 			
 			import mx.managers.PopUpManager;
@@ -18,13 +20,22 @@
 			import myComponents.AmountPicker;
 			import myComponents.PickerEvent;
 			
-			private var amountPicker:AmountPicker;
+			import utilities.MyGATracker;
 			
+			private var amountPicker:AmountPicker;
+
+			private var thisView:View;
+		
 			[Bindable]
 			private var back_label:String;
 			
+			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
+			
 			private function onInit():void {
 				back_label = resourceManager.getString('general','back');
+				trackerId = resourceManager.getString('analytics','trackeraccount');
+				thisView = this;
 			}
 			
 			private function trackingSizeClicked(event:Event):void  {
@@ -47,6 +58,11 @@
 				
 				function onAmountSet(event: PickerEvent): void
 				{
+					if (tracker == null) {
+						tracker = new MyGATracker( thisView, trackerId, "AS3", false );
+					}
+					tracker.trackPageview( "SettingsDatabaseView-trackingSizeChanged" );
+
 					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					trackingsizeButton.label = (event.newValue as Number).toString();

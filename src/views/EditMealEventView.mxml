@@ -33,6 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			
 			import databaseclasses.Meal;
 			import databaseclasses.MealEvent;
 			import databaseclasses.SelectedFoodItem;
@@ -45,6 +47,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import spark.events.IndexChangeEvent;
 			import spark.formatters.DateTimeFormatter;
+			
+			import utilities.MyGATracker;
+
+			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
+
 			[Bindable]
 			private var dateTimeAndMealName_text:String;
 			
@@ -77,6 +85,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
+				trackerId = resourceManager.getString('analytics','trackeraccount');
+
 				if (TrackingView.popToFirstViewNecessary())
 					navigator.popToFirstView();
 				else {
@@ -128,6 +138,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onClick(event:IndexChangeEvent):void {
+				if (tracker == null) {
+					tracker = new MyGATracker( this, trackerId, "AS3", false );
+				}
+				tracker.trackPageview( "EditMealEventView-selectedItemClicked" );
+
 				data = mealEvent;
 				var dataToPass:Object = new Object();
 				dataToPass.selectedFoodItem = mealEvent.selectedFoodItems.getItemAt(event.newIndex);

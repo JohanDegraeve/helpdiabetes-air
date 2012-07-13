@@ -19,9 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
 		backKeyPressed="onBackKeyPressed(event)"
+		creationComplete="view1_creationCompleteHandler(event)"
 		initialize="view1_initializeHandler(event)">
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			
 			import databaseclasses.Settings;
 			
 			import mx.events.FlexEvent;
@@ -30,6 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import spark.events.TextOperationEvent;
 			
+			import utilities.MyGATracker;
+			
 			[Bindable] private var medicinText1:String = "";
 			[Bindable] private var medicinText2:String = "";
 			[Bindable] private var medicinText3:String = "";
@@ -37,7 +42,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable] private var medicinText5:String = "";
 			[Bindable]
 			private var back_label:String;
-			
+
+			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
+
 			private function onBackKeyPressed(event:Event):void {
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType2,medicinText2);
@@ -49,6 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			protected function view1_initializeHandler(event:FlexEvent):void
 
 			{
+				trackerId = resourceManager.getString('analytics','trackeraccount');
 				back_label = resourceManager.getString('general','back');
 				medicinText1 = Settings.getInstance().getSetting(Settings.SettingsInsulinType1);
 				medicinText2 = Settings.getInstance().getSetting(Settings.SettingsInsulinType2);
@@ -87,6 +96,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType5,medicinText5);
 			}
 			
+			protected function view1_creationCompleteHandler(event:FlexEvent):void
+			{
+				if (tracker == null) {
+					tracker = new MyGATracker( this, trackerId, "AS3", false );
+				}
+				tracker.trackPageview( "SettingsMedicinView-viewOpened" );
+			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>

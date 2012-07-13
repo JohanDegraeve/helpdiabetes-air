@@ -16,7 +16,7 @@ package utilities
 		}
 		
 		override public function  trackPageview(pageURL:String=""):void {
-			if ((new Date()).valueOf() - 5*60*1000 > new Number(Settings.getInstance().getSetting(Settings.SettingsFirstStartUp))) 
+			if ((new Date()).valueOf() - 1*1000 > new Number(Settings.getInstance().getSetting(Settings.SettingsFirstStartUp))) 
 				super.trackPageview(pageURL);
 		}
 	}

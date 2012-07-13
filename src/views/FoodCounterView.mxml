@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Metadata>
 		[ResourceBundle("foodcounterview")]
+		[ResourceBundle("analytics")]
 	</fx:Metadata>
 	
 	<fx:Script>
@@ -82,10 +83,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var firstStartUp:Boolean = false;
 			
 			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
 			
 			private function init():void {
 				/* add event listener for clicking item */
 				fooditemlist.addEventListener(Event.CHANGE,selectFoodItem);
+				trackerId = resourceManager.getString('analytics','trackeraccount');
 			}
 			
 			private function onCreationComplete():void {
@@ -101,7 +104,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				} else {
 					firstStartUp = true;
 					notificationPopUp = new Notification();
-					notificationPopUp.notificationText = resourceManager.getString('helpdiabetes','infoaboutlanguageselection')
+					notificationPopUp.notificationText = resourceManager.getString('helpdiabetes','infoaboutlanguageselection');
 					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
 					PopUpManager.addPopUp(notificationPopUp, thisObject, true);
 					PopUpManager.centerPopUp(notificationPopUp);
@@ -238,8 +241,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			
 			private function selectFoodItem(event:IndexChangeEvent):void {
-				tracker = new MyGATracker( this, "UA-32712857-1", "AS3", false );
-				tracker.trackPageview( "FoodCounterView-itemSelected" );
+				if (tracker == null) {
+					tracker = new MyGATracker( this, trackerId, "AS3", false );
+				}
+					tracker.trackPageview( "FoodCounterView-itemSelected" );
 
 				data = new Object();
 				data.searchtext = searchtext.text;//we pass the searchtext to addfooditemview. Addfooditemview will return the searchtext or an empty string when popped

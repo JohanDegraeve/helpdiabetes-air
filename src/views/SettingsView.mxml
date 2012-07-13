@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
 			
@@ -43,9 +45,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
 			
+			import utilities.MyGATracker;
+			
 			private var elementPicker:elementFromListPicker;
 			private var alertPopUp:AlertPopUp;
-			
+
+			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
+
 			[ResourceBundle("settingsview")]
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
@@ -70,6 +77,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function init():void {
+				trackerId = resourceManager.getString('analytics','trackeraccount');
+
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
 				title =  ResourceManager.getInstance().getString("settingsview","settings");
@@ -91,6 +100,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				PopUpManager.centerPopUp(elementPicker);
 				
 				function selectedUnitChanged(event:UnitChangedEvent):void {
+					if (tracker == null) {
+						tracker = new MyGATracker( this, trackerId, "AS3", false );
+					}
+					tracker.trackPageview( "SetingsView-bloodglucoseUnitChanged" );
+
 					elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
 					PopUpManager.removePopUp(elementPicker);
 					if (event.index == 0)
@@ -137,6 +151,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						PopUpManager.centerPopUp(elementPicker);
 						break;
 					case 7:
+						if (tracker == null) {
+							tracker = new MyGATracker( this, trackerId, "AS3", false );
+						}
+						tracker.trackPageview( "SetingsView-infoAndHelpShown" );
+
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						var textToShow:String = 
@@ -159,6 +178,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function languageSelected(event: Event = null): void
 				{
+					if (tracker == null) {
+						tracker = new MyGATracker( this, trackerId, "AS3", false );
+					}
+					tracker.trackPageview( "SetingsView-languageSelected" );
+
 					if (elementPicker != null) {
 						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
 							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, languageSelected);

@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			
 			import databaseclasses.BloodGlucoseEvent;
 			import databaseclasses.Settings;
 			
@@ -49,6 +51,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import spark.components.TabbedViewNavigator;
 			import spark.components.ViewNavigator;
+			
+			import utilities.MyGATracker;
 			
 			private var confirmationPicker:RequestConfirmation;
 			private var theBloodGlucoseEvent:BloodGlucoseEvent;
@@ -85,7 +89,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			[Bindable]
 			private var meteringTexttext:String;
-			
+
+			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
+
+			private var thisView:View;
+
 			private function onCreationComplete(): void {
 				back_label = resourceManager.getString('general','back');
 				if (data is BloodGlucoseEvent) {//coming from trackingview
@@ -164,6 +173,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
+				trackerId = resourceManager.getString('analytics','trackeraccount');
+
 				//setting initial values, will be overwritten in oncreationcomplete if data is an medicinevent
 				eventDateAndTime = new Date();
 				dateText = dateformatter.format(_eventDateAndTime);
@@ -175,6 +186,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				newBloodGlucoseEvent = true;
 				back_label = resourceManager.getString('general','back');
 				TrashButton.visible = false;
+				thisView=this;
 			}
 			
 			private function onTimeOrDateCancel(event: PickerEvent): void
@@ -200,6 +212,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
+				if (tracker == null) {
+					tracker = new MyGATracker( this, trackerId, "AS3", false );
+				}
+				tracker.trackPageview( "EditBGEventView-OkClicked" );
+
 				if (newBloodGlucoseEvent) {
 					theBloodGlucoseEvent = new BloodGlucoseEvent(
 						new Number(meteringResultText),
@@ -255,6 +272,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function onYesClicked(event: PickerEvent): void
 				{
+					if (tracker == null) {
+						tracker = new MyGATracker( thisView, trackerId, "AS3", false );
+					}
+					tracker.trackPageview( "EditBGEventView-deleteClicked" );
+
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					theBloodGlucoseEvent.deleteEvent();

@@ -24,6 +24,7 @@ view to show ModelLocator.getInstance().meals in a list
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*"
+		initialize="init()"
 		creationComplete="onCreationComplete()" 
 		add="addHandler()" >
 	
@@ -32,6 +33,8 @@ view to show ModelLocator.getInstance().meals in a list
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			
 			import databaseclasses.Meal;
 			
 			import model.ModelLocator;
@@ -41,8 +44,13 @@ view to show ModelLocator.getInstance().meals in a list
 			import myComponents.IListElement;
 			
 			import spark.events.IndexChangeEvent;
+			
+			import utilities.MyGATracker;
 			[Bindable]
 			private var back_label:String;
+
+			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
 
 			private function getItemRenderer(item:Object):ClassFactory {
 				return (item as IListElement).listElementRendererFunction();
@@ -59,6 +67,10 @@ view to show ModelLocator.getInstance().meals in a list
 			 */
 			private static const ADD_NEW_MEAL:int=2
 			
+			private function init():void {
+				trackerId = resourceManager.getString('analytics','trackeraccount');
+			}
+			
 			private function onCreationComplete():void {
 				back_label = resourceManager.getString('general','back');
 				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
@@ -69,6 +81,11 @@ view to show ModelLocator.getInstance().meals in a list
 			}
 			
 			private function mealselected(event:IndexChangeEvent):void {
+				
+				if (tracker == null) {
+					tracker = new MyGATracker( this, trackerId, "AS3", false );
+				}
+				tracker.trackPageview( "SelectMealView-mealSelectedFromList" );
 				
 				if (ModelLocator.getInstance().meals.getItemAt(event.newIndex)  is Meal) {
 					//should we not do that also when ui is closed via back key ?
