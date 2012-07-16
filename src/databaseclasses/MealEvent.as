@@ -415,7 +415,10 @@ package databaseclasses
 
 		/**
 		 * recalculates total carbs, kilocalories, protein and fat<br>
-		 * also recalculates insulinamount 
+		 * also recalculates insulinamount <br>
+		 * <br>
+		 * if one of the selectedmeals has a kilocalorie, protein or fat value equal to -1, then the corresponding totals will be set to -1<br>
+		 * Carb value should never be -1
 		 */
 		private function recalculateTotals():void {
 			_totalCarbs = 0;
@@ -425,9 +428,21 @@ package databaseclasses
 			for (var i:int = 0;i < _selectedFoodItems.length; i++) {
 				var selectedFoodItem:SelectedFoodItem = (_selectedFoodItems.getItemAt(i) as SelectedFoodItem);
 				_totalCarbs += selectedFoodItem.unit.carbs/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
-				_totalKilocalories += selectedFoodItem.unit.kcal/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
-				_totalProtein += selectedFoodItem.unit.protein/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
-				_totalFat += selectedFoodItem.unit.fat/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+
+				if (selectedFoodItem.unit.kcal == -1 || _totalKilocalories == -1) 
+					_totalKilocalories = -1;
+				else 
+					_totalKilocalories += selectedFoodItem.unit.kcal/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+
+				if (selectedFoodItem.unit.protein == -1 || _totalProtein == -1) 
+					_totalProtein = -1;
+				else 
+					_totalProtein += selectedFoodItem.unit.protein/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
+
+				if (selectedFoodItem.unit.fat == -1 || _totalFat == -1) 
+					_totalFat = -1;
+				else 
+					_totalFat += selectedFoodItem.unit.fat/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
 			}
 			recalculateInsulinAmount();
 		}
