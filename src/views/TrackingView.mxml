@@ -36,6 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import databaseclasses.ExerciseEvent;
 			import databaseclasses.MealEvent;
 			import databaseclasses.MedicinEvent;
+			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
 			
 			import model.ModelLocator;
@@ -43,14 +44,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			
+			import myComponents.HelpCallOut;
 			import myComponents.IListElement;
+			import myComponents.PickerEvent;
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
+			
+			import spark.skins.mobile.ListSkin;
 			
 			import utilities.MyGATracker;
 			
 			private static var lastClickOnTrackingView:Number;
 
+			private function helptext1Removed(event:Event):void {
+				
+			}
+			
 			private function onInitialize():void {
 				lastClickOnTrackingView = (new Date()).valueOf();
 				trackerId = resourceManager.getString('analytics','trackeraccount');
@@ -120,7 +129,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			click="onListElementClicked(event)"
 			itemRendererFunction="getItemRenderer">
 		<s:layout>
-			<myComponents:TrackingViewLayout useVirtualLayout="true" />
+			<myComponents:TrackingViewLayout useVirtualLayout="true" id="trackinglistlayout"/>
 		</s:layout>
 	</s:List>
 </s:View>

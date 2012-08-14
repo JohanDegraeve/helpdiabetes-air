@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2011  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!--
+callout used to display helptext. 
+Settingid will tell of helptext is to be shown or not.
+On  calling open, a check will be done first to see if helptext is already shown or not.
+-->
+<s:Callout xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark"
+		   horizontalPosition="auto"
+		   verticalPosition="auto" xmlns:myComponents="myComponents.*"
+		   >
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import databaseclasses.Settings;
+			
+			import mx.managers.PopUpManager;
+			private var _helpText:String;
+
+			/**
+			 * the text to show
+			 */
+			public function get helpText():String
+			{
+				return _helpText;
+			}
+
+			public function set helpText(value:String):void
+			{
+				_helpText = value;
+			}
+			
+			private var _settingId:int;
+
+			public function get settingId():int
+			{
+				return _settingId;
+			}
+
+			/**
+			 * the corresponding settingid, which needs to be set to false so that next time it's not shown anymore 
+			 */
+			public function set settingId(value:int):void
+			{
+				_settingId = value;
+			}
+			
+			/**
+			 * checks if callout with helptext specified by settingid is already opened or not, and if yes then dipatches a PickerEvent.PICKER_SET<br>
+			 * otherwise calls super.open 
+			 */
+			override public function open(owner:DisplayObjectContainer, modal:Boolean = false):void {
+				if (Settings.getInstance().getSetting(settingId) == 'true') {
+					super.open(owner,modal);
+				}
+				else {
+					var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
+					dispatchEvent(dpe);
+				}
+			}
+
+			private function okClicked(event: PickerEvent):void {
+				helptextNotification.removeEventListener(PickerEvent.PICKER_SET,okClicked);
+				Settings.getInstance().setSetting(settingId,'false');
+				var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
+				dispatchEvent(dpe);
+				this.close();
+			}
+
+		]]>
+	</fx:Script>
+	<myComponents:Notification id="helptextNotification" width="100%" notificationText="{helpText}" initialize="{helptextNotification.addEventListener(PickerEvent.PICKER_SET, okClicked);}" >
+	</myComponents:Notification>
+</s:Callout>

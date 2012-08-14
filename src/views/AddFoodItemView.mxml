@@ -32,6 +32,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		title=""
 		initialize="init()"
 		backKeyPressed="onBackKeyPressed(event)"
+		
 		>
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','shortdatepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -63,6 +64,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			import mx.resources.ResourceBundle;
 			
 			import myComponents.DayLineWithTotalAmount;
+			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
 			import myComponents.TrackingViewElement;
@@ -97,6 +99,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private var checkLastMealUpdateRequired:Boolean = true;
 			
 			private var confirmationPicker:RequestConfirmation;
+			
+			private var helpCallOut:HelpCallOut;
 			
 			/**
 			 * the chosen unit from the list of units in retrievedFoodItem
@@ -236,7 +240,66 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					selectedUnit = data.selectedUnit;
 					amount_textinput_text = data.amount_textinput_text;
 					details_button_text = createDetailsButtonText(selectedUnit,(new Number(amount_textinput_text)) == 0 ? -1: new Number(amount_textinput_text));
+					TrashButton.visible = false;
 				}
+				
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_selectUnitButton');
+				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				helpCallOut.open(addFoodItemGroup.details_button,true)
+			}
+			
+			private function helptext1Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_changeMeal');
+				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				helpCallOut.open(addFoodItemGroup.meal_button,true);
+			}
+			
+			private function helptext2Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				helpCallOut = new HelpCallOut();
+				if (data.foodItem) {
+					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromFoodCounterView');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromFoodCounterView;
+				} else if (data.selectedFoodItem) {
+					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromTrackingView');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromTrackingView;
+				} else
+					helptext3Removed(null);
+				
+				if (data.foodItem || data.selectedFoodItem) {
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+					helpCallOut.open(addFoodItemGroup.button_5,true);
+				}
+			}
+
+			private function helptext3Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_ok_button');
+				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewOkButton;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext4Removed);
+				helpCallOut.open(OkButton,true);
+			}
+			
+			private function helptext4Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext4Removed);
+				if (TrashButton.visible) {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_delete_button');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewTrashButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext5Removed);
+					helpCallOut.open(TrashButton,true);
+				} else
+					helptext5Removed(null);
+			}
+			
+			private function helptext5Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext5Removed);
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
@@ -527,7 +590,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 	</s:navigationContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>
-		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" click="addButtonClicked()"/>
+		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="addButtonClicked()"/>
 	</s:actionContent>
 	
 	<myComponents:AddFoodItemGroup id="addFoodItemGroup"

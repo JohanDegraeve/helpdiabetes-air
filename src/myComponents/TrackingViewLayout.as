@@ -52,7 +52,19 @@ package myComponents
 		}
 
 		private var _currentFirstIndexInView:int;
+
+		public function get currentFirstIndexInView():int
+		{
+			return _currentFirstIndexInView;
+		}
+
 		private var _currentLastIndexInView:int;
+
+		public function get currentLastIndexInView():int
+		{
+			return _currentLastIndexInView;
+		}
+
 		private var _firstUpdateDisplayList:Boolean=true;
 		
 		

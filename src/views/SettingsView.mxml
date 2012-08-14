@@ -52,6 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
+			private var textToShow:String ;
 
 			[ResourceBundle("settingsview")]
 			
@@ -63,7 +64,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ResourceManager.getInstance().getString("settingsview","exercise"),
 				ResourceManager.getInstance().getString("settingsview","database"),
 				ResourceManager.getInstance().getString("settingsview","language"),
-				ResourceManager.getInstance().getString("settingsview","infoabout")
+				ResourceManager.getInstance().getString("settingsview","infoabout"),
+				ResourceManager.getInstance().getString("settingsview","resethelptext")
 			]);	
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -101,7 +103,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function selectedUnitChanged(event:UnitChangedEvent):void {
 					if (tracker == null) {
-						tracker = new MyGATracker( this, trackerId, "AS3", false );
+						tracker = new MyGATracker( elementPicker, trackerId, "AS3", false );
 					}
 					tracker.trackPageview( "SetingsView-bloodglucoseUnitChanged" );
 
@@ -158,12 +160,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-						var textToShow:String = 
+						textToShow = 
 							resourceManager.getString('settingsview','version') + 
 							resourceManager.getString('settingsview','copyright') +
 							resourceManager.getString('settingsview','infoabouttext');
 						alertPopUp.show(this,textToShow);
 						break;
+					case 8:
+						if (tracker == null) {
+							tracker = new MyGATracker( this, trackerId, "AS3", false );
+						}
+						tracker.trackPageview( "SetingsView-resetHelpText" );
+						for (var i:int = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;i <= Settings.SettingsHelpTextEditBGEventViewOkButton;i++) {
+							Settings.getInstance().setSetting(i,"true");
+						}
+						alertPopUp = new AlertPopUp();
+						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+						textToShow = 
+						resourceManager.getString('settingsview','resethelptextdone') ;
+
+						alertPopUp.show(this,textToShow);
+						
+						break;
+						
 				}
 				
 				function okClicked(event: PopUpEvent):void {
@@ -179,7 +198,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				function languageSelected(event: Event = null): void
 				{
 					if (tracker == null) {
-						tracker = new MyGATracker( this, trackerId, "AS3", false );
+						tracker = new MyGATracker( elementPicker, trackerId, "AS3", false );
 					}
 					tracker.trackPageview( "SetingsView-languageSelected" );
 

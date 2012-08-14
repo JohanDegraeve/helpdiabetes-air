@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		initialize="onInitialize()"
+		creationComplete="onCreationComplete()"
 		>
 	<fx:Declarations>
 	</fx:Declarations>
@@ -38,11 +39,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import databaseclasses.Meal;
 			import databaseclasses.MealEvent;
 			import databaseclasses.SelectedFoodItem;
+			import databaseclasses.Settings;
 			
 			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
 			
+			import myComponents.HelpCallOut;
+			import myComponents.PickerEvent;
 			import myComponents.SelectedFoodItemRenderer;
 			
 			import spark.events.IndexChangeEvent;
@@ -78,10 +82,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private static var dateFormatter:DateTimeFormatter ;
 			private static var timeFormatter:DateTimeFormatter ;
 
+			private var helpCallOut:HelpCallOut;
+			
 			override public function set data(value:Object):void {
 				super.data = value;
 				mealEvent = value as MealEvent;
 				selectedFoodItems = mealEvent.selectedFoodItems;
+			}
+			
+			private function onCreationComplete():void {
+				if (fooditemlist.hasEventListener(Event.CHANGE)) {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditSelectedItem;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.verticalPosition = "before";
+					helpCallOut.open(fooditemlist,true);
+				}
+			}
+			
+			private function helptext1Removed(event:Event):void {
+				
 			}
 			
 			private function onInitialize():void {

@@ -1,5 +1,9 @@
 package skins
 {
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import flash.geom.Matrix;
+	
 	import mx.core.BitmapAsset;
 	
 	import spark.components.Image;
@@ -17,15 +21,21 @@ package skins
 		[Embed(source="assets/bg.png")]
 		private var background:Class;
 		
-		override protected function createChildren():void {
-			image = new Image();
+		
+		override protected function drawBackground(unscaledWidth:Number,unscaledHeight:Number):void {
+			  var imageasBitMap:Bitmap = new background();
 			//Replace the right side below with your source (including URL)
-			image.source = (new background() as BitmapAsset);
-			image.height = 500; //Set image size here
-			image.width = 500;
-			this.addChild(image);
+			var bitmapData : BitmapData = imageasBitMap.bitmapData.clone();
 			
-			super.createChildren();
+			var matrix:Matrix ;
+			if (unscaledWidth > imageasBitMap.width || unscaledHeight > imageasBitMap.height) {
+				matrix = new Matrix();
+				matrix.scale(unscaledWidth/imageasBitMap.width,unscaledHeight/imageasBitMap.height);
+			}
+			
+			graphics.beginBitmapFill(bitmapData,matrix ? matrix:null);
+			graphics.drawRect(0,0,unscaledWidth,unscaledHeight);
+			graphics.endFill();
 		}
 	}
 }

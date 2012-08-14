@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
+		creationComplete="view1_creationCompleteHandler(event)"
 		initialize="onInit()">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -15,9 +16,11 @@
 			
 			import databaseclasses.Settings;
 			
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
 			import myComponents.AmountPicker;
+			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
 			import utilities.MyGATracker;
@@ -31,7 +34,22 @@
 			
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
+			private var helpCallOut:HelpCallOut;
+	
+			protected function view1_creationCompleteHandler(event:FlexEvent):void
+			{
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('settingsdatabaseview','help_text_changeDatabaseStorage');
+				helpCallOut.settingId = Settings.SettingsHelpTextDatabaseViewChangeStorage;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				helpCallOut.open(trackingsizeButton,true);
+			}
 			
+			private function helptext1Removed(event:Event):void  {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+			}
+			
+
 			private function onInit():void {
 				back_label = resourceManager.getString('general','back');
 				trackerId = resourceManager.getString('analytics','trackeraccount');

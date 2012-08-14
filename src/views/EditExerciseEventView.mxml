@@ -44,6 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import myComponents.DatePicker;
 			import myComponents.DayLineWithTotalAmount;
+			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
 			import myComponents.TimePicker;
@@ -71,6 +72,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var trackerId:String;
 			
 			private var thisView:View;
+			
+			private var helpCallOut:HelpCallOut;
 			
 			private var theExerciseEvent:ExerciseEvent;
 			/**
@@ -107,8 +110,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						TrashButton.visible = true;
 					}
 				}
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('editexerciseeventview','help_text_OkButton');
+				helpCallOut.settingId = Settings.SettingsHelpTextEditExerciseEventViewOkButton;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+				helpCallOut.open(OkButton,true);
+			}
+
+			private function helptext0Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('editexerciseeventview','help_text_selectExerciseType');
+				helpCallOut.settingId = Settings.SettingsHelpTextEditExerciseEventViewChangeExerciseType;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				helpCallOut.open(exerciseNameTextField,true);
 			}
 			
+			private function helptext1Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_changeDateAndTime');
+				helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				helpCallOut.open(timeGroup,true)
+			}
+			
+			private function helptext2Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+			}
 			
 			private function onBackKeyPressed(event:Event):void {
 				if (exercisePicker != null) {
@@ -297,7 +326,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</s:navigationContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>
-		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" click="okClicked(event)"/>
+		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked(event)"/>
 	</s:actionContent>
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
 		<s:layout>

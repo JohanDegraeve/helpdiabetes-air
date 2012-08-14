@@ -177,6 +177,30 @@ package databaseclasses
 		 */
 		public static const SettingsFirstStartUp:int=31;
 		
+		/** help setings **/
+		/** if false, help text will not be shown **/
+		public static const SettingsHelpTextAddFoodItemViewSelectUnitButton:int=32;
+		public static const SettingsHelpTextAddFoodItemViewSelectMealButton:int=33;
+		public static const SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromFoodCounterView:int=34;
+		public static const SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromTrackingView:int=35;
+		public static const SettingsHelpTextAddFoodItemViewOkButton:int=36;
+		public static const SettingsHelpTextChangeMealDateAndTimeViewButtons:int=37;
+		public static const SettingsHelpTextAddFoodItemViewTrashButton:int=38;
+		public static const SettingsHelpTextEditMealEventViewEditSelectedItem:int=39;
+		public static const SettingsHelpTextEditBGEventViewChangeAmount:int=40;
+		public static const SettingsHelpTextEditBGEventViewChangeDateAndTime:int=41;
+		public static const SettingsHelpTextEditMedicinEventViewChangeMedicinType:int=42;
+		public static const SettingsHelpTextEditMedicinEventViewChangeAmount:int=43;
+		public static const SettingsHelpTextEditExerciseEventViewChangeExerciseType:int=44;
+		public static const SettingsHelpTextBolusCalculationViewChangeCarbRatio:int=45;
+		public static const SettingsHelpTextMealTimesViewChangeMealTimes:int=46;
+		public static const SettingsHelpTextMedicinViewChangeMedicinType:int=47;
+		public static const SettingsHelpTextExerciseViewChangeMedicinType:int=48;
+		public static const SettingsHelpTextDatabaseViewChangeStorage:int=49;
+		public static const SettingsHelpTextEditMedicinEventViewOkButton:int=50;
+		public static const SettingsHelpTextEditExerciseEventViewOkButton:int=51;
+		public static const SettingsHelpTextEditBGEventViewOkButton:int=52;
+		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
 			"none",// initially there will be no meal too which the last  fooditem has been added
@@ -210,7 +234,29 @@ package databaseclasses
 			"23",//default exercise type, meaning exercise type 1
 			"30",//default length of trackingview, in days
 			"en_US,nl_NL,fr_FR",//just a default value,  
-			"firsttartuptime defined in constructor"//firststartuptime, will be set in constructor
+			"firsttartuptime defined in constructor",//firststartuptime, will be set in constructor
+			"true",//SettingsAddFoodItemViewSelectUnitButton
+			"true",//SettingsHelpTextAddFoodItemViewSelectMealButton
+			"true",//SettingsHelpTextAddFoodItemViewAmountButtons
+			"true",//SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromTrackingView
+			"true",//SettingsHelpTextAddFoodItemViewOkButton
+			"true",
+			"true",//SettingsHelpTextAddFoodItemViewTrashButton
+			"true",//SettingsHelpTextEditMealEventViewEditSelectedItem
+			"true",//SettingsHelpTextEditBGEventViewChangeAmount
+			"true",//SettingsHelpTextEditBGEventViewChangeDateAndTime
+			"true",//SettingsHelpTextEditMedicinEventViewChangeMedicinType
+			"true",//SettingsHelpTextEditMedicinEventViewChangeAmount
+			"true",//SettingsHelpTextEditExerciseEventViewChangeMedicinType
+			"true",//SettingsHelpTextBolusCalculationViewChangeCarbRatio
+			"true",//SettingsHelpTextMealTimesViewChangeMealTimes
+			"true",//SettingsHelpTextMedicinViewChangeMedicinType
+			"true",//SettingsHelpTextExerciseViewChangeMedicinType
+			"true",//SettingsHelpTextDatabaseViewChangeStorage
+			"true",//ok buttons for medicin event, exercise event and bloodglucoseevent
+			"true",
+			"true"
+			
 		];
 		
 		private static var instance:Settings = new Settings();

@@ -21,6 +21,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		backKeyPressed="onBackKeyPressed(event)"
 		creationComplete="view1_creationCompleteHandler(event)"
 		initialize="view1_initializeHandler(event)">
+	
+	<fx:Metadata>
+		[ResourceBundle("settingsmedicinview")]
+	</fx:Metadata>
+
 	<fx:Script>
 		<![CDATA[
 			import com.google.analytics.AnalyticsTracker;
@@ -29,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import mx.events.FlexEvent;
 			
+			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
 			import spark.events.TextOperationEvent;
@@ -45,6 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
+			private var helpCallOut:HelpCallOut;
 
 			private function onBackKeyPressed(event:Event):void {
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
@@ -102,6 +109,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					tracker = new MyGATracker( this, trackerId, "AS3", false );
 				}
 				tracker.trackPageview( "SettingsMedicinView-viewOpened" );
+				
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('settingsmedicinview','help_text_changeMedicinTypes');
+				helpCallOut.settingId = Settings.SettingsHelpTextMedicinViewChangeMedicinType;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				helpCallOut.open(type2,true);
+			}
+			
+			private function helptext1Removed(event:Event):void  {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 			}
 		]]>
 	</fx:Script>

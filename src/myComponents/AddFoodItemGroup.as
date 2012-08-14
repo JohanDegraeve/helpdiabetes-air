@@ -91,7 +91,7 @@ package myComponents
 			}
 		}
 		
-		private var details_button:Button;
+		public var details_button:Button;
 		
 		private var _details_button_click_function:Function;
 
@@ -225,7 +225,7 @@ package myComponents
 			}
 		}
 		
-		private var meal_button:Button;
+		public var meal_button:Button;
 		
 		/**
 		 * the function to call when meal button is clicked 
@@ -343,7 +343,7 @@ package myComponents
 		private var button_2:Button;
 		private var button_3:Button;
 		private var button_4:Button;
-		private var button_5:Button;
+		public var button_5:Button;
 		private var button_6:Button;
 		private var button_7:Button;
 		private var button_8:Button;
