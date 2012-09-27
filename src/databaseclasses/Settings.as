@@ -200,7 +200,64 @@ package databaseclasses
 		public static const SettingsHelpTextEditMedicinEventViewOkButton:int=50;
 		public static const SettingsHelpTextEditExerciseEventViewOkButton:int=51;
 		public static const SettingsHelpTextEditBGEventViewOkButton:int=52;
-		
+		public static const SettingsHelpText53:int=53;
+		public static const SettingsHelpText54:int=54;
+		public static const SettingsHelpText55:int=55;
+		public static const SettingsHelpText56:int=56;
+		public static const SettingsHelpText57:int=57;
+		public static const SettingsHelpText58:int=58;
+		public static const SettingsHelpText59:int=59;
+		public static const SettingsHelpText60:int=60;
+		public static const SettingsHelpText61:int=61;
+		public static const SettingsHelpText62:int=62;
+		public static const SettingsHelpText63:int=63;
+		public static const SettingsHelpText64:int=64;
+		public static const SettingsHelpText65:int=65;
+		public static const SettingsHelpText66:int=66;
+		public static const SettingsHelpText67:int=67;
+		public static const SettingsHelpText68:int=68;
+		public static const SettingsHelpText69:int=69;
+		public static const SettingsHelpText70:int=70;
+		public static const SettingsHelpText71:int=71;
+		public static const SettingsHelpText72:int=72;
+		public static const SettingsHelpText73:int=73;
+		public static const SettingsHelpText74:int=74;
+		public static const SettingsHelpText75:int=75;
+		public static const SettingsHelpText76:int=76;
+		public static const SettingsHelpText77:int=77;
+		public static const SettingsHelpText78:int=78;
+		public static const SettingsHelpText79:int=79;
+		public static const SettingsHelpText80:int=80;
+		public static const SettingsHelpText81:int=81;
+		public static const SettingsHelpText82:int=82;
+		public static const SettingsHelpText83:int=83;
+		public static const SettingsHelpText84:int=84;
+		public static const SettingsHelpText85:int=85;
+		public static const SettingsHelpText86:int=86;
+		public static const SettingsHelpText87:int=87;
+		public static const SettingsHelpText88:int=88;
+		public static const SettingsHelpText89:int=89;
+		public static const SettingsHelpText90:int=90;
+		public static const SettingsHelpText91:int=91;
+		public static const SettingsHelpText92:int=92;
+		public static const SettingsHelpText93:int=93;
+		public static const SettingsHelpText94:int=94;
+		public static const SettingsHelpText95:int=95;
+		public static const SettingsHelpText96:int=96;
+		public static const SettingsHelpText97:int=97;
+		public static const SettingsHelpText98:int=98;
+		public static const SettingsHelpText99:int=99;
+		public static const SettingsHelpText100:int=100;
+		/**
+		 * access_token for Google sync 
+		 */
+		public static const SettingsAccessToken:int=101;
+		/**
+		 * refresh_token for Google sync
+		 */
+		public static const SettingsRefreshToken:int=102;
+		public static const SettingsLastSyncTimeStamp:int=103;
+
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
 			"none",// initially there will be no meal too which the last  fooditem has been added
@@ -255,8 +312,58 @@ package databaseclasses
 			"true",//SettingsHelpTextDatabaseViewChangeStorage
 			"true",//ok buttons for medicin event, exercise event and bloodglucoseevent
 			"true",
-			"true"
-			
+			"true",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",//default access token
+			"",//default refresh token
+			"0"//lastsynctimestamp
 		];
 		
 		private static var instance:Settings = new Settings();
@@ -298,10 +405,12 @@ package databaseclasses
 		
 		/**
 		 * Set the setting specified by the setting id, database will also be updated asynchronously<br>
+		 * If the settingid is the maxtrackingsize, then also lastsynctimestamp will be reset to current date - maxtrackingsize
 		 */
 		public function setSetting(settingId:int, newValue:String):void {
 			var dispatcher:EventDispatcher = new EventDispatcher();
 			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailure);
+			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,settingInsertionSuccess);
 			
 			var oldValue:String = settings[settingId];
 			
@@ -309,7 +418,16 @@ package databaseclasses
 			Database.getInstance().updateSetting(settingId,newValue,dispatcher);
 			
 			function settingInsertionFailure(se:Event):void {
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailure);
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInsertionSuccess);
 				settings[settingId] = oldValue;
+			}
+			
+			function settingInsertionSuccess(se:Event):void {
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailure);
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInsertionSuccess);
+				if (settingId == SettingsMAXTRACKINGSIZE)
+					setSetting(SettingsLastSyncTimeStamp,((new Date()).valueOf() - SettingsMAXTRACKINGSIZE * 24 * 3600 * 1000).toString());
 			}
 		}
 		

@@ -196,6 +196,8 @@ package databaseclasses
 		
 		private const INSERT_EXERCISEEVENT:String = "INSERT INTO exerciseevents (exerciseeventid, level, creationtimestamp, comment_2, lastmodifiedtimestamp) VALUES (:exerciseeventid, :level, :creationtimestamp, :comment_2, :lastmodifiedtimestamp)";
 		
+		private var databaseWasCopiedFromSampleFile:Boolean = false;
+		
 		/**
 		 * constructor, should not be used, use getInstance()
 		 */
@@ -296,7 +298,7 @@ package databaseclasses
 			function reAttempt():void {
 				//attempt to create dbFile based on a sample in assets directory, 
 				//if that fails then dbFile will simply not exist and so will be created later on in openAsync 
-				var result:Boolean = createDatabaseFromAssets(dbFile);
+				databaseWasCopiedFromSampleFile = createDatabaseFromAssets(dbFile);
 				this.aConn = new SQLStatement();
 				aConn.addEventListener(SQLEvent.OPEN, onConnOpen);
 				aConn.addEventListener(SQLErrorEvent.ERROR, onConnError);
@@ -356,6 +358,8 @@ package databaseclasses
 				* any setting which doesn't exist yet in the database needs to be stored in the database with value retrieved from Settings
 				* any setting which already exists in the database will be stored in Settings class
 				* so first store getresult.data values in an array of strings just a large as the Settings class, values that don't exist yet get null as value
+				*
+				* exception for SettingsFirstStartUp, in case the database was created by copying the sample file, then we'll use the SettingsFirstStartUp from the class and not from the database
 				*/
 				for (var i:int = 0;i < retrievalResult.length;i++) {
 					retrievalResult[i] = null;
@@ -363,8 +367,11 @@ package databaseclasses
 				
 				if (result != null && result is Array) {
 					for each (var o:Object in result) {
-						retrievalResult[(o.id as int)] = (o.value as String);
-						Settings.getInstance().setSettingWithoutDatabaseUpdate((o.id as int),(o.value as String));
+						if  ((o.id as int) != Settings.SettingsFirstStartUp || !databaseWasCopiedFromSampleFile) {
+							//retrievalresult[Settings.SettingsFirstStartUp] will remain null so it will get the value from the class later on
+							retrievalResult[(o.id as int)] = (o.value as String);
+							Settings.getInstance().setSettingWithoutDatabaseUpdate((o.id as int),(o.value as String));
+						}
 					}
 				}
 				//now add each missing element in the database, start with the first
@@ -380,12 +387,16 @@ package databaseclasses
 						sqlStatement.clearParameters();
 						sqlStatement.addEventListener(SQLEvent.RESULT,settingAdded);
 						sqlStatement.addEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
-						sqlStatement.text = INSERT_SETTING;
+						sqlStatement.text = 
+							(id != Settings.SettingsFirstStartUp || !databaseWasCopiedFromSampleFile)
+							?
+							INSERT_SETTING
+							:
+							UPDATE_SETTING;
 						sqlStatement.parameters[":id"] = id;
 						sqlStatement.parameters[":value"] = Settings.getInstance().getSetting(id);
 						sqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
 						sqlStatement.execute();
-						
 					} else {
 						addMissingSetting(id + 1);
 					}

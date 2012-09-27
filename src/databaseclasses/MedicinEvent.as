@@ -84,7 +84,7 @@ package databaseclasses
 			_medicinName = newMedicinName;
 			if (!isNaN(newCreationTimeStamp))
 				timeStamp = newCreationTimeStamp;
-			Database.getInstance().updateMedicinEvent(this.eventid,/*_timeStamp,*/_amount,_medicinName,timeStamp);
+			Database.getInstance().updateMedicinEvent(this.eventid,_amount,_medicinName,timeStamp);
 		}
 		
 		/**

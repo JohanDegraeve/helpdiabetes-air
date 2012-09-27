@@ -111,8 +111,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				tabbedNavigator.addEventListener(IndexChangeEvent.CHANGE, changeIcon);
 				
-				modelLocator.resetLabels();
-				
 			}
 			
 			protected function changeIcon(event:IndexChangeEvent):void {

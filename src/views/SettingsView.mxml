@@ -65,7 +65,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ResourceManager.getInstance().getString("settingsview","database"),
 				ResourceManager.getInstance().getString("settingsview","language"),
 				ResourceManager.getInstance().getString("settingsview","infoabout"),
-				ResourceManager.getInstance().getString("settingsview","resethelptext")
+				ResourceManager.getInstance().getString("settingsview","resethelptext"),
+				ResourceManager.getInstance().getString("settingsview","googlesync")
 			]);	
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -182,7 +183,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						alertPopUp.show(this,textToShow);
 						
 						break;
-						
+					case 9:
+						navigator.pushView(SynchronizeView);
+						break;
 				}
 				
 				function okClicked(event: PopUpEvent):void {
@@ -224,8 +227,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
 					Settings.getInstance().setSetting(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
 					
-					//also reset the labels in the tabs
-					ModelLocator.getInstance().resetLabels();
 				}
 			}
 		]]>

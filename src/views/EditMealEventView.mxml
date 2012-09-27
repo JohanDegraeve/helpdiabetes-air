@@ -44,8 +44,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
+			import mx.events.IndexChangedEvent;
+			import mx.managers.PopUpManager;
 			
 			import myComponents.HelpCallOut;
+			import myComponents.Notification;
 			import myComponents.PickerEvent;
 			import myComponents.SelectedFoodItemRenderer;
 			
@@ -54,6 +57,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import utilities.MyGATracker;
 
+			private var notificationPopUp:Notification;
+			
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
 
@@ -142,6 +147,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 								fooditemlist.addEventListener(Event.CHANGE,onClick);
 								mealCounter = -1;
 							}
+							if (!fooditemlist.hasEventListener(Event.CHANGE)) {
+								fooditemlist.addEventListener(Event.CHANGE,onClickButNotEditable);
+							}
 						}
 					}
 					
@@ -156,6 +164,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function itemRendererFunction(item:Object):ClassFactory {
 				return  new ClassFactory(SelectedFoodItemRenderer);
+			}
+			
+			private function onClickButNotEditable(event:IndexChangedEvent):void {
+				notificationPopUp = new Notification();
+				notificationPopUp.notificationText = resourceManager.getString('editmealeventview','youcannoteditthismealevent');
+				notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
+				PopUpManager.addPopUp(notificationPopUp, this, true);
+			}
+			
+			private function okClicked(event: PickerEvent):void {
+				if (notificationPopUp != null) {
+					PopUpManager.removePopUp(notificationPopUp);
+					if (notificationPopUp.hasEventListener(PickerEvent.PICKER_SET)) {
+						notificationPopUp.removeEventListener(PickerEvent.PICKER_SET, okClicked);
+					}
+				}
 			}
 			
 			private function onClick(event:IndexChangeEvent):void {

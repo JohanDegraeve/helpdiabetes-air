@@ -66,6 +66,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import utilities.ExcelSorting;
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			[Bindable]
 			public var listOfOptionsArray:Array ;
@@ -105,6 +106,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					firstStartUp = true;
 					notificationPopUp = new Notification();
 					notificationPopUp.notificationText = resourceManager.getString('helpdiabetes','infoaboutlanguageselection');
+					var temp:String = notificationPopUp.notificationText;
 					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
 					PopUpManager.addPopUp(notificationPopUp, thisObject, true);
 					PopUpManager.centerPopUp(notificationPopUp);
@@ -183,9 +185,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						resourceManager.localeChain.push(localeChainAsArray[j]);
 					}
 					
-					//time to set the labels
-					ModelLocator.getInstance().resetLabels();
-					
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
 					Database.getInstance().getAllFoodItemDescriptions(dispatcher);
@@ -221,6 +220,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						ModelLocator.getInstance().foodItemList = foodItems;
 					} 
 					
+					Synchronize.getInstance().synchronize();
 				}
 				
 				function licenseAccepted(event: PopUpEvent):void {

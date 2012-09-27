@@ -187,17 +187,6 @@ package model
 			return _offSetSoThatTextIsInTheMiddle;
 		}*/
 		
-		[Bindable]
-		public var mealLabel:String ="";
-		[Bindable]
-		public var logbookLabel:String ="";
-		[Bindable]
-		public var settingsLabel:String ="";
-		[Bindable]
-		public var infoaboutLabel:String ="";
-
-
-		
 		/**
 		 * constructor
 		 */
@@ -240,15 +229,6 @@ package model
 			youngestDayLineStoredInTrackingList = 5000000000000;
 			
 		}
-		
-		public function resetLabels():void {
-			//labels for the tabs
-			mealLabel = ResourceManager.getInstance().getString('helpdiabetes','foodcounter');
-			logbookLabel = ResourceManager.getInstance().getString('helpdiabetes','logbook');
-			settingsLabel = ResourceManager.getInstance().getString('helpdiabetes','settings');
-			infoaboutLabel = ResourceManager.getInstance().getString('helpdiabetes','infoabout');
-		}
-
 		
 		/** 
 		 * return the one and only instance of ModelLocator

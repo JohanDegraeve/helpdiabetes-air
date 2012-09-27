@@ -401,6 +401,7 @@ package databaseclasses
 		private function set correctionFactor(value:Number):void
 		{
 			_correctionFactor = value;
+			//hier zou nog een database update moeten gebeuren denk ik
 			recalculateInsulinAmount();
 		}
 
