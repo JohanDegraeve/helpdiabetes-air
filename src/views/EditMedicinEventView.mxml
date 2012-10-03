@@ -291,7 +291,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theMedicinEvent = new MedicinEvent(
 						new Number(amountText),
 						medicinName,
-						eventDateAndTime.valueOf(),
+						new Date().valueOf(),
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theMedicinEvent);
 				} else {

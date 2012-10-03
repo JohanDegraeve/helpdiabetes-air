@@ -1757,7 +1757,7 @@ package databaseclasses
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
 							deleteMedicinEvent(o.medicineventid as Number);
 						} else {
-							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number,o.medicinname as String,o.medicineventid as Number,o.creationtimestamp as Number,false);
+							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number,o.medicinname as String,o.medicineventid as Number,o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
 							var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -1920,7 +1920,7 @@ package databaseclasses
 		 * new medicin event will be added to the database<br>
 		 * here the medicineventid will get the value of current date and time as Number 
 		 */
-		internal function createNewMedicinEvent(amount:int,medicin:String, timeStamp:Number,medicineventid:Number,dispatcher:EventDispatcher = null):void {
+		internal function createNewMedicinEvent(amount:int,medicin:String, timeStamp:Number,newLastModifiedTimeStamp:Number,medicineventid:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -1938,7 +1938,7 @@ package databaseclasses
 				localSqlStatement.parameters[":amount"] = amount;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":medicinname"] = medicin;
-				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, medicinEventCreationFailed);
 				localSqlStatement.execute();
@@ -1977,7 +1977,7 @@ package databaseclasses
 		/**
 		* medicinevent with specified medicineventid is updated with new values for timestamp, amount and medicinname
 		*/ 	
-		internal function updateMedicinEvent(medicinEventId:Number,newAmount:Number,newMedicinName:String,newCreationTimeStamp:Number, dispatcher:EventDispatcher = null):void {
+		internal function updateMedicinEvent(medicinEventId:Number,newAmount:Number,newMedicinName:String,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -1994,7 +1994,7 @@ package databaseclasses
 				localSqlStatement.parameters[":amount"] = newAmount;
 				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;
 				localSqlStatement.parameters[":medicinname"] = newMedicinName;
-				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, medicinEventUpdateFailed);
 				localSqlStatement.execute();

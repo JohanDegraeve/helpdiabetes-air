@@ -41,12 +41,24 @@ package databaseclasses
 			return _amount;
 		}
 
+		private var _lastModifiedTimestamp:Number;
+
+		public function get lastModifiedTimestamp():Number
+		{
+			return _lastModifiedTimestamp;
+		}
+
+	 	internal function set lastModifiedTimestamp(value:Number):void
+		{
+			_lastModifiedTimestamp = value;
+		}
 		
 		/**
 		 * creates a medicin event and stores it immediately in the database if storeInDatabase = true<br>
-		 * if creationTimeStamp = null, then current date and time is used
+		 * if creationTimeStamp = null, then current date and time is used<br>
+		 * if newLastModifiedTimestamp = null, then current date and time is used
 		 */
-		public function MedicinEvent( amount:Number, medicin:String, medicineventid:Number, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true)
+		public function MedicinEvent( amount:Number, medicin:String, medicineventid:Number, creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN,storeInDatabase:Boolean = true)
 		{
 			this._medicinName = medicin;
 			this.eventid = medicineventid;
@@ -56,8 +68,13 @@ package databaseclasses
 			else
 				_timeStamp = (new Date()).valueOf();
 			
+			if (!isNaN(newLastModifiedTimeStamp))
+				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+			else
+				_lastModifiedTimestamp = (new Date()).valueOf();
+			
 			if (storeInDatabase)
-				Database.getInstance().createNewMedicinEvent(amount, medicin, _timeStamp,medicineventid,null);
+				Database.getInstance().createNewMedicinEvent(amount, medicin, _timeStamp,newLastModifiedTimeStamp,medicineventid,null);
 		}
 		
 		public function get timeStamp():Number
@@ -76,15 +93,18 @@ package databaseclasses
 		}
 		
 		/**
-		 * will update the medicinevent in the database with the new values for medicinName and amount
-		 * if newCreationTimeStamp =  Number.NaN then (creation)timeStamp is not updated
+		 * will update the medicinevent in the database with the new values for medicinName and amount<br>
+		 * if newCreationTimeStamp =  Number.NaN then (creation)timeStamp is not updated<br>
+		 *  if newLastModifiedTimestamp = null, then lastmodifiedtimestamp will not be used
 		 */
-		public function updateMedicinEvent(newMedicinName:String,newAmount:Number,newCreationTimeStamp:Number = Number.NaN):void {
+		public function updateMedicinEvent(newMedicinName:String,newAmount:Number,newCreationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN):void {
 			_amount = newAmount;
 			_medicinName = newMedicinName;
+			if (!isNaN(newLastModifiedTimeStamp))
+				_lastModifiedTimestamp = newLastModifiedTimeStamp;
 			if (!isNaN(newCreationTimeStamp))
-				timeStamp = newCreationTimeStamp;
-			Database.getInstance().updateMedicinEvent(this.eventid,_amount,_medicinName,timeStamp);
+				_timeStamp = newCreationTimeStamp;
+			Database.getInstance().updateMedicinEvent(this.eventid,_amount,_medicinName,timeStamp,newLastModifiedTimeStamp);
 		}
 		
 		/**
