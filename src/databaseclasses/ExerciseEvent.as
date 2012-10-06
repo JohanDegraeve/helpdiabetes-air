@@ -65,17 +65,32 @@ package databaseclasses
 			 _timeStamp = newTimeStamp;
 		}
 		
+		private var _lastModifiedTimestamp:Number;
+		
+		public function get lastModifiedTimestamp():Number
+		{
+			return _lastModifiedTimestamp;
+		}
+		
+		internal function set lastModifiedTimestamp(value:Number):void
+		{
+			_lastModifiedTimestamp = value;
+		}
+		
 		/**
 		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
-		 * if newComment = null then an empty string will be used
-		 * if newCreationTimeStamp = null or Number.NaN then (creation)timeStamp is not updated
+		 * if newComment = null then an empty string will be used<br>
+		 * if newCreationTimeStamp = Number.NaN then (creation)timeStamp is not updated<br>
+		 *  if newLastModifiedTimestamp = Number.NAN, then lastmodifiedtimestamp will not be used<br>
 		 */
-		public function updateExerciseEvent(newLevel:String,newComment:String = null,newCreationTimeStamp:Number = Number.NaN):void {
+		public function updateExerciseEvent(newLevel:String,newComment:String = null,newCreationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN):void {
 			_level = newLevel;
 			_comment = (newComment == null ? "":newComment);
+			if (!isNaN(newLastModifiedTimeStamp))
+				_lastModifiedTimestamp = newLastModifiedTimeStamp;
 			if (!isNaN(newCreationTimeStamp))
 				timeStamp = newCreationTimeStamp;
-			Database.getInstance().updateExerciseEvent(this.eventid,newLevel,_comment, timeStamp);
+			Database.getInstance().updateExerciseEvent(this.eventid,newLevel,_comment, timeStamp,_lastModifiedTimestamp);
 		}
 
 		public function listElementRendererFunction():ClassFactory

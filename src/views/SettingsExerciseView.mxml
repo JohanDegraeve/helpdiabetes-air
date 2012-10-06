@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.events.TextOperationEvent;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			[Bindable] private var exerciseText1:String = "";
 			[Bindable] private var exerciseText2:String = "";
@@ -75,32 +76,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			protected function type1_changeHandler(event:TextOperationEvent):void
 			{
 				Settings.getInstance().setSetting(Settings.SettingsExerciseType1,exerciseText1);
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			protected function type2_changeHandler(event:TextOperationEvent):void
 			{
 				Settings.getInstance().setSetting(Settings.SettingsExerciseType2,exerciseText2);
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			protected function type3_changeHandler(event:TextOperationEvent):void
 			{
 				Settings.getInstance().setSetting(Settings.SettingsExerciseType3,exerciseText3);
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			protected function type4_changeHandler(event:TextOperationEvent):void
 			{
 				Settings.getInstance().setSetting(Settings.SettingsExerciseType4,exerciseText4);
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			protected function type5_changeHandler(event:TextOperationEvent):void
 			{
 				Settings.getInstance().setSetting(Settings.SettingsExerciseType5,exerciseText5);
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
+
 			{
+
 				if (tracker == null) {
 					tracker = new MyGATracker( this, trackerId, "AS3", false );
 				}

@@ -74,6 +74,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			import spark.events.ViewNavigatorEvent;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			[Bindable]
 			private var description_textarea_text:String ;
@@ -463,6 +464,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
 							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 					}
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			/**

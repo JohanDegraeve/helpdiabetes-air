@@ -93,6 +93,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onCreationComplete():void {
+
 				thisView = this;
 				if (!ModelLocator.getInstance().firstStartUp)
 					return;
@@ -219,8 +220,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 						ModelLocator.getInstance().foodItemList = foodItems;
 					} 
-					
-					Synchronize.getInstance().synchronize();
+					Synchronize.getInstance().startSynchronize(tracker,false);
 				}
 				
 				function licenseAccepted(event: PopUpEvent):void {

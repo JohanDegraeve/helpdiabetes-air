@@ -34,6 +34,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import utilities.MyGATracker;
+			import com.google.analytics.AnalyticsTracker;
+			import utilities.Synchronize;
 			import myComponents.HelpCallOut;
 			import mx.managers.PopUpManager;
 			import myComponents.TimePicker;
@@ -47,6 +50,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var dateOrTimePicker:TimePicker;
 			
 			private var helpCallOut:HelpCallOut;
+			public var tracker:AnalyticsTracker;
+			private var trackerId:String;
+			
 
 			private function onCreationComplete(): void {
 				helpCallOut = new HelpCallOut();
@@ -54,6 +60,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				helpCallOut.settingId = Settings.SettingsHelpTextMealTimesViewChangeMealTimes;
 				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 				helpCallOut.open(snackuntilTime,true);
+				if (tracker == null) {
+					tracker = new MyGATracker( this, trackerId, "AS3", false );
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
@@ -89,7 +98,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, breakfastUntilTimeSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				breakfastTime = timeformatter.format(event.newValue as Date);
-				Settings.getInstance().setSetting(Settings.SettingBREAKFAST_UNTIL,(((event.newValue as Date).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString()); 
+				Settings.getInstance().setSetting(Settings.SettingBREAKFAST_UNTIL,(((event.newValue as Date).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString());
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			private function breakfastUntilSettingClicked(e:MouseEvent = null):void {
@@ -109,7 +119,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, lunchfastUntilTimeSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				lunchTime = timeformatter.format(event.newValue as Date);
-				Settings.getInstance().setSetting(Settings.SettingLUNCH_UNTIL,(((event.newValue as Date).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString()); 
+				Settings.getInstance().setSetting(Settings.SettingLUNCH_UNTIL,(((event.newValue as Date).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString());
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			private function lunchUntilSettingClicked(e:MouseEvent = null):void {
@@ -129,7 +140,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, snackfastUntilTimeSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				snackTime = timeformatter.format(event.newValue as Date);
-				Settings.getInstance().setSetting(Settings.SettingSNACK_UNTIL,(((event.newValue as Date).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString()); 
+				Settings.getInstance().setSetting(Settings.SettingSNACK_UNTIL,(((event.newValue as Date).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString());
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			private function snackUntilSettingClicked(e:MouseEvent = null):void {

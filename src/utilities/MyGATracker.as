@@ -33,7 +33,7 @@ package utilities
 		}
 		
 		override public function  trackPageview(pageURL:String=""):void {
-			if ((new Date()).valueOf() - 1*7*24*60*60*1000 > new Number(Settings.getInstance().getSetting(Settings.SettingsFirstStartUp))) 
+			if ((new Date()).valueOf() - 7*24*60*60*1000 > new Number(Settings.getInstance().getSetting(Settings.SettingsFirstStartUp))) 
 				super.trackPageview(pageURL);
 		}
 	}

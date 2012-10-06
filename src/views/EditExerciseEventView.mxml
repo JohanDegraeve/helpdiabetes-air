@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.components.ViewNavigator;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			private var exercisePicker:elementFromListPicker;
 			private var dateOrTimePicker:Group;
@@ -244,7 +245,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theExerciseEvent);
 				} else {
-					theExerciseEvent.updateExerciseEvent(exerciseName,null,eventDateAndTime.valueOf());
+					theExerciseEvent.updateExerciseEvent(exerciseName,null,eventDateAndTime.valueOf(),new Date().valueOf());
 				}
 				
 
@@ -279,6 +280,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().trackingEventToShow = theExerciseEvent.eventid;
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			private function deleteEvent(e:MouseEvent = null):void {
 				confirmationPicker = new RequestConfirmation();

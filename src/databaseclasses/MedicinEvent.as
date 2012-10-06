@@ -95,16 +95,19 @@ package databaseclasses
 		/**
 		 * will update the medicinevent in the database with the new values for medicinName and amount<br>
 		 * if newCreationTimeStamp =  Number.NaN then (creation)timeStamp is not updated<br>
-		 *  if newLastModifiedTimestamp = null, then lastmodifiedtimestamp will not be used
+		 *  if newLastModifiedTimestamp = Number.NAN, then lastmodifiedtimestamp will not be used<br>
 		 */
 		public function updateMedicinEvent(newMedicinName:String,newAmount:Number,newCreationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN):void {
 			_amount = newAmount;
 			_medicinName = newMedicinName;
-			if (!isNaN(newLastModifiedTimeStamp))
+			if (!isNaN(newLastModifiedTimeStamp)) {
+				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
+					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
 				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+			}
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
-			Database.getInstance().updateMedicinEvent(this.eventid,_amount,_medicinName,timeStamp,newLastModifiedTimeStamp);
+			Database.getInstance().updateMedicinEvent(this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp);
 		}
 		
 		/**

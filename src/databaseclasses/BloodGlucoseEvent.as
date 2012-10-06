@@ -45,7 +45,8 @@ package databaseclasses
 		/**
 		 * creates a bloodglucose event and stores it immediately in the database if storeInDatabase = true<br>
 		 * unit is a textstring denoting the unit used, mgperdl, or ... <br>
-		 * if creationTimeStamp = null, then curren date and time is used
+		 * if creationTimeStamp = Number.NAN, then curren date and time is used<br>
+		 *  if newLastModifiedTimestamp = Number.NAN, then lastmodifiedtimestamp will not be used<br>
 		 */
 		public function BloodGlucoseEvent(glucoseLevel:int, unit:String, bloodglucoseEventId:Number, creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true )
 		{
@@ -81,18 +82,32 @@ package databaseclasses
 			_timeStamp = value;
 		}
 		
+		private var _lastModifiedTimestamp:Number;
+		
+		public function get lastModifiedTimestamp():Number
+		{
+			return _lastModifiedTimestamp;
+		}
+		
+		internal function set lastModifiedTimestamp(value:Number):void
+		{
+			_lastModifiedTimestamp = value;
+		}
+		
 		/**
 		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
 		 * if newComment = null then an empty string will be used<br>
 		 * if newCreationTimeStamp = null or Number.NaN then (creation)timeStamp is not updated
 		 */
-		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:int,newCreationTimeStamp:Number = Number.NaN):void {
+		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:int,newCreationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN):void {
 			unit = newUnit;
 			_bloodGlucoseLevel = newBloodGlucoseLevel;
+			if (!isNaN(newLastModifiedTimeStamp))
+				_lastModifiedTimestamp = newLastModifiedTimeStamp;
 			if (!isNaN(newCreationTimeStamp)) {
 				timeStamp = newCreationTimeStamp;
 			}
-			Database.getInstance().updateBloodGlucoseEvent(this.eventid,unit,_bloodGlucoseLevel, timeStamp);
+			Database.getInstance().updateBloodGlucoseEvent(this.eventid,unit,_bloodGlucoseLevel, timeStamp,_lastModifiedTimestamp);
 		}
 		
 		public function listElementRendererFunction():ClassFactory

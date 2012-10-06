@@ -41,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.events.TextOperationEvent;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			[Bindable] private var medicinText1:String = "";
 			[Bindable] private var medicinText2:String = "";
@@ -79,29 +80,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
-
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			protected function type2_changeHandler(event:TextOperationEvent):void
 
 			{
-
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType2,medicinText2);
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			protected function type3_changeHandler(event:TextOperationEvent):void
 			{
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType3,medicinText3);
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			protected function type4_changeHandler(event:TextOperationEvent):void
 			{
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType4,medicinText4);
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			protected function type5_changeHandler(event:TextOperationEvent):void
 			{
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType5,medicinText5);
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void

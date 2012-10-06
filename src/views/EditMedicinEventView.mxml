@@ -57,6 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.components.ViewNavigator;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			private var amountPicker:AmountPicker;
 			private var medicinPicker:elementFromListPicker;
@@ -295,7 +296,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theMedicinEvent);
 				} else {
-					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText),eventDateAndTime.valueOf());
+					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText),eventDateAndTime.valueOf(),new Date().valueOf());
 				}
 				
 				var creationTimeStampAsDate:Date = new Date(theMedicinEvent.timeStamp);
@@ -329,6 +330,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().trackingEventToShow = theMedicinEvent.eventid;
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			private function deleteEvent(e:MouseEvent = null):void {

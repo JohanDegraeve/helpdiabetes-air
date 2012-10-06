@@ -2091,7 +2091,7 @@ package databaseclasses
 		/**
 		 * exerciseevent with specified exerciseeventid is updated with new values for timestamp, level and comment
 		 */ 	
-		internal function updateExerciseEvent(exerciseEventId:Number,newLevel:String,newComment_2:String,newCreationTimeStamp:Number, dispatcher:EventDispatcher = null):void {
+		internal function updateExerciseEvent(exerciseEventId:Number,newLevel:String,newComment_2:String,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -2108,7 +2108,7 @@ package databaseclasses
 				localSqlStatement.parameters[":level"] = newLevel;
 				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;
 				localSqlStatement.parameters[":comment_2"] = newComment_2;
-				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, exerciseEventUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, exerciseEventUpdateFailed);
 				localSqlStatement.execute();
@@ -2148,7 +2148,7 @@ package databaseclasses
 		/**
 		 * bloodglucoseevent with specified bloodglucoseeventid is updated with new values  level and unit
 		 */ 	
-		internal function updateBloodGlucoseEvent(bloodglucoseEventId:Number,unit:String,bloodGlucoseLevel:int,newCreationTimeStamp:Number, dispatcher:EventDispatcher = null):void {
+		internal function updateBloodGlucoseEvent(bloodglucoseEventId:Number,unit:String,bloodGlucoseLevel:int,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -2165,7 +2165,7 @@ package databaseclasses
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":value"] = bloodGlucoseLevel;
 				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;
-				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, bloodglucoseEventUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, bloodglucoseEventUpdateFailed);
 				localSqlStatement.execute();

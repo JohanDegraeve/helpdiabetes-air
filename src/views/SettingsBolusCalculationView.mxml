@@ -51,6 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.events.ViewNavigatorEvent;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			private var thisView:View;
 			
@@ -236,6 +237,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp : ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp
 							);
 					}
+					Synchronize.getInstance().startSynchronize(tracker,true);
 				}
 				
 				function onNoClicked(event: PickerEvent): void
@@ -255,6 +257,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					} else {
 						checkOtherSettings(newAmount, (ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp + 1);
 					}
+					Synchronize.getInstance().startSynchronize(tracker,true);
 				}
 
 			}

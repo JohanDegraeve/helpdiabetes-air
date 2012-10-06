@@ -11,6 +11,8 @@
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import com.google.analytics.AnalyticsTracker;
+			
 			import databaseclasses.Settings;
 			
 			import flash.net.drm.AuthenticationMethod;
@@ -21,6 +23,7 @@
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			
+			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
 			
@@ -37,6 +40,7 @@
 			private var authorizationcodeTextAreaVisible:Boolean;
 			[Bindable]
 			private var topLabelText:String;
+			
 
 			[Bindable]
 			private function get authorizationCode_text():String
@@ -69,6 +73,7 @@
 				back_label = resourceManager.getString('general','back');
 				if (!alreadyAuthorised)
 					button.addEventListener(MouseEvent.CLICK,buttonClicked);
+
 			}
 			
 			private function buttonClicked(event:MouseEvent):void {
@@ -113,7 +118,7 @@
 				Settings.getInstance().setSetting(Settings.SettingsRefreshToken,temp.refresh_token);
 				topLabelText = resourceManager.getString('synchronizeview','alreadyauthorized') + '\n' +
 					resourceManager.getString('synchronizeview','synchronisationwillstart');
-				Synchronize.getInstance().synchronize();
+				Synchronize.getInstance().startSynchronize(null,true);
 			}
 			
 		]]>

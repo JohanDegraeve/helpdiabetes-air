@@ -54,6 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.components.ViewNavigator;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			private var confirmationPicker:RequestConfirmation;
 			private var theBloodGlucoseEvent:BloodGlucoseEvent;
@@ -254,7 +255,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theBloodGlucoseEvent);
 				} else {
-					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText), eventDateAndTime.valueOf());
+					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText), eventDateAndTime.valueOf(),new Date().valueOf());
 				}
 				
 				var creationTimeStampAsDate:Date = new Date(theBloodGlucoseEvent.timeStamp);
@@ -288,6 +289,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().trackingEventToShow = theBloodGlucoseEvent.eventid;
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
+				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			private function deleteEvent(e:MouseEvent = null):void {

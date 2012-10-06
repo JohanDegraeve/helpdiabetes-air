@@ -17,10 +17,14 @@
  */
 package utilities
 {
+	import com.google.analytics.AnalyticsTracker;
+	import com.google.analytics.GATracker;
+	
 	import databaseclasses.MedicinEvent;
 	import databaseclasses.Settings;
 	
 	import flash.data.SQLStatement;
+	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.SQLErrorEvent;
@@ -41,6 +45,7 @@ package utilities
 	
 	import myComponents.TrackingViewElement;
 	
+	import spark.components.Application;
 	import spark.formatters.DateTimeFormatter;
 	
 	/**
@@ -49,6 +54,7 @@ package utilities
 	 */
 	public class Synchronize
 	{
+		[ResourceBundle("analytics")]
 		private static var googleRequestTablesUrl:String = "https://www.googleapis.com/fusiontables/v1/tables";
 		private static var googleSelectUrl:String = "https://www.googleapis.com/fusiontables/v1/query";
 		private static var googleTokenRefreshUrl:String = "https://accounts.google.com/o/oauth2/token";
@@ -57,6 +63,10 @@ package utilities
 		 */
 		private static var maxResults:int = 2;
 		
+		/**
+		 * how many minutes between two synchronisations 
+		 */
+		private static var minutesBetweenTwoSync = 1;
 		
 		private static var googleError_Invalid_Credentials:String = "Invalid Credentials";
 		
@@ -67,9 +77,42 @@ package utilities
 		 */
 		private var lastSyncTimeStamp:Number;
 		/**
-		 * timestamp when sync here starts 
+		 * timestamp when sync here starts<br>
+		 * One of the variables that determines if sync will run immediately when synchronize is called<br>
+		 * <br>
+		 * immediateRunNecessary is a parameter in the synchronize method<br>
+		 * <br>
+		 * If  (syncRunning is true and currentSyncTimeStamp > 5 minutes ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 5 minutes ago)), then run the sync, reset timestamp of startrun to current time, 
+		 * set rerunnecessary to false<br>
+		 * <br>
+		 * If  (syncRunning is true and currentSyncTimeStamp < 5 minutes ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
 		 */
 		private var currentSyncTimeStamp:Number;
+		/**
+		 * parameter showing of synchronisation is running or not<br>
+		 * One of the variables that determines if sync will run immediately when synchronize is called<br>
+		 * <br>
+		 * immediateRunNecessary is a parameter in the synchronize method<br>
+		 * <br>
+		 * If  (syncRunning is true and currentSyncTimeStamp > 5 minutes ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 5 minutes ago)), then run the sync, reset timestamp of startrun to current time, 
+		 * set rerunnecessary to false<br>
+		 * <br>
+		 * If  (syncRunning is true and currentSyncTimeStamp < 5 minutes ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
+		 */
+		private var syncRunning:Boolean;
+		/**
+		 * parameter that says if sync should restart when finished<br>
+		 * One of the variables that determines if sync will run immediately when synchronize is called<br>
+		 * <br>
+		 * immediateRunNecessary is a parameter in the synchronize method<br>
+		 * <br>
+		 * If  (syncRunning is true and currentSyncTimeStamp > 5 minutes ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 5 minutes ago)), then run the sync, reset timestamp of startrun to current time, 
+		 * set rerunnecessary to false<br>
+		 * <br>
+		 * If  (syncRunning is true and currentSyncTimeStamp < 5 minutes ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
+		 */
+		private var rerunNecessary:Boolean;
+		
 		/**
 		 * this is the earliest creationtimestamp of the events that will be taken into account 
 		 */
@@ -117,6 +160,7 @@ package utilities
 		 * wil be equal to modellocator.trackinglist, it's just to avoid that I need to type to much 
 		 */
 		private var trackingList:ArrayCollection;
+		private var tracker:AnalyticsTracker;
 		
 		private static var instance:Synchronize = new Synchronize();
 		
@@ -138,6 +182,10 @@ package utilities
 		
 		private var indexOfRetrievedRowId:int;
 		
+		private var amountofSpaces:int;
+		
+		private static var traceNeeded:Boolean = true;
+		
 		/**
 		 * constructor not to be used, get an instance with getInstance() 
 		 */
@@ -146,11 +194,10 @@ package utilities
 			if (instance != null) {
 				throw new Error("Synchronize class can only be accessed through Synchronize.getInstance()");	
 			}
-			lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
-			currentSyncTimeStamp = new Date().valueOf();
-			asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 			trackingList = ModelLocator.getInstance().trackingList;
-			
+			syncRunning = false;
+			rerunNecessary = false;
+			amountofSpaces = 0;
 			instance = this;
 		}
 		
@@ -159,20 +206,52 @@ package utilities
 			return instance;
 		}
 		
+	
+		/**
+		 * If  (syncRunning is true and currentSyncTimeStamp > 5 minutes ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 5 minutes ago)), then run the sync, reset timestamp of startrun to current time, 
+		 * set rerunnecessary to false<br>
+		 * <br>
+		 * If  (syncRunning is true and currentSyncTimeStamp < 5 minutes ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything.<br>
+		 * if tracker is null, then no tracking will be done next time 
+		 */
+		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean):void {
+			tracker = callingTracker;
+
+			lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
+			currentSyncTimeStamp = new Date().valueOf();
+			asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
+
+			var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - lastSyncTimeStamp) > minutesBetweenTwoSync * 60 * 1000;
+			if ((syncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!syncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
+				rerunNecessary = false;
+				currentSyncTimeStamp = new Date().valueOf();
+				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
+				synchronize();
+			} else {
+				if (immediateRunNecessary)
+					rerunNecessary = true;
+			}
+		}
+		
 		/**
 		 * if there's no valid access_token or refresh_token, then this method will do nothing<br>
 		 * if there's a valid access_token or refresh_token, then this method will synchronize the database with 
 		 * Google Fusion Tables 
 		 */
-		public function synchronize():void {
+		private function synchronize():void {
 			//we could be arriving here after a retempt, example, first time failed due to invalid credentials, token refresh occurs, with success, we come back to here
 			//first thing to do is to removeeventlisteners
 			
 			access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
 			if (access_token.length == 0) {
 				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
-				return;
+				syncFinished(false);
 			} 
+			
+			if (tracker != null)
+				tracker.trackPageview( "Synchronize-SyncStarted" );
+			
+
 			//first get all the tables 
 			var request:URLRequest = new URLRequest(googleRequestTablesUrl);
 			request.contentType = "application/x-www-form-urlencoded";
@@ -189,6 +268,8 @@ package utilities
 			functionToRemoveFromEventListener = tablesListRetrieved;
 			loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 			loader.load(request);
+			if (traceNeeded)
+				trace("loader : request = " + request.data); 
 		}
 		
 		private function tablesListRetrieved(event:Event):void {
@@ -267,6 +348,8 @@ package utilities
 				functionToRemoveFromEventListener = createMissingTables;
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
 			}
 			
 		}
@@ -344,8 +427,11 @@ package utilities
 				functionToRemoveFromEventListener = getTheMedicinEvents;
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
 			} else {
 				//get the medicinevents in the trackinglist and store them in localElements.
+				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
 				for (var i:int = 0; i < trackingList.length; i++) {
 					if (trackingList.getItemAt(i) is MedicinEvent) {
 						if ((trackingList.getItemAt(i) as MedicinEvent).timeStamp >= asOfTimeStamp)
@@ -472,6 +558,8 @@ package utilities
 				functionToRemoveFromEventListener = getRowIds;
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
 			}
 		}
 		
@@ -486,7 +574,8 @@ package utilities
 				
 				//start with the medicinevents
 				var sqlStatement:String = "";
-				for (var i:int = 0;i < localElements.length; i++) {
+				var i:int = 0;
+				while (i < localElements.length) {
 					//goal is to insert only elements that are not yet found in remoteelements, those will need updates later on iso inserts
 					if (localElements.getItemAt(i) is MedicinEvent) {//later on we will add exerciseevents, ...
 						var elementFoundWithSameId:Boolean = false;
@@ -511,8 +600,7 @@ package utilities
 					}  else {
 						//here to continue with other kinds of events							
 					}
-					if (i == localElements.length)
-						break;
+					i++;
 				}
 				
 				//if we haven't found new events, then we need to update all remaining, if any off course
@@ -557,10 +645,13 @@ package utilities
 					functionToRemoveFromEventListener = syncLocalEvents;
 					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 					loader.load(request);
+					if (traceNeeded)
+						trace("loader : request = " + request.data); 
 				}
 				
 			} else {
 				//sync other kinds of tables like settings..
+				syncFinished(true);
 			}
 			//there should not be code here
 		}
@@ -587,14 +678,18 @@ package utilities
 					loader.addEventListener(Event.COMPLETE,accessTokenRefreshed);
 					loader.addEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
 					loader.load(request);
-
-				}
+					if (traceNeeded)
+						trace("loader : request = " + request.data); 
+				} else
+					syncFinished(false);
 			} catch (e:SyntaxError) {
 				//event.taregt.data is not json
 				if (event.type == "ioError") {
 					//an ioError, forget about it, the show doesn't go on
+					syncFinished(false);
 				}
 			}
+			syncFinished(false);
 		}
 		
 		private function accessTokenRefreshed(event:Event):void {
@@ -632,18 +727,44 @@ package utilities
 		 * returnvalue will be urlencoded
 		 */
 		private function createSQLQueryToSelectAll(index:int):String {
-			
 			var returnValue:String;
+			
+			//amountofSpaces is a trick to make sure that the query string changes each time, because it seems that with google api,
+			//when doing exactly the same query two times, it gives the same result, even if the table itself has changed in between
+			//adding some space, changes the query strange, and forces an update
+			amountofSpaces = (amountofSpaces == 10) ? 0:amountofSpaces + 1;
+			var spaces:String = "";
+			for (var i:int = 0;i < amountofSpaces;i++)
+				spaces +=" ";
+			
 			returnValue = 
-				"SELECT * FROM " + 
+				"SELECT * FROM " + spaces +
 				tableNamesAndColumnNames[index][1] +
 				" WHERE modifiedtimestamp >= '" + lastSyncTimeStamp.toString() + "'" + " AND " +
 				"creationtimestamp >= '" + asOfTimeStamp.toString() + "'";
+			trace("querystring = " + returnValue);
 			return returnValue;
 		}
 		
-		private function syncFinished():void {
-			Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
+		/**
+		 * to call when sync has finished 
+		 */
+		private function syncFinished(success:Boolean):void {
+			if (success) {
+				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
+				lastSyncTimeStamp = currentSyncTimeStamp;
+			} else {
+				
+			}
+			if (rerunNecessary) {
+				currentSyncTimeStamp = new Date().valueOf();
+				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
+				syncRunning = true;
+				rerunNecessary = false;
+				synchronize();
+			} else  {
+				syncRunning = false;
+			}
 		}
 	}
 	
