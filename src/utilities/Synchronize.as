@@ -160,8 +160,10 @@ package utilities
 		 * wil be equal to modellocator.trackinglist, it's just to avoid that I need to type to much 
 		 */
 		private var trackingList:ArrayCollection;
-		private var tracker:AnalyticsTracker;
 		
+		private var tracker:AnalyticsTracker;
+		private var alReadyGATracked:Boolean;
+
 		private static var instance:Synchronize = new Synchronize();
 		
 		private var loader:URLLoader;
@@ -187,6 +189,11 @@ package utilities
 		private static var traceNeeded:Boolean = true;
 		
 		/**
+		 *  to avoid endless loops, see code
+		 */
+		private var retrievalCounter:int;
+
+		/**
 		 * constructor not to be used, get an instance with getInstance() 
 		 */
 		public function Synchronize()
@@ -198,6 +205,7 @@ package utilities
 			syncRunning = false;
 			rerunNecessary = false;
 			amountofSpaces = 0;
+			alReadyGATracked = false;//only one google analytics tracking per instance
 			instance = this;
 		}
 		
@@ -216,6 +224,8 @@ package utilities
 		 */
 		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean):void {
 			tracker = callingTracker;
+			
+			retrievalCounter = 0;
 
 			lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
 			currentSyncTimeStamp = new Date().valueOf();
@@ -239,40 +249,48 @@ package utilities
 		 * Google Fusion Tables 
 		 */
 		private function synchronize():void {
+			if (traceNeeded)
+				trace("start method synchronize");
+
 			//we could be arriving here after a retempt, example, first time failed due to invalid credentials, token refresh occurs, with success, we come back to here
 			//first thing to do is to removeeventlisteners
 			
 			access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-			if (access_token.length == 0) {
+			
+			if (access_token.length == 0  || access_token == "") {//strange but sometimes with access_token set to "", length != 0)
 				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				syncFinished(false);
-			} 
-			
-			if (tracker != null)
-				tracker.trackPageview( "Synchronize-SyncStarted" );
-			
-
-			//first get all the tables 
-			var request:URLRequest = new URLRequest(googleRequestTablesUrl);
-			request.contentType = "application/x-www-form-urlencoded";
-			var urlVariables:URLVariables = new URLVariables();
-			urlVariables.access_token = access_token;
-			urlVariables.maxResults = maxResults;
-			if (nextPageToken != null)
-				urlVariables.pageToken = nextPageToken;
-			request.data = urlVariables;
-			request.method = URLRequestMethod.GET;
-			loader = new URLLoader();
-			functionToRecall = synchronize;
-			loader.addEventListener(Event.COMPLETE,tablesListRetrieved);
-			functionToRemoveFromEventListener = tablesListRetrieved;
-			loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-			loader.load(request);
-			if (traceNeeded)
-				trace("loader : request = " + request.data); 
+			} else {
+				if (tracker != null && !alReadyGATracked) {
+					tracker.trackPageview( "Synchronize-SyncStarted" );
+					alReadyGATracked = true;
+				}
+				
+				//first get all the tables 
+				var request:URLRequest = new URLRequest(googleRequestTablesUrl);
+				request.contentType = "application/x-www-form-urlencoded";
+				var urlVariables:URLVariables = new URLVariables();
+				urlVariables.access_token = access_token;
+				urlVariables.maxResults = maxResults;
+				if (nextPageToken != null)
+					urlVariables.pageToken = nextPageToken;
+				request.data = urlVariables;
+				request.method = URLRequestMethod.GET;
+				loader = new URLLoader();
+				functionToRecall = synchronize;
+				loader.addEventListener(Event.COMPLETE,tablesListRetrieved);
+				functionToRemoveFromEventListener = tablesListRetrieved;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+			}
 		}
 		
 		private function tablesListRetrieved(event:Event):void {
+			if (traceNeeded)
+				trace("start method tablesListRetrieved");
+
 			loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 			var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -283,6 +301,8 @@ package utilities
 					//go through each item, see if name matches one in the tablelist, if so store tableid
 					for (var j:int = 0;j < tableNamesAndColumnNames.length;j++) {
 						if (eventAsJSONObject.items[i].name == tableNamesAndColumnNames[j][0]) {
+							if (traceNeeded)
+								trace("found a table : " + eventAsJSONObject.items[i].name);
 							tableNamesAndColumnNames[j][1] = eventAsJSONObject.items[i].tableId;	
 						}
 					}
@@ -297,6 +317,9 @@ package utilities
 		}
 		
 		private function createMissingTables(event:Event = null): void {
+			if (traceNeeded)
+				trace("start method createMissingTables");
+			
 			if (event != null) {
 				//here we come if actually a table has just been created and an Event.COMPLETE is dispatched to notify the completion.
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -306,50 +329,57 @@ package utilities
 						break;//we have to create this table so break the loop
 					}
 				}
-			} 
+			} else 
+				retrievalCounter++;
 			
-			var i:int=0;
-			//first find next missing table, for that one will try to create it
-			for (i = 0;i < tableNamesAndColumnNames.length;i++) {
-				if (tableNamesAndColumnNames[i][1] == "")
-					break;//we have to create this table so break the loop
-			}
-			
-			if (i == tableNamesAndColumnNames.length)	{
-				//if we get here, it means all table have a tableid, means they all exist at google docs
-				startSync();
-			} else {
-				
-				var request:URLRequest = new URLRequest(googleRequestTablesUrl);
-				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/json"));
-				request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent","Google APIs Explorer"));
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				
-				var jsonObject:Object = new Object();
-				jsonObject.isExportable = "false";
-				jsonObject.name = tableNamesAndColumnNames[i][0];
-				
-				var columns:ArrayList = new ArrayList();
-				for (var l:int = 0;l < tableNamesAndColumnNames[i][2].length;l++) {
-					var jsonObject2:Object =  new Object();
-					jsonObject2.name = tableNamesAndColumnNames[i][2][l][0]; 
-					jsonObject2.type = tableNamesAndColumnNames[i][2][l][1]; 
-					columns.addItem(jsonObject2);
+			if (retrievalCounter > 2)  {
+				//stop it, we seem to be in an endless loop
+				syncFinished(false);
+			} else  {
+				var i:int=0;
+				//first find next missing table, for that one will try to create it
+				for (i = 0;i < tableNamesAndColumnNames.length;i++) {
+					if (tableNamesAndColumnNames[i][1] == "")
+						break;//we have to create this table so break the loop
 				}
-				jsonObject.columns = columns.toArray();
 				
-				jsonObject.description =   tableNamesAndColumnNames[i][3];
-				var bodyString:String = JSON.stringify(jsonObject);
-				request.data = bodyString;
-				request.method = URLRequestMethod.POST;
-				loader = new URLLoader();
-				functionToRecall = createMissingTables;
-				loader.addEventListener(Event.COMPLETE,createMissingTables);
-				functionToRemoveFromEventListener = createMissingTables;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+				if (i == tableNamesAndColumnNames.length)	{
+					//if we get here, it means all table have a tableid, means they all exist at google docs
+					startSync();
+				} else {
+					
+					var request:URLRequest = new URLRequest(googleRequestTablesUrl);
+					request.requestHeaders.push(new URLRequestHeader("Content-Type","application/json"));
+					request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent","Google APIs Explorer"));
+					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+					
+					var jsonObject:Object = new Object();
+					jsonObject.isExportable = "false";
+					jsonObject.name = tableNamesAndColumnNames[i][0];
+					
+					var columns:ArrayList = new ArrayList();
+					for (var l:int = 0;l < tableNamesAndColumnNames[i][2].length;l++) {
+						var jsonObject2:Object =  new Object();
+						jsonObject2.name = tableNamesAndColumnNames[i][2][l][0]; 
+						jsonObject2.type = tableNamesAndColumnNames[i][2][l][1]; 
+						columns.addItem(jsonObject2);
+					}
+					jsonObject.columns = columns.toArray();
+					
+					jsonObject.description =   tableNamesAndColumnNames[i][3];
+					var bodyString:String = JSON.stringify(jsonObject);
+					request.data = bodyString;
+					request.method = URLRequestMethod.POST;
+					loader = new URLLoader();
+					functionToRecall = createMissingTables;
+					loader.addEventListener(Event.COMPLETE,createMissingTables);
+					functionToRemoveFromEventListener = createMissingTables;
+					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+					loader.load(request);
+					if (traceNeeded)
+						trace("loader : request = " + request.data); 
+				}
+				
 			}
 			
 		}
@@ -371,6 +401,8 @@ package utilities
 			var positionModifiedTimeStamp;
 			var positionDeleted;
 			
+			if (traceNeeded)
+				trace("start method getTheMedicinEvents");
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
