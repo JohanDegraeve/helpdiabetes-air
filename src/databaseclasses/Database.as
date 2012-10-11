@@ -1600,7 +1600,7 @@ package databaseclasses
 		 * get all mealevents, bloodglucoseevents, medicinevents and exerciseevents and store them in the arraycollection in the modellocator as MealEvent objects<br>
 		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects
 		 */
-		private function getAllEventsAndFillUpMeals():void {
+		public function getAllEventsAndFillUpMeals():void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			

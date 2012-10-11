@@ -95,14 +95,14 @@ package model
 
 		/**
 		 * eventid of to the tracking event to show when going to trackingview<br>
-		 * initially set to -1, in the get trackingeventToShow, when still on -1 it will be set to the event id of the last event in the trackinglist, except when 
-		 * there are no elements in the trackinglist, then it stays -1
+		 * initially set to -1, in the get trackingeventToShow, when still on -1 it will be set to the event id of the last event in the _trackingList, except when 
+		 * there are no elements in the _trackingList, then it stays -1
 		 */
 		public function get trackingEventToShow():Number
 		{
 			if (_trackingEventToShow == -1)
-				if (trackingList.length > 0)
-					_trackingEventToShow = (trackingList.getItemAt(trackingList.length -1) as TrackingViewElement).eventid;
+				if (_trackingList.length > 0)
+					_trackingEventToShow = (_trackingList.getItemAt(_trackingList.length -1) as TrackingViewElement).eventid;
 			return _trackingEventToShow;
 		}
 
@@ -139,14 +139,33 @@ package model
 		[Bindable]
 		public var width:int = 300;
 		
+		private var _trackingList:ArrayCollection ;
+
+		[Bindable]
 		/**
 		 * the arraycollection used as list in trackingview<br>
 		 * It is declared here because it will be used in other classes as well, eg during intialization of the application it will already be created and initialized<br>
-		 * The trackingList contains all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents and also DayLine objects are stored here. Sorted by timestamp.<br>
-		 * any item in the trackinglist must be of a class extended from TrackingViewElement
-		 */ 
-		[Bindable]
-		public var trackingList:ArrayCollection = new ArrayCollection();
+		 * The _trackingList contains all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents and also DayLine objects are stored here. Sorted by timestamp.<br>
+		 * any item in the _trackingList must be of a class extended from TrackingViewElement
+		 */
+		public function get trackingList():ArrayCollection
+		{
+			return _trackingList;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set trackingList(value:ArrayCollection):void
+		{
+			_trackingList = value;
+			//create the sort for the _trackingList and the meals
+			dataSortField.name="timeStamp";
+			dataSortField.numeric = true;
+			dataSort.fields = [dataSortField];
+			_trackingList.sort = dataSort;
+		}
+
 		
 		/**
 		 * a very small offset that will be used when creating meals, to distinguish them from dayline objects
@@ -215,18 +234,14 @@ package model
 					ResourceManager.getInstance().getString("general","FrenchAxelle"))
 			);
             
-			//create the sort for the trackinglist and the meals
-			dataSortField.name="timeStamp";
-			dataSortField.numeric = true;
-			dataSort.fields = [dataSortField];
-			trackingList.sort = dataSort;
+			trackingList = new ArrayCollection();
 			
 			instance = this;
 			
 			// at initialization, there's no dayline existing in the tracking, so initialize to 0
-			oldestDayLineStoredInTrackingList = 0;
+			_oldestDayLineStoredInTrackingList = 0;
 			// at initialization, there's no dayline existing in the tracking, so initialize to something very big
-			youngestDayLineStoredInTrackingList = 5000000000000;
+			_youngestDayLineStoredInTrackingList = 5000000000000;
 			
 		}
 		
@@ -264,14 +279,14 @@ package model
 		}
 		
 		/**
-		 * reads from the trackingList the mealevent with identified mealeventid<br>
+		 * reads from the _trackingList the mealevent with identified mealeventid<br>
 		 * returns null if not found
 		 */
 		public function getMealEventFromTrackingList(mealEventId:Number):MealEvent {
-			for (var i:int = trackingList.length - 1;i >= 0; i--) {
-				if (trackingList.getItemAt(i) is MealEvent)
-					if (((trackingList.getItemAt(i)) as MealEvent).eventid == mealEventId)
-						return (trackingList.getItemAt(i) as MealEvent);
+			for (var i:int = _trackingList.length - 1;i >= 0; i--) {
+				if (_trackingList.getItemAt(i) is MealEvent)
+					if (((_trackingList.getItemAt(i)) as MealEvent).eventid == mealEventId)
+						return (_trackingList.getItemAt(i) as MealEvent);
 			}
 			return null;
 		}
@@ -415,10 +430,10 @@ package model
 			 */
 			var mealTimeStampAtMidNight:Number;
 			
-			if (trackingList.length > 0) {
-				for (var j:int = trackingList.length - 1; j >= 0  ; j--) {
-					if (trackingList.getItemAt(j) is MealEvent) {
-						mealEventTimeStamp = new Date((trackingList.getItemAt(j) as MealEvent).timeStamp);
+			if (_trackingList.length > 0) {
+				for (var j:int = _trackingList.length - 1; j >= 0  ; j--) {
+					if (_trackingList.getItemAt(j) is MealEvent) {
+						mealEventTimeStamp = new Date((_trackingList.getItemAt(j) as MealEvent).timeStamp);
 						mealEventTimeStampAtMidNight = (new Date(mealEventTimeStamp.fullYear,mealEventTimeStamp.month,mealEventTimeStamp.date)).valueOf();//this is again local time, so if it's here GMT+2, then this is actually time in ms - 2 hours
 						
 						//check if timestamp is within -1 day or maximum + 7 days
@@ -437,16 +452,16 @@ package model
 										mealTimeStampAtMidNight = (new Date(mealTimeStamp.fullYear,mealTimeStamp.month,mealTimeStamp.date)).valueOf();
 										if (mealTimeStampAtMidNight == mealEventTimeStampAtMidNight) {
 											if ((_meals.getItemAt(k) as Meal).mealName.toUpperCase() == 
-												(trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
+												(_trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
 												mealFound = true;
-												_meals.setItemAt(new Meal(null,(trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
+												_meals.setItemAt(new Meal(null,(_trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
 												k = _meals.length;
 											}
 										}
 									}
 								}
 								if (!mealFound) {
-									_meals.addItem(new Meal(null,(trackingList.getItemAt(j) as MealEvent),Number.NaN));
+									_meals.addItem(new Meal(null,(_trackingList.getItemAt(j) as MealEvent),Number.NaN));
 								}
 							}
 						}
@@ -505,16 +520,16 @@ package model
 		}
 		
 		/**
-		 * updates insulinratio for all mealevents in trackinglist, with timeStamp >= asOfDateAndTime and time of day  between fromTime and toTime whereby ,
+		 * updates insulinratio for all mealevents in _trackingList, with timeStamp >= asOfDateAndTime and time of day  between fromTime and toTime whereby ,
 		 * asOfDateAndTime is ms since 1st of January 1970 UTC<br>
 		 * <br>fromTime and toTime are local time, as example :<br>
 		 * if it's here in Belgium 10:03, then this value = (10*3600 + 3*60)*1000, no matter what the utc time is.<br>
 		 * Also database will be updated.<br>
 		 */
 		public function updateInsulinRatiosInTrackingList(asOfDateAndTime:Number,newInsulinRatio:Number,fromTime:Number,toTime:Number):void {
-		   for (var i:int = 0; i <  trackingList.length	;i++)  {
-			   if (trackingList.getItemAt(i) is MealEvent) {
-				   var mealEvent:MealEvent = trackingList.getItemAt(i) as MealEvent;
+		   for (var i:int = 0; i <  _trackingList.length	;i++)  {
+			   if (_trackingList.getItemAt(i) is MealEvent) {
+				   var mealEvent:MealEvent = _trackingList.getItemAt(i) as MealEvent;
 				   if (mealEvent.timeStamp >= asOfDateAndTime)	{
 					   var mealEventTimeStampAsDate:Date = new Date(mealEvent.timeStamp);
 					   //the timestamp but only the hours, minutes and seconds
@@ -543,7 +558,7 @@ package model
 		private function set meals(value:ArrayCollection):void
 		{
 			_meals = value;
-			//create the sort for the trackinglist and the meals
+			//create the sort for the _trackingList and the meals
 			_meals.sort = dataSort;
 		}
 		

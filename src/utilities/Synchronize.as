@@ -20,6 +20,7 @@ package utilities
 	import com.google.analytics.AnalyticsTracker;
 	import com.google.analytics.GATracker;
 	
+	import databaseclasses.Database;
 	import databaseclasses.MedicinEvent;
 	import databaseclasses.Settings;
 	
@@ -188,6 +189,8 @@ package utilities
 		
 		private static var traceNeeded:Boolean = true;
 		
+		private var localElementsUpdated;
+		
 		/**
 		 *  to avoid endless loops, see code
 		 */
@@ -201,7 +204,6 @@ package utilities
 			if (instance != null) {
 				throw new Error("Synchronize class can only be accessed through Synchronize.getInstance()");	
 			}
-			trackingList = ModelLocator.getInstance().trackingList;
 			syncRunning = false;
 			rerunNecessary = false;
 			amountofSpaces = 0;
@@ -226,7 +228,9 @@ package utilities
 			tracker = callingTracker;
 			
 			retrievalCounter = 0;
-
+			trackingList = ModelLocator.getInstance().trackingList;
+			localElementsUpdated  = false;
+			
 			lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
 			currentSyncTimeStamp = new Date().valueOf();
 			asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
@@ -282,8 +286,10 @@ package utilities
 				functionToRemoveFromEventListener = tablesListRetrieved;
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				loader.load(request);
-				if (traceNeeded)
+				if (traceNeeded) {
+					trace("loader : url = " + request.url);
 					trace("loader : request = " + request.data); 
+				}
 			}
 		}
 		
@@ -510,6 +516,7 @@ package utilities
 					for (l = 0; l < trackingList.length;l++) {
 						if (trackingList.getItemAt(l) is MedicinEvent) {
 							if ((trackingList.getItemAt(l) as MedicinEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
+								localElementsUpdated = true;
 								(trackingList.getItemAt(l) as MedicinEvent).updateMedicinEvent(
 									remoteElements.getItemAt(m)[positionMedicinname],
 									remoteElements.getItemAt(m)[positionValue],
@@ -523,6 +530,7 @@ package utilities
 						//var asstirng:String = dateTimeFormatterForQueryResult.format(remoteElements.getItemAt(m)[positionCreationTimeStamp]);
 						//var nr:Number = Date.parse(dateTimeFormatterForQueryResult.format(remoteElements.getItemAt(m)[positionCreationTimeStamp]));
 						//it means we didn't find the remotelement in the trackinglist, so we need to create it
+						localElementsUpdated = true;
 						trackingList.addItem(new MedicinEvent(
 							remoteElements.getItemAt(m)[positionValue],
 							remoteElements.getItemAt(m)[positionMedicinname],
@@ -692,6 +700,8 @@ package utilities
 			loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 			
+			if (traceNeeded)
+				trace("event.target.data = " + event.target.data as String);
 			//let's first see if the event.target.data has json
 			try {
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -785,6 +795,15 @@ package utilities
 			if (success) {
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
 				lastSyncTimeStamp = currentSyncTimeStamp;
+				
+				if (localElementsUpdated) {
+					ModelLocator.getInstance().trackingList = new ArrayCollection();
+					Database.getInstance().getAllEventsAndFillUpMeals();
+					ModelLocator.getInstance().trackingList.refresh();
+					
+					// now populate ModelLocator.getInstance().meals
+					ModelLocator.getInstance().refreshMeals();
+				}
 			} else {
 				
 			}

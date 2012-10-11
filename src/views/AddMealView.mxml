@@ -51,6 +51,7 @@ view to add a new meal
 			import org.osmf.events.TimeEvent;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			[Bindable]
 			private var mealname_textarea_text:String;
 			[Bindable]
@@ -118,6 +119,7 @@ view to add a new meal
 				currentDateAndTime = new Date();
 				ok_button_text = resourceManager.getString('general','ok');
 				_userChangedMealName : false;
+				Synchronize.getInstance().startSynchronize(tracker,false);
 			}
 			
 			private function dateClicked():void {

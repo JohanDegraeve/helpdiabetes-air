@@ -95,8 +95,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function onCreationComplete():void {
 
 				thisView = this;
-				if (!ModelLocator.getInstance().firstStartUp)
+				
+				if (!ModelLocator.getInstance().firstStartUp)  {
+					Synchronize.getInstance().startSynchronize(tracker,false);
 					return;
+				}
 				ModelLocator.getInstance().firstStartUp = false;
 				
 				var dispatcher:EventDispatcher = new EventDispatcher();
