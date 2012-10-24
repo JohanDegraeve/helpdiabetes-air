@@ -337,6 +337,12 @@ package databaseclasses
 				trace("Failed to create settings table. Database:0005");
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create settings table. Database:0005";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -414,12 +420,24 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingAdded);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
 				trace("Failed to add setting. Database:0006");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to add setting. Database:0006";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 			
 			function settingsRetrievalFailed(se:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingsRetrieved);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingsRetrievalFailed);
 				trace("Failed to retrieve settings. Database:0007");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to retrieve settings. Database:0007";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -445,6 +463,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0008");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0008";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -470,6 +494,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0009");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0009";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -497,6 +527,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0011");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0011";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -522,6 +558,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0012");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0012";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -547,6 +589,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0013");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0013";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -572,6 +620,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0014");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0014";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -597,6 +651,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0015" + "error = " + see.toString());
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0015" + "error = " + see.toString();
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -622,6 +682,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0016" + "error = " + see.toString());
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0016" + "error = " + see.toString();
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -647,6 +713,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0017");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0017";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -674,6 +746,12 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0018");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0018";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -697,6 +775,12 @@ package databaseclasses
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,checkSourceResult);	
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,checkSourceError);	
 				trace("Failed to get the source. Database0019");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to get the source. Database0019";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 			
 		}
@@ -824,6 +908,10 @@ package databaseclasses
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,sourceRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceRetrievalError);
 				trace("Failed to get the source. Database0023");
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					dispatcher.dispatchEvent(event);
+				}
 			}
 			
 		}
@@ -869,6 +957,12 @@ package databaseclasses
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,sourceInserted);
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,sourceInsertionError);
 				trace("Failed to insert the source. Database0024");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to insert the source. Database0024";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 			
 			function goOnWithFoodItems():void {
@@ -897,6 +991,12 @@ package databaseclasses
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemInserted);
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemInsertionError);
 				trace("Failed to insert a fooditem. Database0025");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to insert a fooditem. Database0025";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 			
 			function goOnWithUnits():void {
@@ -929,6 +1029,12 @@ package databaseclasses
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
 				trace("Failed to insert a unit. Database0026");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to insert a unit. Database0026";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
 			}
 		}
 		
@@ -937,10 +1043,12 @@ package databaseclasses
 		 * if globalDispatcher not null then dispatches a result event
 		 */
 		private function finishedCreatingTables():void {
-			if (globalDispatcher != null)
+			if (globalDispatcher != null) {
 				globalDispatcher.dispatchEvent(new Event(DatabaseEvent.RESULT_EVENT));
+				globalDispatcher = null;
+			}
 			//now continue prepopulating other stuff, like the tracking arraycollection, in the background
-			getAllEventsAndFillUpMeals();
+			getAllEventsAndFillUpMeals(globalDispatcher);
 		}
 		
 		
@@ -1598,9 +1706,11 @@ package databaseclasses
 		
 		/**
 		 * get all mealevents, bloodglucoseevents, medicinevents and exerciseevents and store them in the arraycollection in the modellocator as MealEvent objects<br>
-		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects
+		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects<br>
+		 * if dispatcher is not null, then the result will be dispatched
 		 */
-		public function getAllEventsAndFillUpMeals():void {
+		public function getAllEventsAndFillUpMeals(dispatcher:EventDispatcher):void {
+			globalDispatcher = dispatcher;
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -1623,7 +1733,14 @@ package databaseclasses
 			function onOpenError(e:SQLError):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				if (globalDispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					event.data = "failed to open sql connection";
+					globalDispatcher.dispatchEvent(event);
+					globalDispatcher =  null;
+				}
 			}
+			
 			function onOpenResult(e:SQLError):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
@@ -1662,6 +1779,12 @@ package databaseclasses
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
 				trace("Failed to get all selectedFoodItems. Database0061");
+				if (globalDispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					event.data = "Failed to get all selectedFoodItems. Database0061";
+					globalDispatcher.dispatchEvent(event);
+					globalDispatcher =  null;
+				}
 			}
 			
 			function mealEventsRetrieved(result:SQLEvent):void {
@@ -1819,18 +1942,35 @@ package databaseclasses
 				
 				// now populate ModelLocator.getInstance().meals
 				ModelLocator.getInstance().refreshMeals();
+				if (globalDispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+					globalDispatcher.dispatchEvent(event);
+					globalDispatcher =  null;
+				}
 			}
 			
 			function exerciseEventsRetrievalFailed(error:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseEventsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseEventsRetrievalFailed);
 				trace("Failed to get all mealevents. Database0095");
+				if (globalDispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					event.data = "Failed to get all mealevents. Database0095";
+					globalDispatcher.dispatchEvent(event);
+					globalDispatcher =  null;
+				}
 			}
 			
 			function medicinEventsRetrievalFailed(error:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
 				trace("Failed to get all mealevents. Database0094");
+				if (globalDispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					event.data = "Failed to get all mealevents. Database0094";
+					globalDispatcher.dispatchEvent(event);
+					globalDispatcher =  null;
+				}
 			}
 			
 			function filterByMealEventId(item:Object):Boolean {
@@ -1841,12 +1981,24 @@ package databaseclasses
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventsRetrieved);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventRetrievalFailed);
 				trace("Failed to get all mealevents. Database0060");
+				if (globalDispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					event.data = "Failed to get all mealevents. Database0060";
+					globalDispatcher.dispatchEvent(event);
+					globalDispatcher =  null;
+				}
 			}
 			
 			function bloodGlucoseRetrievalFailed(error:SQLErrorEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodGlucoseEventsRetrieved);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodGlucoseRetrievalFailed);
 				trace("Failed to get all mealevents. Database0090");
+				if (globalDispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					event.data = "Failed to get all mealevents. Database0090";
+					globalDispatcher.dispatchEvent(event);
+					globalDispatcher =  null;
+				}
 			}
 		}
 		
@@ -2482,7 +2634,6 @@ package databaseclasses
 		 * return true if database already exists, false in the other case
 		 */
 		public static function databaseExists():Boolean {
-			//this.globalDispatcher = dispatcher;
 			dbFile  = File.applicationStorageDirectory.resolvePath(dbFileName);
 			var sqlConnection:SQLConnection = new SQLConnection();
 			try {

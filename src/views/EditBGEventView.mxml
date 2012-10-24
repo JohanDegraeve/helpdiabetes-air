@@ -116,12 +116,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						backButton.visible=true;
 						TrashButton.visible = true;
 					}
+				} else  {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_OkButton');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewOkButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+					helpCallOut.open(OkButton,true)
 				}
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_OkButton');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewOkButton;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
-				helpCallOut.open(OkButton,true)
 			}
 			
 			private function helptext0Removed(event:Event):void {

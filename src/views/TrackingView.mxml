@@ -125,7 +125,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		]]>
 	</fx:Script>
 	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
-			dataProvider="{ModelLocator.getInstance().trackingList}"
+			dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
 			click="onListElementClicked(event)"
 			itemRendererFunction="getItemRenderer">
 		<s:layout>

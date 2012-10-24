@@ -255,5 +255,6 @@ package myComponents
 			_lastIndexInView = lastIndex;
 			
 		}
+		
 	}
 }
