@@ -20,8 +20,10 @@ package utilities
 	import com.google.analytics.AnalyticsTracker;
 	import com.google.analytics.GATracker;
 	
+	import databaseclasses.BloodGlucoseEvent;
 	import databaseclasses.Database;
 	import databaseclasses.DatabaseEvent;
+	import databaseclasses.ExerciseEvent;
 	import databaseclasses.MedicinEvent;
 	import databaseclasses.Settings;
 	
@@ -73,8 +75,6 @@ package utilities
 		private static var secondsBetweenTwoSync:int = 10;
 		
 		private static var googleError_Invalid_Credentials:String = "Invalid Credentials";
-		
-		private const GET_ALLMEDICINEVENTS:String = "SELECT * FROM medicinevents";
 		
 		/**
 		 * copied from settings at start of sync, timestamp of last synchronisation 
@@ -139,6 +139,31 @@ package utilities
 					["addedtotabletimestamp","NUMBER"]//the timestamp that the row was added to the table
 				],
 				"MedicinEvents"//description
+			],
+			[	"HD-BloodglucoseEvent",
+				"",	
+				[						
+					["id","NUMBER"],//the unique identifier
+					["unit","STRING"],//unit name
+					["value","NUMBER"],//value
+					["creationtimestamp","NUMBER"],//timestamp that the event was created
+					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
+					["deleted","STRING"],//was the event deleted or not
+					["addedtotabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+				],
+				"BloodglucoseEvents"//description
+			],
+			[	"HD-ExerciseEvent",
+				"",	
+				[						
+					["id","NUMBER"],//the unique identifier
+					["level","STRING"],//unit name
+					["creationtimestamp","NUMBER"],//timestamp that the event was created
+					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
+					["deleted","STRING"],//was the event deleted or not
+					["addedtotabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+				],
+				"ExerciseEvents"//description
 			]
 		];
 		
@@ -583,7 +608,8 @@ package utilities
 						break;
 				}
 				//we've got to start updating
-				//only update the locals, the remote's will be done later all together (with exercise, medicin, meals)
+				if (traceNeeded)
+					trace("there are " + remoteElements.length + " remote elements to store or update locally");
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the medicinevent in the trackinglist that has the same id
 					var l:int=0;
@@ -616,6 +642,390 @@ package utilities
 							trackingList.addItem(new MedicinEvent(
 								remoteElements.getItemAt(m)[positionValue],
 								remoteElements.getItemAt(m)[positionMedicinname],
+								remoteElements.getItemAt(m)[positionId],
+								new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
+								new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+								true));
+						}
+					}
+				}
+				//let's go for the bloodglucoseevents
+				getTheBloodGlucoseEvents(null);
+			}
+		}
+		
+		private function getTheBloodGlucoseEvents(event:Event = null):void {
+			var positionId:int;
+			var positionUnit:int;
+			var positionValue:int;
+			var positionCreationTimeStamp:int;
+			var positionModifiedTimeStamp:int;
+			var positionDeleted:int;
+			var positionAddedTimeStamp:int;
+			
+			if (traceNeeded)
+				trace("start method getTheBloodGlucoseEvents");
+			//start with remoteElements
+			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
+			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = getTheBloodGlucoseEvents;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+				} else {
+					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
+					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
+					var ctr:int;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[1][2][0][0] == eventAsJSONObject.columns[ctr])
+							positionId = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[1][2][1][0] == eventAsJSONObject.columns[ctr])
+							positionUnit = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[1][2][2][0] == eventAsJSONObject.columns[ctr])
+							positionValue = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[1][2][3][0] == eventAsJSONObject.columns[ctr])
+							positionCreationTimeStamp = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[1][2][4][0] == eventAsJSONObject.columns[ctr])
+							positionModifiedTimeStamp = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[1][2][5][0] == eventAsJSONObject.columns[ctr])
+							positionDeleted = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[1][2][6][0] == eventAsJSONObject.columns[ctr])
+							positionAddedTimeStamp = ctr;
+					
+					var elementAlreadyThere:Boolean;
+					if (eventAsJSONObject.rows) {
+						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
+							elementAlreadyThere = false;
+							for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
+								if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
+									elementAlreadyThere = true;
+									break;
+								}
+							}
+							if (!elementAlreadyThere) {
+								remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
+								remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
+							}
+						}
+					}
+					nextPageToken = eventAsJSONObject.nextPageToken;
+				}
+			} 
+			
+			if (event == null || nextPageToken != null || !modifiedtimeStampsAlreadyChecked) {//two reasons to try to fetch data from google
+				if (event != null && nextPageToken == null)
+					modifiedtimeStampsAlreadyChecked = true;
+				var request:URLRequest = new URLRequest(googleSelectUrl);
+				request.contentType = "application/x-www-form-urlencoded";
+				var urlVariables:URLVariables = new URLVariables();
+				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				
+				urlVariables.sql = createSQLQueryToSelectAll(1, !modifiedtimeStampsAlreadyChecked);
+				if (nextPageToken != null)
+					urlVariables.pageToken = nextPageToken;
+				urlVariables.access_token = access_token;
+				request.data = urlVariables;
+				request.method = URLRequestMethod.GET;
+				loader = new URLLoader();
+				functionToRecall = getTheBloodGlucoseEvents;
+				loader.addEventListener(Event.COMPLETE,getTheBloodGlucoseEvents);
+				functionToRemoveFromEventListener = getTheBloodGlucoseEvents;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("get the bloodglucoseevents with modifiedtimestampsalreadychecked = " + modifiedtimeStampsAlreadyChecked.toString() + " loader : request = " + request.data); 
+			} else {
+				//get the bloodglucoseevents in the trackinglist and store them in localElements.
+				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
+				for (var i:int = 0; i < trackingList.length; i++) {
+					if (trackingList.getItemAt(i) is BloodGlucoseEvent) {
+						if ((trackingList.getItemAt(i) as BloodGlucoseEvent).timeStamp >= asOfTimeStamp)
+							if ((trackingList.getItemAt(i) as BloodGlucoseEvent).lastModifiedTimestamp >= lastSyncTimeStamp)
+								localElements.addItem(trackingList.getItemAt(i));
+					}
+				}
+				//time to start comparing
+				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
+				for (var j:int = 0; j < localElements.length; j++) {
+					for (var k:int = 0; k < remoteElements.length; k++) {
+						if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as BloodGlucoseEvent).eventid) {
+							//got a matching element, let's see if we need to remove it from both lists
+							if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
+								//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
+								//but first let's see if the remoteelement has the deleted flag set
+								if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+									//its a deleted item remove it from both lists
+									remoteElements.removeItemAt(k);
+									(localElements.getItemAt(j) as BloodGlucoseEvent).deleteEvent();//delete from local database
+									localElementsUpdated = true;//as we deleted one from local database, 
+									localElements.removeItemAt(j);//remove also from list used here
+									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+									break;
+								} else {
+									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
+										remoteElements.removeItemAt(k);
+										break;
+									} else {
+										localElements.removeItemAt(j);
+										j--;
+										break;
+									}
+								}
+							} else {
+								//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
+								remoteElements.removeItemAt(k);
+								//remoteElementIds.removeItemAt(k);
+								localElements.removeItemAt(j);
+								j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+								break;//jump out of th einnter for loop
+							}
+						}
+					}
+					//j could be -1 now, and there might not be anymore elements inlocalemenets so
+					if (j + 1 == localElements.length)
+						break;
+				}
+				//we've got to start updating
+				if (traceNeeded)
+					trace("there are " + remoteElements.length + " remote elements to store or update locally");
+				for (var m:int = 0; m < remoteElements.length; m++) {
+					//we have to find the medicinevent in the trackinglist that has the same id
+					var l:int=0;
+					for (l = 0; l < trackingList.length;l++) {
+						if (trackingList.getItemAt(l) is BloodGlucoseEvent) {
+							if ((trackingList.getItemAt(l) as BloodGlucoseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
+								localElementsUpdated = true;
+								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
+								} else {
+									localElementsUpdated = true;
+									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+									(trackingList.getItemAt(l) as BloodGlucoseEvent).updateBloodGlucoseEvent(
+										remoteElements.getItemAt(m)[positionUnit],
+										remoteElements.getItemAt(m)[positionValue],
+										new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
+										new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]));
+								}
+								break;
+							}
+						}
+					}
+					if (l == trackingList.length) {
+						//it means we didn't find the remotelement in the trackinglist, so we need to create it
+						//but only if deleted is false
+						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
+							localElementsUpdated = true;
+							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+							
+							trackingList.addItem(new BloodGlucoseEvent(
+								remoteElements.getItemAt(m)[positionValue],
+								remoteElements.getItemAt(m)[positionUnit],
+								remoteElements.getItemAt(m)[positionId],
+								new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
+								new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+								true));
+						}
+					}
+				}
+				//let's go for the localevents
+				getTheExerciseEvents(null);
+			}
+		}
+		
+		private function getTheExerciseEvents(event:Event = null):void {
+			var positionId:int;
+			var positionLevel:int;
+			var positionCreationTimeStamp:int;
+			var positionModifiedTimeStamp:int;
+			var positionDeleted:int;
+			var positionAddedTimeStamp:int;
+			
+			if (traceNeeded)
+				trace("start method getTheExerciseEvents");
+			//start with remoteElements
+			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
+			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = getTheMedicinEvents;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+				} else {
+					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
+					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
+					var ctr:int;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[2][2][0][0] == eventAsJSONObject.columns[ctr])
+							positionId = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[2][2][1][0] == eventAsJSONObject.columns[ctr])
+							positionLevel = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[2][2][3][0] == eventAsJSONObject.columns[ctr])
+							positionCreationTimeStamp = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[2][2][4][0] == eventAsJSONObject.columns[ctr])
+							positionModifiedTimeStamp = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[2][2][5][0] == eventAsJSONObject.columns[ctr])
+							positionDeleted = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[2][2][6][0] == eventAsJSONObject.columns[ctr])
+							positionAddedTimeStamp = ctr;
+					
+					var elementAlreadyThere:Boolean;
+					if (eventAsJSONObject.rows) {
+						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
+							elementAlreadyThere = false;
+							for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
+								if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
+									elementAlreadyThere = true;
+									break;
+								}
+							}
+							if (!elementAlreadyThere) {
+								remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
+								remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
+							}
+						}
+					}
+					nextPageToken = eventAsJSONObject.nextPageToken;
+				}
+			} 
+			
+			if (event == null || nextPageToken != null || !modifiedtimeStampsAlreadyChecked) {//two reasons to try to fetch data from google
+				if (event != null && nextPageToken == null)
+					modifiedtimeStampsAlreadyChecked = true;
+				var request:URLRequest = new URLRequest(googleSelectUrl);
+				request.contentType = "application/x-www-form-urlencoded";
+				var urlVariables:URLVariables = new URLVariables();
+				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				
+				urlVariables.sql = createSQLQueryToSelectAll(2, !modifiedtimeStampsAlreadyChecked);
+				if (nextPageToken != null)
+					urlVariables.pageToken = nextPageToken;
+				urlVariables.access_token = access_token;
+				request.data = urlVariables;
+				request.method = URLRequestMethod.GET;
+				loader = new URLLoader();
+				functionToRecall = getTheExerciseEvents;
+				loader.addEventListener(Event.COMPLETE,getTheExerciseEvents);
+				functionToRemoveFromEventListener = getTheExerciseEvents;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("get the medicinevents with modifiedtimestampsalreadychecked = " + modifiedtimeStampsAlreadyChecked.toString() + " loader : request = " + request.data); 
+			} else {
+				//get the medicinevents in the trackinglist and store them in localElements.
+				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
+				for (var i:int = 0; i < trackingList.length; i++) {
+					if (trackingList.getItemAt(i) is ExerciseEvent) {
+						if ((trackingList.getItemAt(i) as ExerciseEvent).timeStamp >= asOfTimeStamp)
+							if ((trackingList.getItemAt(i) as ExerciseEvent).lastModifiedTimestamp >= lastSyncTimeStamp)
+								localElements.addItem(trackingList.getItemAt(i));
+					}
+				}
+				//time to start comparing
+				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
+				for (var j:int = 0; j < localElements.length; j++) {
+					for (var k:int = 0; k < remoteElements.length; k++) {
+						if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as ExerciseEvent).eventid) {
+							//got a matching element, let's see if we need to remove it from both lists
+							if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
+								//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
+								//but first let's see if the remoteelement has the deleted flag set
+								if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+									//its a deleted item remove it from both lists
+									remoteElements.removeItemAt(k);
+									(localElements.getItemAt(j) as ExerciseEvent).deleteEvent();//delete from local database
+									localElementsUpdated = true;//as we deleted one from local database, 
+									localElements.removeItemAt(j);//remove also from list used here
+									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+									break;
+								} else {
+									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
+										remoteElements.removeItemAt(k);
+										break;
+									} else {
+										localElements.removeItemAt(j);
+										j--;
+										break;
+									}
+								}
+							} else {
+								//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
+								remoteElements.removeItemAt(k);
+								//remoteElementIds.removeItemAt(k);
+								localElements.removeItemAt(j);
+								j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+								break;//jump out of th einnter for loop
+							}
+						}
+					}
+					//j could be -1 now, and there might not be anymore elements inlocalemenets so
+					if (j + 1 == localElements.length)
+						break;
+				}
+				//we've got to start updating
+				if (traceNeeded)
+					trace("there are " + remoteElements.length + " remote elements to store or update locally");
+				for (var m:int = 0; m < remoteElements.length; m++) {
+					//we have to find the medicinevent in the trackinglist that has the same id
+					var l:int=0;
+					for (l = 0; l < trackingList.length;l++) {
+						if (trackingList.getItemAt(l) is ExerciseEvent) {
+							if ((trackingList.getItemAt(l) as ExerciseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
+								localElementsUpdated = true;
+								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+									(trackingList.getItemAt(l) as ExerciseEvent).deleteEvent();
+								} else {
+									localElementsUpdated = true;
+									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+									(trackingList.getItemAt(l) as ExerciseEvent).updateExerciseEvent(
+										remoteElements.getItemAt(m)[positionLevel],
+										"",
+										new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
+										new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]));
+								}
+								break;
+							}
+						}
+					}
+					if (l == trackingList.length) {
+						//it means we didn't find the remotelement in the trackinglist, so we need to create it
+						//but only if deleted is false
+						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
+							localElementsUpdated = true;
+							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+							
+							trackingList.addItem(new ExerciseEvent(
+								remoteElements.getItemAt(m)[positionLevel],
+								"",
 								remoteElements.getItemAt(m)[positionId],
 								new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
 								new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),

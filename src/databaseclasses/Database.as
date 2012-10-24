@@ -1521,7 +1521,7 @@ package databaseclasses
 		/**
 		 * new bloodglucoselevel event will be added to the database<br>
 		 */
-		internal function createNewBloodGlucoseEvent(level:int,timeStamp:Number,unit:String,bloodglucoseeventid:Number, dispatcher:EventDispatcher = null ):void {
+		internal function createNewBloodGlucoseEvent(level:int,timeStamp:Number,newLastModifiedTimeStamp:Number,unit:String,bloodglucoseeventid:Number, dispatcher:EventDispatcher = null ):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -1539,7 +1539,7 @@ package databaseclasses
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":value"] = level;
-				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, bloodGlucoseLevelCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, bloodGlucoseLevelCreationFailed);
 				localSqlStatement.execute();
@@ -1846,7 +1846,7 @@ package databaseclasses
 							deleteBloodGlucoseEvent(o.bloodglucoseeventid as Number);
 						} else {
 							
-							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String, o.bloodglucoseeventid as Number, o.creationtimestamp as Number,false);
+							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String, o.bloodglucoseeventid as Number, o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
 							var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();

@@ -74,7 +74,7 @@ package databaseclasses
 				_lastModifiedTimestamp = (new Date()).valueOf();
 			
 			if (storeInDatabase)
-				Database.getInstance().createNewMedicinEvent(amount, medicin, _timeStamp,newLastModifiedTimeStamp,medicineventid,null);
+				Database.getInstance().createNewMedicinEvent(amount, medicin, _timeStamp,_lastModifiedTimestamp,medicineventid,null);
 		}
 		
 		public function get timeStamp():Number
