@@ -41,7 +41,7 @@ package databaseclasses
 			return _comment;
 		}
 		
-		public function ExerciseEvent(level:String,comment:String, exerciseeventid:Number,creationTimeStamp:Number = NaN, storeInDatabase:Boolean = true)
+		public function ExerciseEvent(level:String,comment:String, exerciseeventid:Number,creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true)
 		{
 			this._level = level;
 			this.eventid = exerciseeventid;
@@ -51,8 +51,13 @@ package databaseclasses
 			else
 				_timeStamp = (new Date()).valueOf();
 			
+			if (!isNaN(newLastModifiedTimeStamp))
+				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+			else
+				_lastModifiedTimestamp = (new Date()).valueOf();
+			
 			if (storeInDatabase)
-				Database.getInstance().createNewExerciseEvent(level,comment,_timeStamp,exerciseeventid,null);
+				Database.getInstance().createNewExerciseEvent(level,comment,_timeStamp,_lastModifiedTimestamp,exerciseeventid,null);
 		}
 		
 		public function get timeStamp():Number
@@ -80,14 +85,20 @@ package databaseclasses
 		/**
 		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
 		 * if newComment = null then an empty string will be used<br>
-		 * if newCreationTimeStamp = Number.NaN then (creation)timeStamp is not updated<br>
-		 *  if newLastModifiedTimestamp = Number.NAN, then lastmodifiedtimestamp will not be used<br>
+		 * if creationTimeStamp = null, then current date and time is used<br>
+		 * if newLastModifiedTimestamp = null, then current date and time is used
 		 */
 		public function updateExerciseEvent(newLevel:String,newComment:String = null,newCreationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN):void {
 			_level = newLevel;
 			_comment = (newComment == null ? "":newComment);
-			if (!isNaN(newLastModifiedTimeStamp))
+
+			if (!isNaN(newLastModifiedTimeStamp)) {
+				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
+					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
 				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+			}
+			
+			
 			if (!isNaN(newCreationTimeStamp))
 				timeStamp = newCreationTimeStamp;
 			Database.getInstance().updateExerciseEvent(this.eventid,newLevel,_comment, timeStamp,_lastModifiedTimestamp);

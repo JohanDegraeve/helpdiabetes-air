@@ -1915,7 +1915,7 @@ package databaseclasses
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
 							deleteExerciseEvent(o.exerciseeventid as Number);
 						} else {
-							var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.exerciseeventid as Number,o.creationtimestamp as Number,false);
+							var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.exerciseeventid as Number,o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newExerciseEvent);
 							var creationTimeStampAsDate:Date = new Date(newExerciseEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2186,7 +2186,7 @@ package databaseclasses
 		 * new exercise event will be added to the database<br>
 		 * here the exerciseeventid will get the value of current date and time as Number 
 		 */
-		internal function createNewExerciseEvent(level:String, comment:String, timeStamp:Number, exerciseeventid:Number,dispatcher:EventDispatcher = null):void {
+		internal function createNewExerciseEvent(level:String, comment:String, timeStamp:Number, newLastModifiedTimeStamp:Number,exerciseeventid:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
@@ -2203,7 +2203,7 @@ package databaseclasses
 				localSqlStatement.parameters[":level"] = level;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				localSqlStatement.parameters[":comment_2"] = comment;
-				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.parameters[":exerciseeventid"] = exerciseeventid;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, exerciseEventCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, exerciseEventCreationFailed);

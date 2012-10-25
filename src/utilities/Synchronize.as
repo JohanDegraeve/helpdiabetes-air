@@ -167,6 +167,7 @@ package utilities
 			]
 		];
 		
+		
 		/**
 		 * list of objects found in local database 
 		 */
@@ -649,6 +650,8 @@ package utilities
 						}
 					}
 				}
+				remoteElements = new ArrayList();
+				modifiedtimeStampsAlreadyChecked = false;
 				//let's go for the bloodglucoseevents
 				getTheBloodGlucoseEvents(null);
 			}
@@ -764,36 +767,38 @@ package utilities
 				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
 				for (var j:int = 0; j < localElements.length; j++) {
 					for (var k:int = 0; k < remoteElements.length; k++) {
-						if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as BloodGlucoseEvent).eventid) {
-							//got a matching element, let's see if we need to remove it from both lists
-							if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
-								//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
-								//but first let's see if the remoteelement has the deleted flag set
-								if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
-									//its a deleted item remove it from both lists
-									remoteElements.removeItemAt(k);
-									(localElements.getItemAt(j) as BloodGlucoseEvent).deleteEvent();//delete from local database
-									localElementsUpdated = true;//as we deleted one from local database, 
-									localElements.removeItemAt(j);//remove also from list used here
-									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
-									break;
-								} else {
-									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
+						if (localElements.getItemAt(j) is BloodGlucoseEvent)  {
+							if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as BloodGlucoseEvent).eventid) {
+								//got a matching element, let's see if we need to remove it from both lists
+								if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
+									//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
+									//but first let's see if the remoteelement has the deleted flag set
+									if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+										//its a deleted item remove it from both lists
 										remoteElements.removeItemAt(k);
+										(localElements.getItemAt(j) as BloodGlucoseEvent).deleteEvent();//delete from local database
+										localElementsUpdated = true;//as we deleted one from local database, 
+										localElements.removeItemAt(j);//remove also from list used here
+										j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 										break;
 									} else {
-										localElements.removeItemAt(j);
-										j--;
-										break;
+										if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
+											remoteElements.removeItemAt(k);
+											break;
+										} else {
+											localElements.removeItemAt(j);
+											j--;
+											break;
+										}
 									}
+								} else {
+									//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
+									remoteElements.removeItemAt(k);
+									//remoteElementIds.removeItemAt(k);
+									localElements.removeItemAt(j);
+									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+									break;//jump out of th einnter for loop
 								}
-							} else {
-								//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
-								remoteElements.removeItemAt(k);
-								//remoteElementIds.removeItemAt(k);
-								localElements.removeItemAt(j);
-								j--;//j is going to be incrased and will point to the next element, as we've just deleted one
-								break;//jump out of th einnter for loop
 							}
 						}
 					}
@@ -843,6 +848,8 @@ package utilities
 						}
 					}
 				}
+				modifiedtimeStampsAlreadyChecked = false;
+				remoteElements = new ArrayList();
 				//let's go for the localevents
 				getTheExerciseEvents(null);
 			}
@@ -886,16 +893,16 @@ package utilities
 						if (tableNamesAndColumnNames[2][2][1][0] == eventAsJSONObject.columns[ctr])
 							positionLevel = ctr;
 					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][3][0] == eventAsJSONObject.columns[ctr])
+						if (tableNamesAndColumnNames[2][2][2][0] == eventAsJSONObject.columns[ctr])
 							positionCreationTimeStamp = ctr;
 					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][4][0] == eventAsJSONObject.columns[ctr])
+						if (tableNamesAndColumnNames[2][2][3][0] == eventAsJSONObject.columns[ctr])
 							positionModifiedTimeStamp = ctr;
 					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][5][0] == eventAsJSONObject.columns[ctr])
+						if (tableNamesAndColumnNames[2][2][4][0] == eventAsJSONObject.columns[ctr])
 							positionDeleted = ctr;
 					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][6][0] == eventAsJSONObject.columns[ctr])
+						if (tableNamesAndColumnNames[2][2][5][0] == eventAsJSONObject.columns[ctr])
 							positionAddedTimeStamp = ctr;
 					
 					var elementAlreadyThere:Boolean;
@@ -954,36 +961,38 @@ package utilities
 				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
 				for (var j:int = 0; j < localElements.length; j++) {
 					for (var k:int = 0; k < remoteElements.length; k++) {
-						if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as ExerciseEvent).eventid) {
-							//got a matching element, let's see if we need to remove it from both lists
-							if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
-								//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
-								//but first let's see if the remoteelement has the deleted flag set
-								if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
-									//its a deleted item remove it from both lists
-									remoteElements.removeItemAt(k);
-									(localElements.getItemAt(j) as ExerciseEvent).deleteEvent();//delete from local database
-									localElementsUpdated = true;//as we deleted one from local database, 
-									localElements.removeItemAt(j);//remove also from list used here
-									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
-									break;
-								} else {
-									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
+						if (localElements.getItemAt(j) is ExerciseEvent) {
+							if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as ExerciseEvent).eventid) {
+								//got a matching element, let's see if we need to remove it from both lists
+								if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
+									//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
+									//but first let's see if the remoteelement has the deleted flag set
+									if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+										//its a deleted item remove it from both lists
 										remoteElements.removeItemAt(k);
+										(localElements.getItemAt(j) as ExerciseEvent).deleteEvent();//delete from local database
+										localElementsUpdated = true;//as we deleted one from local database, 
+										localElements.removeItemAt(j);//remove also from list used here
+										j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 										break;
 									} else {
-										localElements.removeItemAt(j);
-										j--;
-										break;
+										if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
+											remoteElements.removeItemAt(k);
+											break;
+										} else {
+											localElements.removeItemAt(j);
+											j--;
+											break;
+										}
 									}
+								} else {
+									//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
+									remoteElements.removeItemAt(k);
+									//remoteElementIds.removeItemAt(k);
+									localElements.removeItemAt(j);
+									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+									break;//jump out of th einnter for loop
 								}
-							} else {
-								//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
-								remoteElements.removeItemAt(k);
-								//remoteElementIds.removeItemAt(k);
-								localElements.removeItemAt(j);
-								j--;//j is going to be incrased and will point to the next element, as we've just deleted one
-								break;//jump out of th einnter for loop
 							}
 						}
 					}
@@ -1064,9 +1073,10 @@ package utilities
 			
 			var sqlStatement:String = "";
 			var elementFoundWithSameId:Boolean = false;
+			var j:int;
 			for (var i:int = 0;i < localElements.length; i++) {
 				if (localElements.getItemAt(i) is MedicinEvent) {//later on we will add exerciseevents, ...
-					for (var j:int = 0;j < remoteElementIds.length; j++) {
+					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
 							elementFoundWithSameId = true;
 							if (!remoteElementIds.getItemAt(j)[1]) {
@@ -1077,8 +1087,32 @@ package utilities
 							j = remoteElementIds.length;
 						}
 					}
-				}  else {
-					//here to continue with other kinds of events							
+				}  else if (localElements.getItemAt(i) is BloodGlucoseEvent) {
+					for (j = 0;j < remoteElementIds.length; j++) {
+						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
+							elementFoundWithSameId = true;
+							if (!remoteElementIds.getItemAt(j)[1]) {
+								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[1][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
+								i = localElements.length;
+								indexOfRetrievedRowId = j;
+							}
+							j = remoteElementIds.length;
+						}
+					}
+				} else if (localElements.getItemAt(i) is ExerciseEvent) {
+					for (j = 0;j < remoteElementIds.length; j++) {
+						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
+							elementFoundWithSameId = true;
+							if (!remoteElementIds.getItemAt(j)[1]) {
+								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[2][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
+								i = localElements.length;
+								indexOfRetrievedRowId = j;
+							}
+							j = remoteElementIds.length;
+						}
+					}
+				} else  {
+					//anything else ?
 				}
 			}
 			
@@ -1130,19 +1164,21 @@ package utilities
 				request.contentType = "application/x-www-form-urlencoded";
 				
 				//start with the medicinevents
+				var previousTypeOfEventAlreadyUsed:Boolean = false;
 				var sqlStatement:String = "";
 				var i:int = 0;
 				while (i < localElements.length) {
 					//goal is to insert only elements that are not yet found in remoteelements, those will need updates later on iso inserts
-					if (localElements.getItemAt(i) is MedicinEvent) {//later on we will add exerciseevents, ...
-						var elementFoundWithSameId:Boolean = false;
-						for (var j:int = 0;j < remoteElementIds.length; j++) {
-							if ((localElements.getItemAt(i) as MedicinEvent).eventid == remoteElementIds.getItemAt(j)[0]) {
-								elementFoundWithSameId = true;
-								j = remoteElementIds.length;
-							}
+					var elementFoundWithSameId:Boolean = false;
+					for (var j:int = 0;j < remoteElementIds.length; j++) {
+						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
+							elementFoundWithSameId = true;
+							j = remoteElementIds.length;
 						}
+					}
+					if (localElements.getItemAt(i) is MedicinEvent) {//later on we will add exerciseevents, ...
 						if (!elementFoundWithSameId) {
+							previousTypeOfEventAlreadyUsed = true;
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[0][1] + " ";
 							sqlStatement += "(id,medicinname,value,creationtimestamp,modifiedtimestamp,deleted,addedtotabletimestamp) VALUES (\'" +
 								(localElements.getItemAt(i) as MedicinEvent).eventid.toString() + "\',\'" +
@@ -1161,8 +1197,48 @@ package utilities
 							localElements.removeItemAt(i);
 							i--;
 						}
+					}  else if (localElements.getItemAt(i) is BloodGlucoseEvent && !previousTypeOfEventAlreadyUsed) {
+						if (!elementFoundWithSameId) {
+							previousTypeOfEventAlreadyUsed = true;
+							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[1][1] + " ";
+							sqlStatement += "(id,unit,value,creationtimestamp,modifiedtimestamp,deleted,addedtotabletimestamp) VALUES (\'" +
+								(localElements.getItemAt(i) as BloodGlucoseEvent).eventid.toString() + "\',\'" +
+								(localElements.getItemAt(i) as BloodGlucoseEvent).unit + "\',\'" +
+								(localElements.getItemAt(i) as BloodGlucoseEvent).bloodGlucoseLevel + "\',\'" +
+								(localElements.getItemAt(i) as BloodGlucoseEvent).timeStamp.toString() + "\',\'" +
+								(localElements.getItemAt(i) as BloodGlucoseEvent).lastModifiedTimestamp.toString() + "\'," +
+								"\'false\'" +
+								",\'" +  
+								((new Date()).valueOf() - (localElements.getItemAt(i) as BloodGlucoseEvent).lastModifiedTimestamp > 10000 
+									? 
+									(new Date()).valueOf().toString() 
+									:
+									(localElements.getItemAt(i) as BloodGlucoseEvent).lastModifiedTimestamp.toString())
+								+ "\')";
+							localElements.removeItemAt(i);
+							i--;
+						}
+					}  else if (localElements.getItemAt(i) is ExerciseEvent && !previousTypeOfEventAlreadyUsed) {
+						if (!elementFoundWithSameId) {
+							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[2][1] + " ";
+							sqlStatement += "(id,level,creationtimestamp,modifiedtimestamp,deleted,addedtotabletimestamp) VALUES (\'" +
+								(localElements.getItemAt(i) as ExerciseEvent).eventid.toString() + "\',\'" +
+								(localElements.getItemAt(i) as ExerciseEvent).level + "\',\'" +
+								(localElements.getItemAt(i) as ExerciseEvent).timeStamp.toString() + "\',\'" +
+								(localElements.getItemAt(i) as ExerciseEvent).lastModifiedTimestamp.toString() + "\'," +
+								"\'false\'" +
+								",\'" +  
+								((new Date()).valueOf() - (localElements.getItemAt(i) as ExerciseEvent).lastModifiedTimestamp > 10000 
+									? 
+									(new Date()).valueOf().toString() 
+									:
+									(localElements.getItemAt(i) as ExerciseEvent).lastModifiedTimestamp.toString())
+								+ "\')";
+							localElements.removeItemAt(i);
+							i--;
+						}
 					}  else {
-						//here to continue with other kinds of events							
+						//other kinds of events ?
 					}
 					i++;
 				}
@@ -1170,11 +1246,14 @@ package utilities
 				//if we haven't found new events, then we need to update all remaining, if any off course
 				if (sqlStatement.length == 0) {
 					var k:int = 0;
-					while (k < localElements.length) {
+					var l:int;
+					var weHaveAlreadyAnUpdate:Boolean = false;//google api only allows one update per statement, so if there's multiple elements to update, we'll have to go through this multiple times
+					while (k < localElements.length && !weHaveAlreadyAnUpdate) {
 						//goal is to update all remaining events
 						if (localElements.getItemAt(k) is MedicinEvent) { //later on we will add exerciseevents, ...
-							for (var l:int = 0;l < remoteElementIds.length; l++) {
+							for (l = 0;l < remoteElementIds.length; l++) {
 								if ((localElements.getItemAt(k) as MedicinEvent).eventid == remoteElementIds.getItemAt(l)[0]) {
+									weHaveAlreadyAnUpdate = true;
 									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
 									sqlStatement += 
 										"id = \'" + (localElements.getItemAt(k) as MedicinEvent).eventid.toString() + "\'," +
@@ -1191,8 +1270,47 @@ package utilities
 									l = remoteElementIds.length;//it's not necessary to go through the rest of the remotelementids
 								}
 							}
+						}  else if (localElements.getItemAt(k) is BloodGlucoseEvent) { 
+							for (l = 0;l < remoteElementIds.length; l++) {
+								if ((localElements.getItemAt(k) as BloodGlucoseEvent).eventid == remoteElementIds.getItemAt(l)[0]) {
+									weHaveAlreadyAnUpdate = true;
+									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[1][1] + " SET ";
+									sqlStatement += 
+										"id = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).eventid.toString() + "\'," +
+										"unit = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).unit + "\'," +
+										"value = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).bloodGlucoseLevel + "\'," +
+										"creationtimestamp = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).timeStamp.toString() + "\'," +
+										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).lastModifiedTimestamp.toString() + "\'," +
+										"deleted = \'false\' WHERE ROWID = \'" +
+										remoteElementIds.getItemAt(l)[1] + "\'";
+									
+									localElements.removeItemAt(k);
+									k--;//reducing k because we just removed one element
+									
+									l = remoteElementIds.length;//it's not necessary to go through the rest of the remotelementids
+								}
+							}
+						}  else if (localElements.getItemAt(k) is ExerciseEvent) { 
+							for (l = 0;l < remoteElementIds.length; l++) {
+								if ((localElements.getItemAt(k) as ExerciseEvent).eventid == remoteElementIds.getItemAt(l)[0]) {
+									weHaveAlreadyAnUpdate = true;
+									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[2][1] + " SET ";
+									sqlStatement += 
+										"id = \'" + (localElements.getItemAt(k) as ExerciseEvent).eventid.toString() + "\'," +
+										"level = \'" + (localElements.getItemAt(k) as ExerciseEvent).level + "\'," +
+										"creationtimestamp = \'" + (localElements.getItemAt(k) as ExerciseEvent).timeStamp.toString() + "\'," +
+										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as ExerciseEvent).lastModifiedTimestamp.toString() + "\'," +
+										"deleted = \'false\' WHERE ROWID = \'" +
+										remoteElementIds.getItemAt(l)[1] + "\'";
+									
+									localElements.removeItemAt(k);
+									k--;//reducing k because we just removed one element
+									
+									l = remoteElementIds.length;//it's not necessary to go through the rest of the remotelementids
+								}
+							}
 						}  else {
-							//here to continue with other kinds of events							
+							//other kinds of events ?
 						}
 						k++;
 					}
