@@ -47,13 +47,13 @@ package databaseclasses
 		 */ 
 		public static const SettingTIME_OF_LAST_MEAL_ADDITION:int = 1;
 		/**
-		 * id to be used when adding a new meal event<br>
-		 * only to be used within the database class therefore package private
+		 * not used anymore
 		 */
 		internal static const SettingNEXT_MEALEVENT_ID:int=2;
 		/**
 		 * id to be used when adding a new selected item<br>
-		 * only to be used within the database class therefore package private
+		 * only to be used within the database class therefore package private<br>
+		 * not used anymore
 		 */
 		internal static const SettingNEXT_SELECTEDITEM_ID:int=3;
 		/**

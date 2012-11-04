@@ -54,10 +54,15 @@ package databaseclasses
 		 */ 
 		private var _previousBGlevel:int;
 
+		private var _lastModifiedTimeStamp:Number;
+
 		/**
 		 * the lastmodifiedtimestamp
-		 */ 
-		private var _lastModifiedTimeStamp:Number;
+		 */
+		public function get lastModifiedTimeStamp():Number
+		{
+			return _lastModifiedTimeStamp;
+		}
 		
 		[Bindable]
 		private var _selectedFoodItems:ArrayCollection;
@@ -111,8 +116,6 @@ package databaseclasses
 		
 		/**
 		 * mealEvent will be created and automatically inserted into the database if databaseStorage = true<br>
-		 * insulinRatio,  correctionFactor can Number.NAN which means there's no settings for the defined period<br>
-		 * previousBGlevel can also be null meaning theres no bloodglucose event within the predefined timeframe<br>
 		 * if timeStamp = null then current time is used as timeStamp for the mealevent, otherwise the supplied timeStamp is used.<br>
 		 * 
 		 * databaseStorage = indicates of the MealEvent needs to be stored in the database, default = true<br>
@@ -122,7 +125,7 @@ package databaseclasses
 		 * if databaseStorage = false then creationTimeStamp must be not null<br>
 		 * new mealEventId is created if databaseStorage = true.
 		 */
-		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,timeStamp:Number,dispatcher:EventDispatcher, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null, mealEventId:Number = Number.NaN,  lastModifiedTimeStamp:Number = Number.NaN) {
+		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,timeStamp:Number,dispatcher:EventDispatcher, mealEventId:Number, lastModifiedTimeStamp:Number, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null) {
 			this._mealName = mealName;
 			if (isNaN(insulinRatio))
 				this._insulinRatio = 0;
@@ -146,23 +149,22 @@ package databaseclasses
 			else {
 				this._timeStamp = _lastModifiedTimeStamp;
 			}
+			
+			eventid = mealEventId;
 
 			if (!databaseStorage) {
-				this.eventid = mealEventId;
 				this._selectedFoodItems = selectedFoodItems;
 				recalculateTotals();
 			}
-			else  {
-				eventid = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_MEALEVENT_ID));
+			else  {				
 				_selectedFoodItems = new ArrayCollection();
 								
 				var localDispatcher:EventDispatcher = new EventDispatcher();
 				localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
 				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
-				Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, (eventid + 1).toString());
 				Database.getInstance().createNewMealEvent(eventid,
 					mealName,
-					_lastModifiedTimeStamp.valueOf().toString(),
+					_lastModifiedTimeStamp.valueOf(),
 					insulinRatio,
 					correctionFactor,
 					previousBGlevel,
@@ -181,7 +183,7 @@ package databaseclasses
 			function mealEventCreationFailed (errorEvent:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
-				Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, eventid.toString());
+				//Settings.getInstance().setSetting(Settings.SettingNEXT_MEALEVENT_ID, eventid.toString());
 				trace("Error while storing mealevent in database. MealEvent.as 0001");
 				if (dispatcher != null) {
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
@@ -191,7 +193,7 @@ package databaseclasses
 		
 		internal function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,dispatcher:EventDispatcher = null):void {
 			_selectedFoodItems.addItem(selectedFoodItem);
-			selectedFoodItem.selectedItemId = new Number(Settings.getInstance().getSetting(Settings.SettingNEXT_SELECTEDITEM_ID));
+			selectedFoodItem.selectedItemId = new Date().valueOf();
 			selectedFoodItem.mealEventId = this.eventid;
 			
 			var localDispatcher:EventDispatcher = new EventDispatcher();
@@ -209,50 +211,20 @@ package databaseclasses
 				selectedFoodItem.unit.carbs,
 				selectedFoodItem.unit.fat,
 				selectedFoodItem.chosenAmount,
+				selectedFoodItem._lastModifiedTimestamp,
 				localDispatcher);
-			Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, (selectedFoodItem.selectedItemId +1).toString() );
+			//Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, (selectedFoodItem.selectedItemId +1).toString() );
 			
 			function selectedItemCreated(event:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
-				localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,timeStampUpdateFailed);
-				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,timeStampUpdated);
-				
-				/* recalculate totals */
-				/*_totalCarbs += selectedFoodItem.unit.carbs/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
-				_totalKilocalories += selectedFoodItem.unit.kcal/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
-				_totalProtein += selectedFoodItem.unit.protein/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
-				_totalFat += selectedFoodItem.unit.fat/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
-				*/
 				recalculateTotals();
-				
-				_lastModifiedTimeStamp = (new Date()).valueOf();
-				Database.getInstance().updateMealEventLastModifiedTimeStamp(_lastModifiedTimeStamp,eventid,localDispatcher);	
 			}
 				
-			function timeStampUpdated(event:DatabaseEvent):void {
-				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,timeStampUpdateFailed);
-				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,timeStampUpdated);
-				if (dispatcher != null) {
-					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					dispatcher.dispatchEvent(event);
-				}
-			}
-			
-			function timeStampUpdateFailed(event:DatabaseEvent):void {
-				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,timeStampUpdateFailed);
-				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,timeStampUpdated);
-				trace("Error while updating itmestamp. MealEvent.as 0003");
-				if (dispatcher != null) {
-					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
-					dispatcher.dispatchEvent(event);
-				}
-			}
-			
 			function selectedItemCreationFailed (errorEvent:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
-				Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, selectedFoodItem.selectedItemId.toString() );
+				//Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, selectedFoodItem.selectedItemId.toString() );
 				trace("Error while creation selected item. MealEvent.as 0002");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -269,24 +241,9 @@ package databaseclasses
 			return _mealName;
 		}
 
-		/**
-		 * @private
-		 */
-		public function set mealName(value:String):void
-		{
-			_mealName = value;
-		}
-		
-
-		internal function get previousBGlevel():int
+		public function get previousBGlevel():int
 		{
 			return _previousBGlevel;
-		}
-
-		internal function set previousBGlevel(value:int):void
-		{
-			_previousBGlevel = value;
-			recalculateInsulinAmount();
 		}
 
 		/**
@@ -373,7 +330,9 @@ package databaseclasses
 				this._insulinRatio = 0;
 			else
 				this._insulinRatio = value;
-			Database.getInstance().updateInsulineRatio(this.eventid,value,null);
+			_lastModifiedTimeStamp = new Date().valueOf();
+			
+			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,_previousBGlevel,_lastModifiedTimeStamp,_timeStamp,null);
 			recalculateInsulinAmount();
 		}
 
@@ -398,12 +357,12 @@ package databaseclasses
 				}
 		}
 
-		private function set correctionFactor(value:Number):void
+		/*private function set correctionFactor(value:Number):void
 		{
 			_correctionFactor = value;
 			//hier zou nog een database update moeten gebeuren denk ik
 			recalculateInsulinAmount();
-		}
+		}*/
 
 		/**f
 		 * the calculated amount, in fact a redundant value because it can be derived from other values here<br>
@@ -464,11 +423,47 @@ package databaseclasses
 		}
 		
 		/**
-		 * deletes the selectedFoodItem, no deletion from the database 
+		 * deletes the selectedFoodItem, also deletes from database<br>
 		 */
 		public function removeSelectedFoodItem(selectedFoodItemToRemove:SelectedFoodItem):void {
+			Database.getInstance().deleteSelectedFoodItem(selectedFoodItemToRemove._selectedItemId,null);
 			_selectedFoodItems.removeItemAt(selectedFoodItems.getItemIndex(selectedFoodItemToRemove));
 			recalculateTotals();
+		}
+		
+		/**
+		 * deletes all selectedfooditems and then also the mealevent, from database 
+		 */
+		public function deleteEvent():void {
+			while (_selectedFoodItems.length > 0) {
+				Database.getInstance().deleteSelectedFoodItem((_selectedFoodItems.getItemAt(0) as SelectedFoodItem)._selectedItemId,null);
+				_selectedFoodItems.removeItemAt(0);
+			}
+			Database.getInstance().deleteMealEvent(eventid,null);
+		}
+		
+		/**
+		 * updates the mealevent, also in the database<br>
+		 * none of the values should be null 
+		 * if creationTimeStamp = null, then current date and time is used<br>
+		 * if newLastModifiedTimestamp = null, then current date and time is used
+		 */
+		public function updateMealEvent(newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newPreviousBGLevel:int,newLastModifiedTimeStamp:Number = Number.NaN,newCreationTimeStamp:Number =  Number.NaN) :void {
+			_mealName = newMealName;
+			_insulinRatio = newInsulinRatio;
+			_correctionFactor = newCorrectionFactor;
+			_previousBGlevel = newPreviousBGLevel;
+
+			if (!isNaN(newLastModifiedTimeStamp)) {
+				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
+					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
+				_lastModifiedTimeStamp = newLastModifiedTimeStamp;
+			}
+			
+			if (!isNaN(newCreationTimeStamp))
+				_timeStamp = newCreationTimeStamp;
+			
+			Database.getInstance().updateMealEvent(this.eventid,newMealName,newInsulinRatio,newCorrectionFactor,newPreviousBGLevel,newLastModifiedTimeStamp,newCreationTimeStamp,null);
 		}
 	}
 }

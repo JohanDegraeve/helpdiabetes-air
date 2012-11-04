@@ -433,7 +433,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					//- create a selectedfooditem and add it
 					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
 					.addSelectedFoodItem(
-						new SelectedFoodItem(retrievedFoodItem.itemDescription,
+						new SelectedFoodItem(new Date().valueOf(),
+							retrievedFoodItem.itemDescription,
 							retrievedFoodItem.getUnit(selectedUnit),
 							new Number(amount_textinput_text)));
 					ModelLocator.getInstance().trackingEventToShow = 

@@ -27,7 +27,6 @@ package databaseclasses
 	{
 		private var _timeStamp:Number;
 		private var _bloodGlucoseLevel:int;
-		private var _eventid:Number;
 		
 		private var _unit:String;
 
@@ -132,7 +131,18 @@ package databaseclasses
 		 * once delted this event should not be used anymore
 		 */
 		public function deleteEvent():void {
-			Database.getInstance().deleteMedicinEvent(this.eventid);
+			Database.getInstance().deleteBloodGlucoseEvent(this.eventid);
+		}
+		
+		public function toString():String {
+			var returnValue:String;
+			returnValue += "eventid = " + eventid + "\n";
+			returnValue = "timeStamp = " + timeStamp+ "\n";
+			returnValue += "ladmodifiedtimestamp = " + _lastModifiedTimestamp+ "\n";
+			returnValue += "bloodglucoselevel = " + _bloodGlucoseLevel+ "\n";
+			returnValue += "unit = " + unit+ "\n";
+			 
+			return returnValue;
 		}
 	}
 }

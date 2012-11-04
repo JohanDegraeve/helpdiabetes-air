@@ -24,7 +24,9 @@ package utilities
 	import databaseclasses.Database;
 	import databaseclasses.DatabaseEvent;
 	import databaseclasses.ExerciseEvent;
+	import databaseclasses.MealEvent;
 	import databaseclasses.MedicinEvent;
+	import databaseclasses.SelectedFoodItem;
 	import databaseclasses.Settings;
 	
 	import flash.data.SQLStatement;
@@ -136,7 +138,7 @@ package utilities
 					["creationtimestamp","NUMBER"],//timestamp that the event was created
 					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
 					["deleted","STRING"],//was the event deleted or not
-					["addedtotabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
 				],
 				"MedicinEvents"//description
 			],
@@ -149,7 +151,7 @@ package utilities
 					["creationtimestamp","NUMBER"],//timestamp that the event was created
 					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
 					["deleted","STRING"],//was the event deleted or not
-					["addedtotabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
 				],
 				"BloodglucoseEvents"//description
 			],
@@ -161,9 +163,44 @@ package utilities
 					["creationtimestamp","NUMBER"],//timestamp that the event was created
 					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
 					["deleted","STRING"],//was the event deleted or not
-					["addedtotabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
 				],
 				"ExerciseEvents"//description
+			],
+			[	"HD-MealEvent",
+				"",	
+				[						
+					["id","NUMBER"],//the unique identifier
+					["mealname","STRING"],
+					["insulinratio","NUMBER"],
+					["correctionfactor","NUMBER"],
+					["previousbglevel","NUMBER"],
+					["creationtimestamp","NUMBER"],//timestamp that the event was created
+					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
+					["deleted","STRING"],//was the event deleted or not
+					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+				],
+				"MealEvents"//description
+			],
+			[	"HD-SelectedFoodItem",
+				"",	
+				[						
+					["id","NUMBER"],//the unique identifier
+					["description","STRING"],
+					["unitdescription","STRING"],
+					["unitstandardamount","NUMBER"],
+					["unitkcal","NUMBER"],
+					["unitprotein","NUMBER"],
+					["unitcarbs","NUMBER"],
+					["unitfat","NUMBER"],
+					["chosenamount","NUMBER"],
+					["mealeventid","NUMBER"],
+					["creationtimestamp","NUMBER"],//timestamp that the event was created, in case of selectedfooditems, creationtimestamp will not really be usefull
+					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
+					["deleted","STRING"],//was the event deleted or not
+					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+				],
+				"Selected Food Items"//description
 			]
 		];
 		
@@ -186,7 +223,7 @@ package utilities
 		 * the access_token to use the google api 
 		 */
 		private var access_token:String;
-
+		
 		/**
 		 * wil be equal to modellocator.trackinglist, it's just to avoid that I need to type to much 
 		 */
@@ -194,7 +231,7 @@ package utilities
 		
 		private var tracker:AnalyticsTracker;
 		private var alReadyGATracked:Boolean;
-
+		
 		private static var instance:Synchronize = new Synchronize();
 		
 		private var loader:URLLoader;
@@ -228,10 +265,8 @@ package utilities
 		 */
 		private var retrievalCounter:int;
 		
-		private var modifiedtimeStampsAlreadyChecked:Boolean;
-	
 		private var secondAttempt:Boolean;
-
+		
 		/**
 		 * constructor not to be used, get an instance with getInstance() 
 		 */
@@ -251,7 +286,7 @@ package utilities
 			if (instance == null) instance = new Synchronize();
 			return instance;
 		}
-			
+		
 		/**
 		 * If  (syncRunning is true and currentSyncTimeStamp > 5 minutes ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 5 minutes ago)), then run the sync, reset timestamp of startrun to current time, 
 		 * set rerunnecessary to false<br>
@@ -269,7 +304,7 @@ package utilities
 			lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
 			currentSyncTimeStamp = new Date().valueOf();
 			asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
-
+			
 			var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - lastSyncTimeStamp) > secondsBetweenTwoSync * 1000;
 			if ((syncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!syncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
 				rerunNecessary = false;
@@ -290,7 +325,7 @@ package utilities
 		private function synchronize():void {
 			if (traceNeeded)
 				trace("start method synchronize");
-
+			
 			//we could be arriving here after a retempt, example, first time failed due to invalid credentials, token refresh occurs, with success, we come back to here
 			//first thing to do is to removeeventlisteners
 			
@@ -331,7 +366,7 @@ package utilities
 		private function tablesListRetrieved(event:Event):void {
 			if (traceNeeded)
 				trace("start method tablesListRetrieved");
-
+			
 			loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 			var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -456,7 +491,6 @@ package utilities
 			remoteElements = new ArrayList();
 			remoteElementIds = new ArrayList();
 			nextPageToken = null;//not sure if nextPageToken is used by google when doing a select
-			modifiedtimeStampsAlreadyChecked = false;
 			secondAttempt = false;
 			getTheMedicinEvents();
 		}
@@ -478,7 +512,7 @@ package utilities
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-
+				
 				if  (eventAsJSONObject.error) {
 					
 					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
@@ -535,15 +569,13 @@ package utilities
 				}
 			} 
 			
-			if (event == null || nextPageToken != null || !modifiedtimeStampsAlreadyChecked) {//two reasons to try to fetch data from google
-				if (event != null && nextPageToken == null)
-					modifiedtimeStampsAlreadyChecked = true;
+			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
 				var request:URLRequest = new URLRequest(googleSelectUrl);
 				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
 				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 				
-				urlVariables.sql = createSQLQueryToSelectAll(0, !modifiedtimeStampsAlreadyChecked);
+				urlVariables.sql = createSQLQueryToSelectAll(0);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
 				urlVariables.access_token = access_token;
@@ -556,7 +588,7 @@ package utilities
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				loader.load(request);
 				if (traceNeeded)
-					trace("get the medicinevents with modifiedtimestampsalreadychecked = " + modifiedtimeStampsAlreadyChecked.toString() + " loader : request = " + request.data); 
+					trace("get the medicinevents " + " loader : request = " + request.data); 
 			} else {
 				//get the medicinevents in the trackinglist and store them in localElements.
 				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
@@ -651,7 +683,6 @@ package utilities
 					}
 				}
 				remoteElements = new ArrayList();
-				modifiedtimeStampsAlreadyChecked = false;
 				//let's go for the bloodglucoseevents
 				getTheBloodGlucoseEvents(null);
 			}
@@ -731,15 +762,13 @@ package utilities
 				}
 			} 
 			
-			if (event == null || nextPageToken != null || !modifiedtimeStampsAlreadyChecked) {//two reasons to try to fetch data from google
-				if (event != null && nextPageToken == null)
-					modifiedtimeStampsAlreadyChecked = true;
+			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
 				var request:URLRequest = new URLRequest(googleSelectUrl);
 				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
 				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 				
-				urlVariables.sql = createSQLQueryToSelectAll(1, !modifiedtimeStampsAlreadyChecked);
+				urlVariables.sql = createSQLQueryToSelectAll(1);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
 				urlVariables.access_token = access_token;
@@ -752,7 +781,7 @@ package utilities
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				loader.load(request);
 				if (traceNeeded)
-					trace("get the bloodglucoseevents with modifiedtimestampsalreadychecked = " + modifiedtimeStampsAlreadyChecked.toString() + " loader : request = " + request.data); 
+					trace("get the bloodglucoseevents , loader : request = " + request.data); 
 			} else {
 				//get the bloodglucoseevents in the trackinglist and store them in localElements.
 				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
@@ -815,12 +844,17 @@ package utilities
 					for (l = 0; l < trackingList.length;l++) {
 						if (trackingList.getItemAt(l) is BloodGlucoseEvent) {
 							if ((trackingList.getItemAt(l) as BloodGlucoseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
+								if (traceNeeded) trace("find an element in with same eventid");
+								if (traceNeeded) trace ("bg event  = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).toString());
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
-									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
+									if (traceNeeded)
+										trace("call to bloodglucoseevent.deleteevent");
+									(trackingList.getItemAt(l) as BloodGlucoseEvent).deleteEvent();
 								} else {
 									localElementsUpdated = true;
 									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+									if (traceNeeded) trace("call to update bloodglucoseevent");
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).updateBloodGlucoseEvent(
 										remoteElements.getItemAt(m)[positionUnit],
 										remoteElements.getItemAt(m)[positionValue],
@@ -848,7 +882,6 @@ package utilities
 						}
 					}
 				}
-				modifiedtimeStampsAlreadyChecked = false;
 				remoteElements = new ArrayList();
 				//let's go for the localevents
 				getTheExerciseEvents(null);
@@ -925,15 +958,13 @@ package utilities
 				}
 			} 
 			
-			if (event == null || nextPageToken != null || !modifiedtimeStampsAlreadyChecked) {//two reasons to try to fetch data from google
-				if (event != null && nextPageToken == null)
-					modifiedtimeStampsAlreadyChecked = true;
+			if (event == null || nextPageToken != null) {//two reasons to try to fetch data from google
 				var request:URLRequest = new URLRequest(googleSelectUrl);
 				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
 				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 				
-				urlVariables.sql = createSQLQueryToSelectAll(2, !modifiedtimeStampsAlreadyChecked);
+				urlVariables.sql = createSQLQueryToSelectAll(2);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
 				urlVariables.access_token = access_token;
@@ -946,7 +977,7 @@ package utilities
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				loader.load(request);
 				if (traceNeeded)
-					trace("get the medicinevents with modifiedtimestampsalreadychecked = " + modifiedtimeStampsAlreadyChecked.toString() + " loader : request = " + request.data); 
+					trace("get the medicinevents , loader : request = " + request.data); 
 			} else {
 				//get the medicinevents in the trackinglist and store them in localElements.
 				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
@@ -1042,7 +1073,444 @@ package utilities
 						}
 					}
 				}
+				remoteElements = new ArrayList();
+				//let's go for the bloodglucoseevents
+				getTheMealEvents(null);
 				//let's go for the localevents
+			}
+		}
+		
+		private function getTheMealEvents(event:Event = null):void {
+			var positionId:int;
+			var positionMealName:int;
+			var positionInsulinRatio:int;
+			var positionCFFactor:int;
+			var positionPreviousBGLevel:int;
+			var positionCreationTimeStamp:int;
+			var positionModifiedTimeStamp:int;
+			var positionDeleted:int;
+			var positionAddedTimeStamp:int;
+			
+			if (traceNeeded)
+				trace("start method getTheMealEvents");
+			//start with remoteElements
+			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
+			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = getTheMealEvents;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+				} else {
+					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
+					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
+					var ctr:int;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[3][2][0][0] == eventAsJSONObject.columns[ctr])
+							positionId = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[3][2][1][0] == eventAsJSONObject.columns[ctr])
+							positionMealName = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[3][2][2][0] == eventAsJSONObject.columns[ctr])
+							positionInsulinRatio = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[3][2][3][0] == eventAsJSONObject.columns[ctr])
+							positionCFFactor = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[3][2][4][0] == eventAsJSONObject.columns[ctr])
+							positionPreviousBGLevel = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[3][2][5][0] == eventAsJSONObject.columns[ctr])
+							positionCreationTimeStamp = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[3][2][6][0] == eventAsJSONObject.columns[ctr])
+							positionModifiedTimeStamp = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[3][2][7][0] == eventAsJSONObject.columns[ctr])
+							positionDeleted = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[3][2][8][0] == eventAsJSONObject.columns[ctr])
+							positionAddedTimeStamp = ctr;
+					
+					var elementAlreadyThere:Boolean;
+					if (eventAsJSONObject.rows) {
+						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
+							elementAlreadyThere = false;
+							for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
+								if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
+									elementAlreadyThere = true;
+									break;
+								}
+							}
+							if (!elementAlreadyThere) {
+								remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
+								remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
+							}
+						}
+					}
+					nextPageToken = eventAsJSONObject.nextPageToken;
+				}
+			} 
+			
+			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
+				var request:URLRequest = new URLRequest(googleSelectUrl);
+				request.contentType = "application/x-www-form-urlencoded";
+				var urlVariables:URLVariables = new URLVariables();
+				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				
+				urlVariables.sql = createSQLQueryToSelectAll(3);
+				if (nextPageToken != null)
+					urlVariables.pageToken = nextPageToken;
+				urlVariables.access_token = access_token;
+				request.data = urlVariables;
+				request.method = URLRequestMethod.GET;
+				loader = new URLLoader();
+				functionToRecall = getTheMealEvents;
+				loader.addEventListener(Event.COMPLETE,getTheMealEvents);
+				functionToRemoveFromEventListener = getTheMealEvents;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("get the mealevents " + " loader : request = " + request.data); 
+			} else {
+				for (var i:int = 0; i < trackingList.length; i++) {
+					if (trackingList.getItemAt(i) is MealEvent) {
+						if ((trackingList.getItemAt(i) as MealEvent).timeStamp >= asOfTimeStamp)
+							if ((trackingList.getItemAt(i) as MealEvent).lastModifiedTimeStamp >= lastSyncTimeStamp)
+								localElements.addItem(trackingList.getItemAt(i));
+					}
+				}
+				//time to start comparing
+				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
+				for (var j:int = 0; j < localElements.length; j++) {
+					for (var k:int = 0; k < remoteElements.length; k++) {
+						if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as MealEvent).eventid) {
+							//got a matching element, let's see if we need to remove it from both lists
+							if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
+								//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
+								//but first let's see if the remoteelement has the deleted flag set
+								if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+									//its a deleted item remove it from both lists
+									remoteElements.removeItemAt(k);
+									(localElements.getItemAt(j) as MealEvent).deleteEvent();//delete from local database
+									localElementsUpdated = true;//as we deleted one from local database, 
+									localElements.removeItemAt(j);//remove also from list used here
+									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+									break;
+								} else {
+									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
+										remoteElements.removeItemAt(k);
+										break;
+									} else {
+										localElements.removeItemAt(j);
+										j--;
+										break;
+									}
+								}
+							} else {
+								//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
+								remoteElements.removeItemAt(k);
+								//remoteElementIds.removeItemAt(k);
+								localElements.removeItemAt(j);
+								j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+								break;//jump out of th einnter for loop
+							}
+						}
+					}
+					//j could be -1 now, and there might not be anymore elements inlocalemenets so
+					if (j + 1 == localElements.length)
+						break;
+				}
+				//we've got to start updating
+				if (traceNeeded)
+					trace("there are " + remoteElements.length + " remote elements to store or update locally");
+				for (var m:int = 0; m < remoteElements.length; m++) {
+					//we have to find the medicinevent in the trackinglist that has the same id
+					var l:int=0;
+					for (l = 0; l < trackingList.length;l++) {
+						if (trackingList.getItemAt(l) is MealEvent) {
+							if ((trackingList.getItemAt(l) as MealEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
+								localElementsUpdated = true;
+								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+									(trackingList.getItemAt(l) as MealEvent).deleteEvent();
+								} else {
+									localElementsUpdated = true;
+									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+									(trackingList.getItemAt(l) as MealEvent).updateMealEvent(
+										remoteElements.getItemAt(m)[positionMealName],
+										remoteElements.getItemAt(m)[positionInsulinRatio],
+										remoteElements.getItemAt(m)[positionCFFactor],
+										remoteElements.getItemAt(m)[positionPreviousBGLevel],
+										new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+										new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]));
+								}
+								break;
+							}
+						}
+					}
+					if (l == trackingList.length) {
+						//it means we didn't find the remotelement in the trackinglist, so we need to create it
+						//but only if deleted is false
+						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
+							localElementsUpdated = true;
+							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+							
+							trackingList.addItem(new MealEvent(
+								remoteElements.getItemAt(m)[positionMealName],
+								remoteElements.getItemAt(m)[positionInsulinRatio],
+								remoteElements.getItemAt(m)[positionCFFactor],
+								remoteElements.getItemAt(m)[positionPreviousBGLevel],
+								new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
+								null,
+								remoteElements.getItemAt(m)[positionId],
+								new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+								true));
+						}
+					}
+				}
+				remoteElements = new ArrayList();
+				getTheSelectedFoodItems(null);
+			}
+		}
+		
+		private function getTheSelectedFoodItems(event:Event = null):void {
+			var positionId:int;
+			var positionDescription:int;
+			var positionUnitDescription:int;
+			var positionUnitStandardAmount:int;
+			var positionUnitKcal:int;
+			var positionUnitProtein:int;
+			var positionUnitCarbs:int;
+			var positionUnitFat:int;
+			var positionChosenAmount:int;
+			var positionMealEventId:int;
+			var positionCreationTimeStamp:int;
+			var positionModifiedTimeStamp:int;
+			var positionDeleted:int;
+			var positionAddedTimeStamp:int;
+			
+			if (traceNeeded)
+				trace("start method getTheSelectedItems");
+			//start with remoteElements
+			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
+			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = getTheMealEvents;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+				} else {
+					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
+					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
+					var ctr:int;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][0][0] == eventAsJSONObject.columns[ctr])
+							positionId = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][1][0] == eventAsJSONObject.columns[ctr])
+							positionDescription = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][2][0] == eventAsJSONObject.columns[ctr])
+							positionUnitDescription = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][3][0] == eventAsJSONObject.columns[ctr])
+							positionUnitStandardAmount = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][4][0] == eventAsJSONObject.columns[ctr])
+							positionUnitKcal = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][5][0] == eventAsJSONObject.columns[ctr])
+							positionUnitProtein = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][6][0] == eventAsJSONObject.columns[ctr])
+							positionUnitCarbs = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][7][0] == eventAsJSONObject.columns[ctr])
+							positionUnitFat = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][8][0] == eventAsJSONObject.columns[ctr])
+							positionChosenAmount = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][9][0] == eventAsJSONObject.columns[ctr])
+							positionMealEventId = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][10][0] == eventAsJSONObject.columns[ctr])
+							positionCreationTimeStamp = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][11][0] == eventAsJSONObject.columns[ctr])
+							positionModifiedTimeStamp = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][12][0] == eventAsJSONObject.columns[ctr])
+							positionDeleted = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[4][2][13][0] == eventAsJSONObject.columns[ctr])
+							positionAddedTimeStamp = ctr;
+					
+					var elementAlreadyThere:Boolean;
+					if (eventAsJSONObject.rows) {
+						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
+							elementAlreadyThere = false;
+							for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
+								if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
+									elementAlreadyThere = true;
+									break;
+								}
+							}
+							if (!elementAlreadyThere) {
+								remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
+								remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
+							}
+						}
+					}
+					nextPageToken = eventAsJSONObject.nextPageToken;
+				}
+			} 
+			
+			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
+				var request:URLRequest = new URLRequest(googleSelectUrl);
+				request.contentType = "application/x-www-form-urlencoded";
+				var urlVariables:URLVariables = new URLVariables();
+				
+				urlVariables.sql = createSQLQueryToSelectAll(4);
+				if (nextPageToken != null)
+					urlVariables.pageToken = nextPageToken;
+				urlVariables.access_token = access_token;
+				request.data = urlVariables;
+				request.method = URLRequestMethod.GET;
+				loader = new URLLoader();
+				functionToRecall = getTheSelectedFoodItems;
+				loader.addEventListener(Event.COMPLETE,getTheSelectedFoodItems);
+				functionToRemoveFromEventListener = getTheSelectedFoodItems;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("get the selectedfooditems " + " loader : request = " + request.data); 
+			} else {
+				for (var i:int = 0; i < trackingList.length; i++) {
+					if (trackingList.getItemAt(i) is MealEvent) {
+						if ((trackingList.getItemAt(i) as MealEvent).timeStamp >= asOfTimeStamp) {
+							var theMealEvent:MealEvent = trackingList.getItemAt(i) as MealEvent;
+							//not checking here for creationtimestamp as with other table elements, but that should not be necessary
+							//because a selectedfooditem is always linked to a mealevent, mealevent has already been checked for creationtimestamp, so ..
+							for (var selctr:int = 0; selctr < theMealEvent.selectedFoodItems.length; selctr++) {
+								if ((theMealEvent.selectedFoodItems.getItemAt(selctr) as SelectedFoodItem)._lastModifiedTimestamp >= lastSyncTimeStamp)
+									localElements.addItem(theMealEvent.selectedFoodItems.getItemAt(selctr));						
+							}
+						}
+					}
+				}
+				//time to start comparing
+				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
+				for (var j:int = 0; j < localElements.length; j++) {
+					for (var k:int = 0; k < remoteElements.length; k++) {
+						if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as SelectedFoodItem).selectedItemId) {
+							//got a matching element, let's see if we need to remove it from both lists
+							if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as SelectedFoodItem)._lastModifiedTimestamp) {
+								//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
+								//but first let's see if the remoteelement has the deleted flag set
+								if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+									//its a deleted item remove it from both lists
+									remoteElements.removeItemAt(k);
+									(localElements.getItemAt(j) as SelectedFoodItem).deleteEvent();//delete from local database
+									localElementsUpdated = true;//as we deleted one from local database, 
+									localElements.removeItemAt(j);//remove also from list used here
+									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+									break;
+								} else {
+									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as SelectedFoodItem)._lastModifiedTimestamp) {
+										remoteElements.removeItemAt(k);
+										break;
+									} else {
+										localElements.removeItemAt(j);
+										j--;
+										break;
+									}
+								}
+							} else {
+								//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
+								remoteElements.removeItemAt(k);
+								localElements.removeItemAt(j);
+								j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+								break;//jump out of th einnter for loop
+							}
+						}
+					}
+					//j could be -1 now, and there might not be anymore elements inlocalemenets so
+					if (j + 1 == localElements.length)
+						break;
+				}
+				//we've got to start updating
+				if (traceNeeded)
+					trace("there are " + remoteElements.length + " remote elements to store or update locally");
+				for (var m:int = 0; m < remoteElements.length; m++) {
+					//we have to find the selectedfooditem in the trackinglist that has the same id
+					var l:int=0;
+					for (l = 0; l < trackingList.length;l++) {
+						if (trackingList.getItemAt(l) is MealEvent) {
+							var theMealEvent2:MealEvent = trackingList.getItemAt(l) as MealEvent;
+							for (var selctr2:int = 0;selctr2 < theMealEvent2.selectedFoodItems.length; selctr2++) {
+								if ((theMealEvent2.selectedFoodItems.getItemAt(selctr2) as SelectedFoodItem).selectedItemId == remoteElements.getItemAt(m)[positionId]) {
+									var theSelectedFoodItem:SelectedFoodItem = theMealEvent2.selectedFoodItems.getItemAt(selctr2);
+									localElementsUpdated = true;
+									if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+										theSelectedFoodItem.deleteEvent();
+									} else {
+										localElementsUpdated = true;
+										ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+										theSelectedFoodItem.update(
+											remoteElements.getItemAt(m)[positionDescription],
+											remoteElements.getItemAt(m)[positionUnitDescription],
+											remoteElements.getItemAt(m)[positionUnitStandardAmount],
+											remoteElements.getItemAt(m)[positionUnitKcal],
+											new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+											new Number(remoteElements.getItemAt(m)[positionUnitProtein]));
+									}
+									break;
+									l =  trackingList.length;
+								}
+							}
+						}
+					}
+					if (l == trackingList.length) {
+						//it means we didn't find the remotelement in the trackinglist, so we need to create it
+						//but only if deleted is false
+						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
+							localElementsUpdated = true;
+							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+							hier moeten we zien in welke local mealevent het selectedfooditem moet terechtkomen, op basis van mealeventid
+							dan toevoegen
+							trackingList.addItem(new MealEvent(
+								remoteElements.getItemAt(m)[positionDescription],
+								remoteElements.getItemAt(m)[positionUnitDescription],
+								remoteElements.getItemAt(m)[positionUnitStandardAmount],
+								remoteElements.getItemAt(m)[positionUnitKcal],
+								new Number(remoteElements.getItemAt(m)[positionUnitProtein]),
+								null,
+								remoteElements.getItemAt(m)[positionId],
+								new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+								true));
+						}
+					}
+				}
 				getRowIds(null);
 			}
 		}
@@ -1055,7 +1523,7 @@ package utilities
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-
+				
 				if  (eventAsJSONObject.error) {
 					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
 						secondAttempt = true;
@@ -1067,7 +1535,7 @@ package utilities
 					}
 					return;
 				} 
-
+				
 				remoteElementIds.getItemAt(indexOfRetrievedRowId)[1] =  new Number(eventAsJSONObject.rows[0][0]);
 			} 
 			
@@ -1105,6 +1573,18 @@ package utilities
 							elementFoundWithSameId = true;
 							if (!remoteElementIds.getItemAt(j)[1]) {
 								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[2][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
+								i = localElements.length;
+								indexOfRetrievedRowId = j;
+							}
+							j = remoteElementIds.length;
+						}
+					}
+				} else if (localElements.getItemAt(i) is MealEvent) {
+					for (j = 0;j < remoteElementIds.length; j++) {
+						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
+							elementFoundWithSameId = true;
+							if (!remoteElementIds.getItemAt(j)[1]) {
+								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[3][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
 								i = localElements.length;
 								indexOfRetrievedRowId = j;
 							}
@@ -1180,7 +1660,7 @@ package utilities
 						if (!elementFoundWithSameId) {
 							previousTypeOfEventAlreadyUsed = true;
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[0][1] + " ";
-							sqlStatement += "(id,medicinname,value,creationtimestamp,modifiedtimestamp,deleted,addedtotabletimestamp) VALUES (\'" +
+							sqlStatement += "(id,medicinname,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp) VALUES (\'" +
 								(localElements.getItemAt(i) as MedicinEvent).eventid.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).medicinName + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).amount.toString() + "\',\'" +
@@ -1201,7 +1681,7 @@ package utilities
 						if (!elementFoundWithSameId) {
 							previousTypeOfEventAlreadyUsed = true;
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[1][1] + " ";
-							sqlStatement += "(id,unit,value,creationtimestamp,modifiedtimestamp,deleted,addedtotabletimestamp) VALUES (\'" +
+							sqlStatement += "(id,unit,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp) VALUES (\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).eventid.toString() + "\',\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).unit + "\',\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).bloodGlucoseLevel + "\',\'" +
@@ -1220,8 +1700,9 @@ package utilities
 						}
 					}  else if (localElements.getItemAt(i) is ExerciseEvent && !previousTypeOfEventAlreadyUsed) {
 						if (!elementFoundWithSameId) {
+							previousTypeOfEventAlreadyUsed = true;
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[2][1] + " ";
-							sqlStatement += "(id,level,creationtimestamp,modifiedtimestamp,deleted,addedtotabletimestamp) VALUES (\'" +
+							sqlStatement += "(id,level,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp) VALUES (\'" +
 								(localElements.getItemAt(i) as ExerciseEvent).eventid.toString() + "\',\'" +
 								(localElements.getItemAt(i) as ExerciseEvent).level + "\',\'" +
 								(localElements.getItemAt(i) as ExerciseEvent).timeStamp.toString() + "\',\'" +
@@ -1237,8 +1718,31 @@ package utilities
 							localElements.removeItemAt(i);
 							i--;
 						}
+					}  else if (localElements.getItemAt(i) is MealEvent && !previousTypeOfEventAlreadyUsed) {
+						if (!elementFoundWithSameId) {
+							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[3][1] + " ";
+							sqlStatement += "(id,mealname,insulinratio,correctionfactor,previousbglevel,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp) VALUES (\'" +
+								(localElements.getItemAt(i) as MealEvent).eventid.toString() + "\',\'" +
+								(localElements.getItemAt(i) as MealEvent).mealName + "\',\'" +
+								(localElements.getItemAt(i) as MealEvent).insulinRatio.toString() + "\',\'" +
+								(localElements.getItemAt(i) as MealEvent).correctionFactor.toString() + "\',\'" +
+								(localElements.getItemAt(i) as MealEvent).previousBGlevel + "\',\'" +
+								(localElements.getItemAt(i) as MealEvent).timeStamp.toString() + "\',\'" +
+								(localElements.getItemAt(i) as MealEvent).lastModifiedTimeStamp.toString() + "\',\'" +
+								"\'false\'" +
+								",\'" +  
+								((new Date()).valueOf() - (localElements.getItemAt(i) as MealEvent).lastModifiedTimeStamp > 10000 
+									? 
+									(new Date()).valueOf().toString() 
+									:
+									(localElements.getItemAt(i) as MealEvent).lastModifiedTimeStamp.toString())
+								+ "\')";
+							localElements.removeItemAt(i);
+							i--;
+						}
 					}  else {
 						//other kinds of events ?
+						//IF SELECTEDITEM THEN SET CREATIONTIMESTAMP TO CURRENT DATE AND TIME
 					}
 					i++;
 				}
@@ -1261,6 +1765,13 @@ package utilities
 										"value = \'" + (localElements.getItemAt(k) as MedicinEvent).amount.toString() + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as MedicinEvent).timeStamp.toString() + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as MedicinEvent).lastModifiedTimestamp.toString() + "\'," +
+										"addedtoormodifiedintabletimestamp = \'" +
+										((new Date()).valueOf() - (localElements.getItemAt(k) as MedicinEvent).lastModifiedTimestamp > 10000 
+											? 
+											(new Date()).valueOf().toString() 
+											:
+											(localElements.getItemAt(k) as MedicinEvent).lastModifiedTimestamp.toString())
+										+ "\'," +
 										"deleted = \'false\' WHERE ROWID = \'" +
 										remoteElementIds.getItemAt(l)[1] + "\'";
 									
@@ -1281,6 +1792,13 @@ package utilities
 										"value = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).bloodGlucoseLevel + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).timeStamp.toString() + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).lastModifiedTimestamp.toString() + "\'," +
+										"addedtoormodifiedintabletimestamp = \'" +
+										((new Date()).valueOf() - (localElements.getItemAt(k) as BloodGlucoseEvent).lastModifiedTimestamp > 10000 
+											? 
+											(new Date()).valueOf().toString() 
+											:
+											(localElements.getItemAt(k) as BloodGlucoseEvent).lastModifiedTimestamp.toString())
+										+ "\'," +
 										"deleted = \'false\' WHERE ROWID = \'" +
 										remoteElementIds.getItemAt(l)[1] + "\'";
 									
@@ -1300,6 +1818,13 @@ package utilities
 										"level = \'" + (localElements.getItemAt(k) as ExerciseEvent).level + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as ExerciseEvent).timeStamp.toString() + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as ExerciseEvent).lastModifiedTimestamp.toString() + "\'," +
+										"addedtoormodifiedintabletimestamp = \'" +
+										((new Date()).valueOf() - (localElements.getItemAt(k) as ExerciseEvent).lastModifiedTimestamp > 10000 
+											? 
+											(new Date()).valueOf().toString() 
+											:
+											(localElements.getItemAt(k) as ExerciseEvent).lastModifiedTimestamp.toString())
+										+ "\'," +
 										"deleted = \'false\' WHERE ROWID = \'" +
 										remoteElementIds.getItemAt(l)[1] + "\'";
 									
@@ -1311,6 +1836,8 @@ package utilities
 							}
 						}  else {
 							//other kinds of events ?
+							//IF SELECTEDITEM THEN DONT UPDATE THE CREATIONTIMESTAMP
+
 						}
 						k++;
 					}
@@ -1337,6 +1864,8 @@ package utilities
 			}
 			//there should not be code here
 		}
+		
+		
 		
 		private function googleAPICallFailed(event:Event):void {
 			if (functionToRemoveFromEventListener != null)
@@ -1384,7 +1913,7 @@ package utilities
 		private function accessTokenRefreshed(event:Event):void {
 			loader.removeEventListener(Event.COMPLETE,accessTokenRefreshed);
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
-
+			
 			var temp:Object = JSON.parse(event.target.data as String);
 			Settings.getInstance().setSetting(Settings.SettingsAccessToken,temp.access_token);
 			
@@ -1413,10 +1942,9 @@ package utilities
 		/**
 		 * will create the query string to select all rows with a modifiedtimestamp higher than requested timestamp<br>
 		 * index is the index in tableNamesAndColumnNames<br>
-		 * checkmodifiedtimestamp true means query will be done on modifiedtimestamp, if false then query will be done on addedtotabletimestamp
 		 * returnvalue will be urlencoded
 		 */
-		private function createSQLQueryToSelectAll(index:int, checkmodifiedtimestamp:Boolean):String {
+		private function createSQLQueryToSelectAll(index:int):String {
 			var returnValue:String;
 			
 			//amountofSpaces is a trick to make sure that the query string changes each time, because it seems that with google api,
@@ -1426,13 +1954,14 @@ package utilities
 			var spaces:String = "";
 			for (var i:int = 0;i < amountofSpaces;i++)
 				spaces +=" ";
-			var whichTimeStamp:String = checkmodifiedtimestamp ? "modifiedtimestamp":"addedtotabletimestamp";
+			var whichTimeStamp:String = "addedtoormodifiedintabletimestamp";
 			returnValue = 
 				"SELECT * FROM " + spaces +
 				tableNamesAndColumnNames[index][1] +
 				" WHERE " + whichTimeStamp + " >= '" + lastSyncTimeStamp.toString() + "' AND " +
 				"creationtimestamp >= '" + asOfTimeStamp.toString() + "'";
-			trace("querystring = " + returnValue);
+			if (traceNeeded)
+				trace("querystring = " + returnValue);
 			return returnValue;
 		}
 		
@@ -1441,7 +1970,7 @@ package utilities
 		 */
 		private function syncFinished(success:Boolean):void {
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-
+			
 			if (success) {
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
 				lastSyncTimeStamp = currentSyncTimeStamp;
@@ -1453,10 +1982,10 @@ package utilities
 					ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 					
 					ModelLocator.getInstance().trackingList = new ArrayCollection();
-
+					
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-
+					
 					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
 				}
 			} else {
@@ -1483,7 +2012,7 @@ package utilities
 				// now populate ModelLocator.getInstance().meals
 				ModelLocator.getInstance().refreshMeals();
 			}
-
+			
 		}
 		
 		public function deleteRemoteMedicinEvent(event:Event = null,medicinEvent:MedicinEvent = null):void {
@@ -1504,6 +2033,13 @@ package utilities
 						"value = \'" + (eventToBeDeleted as MedicinEvent).amount.toString() + "\'," +
 						"creationtimestamp = \'" + (eventToBeDeleted as MedicinEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
+						"addedtoormodifiedintabletimestamp = \'" +
+						((new Date()).valueOf() - (eventToBeDeleted as MedicinEvent).lastModifiedTimestamp > 10000 
+							? 
+							(new Date()).valueOf().toString() 
+							:
+							(eventToBeDeleted as MedicinEvent).lastModifiedTimestamp.toString())
+						+ "\'," +
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
@@ -1558,6 +2094,242 @@ package utilities
 				}
 			}
 		}
+		
+		public function deleteRemoteBloodGlucoseEvent(event:Event = null,bloodglucoseEvent:BloodGlucoseEvent = null):void {
+			var request:URLRequest
+			
+			if (bloodglucoseEvent != null)
+				eventToBeDeleted = bloodglucoseEvent;
+			if (event != null)  {
+				if (functionToRemoveFromEventListener != null)
+					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
+					sqlStatement = "UPDATE " + tableNamesAndColumnNames[1][1] + " SET ";
+					sqlStatement += 
+						"id = \'" + eventToBeDeleted.eventid.toString() + "\'," +
+						"unit = \'" + (eventToBeDeleted as BloodGlucoseEvent).unit + "\'," +
+						"value = \'" + (eventToBeDeleted as BloodGlucoseEvent).bloodGlucoseLevel + "\'," +
+						"creationtimestamp = \'" + (eventToBeDeleted as BloodGlucoseEvent).timeStamp.toString() + "\'," +
+						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
+						"addedtoormodifiedintabletimestamp = \'" +
+						((new Date()).valueOf() - (eventToBeDeleted as BloodGlucoseEvent).lastModifiedTimestamp > 10000 
+							? 
+							(new Date()).valueOf().toString() 
+							:
+							(eventToBeDeleted as BloodGlucoseEvent).lastModifiedTimestamp.toString())
+						+ "\'," +
+						"deleted = \'true\' WHERE ROWID = \'" +
+						eventAsJSONObject.rows[0][0] + "\'";
+					
+					
+					request = new URLRequest(googleSelectUrl);
+					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+					request.data = new URLVariables(
+						"sql=" + sqlStatement);
+					
+					request.method = URLRequestMethod.POST;
+					loader = new URLLoader();
+					functionToRecall = null;
+					functionToRemoveFromEventListener = null;
+					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+					loader.load(request);
+					if (traceNeeded)
+						trace("loader : request = " + request.data); 
+				}
+			} else {
+				if (traceNeeded)
+					trace("start method deleteBloodGlucoseEvent");
+				
+				
+				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
+				var sqlStatement:String;
+				
+				if (access_token.length == 0 ) {
+					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
+					
+				} else {
+					
+					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[1][1] + " WHERE id = \'" + bloodglucoseEvent.eventid + "\'";
+					request = new URLRequest(googleSelectUrl);
+					request.contentType = "application/x-www-form-urlencoded";
+					var urlVariables:URLVariables = new URLVariables();
+					
+					urlVariables.sql = sqlStatement;
+					urlVariables.access_token = access_token;
+					request.data = urlVariables;
+					request.method = URLRequestMethod.GET;
+					loader = new URLLoader();
+					functionToRecall = deleteRemoteBloodGlucoseEvent;
+					loader.addEventListener(Event.COMPLETE,deleteRemoteBloodGlucoseEvent);
+					functionToRemoveFromEventListener = deleteRemoteBloodGlucoseEvent;
+					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+					loader.load(request);
+					if (traceNeeded)
+						trace("loader : request = " + request.data); 
+					
+				}
+			}
+		}
+
+		public function deleteRemoteExerciseEvent(event:Event = null,exerciseEvent:ExerciseEvent = null):void {
+			var request:URLRequest
+			
+			if (exerciseEvent != null)
+				eventToBeDeleted = exerciseEvent;
+			if (event != null)  {
+				if (functionToRemoveFromEventListener != null)
+					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
+					sqlStatement = "UPDATE " + tableNamesAndColumnNames[2][1] + " SET ";
+					sqlStatement += 
+						"id = \'" + eventToBeDeleted.eventid.toString() + "\'," +
+						"level = \'" + (eventToBeDeleted as ExerciseEvent).level + "\'," +
+						"creationtimestamp = \'" + (eventToBeDeleted as ExerciseEvent).timeStamp.toString() + "\'," +
+						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
+						"addedtoormodifiedintabletimestamp = \'" +
+						((new Date()).valueOf() - (eventToBeDeleted as ExerciseEvent).lastModifiedTimestamp > 10000 
+							? 
+							(new Date()).valueOf().toString() 
+							:
+							(eventToBeDeleted as ExerciseEvent).lastModifiedTimestamp.toString())
+						+ "\'," +
+						"deleted = \'true\' WHERE ROWID = \'" +
+						eventAsJSONObject.rows[0][0] + "\'";
+					
+					
+					request = new URLRequest(googleSelectUrl);
+					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+					request.data = new URLVariables(
+						"sql=" + sqlStatement);
+					
+					request.method = URLRequestMethod.POST;
+					loader = new URLLoader();
+					functionToRecall = null;
+					functionToRemoveFromEventListener = null;
+					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+					loader.load(request);
+					if (traceNeeded)
+						trace("loader : request = " + request.data); 
+				}
+			} else {
+				if (traceNeeded)
+					trace("start method deleteExerciseEvent");
+				
+				
+				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
+				var sqlStatement:String;
+				
+				if (access_token.length == 0 ) {
+					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
+					
+				} else {
+					
+					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[2][1] + " WHERE id = \'" + exerciseEvent.eventid + "\'";
+					request = new URLRequest(googleSelectUrl);
+					request.contentType = "application/x-www-form-urlencoded";
+					var urlVariables:URLVariables = new URLVariables();
+					
+					urlVariables.sql = sqlStatement;
+					urlVariables.access_token = access_token;
+					request.data = urlVariables;
+					request.method = URLRequestMethod.GET;
+					loader = new URLLoader();
+					functionToRecall = deleteRemoteExerciseEvent;
+					loader.addEventListener(Event.COMPLETE,deleteRemoteExerciseEvent);
+					functionToRemoveFromEventListener = deleteRemoteExerciseEvent;
+					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+					loader.load(request);
+					if (traceNeeded)
+						trace("loader : request = " + request.data); 
+					
+				}
+			}
+		}
+
+		public function deleteRemoteMealEvent(event:Event = null,mealEvent:MealEvent = null):void {
+			var request:URLRequest
+			
+			if (mealEvent != null)
+				eventToBeDeleted = mealEvent;
+			if (event != null)  {
+				if (functionToRemoveFromEventListener != null)
+					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
+					sqlStatement = "UPDATE " + tableNamesAndColumnNames[3][1] + " SET ";
+					sqlStatement += 
+						"id = \'" + eventToBeDeleted.eventid.toString() + "\'," +
+						"mealname = \'" + (eventToBeDeleted as MealEvent).mealName + "\'," +
+						"insulinratio = \'" + (eventToBeDeleted as MealEvent).insulinRatio + "\'," +
+						"correctionfactor = \'" + (eventToBeDeleted as MealEvent).correctionFactor + "\'," +
+						"previousbglevel = \'" + (eventToBeDeleted as MealEvent).previousBGlevel + "\'," +
+						"creationtimestamp = \'" + (eventToBeDeleted as MealEvent).timeStamp.toString() + "\'," +
+						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
+						"addedtoormodifiedintabletimestamp = \'" +
+						((new Date()).valueOf() - (eventToBeDeleted as MealEvent).lastModifiedTimeStamp > 10000 
+							? 
+							(new Date()).valueOf().toString() 
+							:
+							(eventToBeDeleted as MealEvent).lastModifiedTimeStamp.toString())
+						+ "\'," +
+						"deleted = \'true\' WHERE ROWID = \'" +
+						eventAsJSONObject.rows[0][0] + "\'";
+					
+					
+					request = new URLRequest(googleSelectUrl);
+					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+					request.data = new URLVariables(
+						"sql=" + sqlStatement);
+					
+					request.method = URLRequestMethod.POST;
+					loader = new URLLoader();
+					functionToRecall = null;
+					functionToRemoveFromEventListener = null;
+					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+					loader.load(request);
+					if (traceNeeded)
+						trace("loader : request = " + request.data); 
+				}
+			} else {
+				if (traceNeeded)
+					trace("start method deleteMealEvent");
+				
+				
+				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
+				var sqlStatement:String;
+				
+				if (access_token.length == 0 ) {
+					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
+					
+				} else {
+					
+					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[3][1] + " WHERE id = \'" + mealEvent.eventid + "\'";
+					request = new URLRequest(googleSelectUrl);
+					request.contentType = "application/x-www-form-urlencoded";
+					var urlVariables:URLVariables = new URLVariables();
+					
+					urlVariables.sql = sqlStatement;
+					urlVariables.access_token = access_token;
+					request.data = urlVariables;
+					request.method = URLRequestMethod.GET;
+					loader = new URLLoader();
+					functionToRecall = deleteRemoteMealEvent;
+					loader.addEventListener(Event.COMPLETE,deleteRemoteMealEvent);
+					functionToRemoveFromEventListener = deleteRemoteMealEvent;
+					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+					loader.load(request);
+					if (traceNeeded)
+						trace("loader : request = " + request.data); 
+					
+				}
+			}
+		}
+
 	}
 }
 

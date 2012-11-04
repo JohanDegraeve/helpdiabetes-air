@@ -27,19 +27,36 @@ package databaseclasses
 		private var _itemDescription:String;
 		private var _unit:Unit;
 		private var _chosenAmount:Number;
-		internal var _selectedItemId:int;
+		internal var _selectedItemId:Number;
 		private var _mealEventId:int;
 
+		public var _lastModifiedTimestamp:Number;//i don't know why but if I set this private and use the getter and setter, I get errors "access of undefined poperty" ...
+		
+		public function get lastModifiedTimestamp():Number
+		{
+			return _lastModifiedTimestamp;
+		}
+		
+		internal function set lastModifiedTimestamp(value:Number):void
+		{
+			_lastModifiedTimestamp = value;
+		}
+		
 		/**
 		 * constructor taking description, unit and chosenamount as parameter
 		 */
-		public function SelectedFoodItem(description:String, unit:Unit,chosenAmount:Number):void
+		public function SelectedFoodItem(newSelectedItemId:Number,description:String, unit:Unit,chosenAmount:Number, newLastModifiedTimeStamp:Number = Number.NaN):void
 		{
 			this._unit = new Unit(unit.unitDescription,unit.standardAmount,unit.kcal,unit.protein,unit.carbs,unit.fat);
 			this._itemDescription = description;
 			this._chosenAmount = chosenAmount;
+			this._selectedItemId = newSelectedItemId;
+
+			if (!isNaN(newLastModifiedTimeStamp))
+				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+			else
+				_lastModifiedTimestamp = (new Date()).valueOf();
 		}
-		
 		
 		public function get itemDescription():String
 		{
@@ -68,26 +85,28 @@ package databaseclasses
 
 		/**
 		 * the amount chosen by the user.<br>
-		 * when changed then also  database update happens with new value for chosenAmount 
+		 * when changed then also  database update happens with new value for chosenAmount<br>
+		 * lastmodifiedtimestamp will get current date
 		 */
 		public function set chosenAmount(value:Number):void
 		{
 			_chosenAmount = value;
-			Database.getInstance().updateSelectedFoodItemChosenAmount(this.selectedItemId,value,null);
+			_lastModifiedTimestamp = new Date().valueOf();
+			Database.getInstance().updateSelectedFoodItem(_selectedItemId,value,_lastModifiedTimestamp,null);
 		}
 		
 
-		internal function get selectedItemId():int
+		public function get selectedItemId():Number
 		{
 			return _selectedItemId;
 		}
 
-		internal function set selectedItemId(value:int):void
+		internal function set selectedItemId(value:Number):void
 		{
-			_selectedItemId = value;
+			 _selectedItemId = value;
 		}
-
-		internal function get mealEventId():int
+		
+		public function get mealEventId():int
 		{
 			return _mealEventId;
 		}
@@ -102,6 +121,12 @@ package databaseclasses
 			return _mealEventId;
 		}
 
+		/**
+		 * deletes from database 
+		 */
+		public function deleteEvent():void {
+			Database.getInstance().deleteSelectedFoodItem(_selectedItemId,null);
+		}
 
 	}
 }

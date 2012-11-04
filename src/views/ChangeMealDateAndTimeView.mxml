@@ -115,7 +115,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				helpCallOut.settingId = Settings.SettingsHelpTextChangeMealDateAndTimeViewButtons;
 				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 				helpCallOut.open(time_button,true)
-}
+			}
 			
 			private function dateClicked():void {
 				dateOrTimePicket = new DatePicker();
@@ -125,7 +125,6 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				PopUpManager.addPopUp(dateOrTimePicket, this, true);
 				PopUpManager.centerPopUp(dateOrTimePicket);
 			}
-
 
 			private function timeClicked():void {
 				dateOrTimePicket = new TimePicker();
@@ -153,7 +152,6 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				ModelLocator.getInstance().meals.refresh();
 				selectedMealIndex = ModelLocator.getInstance().meals.getItemIndex(data.meal as Meal);
 			}
-
 			
 			/**
 			 * refresh the meals list, and pop two views so that we return back to addfooditemview

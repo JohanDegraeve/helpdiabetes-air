@@ -98,7 +98,6 @@ package databaseclasses
 				_lastModifiedTimestamp = newLastModifiedTimeStamp;
 			}
 			
-			
 			if (!isNaN(newCreationTimeStamp))
 				timeStamp = newCreationTimeStamp;
 			Database.getInstance().updateExerciseEvent(this.eventid,newLevel,_comment, timeStamp,_lastModifiedTimestamp);
@@ -114,7 +113,7 @@ package databaseclasses
 		 * once delted this event should not be used anymore
 		 */
 		public function deleteEvent():void {
-			Database.getInstance().deleteMedicinEvent(this.eventid);
+			Database.getInstance().deleteExerciseEvent(this.eventid);
 		}
 	}
 }

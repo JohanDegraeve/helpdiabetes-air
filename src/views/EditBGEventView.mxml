@@ -252,7 +252,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theBloodGlucoseEvent = new BloodGlucoseEvent(
 						new Number(meteringResultText),
 						unit,
-						eventDateAndTime.valueOf(),
+						new Date().valueOf(),
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theBloodGlucoseEvent);
 				} else {
@@ -311,6 +311,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+					Synchronize.getInstance().deleteRemoteBloodGlucoseEvent(null,theBloodGlucoseEvent);
 					theBloodGlucoseEvent.deleteEvent();
 					//we need to make sure the previous tracking event is visible so we store the itemindex
 					var trackinglistPointer:Number = ModelLocator.getInstance().trackingList.getItemIndex(theBloodGlucoseEvent);
