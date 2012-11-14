@@ -27,17 +27,28 @@ package databaseclasses
 		private var _itemDescription:String;
 		private var _unit:Unit;
 		private var _chosenAmount:Number;
-		internal var _selectedItemId:Number;
-		private var _mealEventId:int;
+		private var _eventid:Number;
+		private var _mealEventId:Number;
 
-		public var _lastModifiedTimestamp:Number;//i don't know why but if I set this private and use the getter and setter, I get errors "access of undefined poperty" ...
+		public function get mealEventId():Number
+		{
+			return _mealEventId;
+		}
+
+		public function set mealEventId(value:Number):void
+		{
+			_mealEventId = value;
+		}
+
+
+		private var _lastModifiedTimestamp:Number;//i don't know why but if I set this private and use the getter and setter, I get errors "access of undefined poperty" ...
 		
 		public function get lastModifiedTimestamp():Number
 		{
 			return _lastModifiedTimestamp;
 		}
 		
-		internal function set lastModifiedTimestamp(value:Number):void
+		public function set lastModifiedTimestamp(value:Number):void
 		{
 			_lastModifiedTimestamp = value;
 		}
@@ -50,7 +61,7 @@ package databaseclasses
 			this._unit = new Unit(unit.unitDescription,unit.standardAmount,unit.kcal,unit.protein,unit.carbs,unit.fat);
 			this._itemDescription = description;
 			this._chosenAmount = chosenAmount;
-			this._selectedItemId = newSelectedItemId;
+			this._eventid = newSelectedItemId;
 
 			if (!isNaN(newLastModifiedTimeStamp))
 				_lastModifiedTimestamp = newLastModifiedTimeStamp;
@@ -92,40 +103,49 @@ package databaseclasses
 		{
 			_chosenAmount = value;
 			_lastModifiedTimestamp = new Date().valueOf();
-			Database.getInstance().updateSelectedFoodItem(_selectedItemId,value,_lastModifiedTimestamp,null);
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
+
+			Database.getInstance().updateSelectedFoodItem(_eventid,_itemDescription,value,unit,_lastModifiedTimestamp,null);
 		}
 		
 
-		public function get selectedItemId():Number
+		public function get eventid():Number
 		{
-			return _selectedItemId;
+			return _eventid;
 		}
 
-		internal function set selectedItemId(value:Number):void
+		public function set eventid(value:Number):void
 		{
-			 _selectedItemId = value;
+			 _eventid = value;
 		}
 		
-		public function get mealEventId():int
-		{
-			return _mealEventId;
-		}
-
-		internal function set mealEventId(value:int):void
-		{
-			_mealEventId = value;
-		}
-		
-		public function getMealEventId():int
-		{
-			return _mealEventId;
-		}
-
 		/**
 		 * deletes from database 
 		 */
 		public function deleteEvent():void {
-			Database.getInstance().deleteSelectedFoodItem(_selectedItemId,null);
+			Database.getInstance().deleteSelectedFoodItem(_eventid,null);
+		}
+		
+		/**
+		 * if newLastModifiedTimestamp isnan the current timestamp is used 
+		 */
+		public function updateSelectedFoodItem(newDescription:String,newUnit:Unit,newLastModifiedTimeStamp:Number,newChosenAmount:Number):void  {
+			_itemDescription = newDescription;
+			_unit = newUnit;
+			if (!isNaN(newLastModifiedTimeStamp))
+				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+			else
+				_lastModifiedTimestamp = (new Date()).valueOf();
+			
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
+			_lastModifiedTimestamp = newLastModifiedTimeStamp;
+			
+			_chosenAmount = newChosenAmount;
+			
+			Database.getInstance().updateSelectedFoodItem(_eventid,_itemDescription,_chosenAmount,unit,_lastModifiedTimestamp,null);
+
 		}
 
 	}

@@ -191,9 +191,9 @@ package databaseclasses
 			}
 		}
 		
-		internal function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,dispatcher:EventDispatcher = null):void {
+		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,dispatcher:EventDispatcher = null):void {
 			_selectedFoodItems.addItem(selectedFoodItem);
-			selectedFoodItem.selectedItemId = new Date().valueOf();
+			//selectedFoodItem.eventid = new Date().valueOf();
 			selectedFoodItem.mealEventId = this.eventid;
 			
 			var localDispatcher:EventDispatcher = new EventDispatcher();
@@ -201,7 +201,7 @@ package databaseclasses
 			localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
 			
 			Database.getInstance().createNewSelectedItem(
-				selectedFoodItem._selectedItemId,
+				selectedFoodItem.eventid,
 				this.eventid,
 				selectedFoodItem.itemDescription,
 				selectedFoodItem.unit.unitDescription,
@@ -211,7 +211,7 @@ package databaseclasses
 				selectedFoodItem.unit.carbs,
 				selectedFoodItem.unit.fat,
 				selectedFoodItem.chosenAmount,
-				selectedFoodItem._lastModifiedTimestamp,
+				selectedFoodItem.lastModifiedTimestamp,
 				localDispatcher);
 			//Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, (selectedFoodItem.selectedItemId +1).toString() );
 			
@@ -426,7 +426,7 @@ package databaseclasses
 		 * deletes the selectedFoodItem, also deletes from database<br>
 		 */
 		public function removeSelectedFoodItem(selectedFoodItemToRemove:SelectedFoodItem):void {
-			Database.getInstance().deleteSelectedFoodItem(selectedFoodItemToRemove._selectedItemId,null);
+			Database.getInstance().deleteSelectedFoodItem(selectedFoodItemToRemove.eventid,null);
 			_selectedFoodItems.removeItemAt(selectedFoodItems.getItemIndex(selectedFoodItemToRemove));
 			recalculateTotals();
 		}
@@ -436,7 +436,7 @@ package databaseclasses
 		 */
 		public function deleteEvent():void {
 			while (_selectedFoodItems.length > 0) {
-				Database.getInstance().deleteSelectedFoodItem((_selectedFoodItems.getItemAt(0) as SelectedFoodItem)._selectedItemId,null);
+				Database.getInstance().deleteSelectedFoodItem((_selectedFoodItems.getItemAt(0) as SelectedFoodItem).eventid,null);
 				_selectedFoodItems.removeItemAt(0);
 			}
 			Database.getInstance().deleteMealEvent(eventid,null);
@@ -448,7 +448,7 @@ package databaseclasses
 		 * if creationTimeStamp = null, then current date and time is used<br>
 		 * if newLastModifiedTimestamp = null, then current date and time is used
 		 */
-		public function updateMealEvent(newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newPreviousBGLevel:int,newLastModifiedTimeStamp:Number = Number.NaN,newCreationTimeStamp:Number =  Number.NaN) :void {
+		public function updateMealEvent(newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newPreviousBGLevel:int,newLastModifiedTimeStamp:Number,newCreationTimeStamp:Number =  Number.NaN) :void {
 			_mealName = newMealName;
 			_insulinRatio = newInsulinRatio;
 			_correctionFactor = newCorrectionFactor;

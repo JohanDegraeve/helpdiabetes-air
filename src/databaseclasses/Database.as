@@ -178,7 +178,7 @@ package databaseclasses
 			":carbs," +
 			":fat, :lastmodifiedtimestamp)";
 		private const UPDATE_MEAL_EVENT:String = "UPDATE mealevents set mealname = :mealname, insulinratio = :insulinratio, previousBGlevel = :previousBGlevel, creationtimestamp := creationtimestamp, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE mealeventid = :id";
-		private const UPDATE_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set chosenamount = :value,lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE selectedfooditemid = :id";
+		private const UPDATE_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set description = :description, standardamount = :standardamount,unitdescription = :=unitdescription,kcal = :kcal,protein = :protein,carbs = :carbs,fat = :fat,chosenamount = :value,lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE selectedfooditemid = :id";
 		private const UPDATE_MEDICINEVENT:String="UPDATE medicinevents set amount = :amount, medicinname = :medicinname, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE medicineventid = :id";
 		private const UPDATE_EXERCISEEVENT:String="UPDATE exerciseevents set level = :level, comment_2 = :comment_2, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE exerciseeventid = :id";
 		private const UPDATE_BLOODGLUCOSEEVENT:String="UPDATE bloodglucoseevents set unit = :unit, value = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE bloodglucoseeventid = :id";
@@ -1635,11 +1635,11 @@ package databaseclasses
 					dispatcher.dispatchEvent(event);
 				}
 			}
-			
-			
+						
 			function selectedItemCreated(se:SQLEvent):void {
 				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
 				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
+				trace("newSelectedItem successfully stored");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -1655,61 +1655,8 @@ package databaseclasses
 					dispatcher.dispatchEvent(event);
 				}
 			}
-			
 		}
-		
-		
-		internal function kupdateMealEventLastModifiedTimeStamp(lastModifiedTimeStamp:Number,mealEventId:Number,dispatcher:EventDispatcher):void {
-			var localSqlStatement:SQLStatement = new SQLStatement()
-			var localdispatcher:EventDispatcher = new EventDispatcher();
-			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
-			if (openSQLConnection(localdispatcher))
-				onOpenResult(null);
-			
-			
-			
-			function onOpenError(e:SQLError):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
 				
-			}
-			function onOpenResult(e:SQLError):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
-				localSqlStatement.addEventListener(SQLEvent.RESULT,timeStampModified);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,timeStampModificationFailed);
-				localSqlStatement.sqlConnection = aConn;
-				localSqlStatement.text = UPDATE_MEALEVENT_LASTMODIFIEDTIMESTAMP;
-				localSqlStatement.parameters[":lastmodifiedtimestamp"] = lastModifiedTimeStamp;
-				localSqlStatement.parameters[":mealeventid"] = mealEventId;
-				localSqlStatement.execute();
-				
-			}
-			
-			function timeStampModified(result:SQLEvent):void {
-				localSqlStatement.removeEventListener(SQLEvent.RESULT,timeStampModified);
-				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,timeStampModificationFailed);
-				if (dispatcher != null) {
-					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
-					dispatcher.dispatchEvent(event);
-				}
-			}
-			
-			function timeStampModificationFailed(error:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(SQLEvent.RESULT,timeStampModified);
-				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,timeStampModificationFailed);
-				if (dispatcher != null) {
-					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
-					dispatcher.dispatchEvent(event);
-				}
-				trace("Failed to create a selectedItem. Database0053");
-			}
-			
-			
-		}
-		
 		/**
 		 * get all mealevents, bloodglucoseevents, medicinevents and exerciseevents and store them in the arraycollection in the modellocator as MealEvent objects<br>
 		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects<br>
@@ -2020,7 +1967,7 @@ package databaseclasses
 			dispatcher.dispatchEvent(event);
 		}
 		
-		internal function updateSelectedFoodItem(selectedFoodItemId:Number, newChosenAmount:Number, newLastModifiedTimeStamp:Number, dispatcher:EventDispatcher):void {
+		internal function updateSelectedFoodItem(selectedFoodItemId:Number, newDescription:String,newChosenAmount:Number, newUnit:Unit, newLastModifiedTimeStamp:Number, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -2028,14 +1975,23 @@ package databaseclasses
 			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
-			
+
 			function onOpenResult(se:SQLEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = UPDATE_SELECTED_FOOD_ITEM;
 				localSqlStatement.parameters[":id"] = selectedFoodItemId;
+				localSqlStatement.parameters[":description"] = selectedFoodItemId;
+				localSqlStatement.parameters[":standardamount"] = newUnit.standardAmount;
 				localSqlStatement.parameters[":value"] = newChosenAmount;
+				localSqlStatement.parameters[":unitdescription"] = newUnit.unitDescription;
+				localSqlStatement.parameters[":kcal"] = newUnit.kcal;
+				localSqlStatement.parameters[":carbs"] = newUnit.carbs;
+				localSqlStatement.parameters[":fat"] = newUnit.fat;
+				localSqlStatement.parameters[":kcal"] = newUnit.kcal;
+				localSqlStatement.parameters[":id"] = selectedFoodItemId;
+				localSqlStatement.parameters[":id"] = selectedFoodItemId;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, selectedItemUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, selectedItemUpdateFailed);
