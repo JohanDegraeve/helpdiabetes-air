@@ -330,7 +330,10 @@ package databaseclasses
 				this._insulinRatio = 0;
 			else
 				this._insulinRatio = value;
-			_lastModifiedTimeStamp = new Date().valueOf();
+			var newLastModifiedTimeStamp:Number = new Date().valueOf();
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			_lastModifiedTimeStamp = newLastModifiedTimeStamp;
 			
 			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,_previousBGlevel,_lastModifiedTimeStamp,_timeStamp,null);
 			recalculateInsulinAmount();
@@ -432,7 +435,9 @@ package databaseclasses
 		}
 		
 		/**
-		 * deletes all selectedfooditems and then also the mealevent, from database 
+		 * deletes all selectedfooditems and then also the mealevent, from database <br>
+		 * There's no call to synchronize from here, because this function should only get called from database.as (during startup) or from synchronize itself 
+		 * (when a local event needs to be deleted)
 		 */
 		public function deleteEvent():void {
 			while (_selectedFoodItems.length > 0) {
@@ -445,20 +450,18 @@ package databaseclasses
 		/**
 		 * updates the mealevent, also in the database<br>
 		 * none of the values should be null 
-		 * if creationTimeStamp = null, then current date and time is used<br>
-		 * if newLastModifiedTimestamp = null, then current date and time is used
 		 */
-		public function updateMealEvent(newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newPreviousBGLevel:int,newLastModifiedTimeStamp:Number,newCreationTimeStamp:Number =  Number.NaN) :void {
+		public function updateMealEvent(newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newPreviousBGLevel:int,newLastModifiedTimeStamp:Number,newCreationTimeStamp:Number) :void {
 			_mealName = newMealName;
 			_insulinRatio = newInsulinRatio;
 			_correctionFactor = newCorrectionFactor;
 			_previousBGlevel = newPreviousBGLevel;
 
-			if (!isNaN(newLastModifiedTimeStamp)) {
 				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
 					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
 				_lastModifiedTimeStamp = newLastModifiedTimeStamp;
-			}
+			
+			recalculateTotals();
 			
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;

@@ -33,22 +33,22 @@ package databaseclasses
 		{
 			return _medicinName;
 		}
-
+		
 		private var _amount:Number;
-
+		
 		public function get amount():Number
 		{
 			return _amount;
 		}
-
+		
 		private var _lastModifiedTimestamp:Number;
-
+		
 		public function get lastModifiedTimestamp():Number
 		{
 			return _lastModifiedTimestamp;
 		}
-
-	 	internal function set lastModifiedTimestamp(value:Number):void
+		
+		internal function set lastModifiedTimestamp(value:Number):void
 		{
 			_lastModifiedTimestamp = value;
 		}
@@ -94,17 +94,14 @@ package databaseclasses
 		
 		/**
 		 * will update the medicinevent in the database with the new values for medicinName and amount<br>
-		 * if newCreationTimeStamp =  Number.NaN then (creation)timeStamp is not updated<br>
-		 *  if newLastModifiedTimestamp = Number.NAN, then lastmodifiedtimestamp will not be used<br>
 		 */
-		public function updateMedicinEvent(newMedicinName:String,newAmount:Number,newCreationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN):void {
+		public function updateMedicinEvent(newMedicinName:String,newAmount:Number,newCreationTimeStamp:Number , newLastModifiedTimeStamp:Number):void {
 			_amount = newAmount;
 			_medicinName = newMedicinName;
-			if (!isNaN(newLastModifiedTimeStamp)) {
-				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
-					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
-				_lastModifiedTimestamp = newLastModifiedTimeStamp;
-			}
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
+			_lastModifiedTimestamp = newLastModifiedTimeStamp;
+			
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
 			Database.getInstance().updateMedicinEvent(this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp);

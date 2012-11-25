@@ -85,18 +85,14 @@ package databaseclasses
 		/**
 		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
 		 * if newComment = null then an empty string will be used<br>
-		 * if creationTimeStamp = null, then current date and time is used<br>
-		 * if newLastModifiedTimestamp = null, then current date and time is used
 		 */
-		public function updateExerciseEvent(newLevel:String,newComment:String = null,newCreationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN):void {
+		public function updateExerciseEvent(newLevel:String,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number,newComment:String = null):void {
 			_level = newLevel;
 			_comment = (newComment == null ? "":newComment);
 
-			if (!isNaN(newLastModifiedTimeStamp)) {
 				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
 					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
 				_lastModifiedTimestamp = newLastModifiedTimeStamp;
-			}
 			
 			if (!isNaN(newCreationTimeStamp))
 				timeStamp = newCreationTimeStamp;

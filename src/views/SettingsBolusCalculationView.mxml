@@ -231,13 +231,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					
 					button.label = newAmount.toString();
 					if (!firstTime) {
+						Synchronize.getInstance().startSynchronize(tracker,true);
 					} else {
 						checkOtherSettings(newAmount,
 							(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp < ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp ? 
 							(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp : ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp
 							);
 					}
-					Synchronize.getInstance().startSynchronize(tracker,true);
 				}
 				
 				function onNoClicked(event: PickerEvent): void
@@ -254,10 +254,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					
 					button.label = (newAmount).toString();
 					if (!firstTime) {
+						Synchronize.getInstance().startSynchronize(tracker,true);
 					} else {
 						checkOtherSettings(newAmount, (ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp + 1);
 					}
-					Synchronize.getInstance().startSynchronize(tracker,true);
 				}
 
 			}
@@ -325,6 +325,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				{
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+					Synchronize.getInstance().startSynchronize(tracker,true);
 				}
 				
 				function onYesYesClicked(event: PickerEvent): void {
@@ -337,6 +338,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						newValue,
 						0,
 						86400000);
+					Synchronize.getInstance().startSynchronize(tracker,true);
 				}
 
 				function onNoNoClicked(event: PickerEvent): void {
@@ -349,6 +351,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						newValue,
 						0,
 						86400000);
+					Synchronize.getInstance().startSynchronize(tracker,true);
 				}
 			}
 			

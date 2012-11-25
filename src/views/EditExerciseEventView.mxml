@@ -246,7 +246,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theExerciseEvent);
 				} else {
-					theExerciseEvent.updateExerciseEvent(exerciseName,null,eventDateAndTime.valueOf(),new Date().valueOf());
+					theExerciseEvent.updateExerciseEvent(exerciseName,eventDateAndTime.valueOf(),new Date().valueOf(),null);
 				}
 				
 
@@ -301,7 +301,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
-					Synchronize.getInstance().deleteRemoteExerciseEvent(null,theExerciseEvent);
+					Synchronize.getInstance().addObjectToBeDeleted(theExerciseEvent);
+					Synchronize.getInstance().startSynchronize(tracker,true);
+
 					theExerciseEvent.deleteEvent();
 
 					//we need to make sure the previous tracking event is visible so we store the itemindex

@@ -31,6 +31,8 @@ package databaseclasses
 	import myComponents.IListElement;
 	import myComponents.MealItemRenderer;
 	
+	import utilities.Synchronize;
+	
 	/**
 	 * a name for the meal and a mealevent that can be null<br>
 	 * This class is in the first place created to hold the meals from which the user can chose when adding an item<br>
@@ -196,6 +198,10 @@ package databaseclasses
 		/**
 		 * deletes a selected food item from the meal, if it is the last selectedfooditem in the mealevent then also the mealevent will be deleted<br>
 		 * Also deletion from database <br>
+		 * <br>
+		 * Also triggers the synchronization, so that deleted is set to true in remote database<br>
+		 * The same applies for mealevent, if mealevent is deleted<br>
+		 * <br>
 		 * - selectedFoodItem : the selectedfooditem to be deleted<br>
 		 * If the  meal does not have the specified selectedfooditem then this function does nothing but trace an error<br>
 		 * - dispatcher is used to dispatch the result
@@ -215,6 +221,8 @@ package databaseclasses
 				return;
 			}
 
+			Synchronize.getInstance().addObjectToBeDeleted(selectedFoodItem);
+			Synchronize.getInstance().startSynchronize(null,true);
 			_mealEvent.removeSelectedFoodItem(selectedFoodItem);
 			
 			if (_mealEvent.selectedFoodItems.length == 0) {
@@ -235,8 +243,11 @@ package databaseclasses
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventDeletedFromDB);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventDeletionFromDBFailed);
 				if (de != null) {
-				} else 
-					_mealEvent == null;
+					Synchronize.getInstance().addObjectToBeDeleted(_mealEvent);
+					Synchronize.getInstance().startSynchronize(null,true);
+					//_mealEvent = null;
+				} else {
+				}
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);

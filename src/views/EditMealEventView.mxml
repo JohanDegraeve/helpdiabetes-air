@@ -44,7 +44,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
-			import mx.events.IndexChangedEvent;
 			import mx.managers.PopUpManager;
 			
 			import myComponents.HelpCallOut;
@@ -147,12 +146,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 								fooditemlist.addEventListener(Event.CHANGE,onClick);
 								mealCounter = -1;
 							}
-							if (!fooditemlist.hasEventListener(Event.CHANGE)) {
-								fooditemlist.addEventListener(Event.CHANGE,onClickButNotEditable);
-							}
 						}
 					}
-					
+
+					if (!fooditemlist.hasEventListener(Event.CHANGE)) {
+						fooditemlist.addEventListener(Event.CHANGE,onClickButNotEditable);
+					}
+
 					if (mealEvent.insulinRatio != 0)
 						currentState="insulinAmount";
 				}
@@ -166,7 +166,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				return  new ClassFactory(SelectedFoodItemRenderer);
 			}
 			
-			private function onClickButNotEditable(event:IndexChangedEvent):void {
+			private function onClickButNotEditable(event:spark.events.IndexChangeEvent):void {
 				notificationPopUp = new Notification();
 				notificationPopUp.notificationText = resourceManager.getString('editmealeventview','youcannoteditthismealevent');
 				notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);

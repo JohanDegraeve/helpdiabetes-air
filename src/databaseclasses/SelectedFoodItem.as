@@ -102,11 +102,12 @@ package databaseclasses
 		public function set chosenAmount(value:Number):void
 		{
 			_chosenAmount = value;
-			_lastModifiedTimestamp = new Date().valueOf();
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
-
-			Database.getInstance().updateSelectedFoodItem(_eventid,_itemDescription,value,unit,_lastModifiedTimestamp,null);
+			
+			_lastModifiedTimestamp = new Date().valueOf();
+			
+			Database.getInstance().updateSelectedFoodItem(_eventid,_mealEventId,_itemDescription,value,unit,_lastModifiedTimestamp,null);
 		}
 		
 
@@ -133,18 +134,15 @@ package databaseclasses
 		public function updateSelectedFoodItem(newDescription:String,newUnit:Unit,newLastModifiedTimeStamp:Number,newChosenAmount:Number):void  {
 			_itemDescription = newDescription;
 			_unit = newUnit;
-			if (!isNaN(newLastModifiedTimeStamp))
-				_lastModifiedTimestamp = newLastModifiedTimeStamp;
-			else
-				_lastModifiedTimestamp = (new Date()).valueOf();
-			
+
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
+
 			_lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
 			_chosenAmount = newChosenAmount;
 			
-			Database.getInstance().updateSelectedFoodItem(_eventid,_itemDescription,_chosenAmount,unit,_lastModifiedTimestamp,null);
+			Database.getInstance().updateSelectedFoodItem(_eventid,_mealEventId,_itemDescription,_chosenAmount,unit,_lastModifiedTimestamp,null);
 
 		}
 

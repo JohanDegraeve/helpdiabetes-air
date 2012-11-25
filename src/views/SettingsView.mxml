@@ -53,6 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
 			private var textToShow:String ;
+			private var debugging:Boolean = false;
 
 			[ResourceBundle("settingsview")]
 			
@@ -85,6 +86,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
 				title =  ResourceManager.getInstance().getString("settingsview","settings");
+				if (debugging) 
+					menuList.addItem("debug info");
 			}
 			
 			private function selectBloodGlucoseUnit():void {
@@ -186,6 +189,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					case 9:
 						navigator.pushView(SynchronizeView);
 						break;
+					/*case 10 :
+						alertPopUp = new AlertPopUp();
+						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+						textToShow = ModelLocator.getInstance().logString;
+						alertPopUp.show(this,textToShow);
+						break;*/						
 				}
 				
 				function okClicked(event: PopUpEvent):void {

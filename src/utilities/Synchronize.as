@@ -207,6 +207,11 @@ package utilities
 		
 		
 		/**
+		 * list of elements (events, selectedfooditems) that need to get deleted=true in remote database 
+		 */
+		private var listOfElementsToBeDeleted:ArrayList;
+		
+		/**
 		 * list of objects found in local database 
 		 */
 		private var localElements:ArrayList;
@@ -259,7 +264,7 @@ package utilities
 		
 		private var localElementsUpdated:Boolean;
 		
-		private var eventToBeDeleted:Object;
+		private var objectToBeDeleted:Object;
 		
 		/**
 		 *  to avoid endless loops, see code
@@ -280,7 +285,9 @@ package utilities
 			rerunNecessary = false;
 			amountofSpaces = 0;
 			alReadyGATracked = false;//only one google analytics tracking per instance
+			listOfElementsToBeDeleted = new ArrayList();
 			instance = this;
+			currentSyncTimeStamp = 0;
 		}
 		
 		public static function getInstance():Synchronize {
@@ -296,25 +303,31 @@ package utilities
 		 * if tracker is null, then no tracking will be done next time 
 		 */
 		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean):void {
+			//ModelLocator.getInstance().logString = "start method startSynchronize"+ "\n";;
+
 			tracker = callingTracker;
 			
 			retrievalCounter = 0;
 			trackingList = ModelLocator.getInstance().trackingList;
 			localElementsUpdated  = false;
 			
-			lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
-			currentSyncTimeStamp = new Date().valueOf();
-			asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 			
-			var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - lastSyncTimeStamp) > secondsBetweenTwoSync * 1000;
+			var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > secondsBetweenTwoSync * 1000;
+			if (traceNeeded) {
+			}
 			if ((syncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!syncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
+				currentSyncTimeStamp = new Date().valueOf();
+				lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
+				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 				rerunNecessary = false;
+				syncRunning = true;
 				currentSyncTimeStamp = new Date().valueOf();
 				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 				synchronize();
 			} else {
-				if (immediateRunNecessary)
+				if (immediateRunNecessary) {
 					rerunNecessary = true;
+				}
 			}
 		}
 		
@@ -326,6 +339,7 @@ package utilities
 		private function synchronize():void {
 			if (traceNeeded)
 				trace("start method synchronize");
+			//ModelLocator.getInstance().logString += "start method synchronize"+ "\n";;
 			
 			//we could be arriving here after a retempt, example, first time failed due to invalid credentials, token refresh occurs, with success, we come back to here
 			//first thing to do is to removeeventlisteners
@@ -334,6 +348,7 @@ package utilities
 			
 			if (access_token.length == 0  ) {
 				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
+				//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
 				syncFinished(false);
 			} else {
 				if (tracker != null && !alReadyGATracked) {
@@ -408,7 +423,8 @@ package utilities
 		private function createMissingTables(event:Event = null): void {
 			if (traceNeeded)
 				trace("start method createMissingTables");
-			
+			//ModelLocator.getInstance().logString += "start method createmissingtables"+ "\n";;
+
 			if (event != null) {
 				//here we come if actually a table has just been created and an Event.COMPLETE is dispatched to notify the completion.
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -419,6 +435,7 @@ package utilities
 						functionToRemoveFromEventListener = null;
 						googleAPICallFailed(event);
 					} else {
+						//ModelLocator.getInstance().logString += (event.target.data as String) + "\n";
 						//some other kind of yet unidentified error 
 					}
 					return;
@@ -434,6 +451,7 @@ package utilities
 			
 			if (retrievalCounter > 100)  {
 				//stop it, we seem to be in an endless loop
+				//ModelLocator.getInstance().logString += "error 2 : " + event.target.data;
 				syncFinished(false);
 			} else  {
 				var i:int=0;
@@ -484,12 +502,35 @@ package utilities
 		}
 		
 		private function startSync():void {
-						localElements = new ArrayList();
+			localElements = new ArrayList();
+						
 			remoteElements = new ArrayList();
 			remoteElementIds = new ArrayList();
 			nextPageToken = null;//not sure if nextPageToken is used by google when doing a select
 			secondAttempt = false;
-			getTheMedicinEvents();
+			deleteRemoteItems();
+		}
+		
+		/**
+		 * will start deleting all the items in listofElementsToBeDeleted<br>
+		 * event will be there if called after update of previous element in remote database finished, but we're not interested in the result
+		 */
+		private function deleteRemoteItems(event:Event = null):void {
+			if (listOfElementsToBeDeleted.length > 0) {
+				var firstelementToDeleted:Object = listOfElementsToBeDeleted.getItemAt(0);
+				if (firstelementToDeleted is MedicinEvent)
+					deleteRemoteMedicinEvent(null, firstelementToDeleted as MedicinEvent);
+				else if (firstelementToDeleted is BloodGlucoseEvent)
+					deleteRemoteBloodGlucoseEvent(null, firstelementToDeleted as BloodGlucoseEvent);
+				else if (firstelementToDeleted is ExerciseEvent)
+					deleteRemoteExerciseEvent(null, firstelementToDeleted as ExerciseEvent);
+				else if (firstelementToDeleted is MealEvent)
+					deleteRemoteMealEvent(null, firstelementToDeleted as MealEvent);
+				else if (firstelementToDeleted is SelectedFoodItem)
+					deleteRemoteSelectedFoodItem(null, firstelementToDeleted as SelectedFoodItem);
+			} else {
+				getTheMedicinEvents();
+			}
 		}
 		
 		private function getTheMedicinEvents(event:Event = null):void {
@@ -503,6 +544,7 @@ package utilities
 			
 			if (traceNeeded)
 				trace("start method getTheMedicinEvents");
+			//ModelLocator.getInstance().logString += "start method getthemedicinevents"+ "\n";;
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -696,6 +738,8 @@ package utilities
 			
 			if (traceNeeded)
 				trace("start method getTheBloodGlucoseEvents");
+			//ModelLocator.getInstance().logString += "start method getthebloodglucoseevents"+ "\n";
+
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -895,6 +939,7 @@ package utilities
 			
 			if (traceNeeded)
 				trace("start method getTheExerciseEvents");
+			//ModelLocator.getInstance().logString += "start method getTheExerciseEvents"+ "\n";
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -988,7 +1033,7 @@ package utilities
 				//time to start comparing
 				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
 				for (var j:int = 0; j < localElements.length; j++) {
-					for (var k:int = 0; k < remoteElements.length; k++) {
+					for (var k:int = 0; k < remoteElements.length; k++) {//not a logical implementation, we should first check if it's an exerciseevent, and then go through the list of remoteleements
 						if (localElements.getItemAt(j) is ExerciseEvent) {
 							if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as ExerciseEvent).eventid) {
 								//got a matching element, let's see if we need to remove it from both lists
@@ -1045,9 +1090,9 @@ package utilities
 									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 									(trackingList.getItemAt(l) as ExerciseEvent).updateExerciseEvent(
 										remoteElements.getItemAt(m)[positionLevel],
-										"",
 										new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
-										new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]));
+										new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+										"");
 								}
 								break;
 							}
@@ -1090,9 +1135,12 @@ package utilities
 			
 			if (traceNeeded)
 				trace("start method getTheMealEvents");
+			//ModelLocator.getInstance().logString += "start method getTheMealEvents"+ "\n";
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
+				//ModelLocator.getInstance().logString += "in getthemealevents, receved an event, event.target.data = " + event.target.data + "\n";
+				
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -1106,6 +1154,8 @@ package utilities
 						googleAPICallFailed(event);
 					} else {
 						//some other kind of yet unidentified error 
+						//ModelLocator.getInstance().logString += "Error in Synchronize.as - unidentified cause 1  : " + (event.target.data as String) + "\n";
+						syncFinished(false);
 					}
 				} else {
 					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
@@ -1187,50 +1237,72 @@ package utilities
 								localElements.addItem(trackingList.getItemAt(i));
 					}
 				}
+				//ModelLocator.getInstance().logString += "here i am, localElements.length = " + localElements.length + "\n";
 				//time to start comparing
 				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
-				for (var j:int = 0; j < localElements.length; j++) {
-					for (var k:int = 0; k < remoteElements.length; k++) {
-						if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as MealEvent).eventid) {
-							//got a matching element, let's see if we need to remove it from both lists
-							if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
-								//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
-								//but first let's see if the remoteelement has the deleted flag set
-								if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
-									//its a deleted item remove it from both lists
-									remoteElements.removeItemAt(k);
-									(localElements.getItemAt(j) as MealEvent).deleteEvent();//delete from local database
-									localElementsUpdated = true;//as we deleted one from local database, 
-									localElements.removeItemAt(j);//remove also from list used here
-									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
-									break;
-								} else {
-									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
-										remoteElements.removeItemAt(k);
-										break;
+				try {
+					for (var j:int = 0; j < localElements.length; j++) {
+						//ModelLocator.getInstance().logString += "1\n";
+						//ModelLocator.getInstance().logString += "remoteElements.length = " + remoteElements.length + "\n";
+						if (localElements.getItemAt(j) is MealEvent) {
+							for (var k:int = 0; k < remoteElements.length; k++) {
+								//ModelLocator.getInstance().logString += "2"  + "\n";
+								if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as MealEvent).eventid) {
+									//ModelLocator.getInstance().logString += "3" + "\n";
+									
+									//got a matching element, let's see if we need to remove it from both lists
+									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
+										//ModelLocator.getInstance().logString += "4" + "\n";
+										//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
+										//but first let's see if the remoteelement has the deleted flag set
+										if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+											//ModelLocator.getInstance().logString += "5" + "\n";
+											//its a deleted item remove it from both lists
+											remoteElements.removeItemAt(k);
+											(localElements.getItemAt(j) as MealEvent).deleteEvent();//delete from local database
+											localElementsUpdated = true;//as we deleted one from local database, 
+											localElements.removeItemAt(j);//remove also from list used here
+											j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+											break;
+										} else {
+											//ModelLocator.getInstance().logString += "6" + "\n";
+											if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
+												//ModelLocator.getInstance().logString += "7" + "\n";
+												remoteElements.removeItemAt(k);
+												break;
+											} else {
+												//ModelLocator.getInstance().logString += "8" + "\n";
+												localElements.removeItemAt(j);
+												j--;
+												break;
+											}
+										}
 									} else {
+										//ModelLocator.getInstance().logString += "9" + "\n";
+										//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
+										remoteElements.removeItemAt(k);
+										//remoteElementIds.removeItemAt(k);
 										localElements.removeItemAt(j);
-										j--;
-										break;
+										j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+										break;//jump out of th einnter for loop
 									}
 								}
-							} else {
-								//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
-								remoteElements.removeItemAt(k);
-								//remoteElementIds.removeItemAt(k);
-								localElements.removeItemAt(j);
-								j--;//j is going to be incrased and will point to the next element, as we've just deleted one
-								break;//jump out of th einnter for loop
+							}
+							//j could be -1 now, and there might not be anymore elements inlocalemenets so
+							if (j + 1 == localElements.length) {
+								//ModelLocator.getInstance().logString += "j + 1 = localElements.length\n";
+								break;
 							}
 						}
 					}
-					//j could be -1 now, and there might not be anymore elements inlocalemenets so
-					if (j + 1 == localElements.length)
-						break;
+				} catch (error:Error) {
+					//ModelLocator.getInstance().logString += "exception 1 = " + error.toString() + " stacktrace = " + error.getStackTrace() + "\n";
+					syncFinished(false);
 				}
 				//we've got to start updating
 				if (traceNeeded)
 					trace("there are " + remoteElements.length + " remote elements to store or update locally");
+				//ModelLocator.getInstance().logString += "in getthemealevents, ready to start updating, remoteElements.length = " + remoteElements.length + "\n";
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the medicinevent in the trackinglist that has the same id
 					var l:int=0;
@@ -1298,9 +1370,11 @@ package utilities
 			
 			if (traceNeeded)
 				trace("start method getTheSelectedItems");
+			//ModelLocator.getInstance().logString += "start method getTheSelectedFoodItems" + "\n";
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
+				//ModelLocator.getInstance().logString += "in method getTheSelectedFoodItems, event != null"+ "\n";
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -1313,7 +1387,9 @@ package utilities
 						functionToRemoveFromEventListener = null;
 						googleAPICallFailed(event);
 					} else {
-						//some other kind of yet unidentified error 
+						//some other kind of yet unidentified error
+						//ModelLocator.getInstance().logString += "in method gettheselecteditems, unidentified error"+ "\n";
+						//ModelLocator.getInstance().logString += "event.target.data = " + event.target.data + "\n";
 					}
 				} else {
 					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
@@ -1383,6 +1459,7 @@ package utilities
 			} 
 			
 			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
+				//ModelLocator.getInstance().logString += "in gettheselectedfooditems, event = null or nextpagetoken != null" + "\n";;
 				var request:URLRequest = new URLRequest(googleSelectUrl);
 				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
@@ -1401,6 +1478,7 @@ package utilities
 				loader.load(request);
 				if (traceNeeded)
 					trace("get the selectedfooditems " + " loader : request = " + request.data); 
+				//ModelLocator.getInstance().logString += " loader : request = " + request.data + "\n";;
 			} else {
 				for (var i:int = 0; i < trackingList.length; i++) {
 					if (trackingList.getItemAt(i) is MealEvent) {
@@ -1418,42 +1496,44 @@ package utilities
 				//time to start comparing
 				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
 				for (var j:int = 0; j < localElements.length; j++) {
-					for (var k:int = 0; k < remoteElements.length; k++) {
-						if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as SelectedFoodItem).eventid) {
-							//got a matching element, let's see if we need to remove it from both lists
-							if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as SelectedFoodItem).lastModifiedTimestamp) {
-								//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
-								//but first let's see if the remoteelement has the deleted flag set
-								if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
-									//its a deleted item remove it from both lists
-									remoteElements.removeItemAt(k);
-									(localElements.getItemAt(j) as SelectedFoodItem).deleteEvent();//delete from local database
-									localElementsUpdated = true;//as we deleted one from local database, 
-									localElements.removeItemAt(j);//remove also from list used here
-									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
-									break;
-								} else {
-									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as SelectedFoodItem).lastModifiedTimestamp) {
+					if (localElements.getItemAt(j) is SelectedFoodItem) {
+						for (var k:int = 0; k < remoteElements.length; k++) {
+							if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as SelectedFoodItem).eventid) {
+								//got a matching element, let's see if we need to remove it from both lists
+								if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as SelectedFoodItem).lastModifiedTimestamp) {
+									//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
+									//but first let's see if the remoteelement has the deleted flag set
+									if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+										//its a deleted item remove it from both lists
 										remoteElements.removeItemAt(k);
+										(localElements.getItemAt(j) as SelectedFoodItem).deleteEvent();//delete from local database
+										localElementsUpdated = true;//as we deleted one from local database, 
+										localElements.removeItemAt(j);//remove also from list used here
+										j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 										break;
 									} else {
-										localElements.removeItemAt(j);
-										j--;
-										break;
+										if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as SelectedFoodItem).lastModifiedTimestamp) {
+											remoteElements.removeItemAt(k);
+											break;
+										} else {
+											localElements.removeItemAt(j);
+											j--;
+											break;
+										}
 									}
+								} else {
+									//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
+									remoteElements.removeItemAt(k);
+									localElements.removeItemAt(j);
+									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
+									break;//jump out of th einnter for loop
 								}
-							} else {
-								//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
-								remoteElements.removeItemAt(k);
-								localElements.removeItemAt(j);
-								j--;//j is going to be incrased and will point to the next element, as we've just deleted one
-								break;//jump out of th einnter for loop
 							}
 						}
+						//j could be -1 now, and there might not be anymore elements inlocalemenets so
+						if (j + 1 == localElements.length)
+							break;
 					}
-					//j could be -1 now, and there might not be anymore elements inlocalemenets so
-					if (j + 1 == localElements.length)
-						break;
 				}
 				//we've got to start updating
 				if (traceNeeded)
@@ -1461,6 +1541,7 @@ package utilities
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the selectedfooditem in the trackinglist that has the same id
 					var l:int=0;
+					var selectedFoodItemFound:Boolean = false;
 					for (l = 0; l < trackingList.length;l++) {
 						if (trackingList.getItemAt(l) is MealEvent) {
 							var theMealEvent2:MealEvent = trackingList.getItemAt(l) as MealEvent;
@@ -1468,6 +1549,7 @@ package utilities
 								if ((theMealEvent2.selectedFoodItems.getItemAt(selctr2) as SelectedFoodItem).eventid == remoteElements.getItemAt(m)[positionId]) {
 									var theSelectedFoodItem:SelectedFoodItem = theMealEvent2.selectedFoodItems.getItemAt(selctr2) as SelectedFoodItem;
 									localElementsUpdated = true;
+									selectedFoodItemFound = true;
 									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 									if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 										theSelectedFoodItem.deleteEvent();
@@ -1483,14 +1565,16 @@ package utilities
 											remoteElements.getItemAt(m)[positionUnitProtein],
 											remoteElements.getItemAt(m)[positionUnitCarbs],
 											remoteElements.getItemAt(m)[positionUnitFat]),
-											new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
-											new Number(remoteElements.getItemAt(m)[positionUnitProtein]));
+											remoteElements.getItemAt(m)[positionModifiedTimeStamp],
+											remoteElements.getItemAt(m)[positionChosenAmount]);
 									}
 									break;
-									l =  trackingList.length;
+									//l =  trackingList.length;
 								}
 							}
 						}
+						if (selectedFoodItemFound)
+							break;
 					}
 					if (l == trackingList.length) {
 						//it means we didn't find the remotelement in the trackinglist, so we need to create it
@@ -1536,6 +1620,7 @@ package utilities
 		private function getRowIds(event:Event):void {
 			if (traceNeeded)
 				trace ("in method getrowids");
+			//ModelLocator.getInstance().logString += "in method getrowids" + "\n";
 			if (event != null) {
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
@@ -2017,6 +2102,7 @@ package utilities
 					if (traceNeeded)
 						trace("loader : request = " + request.data); 
 				} else {
+					//ModelLocator.getInstance().logString += "error 3 : " + event.target.data + "\n";;
 					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
 					syncFinished(false);
 				}
@@ -2025,11 +2111,10 @@ package utilities
 				if (event.type == "ioError") {
 					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
 					//an ioError, forget about it, the show doesn't go on
+					//ModelLocator.getInstance().logString += "error 4 : " + event.target.data+ "\n";;
 					syncFinished(false);
 				}
 			}
-			ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
-			syncFinished(false);
 		}
 		
 		private function accessTokenRefreshed(event:Event):void {
@@ -2087,11 +2172,13 @@ package utilities
 			return returnValue;
 		}
 		
-		public function deleteRemoteMedicinEvent(event:Event = null,medicinEvent:MedicinEvent = null):void {
+		private function deleteRemoteMedicinEvent(event:Event,medicinEvent:MedicinEvent = null):void {
 			var request:URLRequest
 			
+			if (traceNeeded)
+				trace("in method deleteremotemedicinevent");
 			if (medicinEvent != null)
-				eventToBeDeleted = medicinEvent;
+				objectToBeDeleted = medicinEvent;
 			if (event != null)  {
 				if (functionToRemoveFromEventListener != null)
 					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
@@ -2100,17 +2187,17 @@ package utilities
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					sqlStatement = "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
 					sqlStatement += 
-						"id = \'" + eventToBeDeleted.eventid.toString() + "\'," +
-						"medicinname = \'" + (eventToBeDeleted as MedicinEvent).medicinName + "\'," +
-						"value = \'" + (eventToBeDeleted as MedicinEvent).amount.toString() + "\'," +
-						"creationtimestamp = \'" + (eventToBeDeleted as MedicinEvent).timeStamp.toString() + "\'," +
+						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
+						"medicinname = \'" + (objectToBeDeleted as MedicinEvent).medicinName + "\'," +
+						"value = \'" + (objectToBeDeleted as MedicinEvent).amount.toString() + "\'," +
+						"creationtimestamp = \'" + (objectToBeDeleted as MedicinEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
 						"addedtoormodifiedintabletimestamp = \'" +
-						((new Date()).valueOf() - (eventToBeDeleted as MedicinEvent).lastModifiedTimestamp > 10000 
+						((new Date()).valueOf() - (objectToBeDeleted as MedicinEvent).lastModifiedTimestamp > 10000 
 							? 
 							(new Date()).valueOf().toString() 
 							:
-							(eventToBeDeleted as MedicinEvent).lastModifiedTimestamp.toString())
+							(objectToBeDeleted as MedicinEvent).lastModifiedTimestamp.toString())
 						+ "\'," +
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
@@ -2123,13 +2210,20 @@ package utilities
 					
 					request.method = URLRequestMethod.POST;
 					loader = new URLLoader();
-					functionToRecall = null;
-					//loader.addEventListener(Event.COMPLETE,syncLocalEvents);
-					functionToRemoveFromEventListener = null;
+					
+					//in case delete would fail, and functiontorecall is called, then we arrive back here, well understood with event=null and medicinevent = null
+					//but with objecttobedeleted != null
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
+					functionToRecall = deleteRemoteMedicinEvent;
+					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
+					functionToRemoveFromEventListener = deleteRemoteItems;
 					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 					loader.load(request);
 					if (traceNeeded)
 						trace("loader : request = " + request.data); 
+				} else {
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
+					deleteRemoteItems();
 				}
 			} else {
 				if (traceNeeded)
@@ -2141,7 +2235,6 @@ package utilities
 				
 				if (access_token.length == 0 ) {
 					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
-					
 				} else {
 					
 					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[0][1] + " WHERE id = \'" + medicinEvent.eventid + "\'";
@@ -2162,16 +2255,17 @@ package utilities
 					loader.load(request);
 					if (traceNeeded)
 						trace("loader : request = " + request.data); 
-					
 				}
 			}
 		}
 		
-		public function deleteRemoteBloodGlucoseEvent(event:Event = null,bloodglucoseEvent:BloodGlucoseEvent = null):void {
+		private function deleteRemoteBloodGlucoseEvent(event:Event, bloodglucoseEvent:BloodGlucoseEvent = null):void {
 			var request:URLRequest
 			
+			if (traceNeeded)
+				trace("in method deleteremotebloodglucoseevent");
 			if (bloodglucoseEvent != null)
-				eventToBeDeleted = bloodglucoseEvent;
+				objectToBeDeleted = bloodglucoseEvent;
 			if (event != null)  {
 				if (functionToRemoveFromEventListener != null)
 					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
@@ -2180,17 +2274,17 @@ package utilities
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					sqlStatement = "UPDATE " + tableNamesAndColumnNames[1][1] + " SET ";
 					sqlStatement += 
-						"id = \'" + eventToBeDeleted.eventid.toString() + "\'," +
-						"unit = \'" + (eventToBeDeleted as BloodGlucoseEvent).unit + "\'," +
-						"value = \'" + (eventToBeDeleted as BloodGlucoseEvent).bloodGlucoseLevel + "\'," +
-						"creationtimestamp = \'" + (eventToBeDeleted as BloodGlucoseEvent).timeStamp.toString() + "\'," +
+						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
+						"unit = \'" + (objectToBeDeleted as BloodGlucoseEvent).unit + "\'," +
+						"value = \'" + (objectToBeDeleted as BloodGlucoseEvent).bloodGlucoseLevel + "\'," +
+						"creationtimestamp = \'" + (objectToBeDeleted as BloodGlucoseEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
 						"addedtoormodifiedintabletimestamp = \'" +
-						((new Date()).valueOf() - (eventToBeDeleted as BloodGlucoseEvent).lastModifiedTimestamp > 10000 
+						((new Date()).valueOf() - (objectToBeDeleted as BloodGlucoseEvent).lastModifiedTimestamp > 10000 
 							? 
 							(new Date()).valueOf().toString() 
 							:
-							(eventToBeDeleted as BloodGlucoseEvent).lastModifiedTimestamp.toString())
+							(objectToBeDeleted as BloodGlucoseEvent).lastModifiedTimestamp.toString())
 						+ "\'," +
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
@@ -2203,12 +2297,19 @@ package utilities
 					
 					request.method = URLRequestMethod.POST;
 					loader = new URLLoader();
-					functionToRecall = null;
-					functionToRemoveFromEventListener = null;
+
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
+					functionToRecall = deleteRemoteMedicinEvent;
+					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
+					functionToRemoveFromEventListener = deleteRemoteItems;
+
 					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 					loader.load(request);
 					if (traceNeeded)
 						trace("loader : request = " + request.data); 
+				} else {
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
+					deleteRemoteItems();
 				}
 			} else {
 				if (traceNeeded)
@@ -2220,7 +2321,6 @@ package utilities
 				
 				if (access_token.length == 0 ) {
 					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
-					
 				} else {
 					
 					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[1][1] + " WHERE id = \'" + bloodglucoseEvent.eventid + "\'";
@@ -2245,11 +2345,13 @@ package utilities
 			}
 		}
 
-		public function deleteRemoteExerciseEvent(event:Event = null,exerciseEvent:ExerciseEvent = null):void {
+		private function deleteRemoteExerciseEvent(event:Event, exerciseEvent:ExerciseEvent = null):void {
 			var request:URLRequest
 			
+			if (traceNeeded)
+				trace("in method deleteremoteexerciseevent");
 			if (exerciseEvent != null)
-				eventToBeDeleted = exerciseEvent;
+				objectToBeDeleted = exerciseEvent;
 			if (event != null)  {
 				if (functionToRemoveFromEventListener != null)
 					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
@@ -2258,16 +2360,16 @@ package utilities
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					sqlStatement = "UPDATE " + tableNamesAndColumnNames[2][1] + " SET ";
 					sqlStatement += 
-						"id = \'" + eventToBeDeleted.eventid.toString() + "\'," +
-						"level = \'" + (eventToBeDeleted as ExerciseEvent).level + "\'," +
-						"creationtimestamp = \'" + (eventToBeDeleted as ExerciseEvent).timeStamp.toString() + "\'," +
+						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
+						"level = \'" + (objectToBeDeleted as ExerciseEvent).level + "\'," +
+						"creationtimestamp = \'" + (objectToBeDeleted as ExerciseEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
 						"addedtoormodifiedintabletimestamp = \'" +
-						((new Date()).valueOf() - (eventToBeDeleted as ExerciseEvent).lastModifiedTimestamp > 10000 
+						((new Date()).valueOf() - (objectToBeDeleted as ExerciseEvent).lastModifiedTimestamp > 10000 
 							? 
 							(new Date()).valueOf().toString() 
 							:
-							(eventToBeDeleted as ExerciseEvent).lastModifiedTimestamp.toString())
+							(objectToBeDeleted as ExerciseEvent).lastModifiedTimestamp.toString())
 						+ "\'," +
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
@@ -2280,12 +2382,17 @@ package utilities
 					
 					request.method = URLRequestMethod.POST;
 					loader = new URLLoader();
-					functionToRecall = null;
-					functionToRemoveFromEventListener = null;
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
+					functionToRecall = deleteRemoteMedicinEvent;
+					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
+					functionToRemoveFromEventListener = deleteRemoteItems;
 					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 					loader.load(request);
 					if (traceNeeded)
 						trace("loader : request = " + request.data); 
+				} else {
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
+					deleteRemoteItems();
 				}
 			} else {
 				if (traceNeeded)
@@ -2297,7 +2404,6 @@ package utilities
 				
 				if (access_token.length == 0 ) {
 					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
-					
 				} else {
 					
 					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[2][1] + " WHERE id = \'" + exerciseEvent.eventid + "\'";
@@ -2322,11 +2428,13 @@ package utilities
 			}
 		}
 
-		public function deleteRemoteMealEvent(event:Event = null,mealEvent:MealEvent = null):void {
+		private function deleteRemoteMealEvent(event:Event, mealEvent:MealEvent = null):void {
 			var request:URLRequest
 			
+			if (traceNeeded)
+				trace("in method deleteremotemealevent");
 			if (mealEvent != null)
-				eventToBeDeleted = mealEvent;
+				objectToBeDeleted = mealEvent;
 			if (event != null)  {
 				if (functionToRemoveFromEventListener != null)
 					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
@@ -2335,19 +2443,19 @@ package utilities
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					sqlStatement = "UPDATE " + tableNamesAndColumnNames[3][1] + " SET ";
 					sqlStatement += 
-						"id = \'" + eventToBeDeleted.eventid.toString() + "\'," +
-						"mealname = \'" + (eventToBeDeleted as MealEvent).mealName + "\'," +
-						"insulinratio = \'" + (eventToBeDeleted as MealEvent).insulinRatio + "\'," +
-						"correctionfactor = \'" + (eventToBeDeleted as MealEvent).correctionFactor + "\'," +
-						"previousbglevel = \'" + (eventToBeDeleted as MealEvent).previousBGlevel + "\'," +
-						"creationtimestamp = \'" + (eventToBeDeleted as MealEvent).timeStamp.toString() + "\'," +
+						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
+						"mealname = \'" + (objectToBeDeleted as MealEvent).mealName + "\'," +
+						"insulinratio = \'" + (objectToBeDeleted as MealEvent).insulinRatio + "\'," +
+						"correctionfactor = \'" + (objectToBeDeleted as MealEvent).correctionFactor + "\'," +
+						"previousbglevel = \'" + (objectToBeDeleted as MealEvent).previousBGlevel + "\'," +
+						"creationtimestamp = \'" + (objectToBeDeleted as MealEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
 						"addedtoormodifiedintabletimestamp = \'" +
-						((new Date()).valueOf() - (eventToBeDeleted as MealEvent).lastModifiedTimeStamp > 10000 
+						((new Date()).valueOf() - (objectToBeDeleted as MealEvent).lastModifiedTimeStamp > 10000 
 							? 
 							(new Date()).valueOf().toString() 
 							:
-							(eventToBeDeleted as MealEvent).lastModifiedTimeStamp.toString())
+							(objectToBeDeleted as MealEvent).lastModifiedTimeStamp.toString())
 						+ "\'," +
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
@@ -2360,16 +2468,21 @@ package utilities
 					
 					request.method = URLRequestMethod.POST;
 					loader = new URLLoader();
-					functionToRecall = null;
-					functionToRemoveFromEventListener = null;
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
+					functionToRecall = deleteRemoteMedicinEvent;
+					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
+					functionToRemoveFromEventListener = deleteRemoteItems;
 					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 					loader.load(request);
 					if (traceNeeded)
 						trace("loader : request = " + request.data); 
+				} else {
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
+					deleteRemoteItems();
 				}
 			} else {
 				if (traceNeeded)
-					trace("start method deleteMealEvent");
+					trace("start method deleteRemoteMealEvent");
 				
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
@@ -2402,19 +2515,21 @@ package utilities
 			}
 		}
 		
-		public function deleteRemoteSelectedFoodItem(event:Event = null,selectedFoodItem:SelectedFoodItem = null):void {
+		private function deleteRemoteSelectedFoodItem(event:Event, selectedFoodItem:SelectedFoodItem = null):void {
 			var request:URLRequest
 			
+			if (traceNeeded)
+				trace("in method deleteremoteselectedfooditem");
 			if (selectedFoodItem != null)
-				eventToBeDeleted = selectedFoodItem;
+				objectToBeDeleted = selectedFoodItem;
 			if (event != null)  {
 				if (functionToRemoveFromEventListener != null)
 					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
+					var selectedItemToBeDeleted:Object = objectToBeDeleted as SelectedFoodItem;
 					sqlStatement = "UPDATE " + tableNamesAndColumnNames[4][1] + " SET ";
-					var selectedItemToBeDeleted:SelectedFoodItem = eventToBeDeleted as SelectedFoodItem;
 					sqlStatement += 
 						"id = \'" + selectedItemToBeDeleted.eventid.toString() + "\'," +
 						"description = \'" + (selectedItemToBeDeleted).itemDescription + "\'," +
@@ -2446,16 +2561,21 @@ package utilities
 					
 					request.method = URLRequestMethod.POST;
 					loader = new URLLoader();
-					functionToRecall = null;
-					functionToRemoveFromEventListener = null;
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
+					functionToRecall = deleteRemoteMedicinEvent;
+					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
+					functionToRemoveFromEventListener = deleteRemoteItems;
 					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 					loader.load(request);
 					if (traceNeeded)
 						trace("loader : request = " + request.data); 
+				} else {
+					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
+					deleteRemoteItems();
 				}
 			} else {
 				if (traceNeeded)
-					trace("start method deleteSelectedFoodItem");
+					trace("start method deleteRemoteSelectedFoodItem");
 				
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
@@ -2494,6 +2614,7 @@ package utilities
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
 			if (success) {
+				//ModelLocator.getInstance().logString += "sync successful" + "\n";
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
 				lastSyncTimeStamp = currentSyncTimeStamp;
 				
@@ -2511,7 +2632,12 @@ package utilities
 					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
 				}
 			} else {
-				
+				ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+				ModelLocator.getInstance().trackingList = new ArrayCollection();
+				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
+				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
+				ModelLocator.getInstance().trackingList = new ArrayCollection();
+				Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
 			}
 			
 			if (rerunNecessary) {
@@ -2534,6 +2660,10 @@ package utilities
 				// now populate ModelLocator.getInstance().meals
 				ModelLocator.getInstance().refreshMeals();
 			}
+		}
+		
+		public function addObjectToBeDeleted(object:Object):void {
+			listOfElementsToBeDeleted.addItem(object);
 		}
 	}
 	

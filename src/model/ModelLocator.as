@@ -140,6 +140,8 @@ package model
 		public var width:int = 300;
 		
 		private var _trackingList:ArrayCollection;
+		
+		//public var logString:String;
 
 		[Bindable]
 		/**

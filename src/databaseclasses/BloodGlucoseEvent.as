@@ -102,18 +102,14 @@ package databaseclasses
 		/**
 		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
 		 * if newComment = null then an empty string will be used<br>
-		 * if newCreationTimeStamp =  Number.NaN then (creation)timeStamp is not updated<br>
-		 *  if newLastModifiedTimestamp = Number.NAN, then lastmodifiedtimestamp will not be used<br>
 		 */
-		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:int,newCreationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN):void {
+		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:int,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number):void {
 			unit = newUnit;
 			_bloodGlucoseLevel = newBloodGlucoseLevel;
 
-			if (!isNaN(newLastModifiedTimeStamp)) {
 				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
 					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
 				_lastModifiedTimestamp = newLastModifiedTimeStamp;
-			}
 
 			if (!isNaN(newCreationTimeStamp)) {
 				timeStamp = newCreationTimeStamp;
