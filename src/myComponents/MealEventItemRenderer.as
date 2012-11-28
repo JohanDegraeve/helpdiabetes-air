@@ -425,30 +425,34 @@ package myComponents
 						}
 				}
 				//
-				if (selectedMealsCarbAmountStyleableTextFields == null || selectedMealsCarbAmountStyleableTextFields.length == 0)
-					createSelectedMealCarbAmountStyleableTextFields(selectedMealsDescriptionStrings.length);
-				if (selectedMealsDescriptionStyleableTextFields == null || selectedMealsDescriptionStyleableTextFields.length == 0)
-					createSelectedMealDescriptionStyleableTextFields(selectedMealsDescriptionStrings.length);
-				for (var m:int; m < selectedMealsCarbAmountStyleableTextFields.length; m++) { 
-					//reusing some variables already defined while calculating labelDisplay and carbAmountDisplay
-					carbAmountDisplayWidth = Math.max(getElementPreferredWidth(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField),MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT);
-					//carbAmountDisplayWidth = MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT;
-					(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField).text = selectedMealsDescriptionStrings.getItemAt(m) as String;
-					labelDisplayWidth = Math.min(getElementPreferredWidth(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth);
+				try { 
+					if (selectedMealsCarbAmountStyleableTextFields == null || selectedMealsCarbAmountStyleableTextFields.length == 0)
+						createSelectedMealCarbAmountStyleableTextFields(selectedMealsDescriptionStrings.length);
+					if (selectedMealsDescriptionStyleableTextFields == null || selectedMealsDescriptionStyleableTextFields.length == 0)
+						createSelectedMealDescriptionStyleableTextFields(selectedMealsDescriptionStrings.length);
+					for (var m:int; m < selectedMealsCarbAmountStyleableTextFields.length; m++) { 
+						//reusing some variables already defined while calculating labelDisplay and carbAmountDisplay
+						carbAmountDisplayWidth = Math.max(getElementPreferredWidth(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField),MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT);
+						//carbAmountDisplayWidth = MINIMUM_CARB_AMOUNT_WIDTH_SMALL_FONT;
+						(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField).text = selectedMealsDescriptionStrings.getItemAt(m) as String;
+						labelDisplayWidth = Math.min(getElementPreferredWidth(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth);
+						
+						(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField).text = (selectedMealsCarbAmountStrings.getItemAt(m) as String)  +  " " + gramkh;
+						carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField));
+						setElementSize(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,carbAmountDisplayWidth,selectedMealHeight);
+						
+						setElementSize(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,labelDisplayWidth,selectedMealHeight);
+						
+						(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField).truncateToFit();
+						(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField).truncateToFit();
+						
+						setElementPosition(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,0 + PADDING_LEFT,currentY + offsetToPutTextInTheMiddle);
+						setElementPosition(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,currentY + offsetToPutTextInTheMiddle);
+						
+						currentY += selectedMealHeight - _upLiftForNextField;
+					}
+				} catch (error:Error) { 
 					
-					(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField).text = (selectedMealsCarbAmountStrings.getItemAt(m) as String)  +  " " + gramkh;
-					carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField));
-					setElementSize(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,carbAmountDisplayWidth,selectedMealHeight);
-					
-					setElementSize(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,labelDisplayWidth,selectedMealHeight);
-					
-					(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField).truncateToFit();
-					(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField).truncateToFit();
-					
-					setElementPosition(selectedMealsDescriptionStyleableTextFields.getItemAt(m) as StyleableTextField,0 + PADDING_LEFT,currentY + offsetToPutTextInTheMiddle);
-					setElementPosition(selectedMealsCarbAmountStyleableTextFields.getItemAt(m) as StyleableTextField,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,currentY + offsetToPutTextInTheMiddle);
-					
-					currentY += selectedMealHeight - _upLiftForNextField;
 				}
 			} 
 			
