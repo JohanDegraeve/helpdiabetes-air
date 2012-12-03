@@ -1689,13 +1689,11 @@ package utilities
 			} 
 			
 			var sqlStatement:String = "";
-			var elementFoundWithSameId:Boolean = false;
 			var j:int;
 			for (var i:int = 0;i < localElements.length; i++) {
 				if (localElements.getItemAt(i) is MedicinEvent) {//later on we will add exerciseevents, ...
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
-							elementFoundWithSameId = true;
 							if (!remoteElementIds.getItemAt(j)[1]) {
 								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[0][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
 								i = localElements.length;
@@ -1707,7 +1705,6 @@ package utilities
 				}  else if (localElements.getItemAt(i) is BloodGlucoseEvent) {
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
-							elementFoundWithSameId = true;
 							if (!remoteElementIds.getItemAt(j)[1]) {
 								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[1][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
 								i = localElements.length;
@@ -1719,7 +1716,6 @@ package utilities
 				} else if (localElements.getItemAt(i) is ExerciseEvent) {
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
-							elementFoundWithSameId = true;
 							if (!remoteElementIds.getItemAt(j)[1]) {
 								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[2][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
 								i = localElements.length;
@@ -1731,7 +1727,6 @@ package utilities
 				} else if (localElements.getItemAt(i) is MealEvent) {
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
-							elementFoundWithSameId = true;
 							if (!remoteElementIds.getItemAt(j)[1]) {
 								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[3][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
 								i = localElements.length;
@@ -1743,7 +1738,6 @@ package utilities
 				} else if (localElements.getItemAt(i) is SelectedFoodItem) {
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as SelectedFoodItem).eventid == remoteElementIds.getItemAt(j)[0]) {
-							elementFoundWithSameId = true;
 							if (!remoteElementIds.getItemAt(j)[1]) {
 								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[4][1] + " WHERE id = \'" + (localElements.getItemAt(i) as SelectedFoodItem).eventid + "\'";
 								i = localElements.length;
