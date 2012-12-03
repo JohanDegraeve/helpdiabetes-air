@@ -35,8 +35,6 @@ package utilities
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
-	import flash.events.SQLErrorEvent;
-	import flash.events.SQLEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestHeader;
@@ -696,10 +694,10 @@ package utilities
 						if (trackingList.getItemAt(l) is MedicinEvent) {
 							if ((trackingList.getItemAt(l) as MedicinEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
-								if (!trackingListAlreadyModified) {
+								/*if (!trackingListAlreadyModified) {
 									trackingListAlreadyModified = true;
 									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-								}
+								}*/
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
 								} else {
@@ -718,12 +716,12 @@ package utilities
 						//but only if deleted is false
 						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
 							localElementsUpdated = true;
-							if (!trackingListAlreadyModified) {
+							/*if (!trackingListAlreadyModified) {
 								trackingListAlreadyModified = true;
 								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-							}
+							}*/
 							
-							trackingList.addItem(new MedicinEvent(
+							/*trackingList.addItem*/(new MedicinEvent(
 								remoteElements.getItemAt(m)[positionValue],
 								remoteElements.getItemAt(m)[positionMedicinname],
 								remoteElements.getItemAt(m)[positionId],
@@ -904,10 +902,10 @@ package utilities
 								if (traceNeeded) trace("find an element in with same eventid");
 								if (traceNeeded) trace ("bg event  = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).toString());
 								localElementsUpdated = true;
-								if (!trackingListAlreadyModified) {
+								/*if (!trackingListAlreadyModified) {
 									trackingListAlreadyModified = true;
 									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-								}
+								}*/
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 									if (traceNeeded)
 										trace("call to bloodglucoseevent.deleteevent");
@@ -929,12 +927,12 @@ package utilities
 						//but only if deleted is false
 						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
 							localElementsUpdated = true;
-							if (!trackingListAlreadyModified) {
+							/*if (!trackingListAlreadyModified) {
 								trackingListAlreadyModified = true;
 								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-							}
+							}*/
 							
-							trackingList.addItem(new BloodGlucoseEvent(
+							/*trackingList.addItem*/(new BloodGlucoseEvent(
 								remoteElements.getItemAt(m)[positionValue],
 								remoteElements.getItemAt(m)[positionUnit],
 								remoteElements.getItemAt(m)[positionId],
@@ -1108,10 +1106,10 @@ package utilities
 						if (trackingList.getItemAt(l) is ExerciseEvent) {
 							if ((trackingList.getItemAt(l) as ExerciseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
-								if (!trackingListAlreadyModified) {
+								/*if (!trackingListAlreadyModified) {
 									trackingListAlreadyModified = true;
 									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-								}
+								}*/
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 									(trackingList.getItemAt(l) as ExerciseEvent).deleteEvent();
 								} else {
@@ -1130,12 +1128,12 @@ package utilities
 						//but only if deleted is false
 						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
 							localElementsUpdated = true;
-							if (!trackingListAlreadyModified) {
+							/*if (!trackingListAlreadyModified) {
 								trackingListAlreadyModified = true;
 								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-							}
+							}*/
 							
-							trackingList.addItem(new ExerciseEvent(
+							/*trackingList.addItem*/(new ExerciseEvent(
 								remoteElements.getItemAt(m)[positionLevel],
 								"",
 								remoteElements.getItemAt(m)[positionId],
@@ -1344,11 +1342,13 @@ package utilities
 						if (trackingList.getItemAt(l) is MealEvent) {
 							if ((trackingList.getItemAt(l) as MealEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
-								if (!trackingListAlreadyModified) {
+								/*if (!trackingListAlreadyModified) {
 									trackingListAlreadyModified = true;
 									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-								}
+								}*/
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+									if (traceNeeded)
+										trace("in synchronize.as, calling mealevent.deleteevent");
 									(trackingList.getItemAt(l) as MealEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as MealEvent).updateMealEvent(
@@ -1373,7 +1373,7 @@ package utilities
 								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 							}
 							
-							trackingList.addItem(new MealEvent(
+							trackingList.addItem(new MealEvent(//in contradiction to medicin/bloodglucose and exerciseevents, I must add new mealevents to the trackinglist, because if i don't, the adding of selectedfooditems would fail because I wouldn't find the mealevent
 								remoteElements.getItemAt(m)[positionMealName],
 								remoteElements.getItemAt(m)[positionInsulinRatio],
 								remoteElements.getItemAt(m)[positionCFFactor],
@@ -1593,10 +1593,10 @@ package utilities
 									var theSelectedFoodItem:SelectedFoodItem = theMealEvent2.selectedFoodItems.getItemAt(selctr2) as SelectedFoodItem;
 									localElementsUpdated = true;
 									selectedFoodItemFound = true;
-									if (!trackingListAlreadyModified) {
+									/*if (!trackingListAlreadyModified) {
 										trackingListAlreadyModified = true;
 										ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-									}
+									}*/
 									if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 										theSelectedFoodItem.deleteEvent();
 									} else {
@@ -1630,10 +1630,10 @@ package utilities
 									if ((trackingList.getItemAt(lstctr) as MealEvent).timeStamp >= asOfTimeStamp) {
 										if ((trackingList.getItemAt(lstctr) as MealEvent).eventid == remoteElements.getItemAt(m)[positionMealEventId]) {
 											localElementsUpdated = true;
-											if (!trackingListAlreadyModified) {
+											/*if (!trackingListAlreadyModified) {
 												trackingListAlreadyModified = true;
 												ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-											}
+											}*/
 											(trackingList.getItemAt(lstctr) as MealEvent).addSelectedFoodItem(
 												new SelectedFoodItem(
 													remoteElements.getItemAt(m)[positionId],
@@ -2669,8 +2669,11 @@ package utilities
 				
 				if (localElementsUpdated) {
 					localElementsUpdated = false;
-					//ModelLocator.getInstance().trackingList = new ArrayCollection();
-					//while (ModelLocator.getInstance().trackingList.length > 0)
+					if (!trackingListAlreadyModified) {//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
+						trackingListAlreadyModified = true;
+						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+					}
+
 					ModelLocator.getInstance().trackingList = new ArrayCollection();
 					
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
@@ -2679,10 +2682,16 @@ package utilities
 					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
 				}
 			} else {
-				ModelLocator.getInstance().trackingList = new ArrayCollection();
-				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
-				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-				Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
+				if (localElementsUpdated) {
+					if (!trackingListAlreadyModified) {//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
+						trackingListAlreadyModified = true;
+						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+					}
+					ModelLocator.getInstance().trackingList = new ArrayCollection();
+					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
+					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
+					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
+				}
 			}
 			
 			if (rerunNecessary) {

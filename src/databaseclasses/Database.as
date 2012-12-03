@@ -311,7 +311,8 @@ package databaseclasses
 		 * Will execute SQL that will either create the tables in a fresh database or return, if they're already creatd.
 		 **/
 		private function createTables():void
-		{						
+		{			
+			trace("in method createtables");
 			sqlStatement = new SQLStatement();
 			sqlStatement.sqlConnection = aConn;
 			createSettingsTable();				
@@ -1120,14 +1121,14 @@ package databaseclasses
 			var fooditemId:int;
 			var unitList:ArrayCollection;
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				
 				localSqlStatement.addEventListener(SQLEvent.RESULT,foodItemRetrieved);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,foodItemRetrievalError);
@@ -1138,8 +1139,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0028");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1227,14 +1228,14 @@ package databaseclasses
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			var unitList:ArrayCollection;
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				
 				localSqlStatement.addEventListener(SQLEvent.RESULT,unitListRetrieved);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,unitListRetrievalError);
@@ -1246,8 +1247,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0032");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1300,14 +1301,14 @@ package databaseclasses
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = UPDATE_MEAL_EVENT;
 				localSqlStatement.parameters[":id"] = mealEventId;
@@ -1323,8 +1324,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0071");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1334,8 +1335,8 @@ package databaseclasses
 			
 			
 			function mealEventUpdated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventUpdateFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -1343,9 +1344,9 @@ package databaseclasses
 			}
 			
 			function mealEventUpdateFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventUpdateFailed);
-				trace("Failed to update a insulinratio. Database0070");
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventUpdateFailed);
+				trace("Failed to update a mealevent. Database0070");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -1402,14 +1403,14 @@ package databaseclasses
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = UPDATE_SETTING;
 				localSqlStatement.parameters[":id"] = id;
@@ -1421,8 +1422,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0041");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1432,8 +1433,8 @@ package databaseclasses
 			
 			
 			function settingUpdated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,settingUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,settingUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingUpdateFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -1441,8 +1442,8 @@ package databaseclasses
 			}
 			
 			function settingUpdateFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,settingUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,settingUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,settingUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,settingUpdateFailed);
 				trace("Failed to update a setting. Database0031");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1467,14 +1468,14 @@ package databaseclasses
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_MEALEVENT;
 				localSqlStatement.parameters[":mealeventid"] = mealEventId;
@@ -1490,8 +1491,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0050");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1501,8 +1502,8 @@ package databaseclasses
 			
 			
 			function mealEventCreated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventCreationFailed);
 				
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
@@ -1512,8 +1513,8 @@ package databaseclasses
 			}
 			
 			function mealEventCreationFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventCreationFailed);
 				trace("Failed to create a mealEvent. Database0051");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1529,14 +1530,14 @@ package databaseclasses
 		internal function createNewBloodGlucoseEvent(level:int,timeStamp:Number,newLastModifiedTimeStamp:Number,unit:String,bloodglucoseeventid:Number, dispatcher:EventDispatcher = null ):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_BLOODGLUCOSEEVENT;
 				//(bloodglucoseeventid, unit, creationtimestamp, value)
@@ -1551,8 +1552,8 @@ package databaseclasses
 			}
 			
 			function bloodGlucoseLevelCreated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodGlucoseLevelCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodGlucoseLevelCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,bloodGlucoseLevelCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,bloodGlucoseLevelCreationFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -1560,8 +1561,8 @@ package databaseclasses
 			}
 			
 			function bloodGlucoseLevelCreationFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodGlucoseLevelCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodGlucoseLevelCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,bloodGlucoseLevelCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,bloodGlucoseLevelCreationFailed);
 				trace("Failed to create a bloodglucseevent. Database0081");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1570,8 +1571,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0080");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1600,14 +1601,14 @@ package databaseclasses
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_SELECTED_FOOD_ITEM;
 				localSqlStatement.parameters[":selectedfooditemid"] = selectedItemId;
@@ -1627,8 +1628,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0050");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1637,8 +1638,8 @@ package databaseclasses
 			}
 						
 			function selectedItemCreated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedItemCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedItemCreationFailed);
 				trace("newSelectedItem successfully stored");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
@@ -1647,8 +1648,8 @@ package databaseclasses
 			}
 			
 			function selectedItemCreationFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedItemCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedItemCreationFailed);
 				trace("Failed to create a selectedItem. Database0052");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1677,15 +1678,15 @@ package databaseclasses
 			//so start with calculating the minimumTimeStamp
 			var minimumTimeStamp:Number = (new Date()).valueOf() - (new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE))) * 24 * 3600 * 1000;
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			
 			function onOpenError(e:SQLError):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				if (globalDispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					event.data = "failed to open sql connection";
@@ -1695,8 +1696,8 @@ package databaseclasses
 			}
 			
 			function onOpenResult(e:SQLError):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				
 				localSqlStatement.addEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
@@ -1971,14 +1972,14 @@ package databaseclasses
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = UPDATE_SELECTED_FOOD_ITEM;
 				localSqlStatement.parameters[":selectedfooditemid"] = selectedFoodItemId;
@@ -1998,8 +1999,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0101");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2009,8 +2010,8 @@ package databaseclasses
 			
 			
 			function selectedItemUpdated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedItemUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedItemUpdateFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -2018,8 +2019,8 @@ package databaseclasses
 			}
 			
 			function selectedItemUpdateFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedItemUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedItemUpdateFailed);
 				trace("Failed to update a insulinratio. Database0102");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2037,14 +2038,14 @@ package databaseclasses
 		internal function createNewMedicinEvent(amount:int,medicin:String, timeStamp:Number,newLastModifiedTimeStamp:Number,medicineventid:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_MEDICINEVENT;
 				//(bloodglucoseeventid, unit, creationtimestamp, value)
@@ -2059,8 +2060,8 @@ package databaseclasses
 			}
 			
 			function medicinEventCreated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicinEventCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicinEventCreationFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -2068,8 +2069,8 @@ package databaseclasses
 			}
 			
 			function medicinEventCreationFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicinEventCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicinEventCreationFailed);
 				trace("Failed to create a medicinEvent. Database0091");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2078,8 +2079,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0092");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2094,14 +2095,14 @@ package databaseclasses
 		internal function updateMedicinEvent(medicinEventId:Number,newAmount:Number,newMedicinName:String,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = UPDATE_MEDICINEVENT;
 				localSqlStatement.parameters[":id"] = medicinEventId;
@@ -2115,8 +2116,8 @@ package databaseclasses
 			}
 			
 			function medicinEventUpdated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicinEventUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicinEventUpdateFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -2124,8 +2125,8 @@ package databaseclasses
 			}
 			
 			function medicinEventUpdateFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicinEventUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicinEventUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicinEventUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicinEventUpdateFailed);
 				trace("Failed to update a medicinEvent. Database0100");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2134,8 +2135,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0101");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2151,14 +2152,14 @@ package databaseclasses
 		internal function createNewExerciseEvent(level:String, comment:String, timeStamp:Number, newLastModifiedTimeStamp:Number,exerciseeventid:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_EXERCISEEVENT;
 				//(bloodglucoseeventid, unit, creationtimestamp, value)
@@ -2173,8 +2174,8 @@ package databaseclasses
 			}
 			
 			function exerciseEventCreated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseEventCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseEventCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseEventCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseEventCreationFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -2182,8 +2183,8 @@ package databaseclasses
 			}
 			
 			function exerciseEventCreationFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseEventCreated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseEventCreationFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseEventCreated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseEventCreationFailed);
 				trace("Failed to create a medicinEvent. Database0093");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2192,8 +2193,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0094");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2208,14 +2209,14 @@ package databaseclasses
 		internal function updateExerciseEvent(exerciseEventId:Number,newLevel:String,newComment_2:String,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = UPDATE_EXERCISEEVENT;
 				localSqlStatement.parameters[":id"] = exerciseEventId;
@@ -2229,8 +2230,8 @@ package databaseclasses
 			}
 			
 			function exerciseEventUpdated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseEventUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseEventUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseEventUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseEventUpdateFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -2238,8 +2239,8 @@ package databaseclasses
 			}
 			
 			function exerciseEventUpdateFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseEventUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseEventUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseEventUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseEventUpdateFailed);
 				trace("Failed to update an exerciseEvent. Database0102");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2248,8 +2249,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0102");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2265,14 +2266,14 @@ package databaseclasses
 		internal function updateBloodGlucoseEvent(bloodglucoseEventId:Number,unit:String,bloodGlucoseLevel:int,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = UPDATE_BLOODGLUCOSEEVENT;
 				localSqlStatement.parameters[":id"] = bloodglucoseEventId;
@@ -2286,8 +2287,8 @@ package databaseclasses
 			}
 			
 			function bloodglucoseEventUpdated(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodglucoseEventUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodglucoseEventUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,bloodglucoseEventUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,bloodglucoseEventUpdateFailed);
 				trace("bloodglucoseevent updated in database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
@@ -2296,8 +2297,8 @@ package databaseclasses
 			}
 			
 			function bloodglucoseEventUpdateFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodglucoseEventUpdated);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodglucoseEventUpdateFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,bloodglucoseEventUpdated);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,bloodglucoseEventUpdateFailed);
 				trace("Failed to update a bloodglucoseEvent. Database0110");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2306,8 +2307,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database. Database0111");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2318,17 +2319,20 @@ package databaseclasses
 		
 		
 		internal function deleteMealEvent(mealEventId:Number,dispatcher:EventDispatcher = null):void {
+			var yes:int=0;
+			trace("in database.as deleteMealEvent");
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				trace("in onopenresult");
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = DELETE_ROW_IN_TABLE_MEALEVENTS;
 				localSqlStatement.parameters[":mealeventid"] = mealEventId;
@@ -2338,8 +2342,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database in unction deleteMealEvent in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2349,8 +2353,12 @@ package databaseclasses
 			
 			
 			function mealeventDeleted(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealeventDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealeventDeletionFailed);
+				if (yes < 10) {
+					yes ++;
+					trace("in database.as mealeventDeleted");
+				}
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealeventDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealeventDeletionFailed);
 				localSqlStatement.addEventListener(SQLEvent.RESULT,selectedFoodItemsDeleted);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,selectedFoodItemsDeletionFailed);
 				localSqlStatement.sqlConnection = aConn;
@@ -2361,8 +2369,8 @@ package databaseclasses
 			}
 			
 			function selectedFoodItemsDeleted (se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemsDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedFoodItemsDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedFoodItemsDeletionFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -2370,8 +2378,8 @@ package databaseclasses
 			}
 			
 			function selectedFoodItemsDeletionFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemsDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemsDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedFoodItemsDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedFoodItemsDeletionFailed);
 				trace("SelectedFoodItemsDeletionFailed. function deleteMealEvent in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2380,8 +2388,8 @@ package databaseclasses
 			}
 			
 			function mealeventDeletionFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,mealeventDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,mealeventDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealeventDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealeventDeletionFailed);
 				trace("Mealeventdeletionfailed, function deleteMealEvent in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2394,14 +2402,14 @@ package databaseclasses
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = DELETE_ROW_IN_TABLE_MEDICINEVENTS;
 				localSqlStatement.parameters[":medicineventid"] = medicinEventId;
@@ -2411,8 +2419,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database in unction deleteMealEvent in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2421,8 +2429,8 @@ package databaseclasses
 			}
 			
 			function medicineventDeleted(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicineventDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicineventDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicineventDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicineventDeletionFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -2430,8 +2438,8 @@ package databaseclasses
 			}
 			
 			function medicineventDeletionFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,medicineventDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,medicineventDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicineventDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicineventDeletionFailed);
 				trace("medicineventdeletionfailed, function delete Event in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2444,14 +2452,14 @@ package databaseclasses
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = DELETE_ROW_IN_TABLE_BLOODGLUCOSEEVENTS;
 				localSqlStatement.parameters[":bloodglucoseeventid"] = bloodglucoseEventId;
@@ -2461,8 +2469,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database in unction deleteMealEvent in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2471,8 +2479,8 @@ package databaseclasses
 			}
 			
 			function bloodglucoseeventDeleted(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodglucoseeventDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodglucoseeventDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,bloodglucoseeventDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,bloodglucoseeventDeletionFailed);
 				trace("bloodglucoseevent deleted in database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
@@ -2481,8 +2489,8 @@ package databaseclasses
 			}
 			
 			function bloodglucoseeventDeletionFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,bloodglucoseeventDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,bloodglucoseeventDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,bloodglucoseeventDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,bloodglucoseeventDeletionFailed);
 				trace("bloodglucoseeventdeletionfailed, function delete Event in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2495,14 +2503,14 @@ package databaseclasses
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = DELETE_ROW_IN_TABLE_EXERCISEEVENTS;
 				localSqlStatement.parameters[":exerciseeventid"] = exerciseEventId;
@@ -2512,8 +2520,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database in unction deleteMealEvent in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2522,8 +2530,8 @@ package databaseclasses
 			}
 			
 			function exerciseeventDeleted(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseeventDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseeventDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseeventDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseeventDeletionFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -2531,8 +2539,8 @@ package databaseclasses
 			}
 			
 			function exerciseeventDeletionFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,exerciseeventDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,exerciseeventDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseeventDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseeventDeletionFailed);
 				trace("exerciseeventdeletionfailed, function delete Event in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2548,14 +2556,14 @@ package databaseclasses
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
+			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = DELETE_ROW_IN_TABLE_SELECTED_FOODITEMS_MATCHING_SELECTEDFOODITEMID;
 				localSqlStatement.parameters[":selectedfooditemid"] = selectedFoodItemId;
@@ -2565,8 +2573,8 @@ package databaseclasses
 			}
 			
 			function onOpenError(see:SQLErrorEvent):void {
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,onOpenResult);
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onOpenError);
+				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
+				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				trace("Failed to open the database in function deleteSelectedFoodItem in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2575,8 +2583,8 @@ package databaseclasses
 			}
 			
 			function selectedFoodItemDeleted(se:SQLEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedFoodItemDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedFoodItemDeletionFailed);
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
@@ -2584,8 +2592,8 @@ package databaseclasses
 			}
 			
 			function selectedFoodItemDeletionFailed(see:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
-				localSqlStatement.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedFoodItemDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedFoodItemDeletionFailed);
 				trace("selectedFoodItemDeletionFailed, function deleteSelectedFoodItem in Database.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
