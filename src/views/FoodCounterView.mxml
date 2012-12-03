@@ -110,7 +110,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					firstStartUp = true;
 					notificationPopUp = new Notification();
 					notificationPopUp.notificationText = resourceManager.getString('helpdiabetes','infoaboutlanguageselection');
-					var temp:String = notificationPopUp.notificationText;
 					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
 					PopUpManager.addPopUp(notificationPopUp, thisObject, true);
 					PopUpManager.centerPopUp(notificationPopUp);
