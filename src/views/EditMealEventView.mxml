@@ -56,8 +56,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import utilities.MyGATracker;
 
-			private var notificationPopUp:Notification;
-			
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
 
@@ -88,6 +86,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			private var helpCallOut:HelpCallOut;
 			
+			private var itemsAreEditable:Boolean;
+			
 			override public function set data(value:Object):void {
 				super.data = value;
 				mealEvent = value as MealEvent;
@@ -95,13 +95,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onCreationComplete():void {
-				if (fooditemlist.hasEventListener(Event.CHANGE)) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
-					helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditSelectedItem;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-					helpCallOut.verticalPosition = "before";
-					helpCallOut.open(fooditemlist,true);
+				if (itemsAreEditable) {
+					if (fooditemlist.hasEventListener(Event.CHANGE)) {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
+						helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditSelectedItem;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+						helpCallOut.verticalPosition = "before";
+						helpCallOut.open(fooditemlist,true);
+					}
 				}
 			}
 			
@@ -145,12 +147,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 								ModelLocator.getInstance().selectedMeal = mealCounter;						
 								fooditemlist.addEventListener(Event.CHANGE,onClick);
 								mealCounter = -1;
+								itemsAreEditable = true;
 							}
 						}
 					}
 
 					if (!fooditemlist.hasEventListener(Event.CHANGE)) {
 						fooditemlist.addEventListener(Event.CHANGE,onClickButNotEditable);
+						itemsAreEditable = false;
 					}
 
 					if (mealEvent.insulinRatio != 0)
@@ -167,19 +171,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onClickButNotEditable(event:spark.events.IndexChangeEvent):void {
-				notificationPopUp = new Notification();
-				notificationPopUp.notificationText = resourceManager.getString('editmealeventview','youcannoteditthismealevent');
-				notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
-				PopUpManager.addPopUp(notificationPopUp, this, true);
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('editmealeventview','youcannoteditthismealevent');
+				helpCallOut.settingId = 0;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,okClicked);
+				helpCallOut.verticalPosition = "before";
+				helpCallOut.open(fooditemlist,true);
 			}
 			
-			private function okClicked(event: PickerEvent):void {
-				if (notificationPopUp != null) {
-					PopUpManager.removePopUp(notificationPopUp);
-					if (notificationPopUp.hasEventListener(PickerEvent.PICKER_SET)) {
-						notificationPopUp.removeEventListener(PickerEvent.PICKER_SET, okClicked);
-					}
-				}
+			private function okClicked(event: Event):void {
 			}
 			
 			private function onClick(event:IndexChangeEvent):void {

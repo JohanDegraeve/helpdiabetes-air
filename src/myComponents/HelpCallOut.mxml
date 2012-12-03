@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 callout used to display helptext. 
 Settingid will tell of helptext is to be shown or not.
 On  calling open, a check will be done first to see if helptext is already shown or not.
+If settingid = 0, then helptext will always be shown
 -->
 <s:Callout xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		   xmlns:s="library://ns.adobe.com/flex/spark"
@@ -67,21 +68,27 @@ On  calling open, a check will be done first to see if helptext is already shown
 			
 			/**
 			 * checks if callout with helptext specified by settingid is already opened or not, and if yes then dipatches a PickerEvent.PICKER_SET<br>
-			 * otherwise calls super.open 
+			 * otherwise calls super.open <br>
+			 * if settingid = 0 then callout will always be shown, there's no corresponding settingid in that case 
 			 */
 			override public function open(owner:DisplayObjectContainer, modal:Boolean = false):void {
-				if (Settings.getInstance().getSetting(settingId) == 'true') {
+				if (settingId == 0) {
 					super.open(owner,modal);
-				}
-				else {
-					var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
-					dispatchEvent(dpe);
+				} else  {
+					if (Settings.getInstance().getSetting(settingId) == 'true') {
+						super.open(owner,modal);
+					}
+					else {
+						var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
+						dispatchEvent(dpe);
+					}
 				}
 			}
 
 			private function okClicked(event: PickerEvent):void {
 				helptextNotification.removeEventListener(PickerEvent.PICKER_SET,okClicked);
-				Settings.getInstance().setSetting(settingId,'false');
+				if (settingId != 0)
+					Settings.getInstance().setSetting(settingId,'false');
 				var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
 				dispatchEvent(dpe);
 				this.close();
