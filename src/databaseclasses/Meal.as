@@ -101,22 +101,13 @@ package databaseclasses
 		 * adds a selected food item, if there's no mealevent yet then it will be created here<br>
 		 * It is here also that the insulinratio to be used is defined,  this will be redefined each time a selectedfooditem is added<br>
 		 * Also the previous blood glucose event is checked, if any. If the time difference is less than Settings.<br>
-		 * <br>
-		 * timeStamp is optional<br>
-		 * if timeStamp is not null, then this meal.timeStamp and also if a new mealevent is created, the mealevent's timestamp is set to the timestamp value<br>
-		 * if timeStamp is null, then default value is NaN, then in the method, if it's the first selectedfooditem being added, and if it's not a future meal, then the timestamp is set to current timestamp.<br>
-		 * (note : it looks as if the timeStamp parameter is never used, ie always the default value - maybe this can be delted)
 		 */
-		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem,timeStamp:Number = Number.NaN):void {
+		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem):void {
 			var now:Date = new Date();
 			var previousBGlevel:Number = Number.NaN;
 			var insulinRatio:Number;
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			
-			if (!isNaN(timeStamp))
-				this._timeStamp = timeStamp;
-			else ;//no need to set or change the timestamp because it's already been set during meal creation, if it's the first selecteditem being added then the timestamp will be set to current timestamp a bit later
-			
+						
 			var nowAsNumber:Number = (now.hours * 3600 + now.minutes * 60 + now.seconds)*1000;
 			if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
 				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST));

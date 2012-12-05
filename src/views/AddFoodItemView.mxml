@@ -131,6 +131,12 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
+			
+			/**
+			 * tells us if the mealtimeStamp used here is still having the default mealtime or no,<br>
+			 * value only makes sense if mealevent = null,  
+			 */
+			private var defaultMealTimeSTamp:Boolean;
 
 			private function init():void {
 				trackerId = resourceManager.getString('analytics','trackeraccount');
@@ -181,20 +187,14 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (checkLastMealUpdateRequired)
 					ModelLocator.getInstance().refreshMeals();
 				
-				//here's the set the correct initial value for meal_button_text
-				if (ModelLocator.getInstance().selectedMeal >= 0) {
-					if (checkLastMealUpdateRequired)
-						checkLastMealUpdate();
-					meal_button_text = 	 initMealButtonText();				}
-				
 				if (data.foodItem) {
+					defaultMealTimeSTamp = true;
 					//addfooditemview has been created via foodcounter view, so initial setup is necessary
 					TrashButton.visible = false;
 					var dispatcher:EventDispatcher = new EventDispatcher();
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 					Database.getInstance().getUnitList((data.foodItem) ,dispatcher);
-					
 					
 					function unitListRetrieved (event:DatabaseEvent):void {
 						dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
@@ -223,11 +223,14 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					}
 					
 					function unitListRetrievelError(event:DatabaseEvent):void {
+						trace("error in addvoeoditemveiw.mxml, unitlistretrievalerror, event = " + event.target.toString());
 						dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 						dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 					}
+					
 				} else if (data.selectedFoodItem) {
 					//addfooditemview created via tracking => click on mealevent => click on selectedfooditem
+					defaultMealTimeSTamp = true;//should be false actually but anyway mealevent != null here so it will not be used
 					retrievedFoodItem = new FoodItem((data.selectedFoodItem).itemDescription,new ArrayCollection([(data.selectedFoodItem).unit]),0);
 					description_textarea_text = retrievedFoodItem.itemDescription;
 					details_button_text = createDetailsButtonText(0,(data.selectedFoodItem).chosenAmount);
@@ -235,13 +238,21 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					selectedUnit = 0;
 					TrashButton.visible = true;
 				} else { 
-					//addfooditem recreated after having pushed meal button and returning from selectedmealview
+					//addfooditem recreated after having pushed meal button and returning from selectmealview
+					defaultMealTimeSTamp = false;
 					retrievedFoodItem = (data.retrievedFoodItem as FoodItem);
 					description_textarea_text = retrievedFoodItem.itemDescription;
 					selectedUnit = data.selectedUnit;
 					amount_textinput_text = data.amount_textinput_text;
 					details_button_text = createDetailsButtonText(selectedUnit,(new Number(amount_textinput_text)) == 0 ? -1: new Number(amount_textinput_text));
 					TrashButton.visible = false;
+				}
+				
+				//here's the set the correct initial value for meal_button_text
+				if (ModelLocator.getInstance().selectedMeal >= 0) {
+					if (checkLastMealUpdateRequired)
+						checkLastMealUpdate();
+					meal_button_text = 	 initMealButtonText();				
 				}
 				
 				helpCallOut = new HelpCallOut();
@@ -389,7 +400,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null) {
 					//mealevent is null, so we will check if the current time is later than the timestamp of the meal, ie the timestamp that normally meal would start if we would 
 					//just take defalt starttimes
-					if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp < (new Date()).valueOf()) {
+					//but only if defaultMealTimeStamp =  true; - if false it means we come from selectmealview, where another timestamp has been set by the user, we will not overwrite this
+					if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp < (new Date()).valueOf() && defaultMealTimeSTamp) {
 						returnValue = 
 							timeformatter.format((new Date()).valueOf()) + " - "
 							+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
@@ -603,7 +615,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 								   amount_textarea_text="{_amount_textarea_text}"
 								   meal_textarea_text="@{meal_textarea_text}"
 								   amount_textinput_text="@{amount_textinput_text}"
-								   meal_button_text="{ meal_button_text}"
+								   meal_button_text="{meal_button_text}"
 								   details_button_click_function="{popUpUnitList}"
 								   meal_button_click_function="{mealButtonClicked}"
 								   amountTextChangedFunction="{amountTextChanged}"

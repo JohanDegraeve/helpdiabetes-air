@@ -2320,7 +2320,6 @@ package databaseclasses
 		
 		internal function deleteMealEvent(mealEventId:Number,dispatcher:EventDispatcher = null):void {
 			var yes:int=0;
-			trace("in database.as deleteMealEvent");
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -2330,7 +2329,6 @@ package databaseclasses
 				onOpenResult(null);
 			
 			function onOpenResult(se:SQLEvent):void {
-				trace("in onopenresult");
 				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
 				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;

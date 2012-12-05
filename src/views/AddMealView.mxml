@@ -150,9 +150,9 @@ view to add a new meal
 			{
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
-				if ((event.newValue as Date).valueOf() > (new Date()).valueOf()) {//check if entered date is > currentdate
+				//if ((event.newValue as Date).valueOf() > (new Date()).valueOf()) {//check if entered date is > currentdate
 					currentDateAndTime = (event.newValue as Date);
-				}
+				//}
 			}
 
 			private function okClicked():void {
