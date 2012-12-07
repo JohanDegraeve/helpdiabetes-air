@@ -74,6 +74,7 @@ package databaseclasses
 				_mealEvent = newMealEvent;
 				_timeStamp = _mealEvent.timeStamp;
 				_mealName = _mealEvent._mealName;
+				newMealEvent.meal = this;
 			}
 		}
 		
@@ -95,6 +96,7 @@ package databaseclasses
 		internal function set mealEvent(value:MealEvent):void
 		{
 			_mealEvent = value;
+			_mealEvent.meal = this;
 		}
 		
 		/**
@@ -150,7 +152,7 @@ package databaseclasses
 					}
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-					_mealEvent = new MealEvent(mealName,insulinRatio,new Number(Settings.getInstance().getSetting(Settings.SettingCORRECTION_FACTOR)), previousBGlevel,_timeStamp,localdispatcher,new Date().valueOf(),new Date().valueOf());
+					_mealEvent = new MealEvent(mealName,insulinRatio,new Number(Settings.getInstance().getSetting(Settings.SettingCORRECTION_FACTOR)), previousBGlevel,_timeStamp,localdispatcher,new Date().valueOf(),new Date().valueOf(),true,null,this as Meal);
 				} else
 					mealEventCreated(null);
 			}

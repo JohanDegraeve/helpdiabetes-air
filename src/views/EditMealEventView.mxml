@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		initialize="onInitialize()"
 		creationComplete="onCreationComplete()"
+		add="addHandler()"
 		>
 	<fx:Declarations>
 	</fx:Declarations>
@@ -36,6 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<![CDATA[
 			import com.google.analytics.AnalyticsTracker;
 			
+			import databaseclasses.Database;
+			import databaseclasses.DatabaseEvent;
 			import databaseclasses.Meal;
 			import databaseclasses.MealEvent;
 			import databaseclasses.SelectedFoodItem;
@@ -87,7 +90,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var helpCallOut:HelpCallOut;
 			
 			private var itemsAreEditable:Boolean;
-			
+
+			/**
+			 * used as context value when pushing the view ChangeMealDateAndTimeView<br>
+			 * when addHandler is called, the value of the return object will be check, if equal to CHANGE_MEAL_DATE_AND_TIME then view is popped
+			 */
+			private static const CHANGE_MEAL_DATE_AND_TIME:int = 1;
+		
 			override public function set data(value:Object):void {
 				super.data = value;
 				mealEvent = value as MealEvent;
@@ -159,6 +168,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 					if (mealEvent.insulinRatio != 0)
 						currentState="insulinAmount";
+					
 				}
 			}
 			
@@ -193,6 +203,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToPass.selectedFoodItem = mealEvent.selectedFoodItems.getItemAt(event.newIndex);
 				navigator.pushView(AddFoodItemView,dataToPass,null,null);
 			}
+			
+			private function dateTimeAndMealNameClicked(event:Event):void  {
+				if (mealEvent.meal != null)   {//meal date and time can only be changed if meal != null, that means future, current ans previous meal, but older meals than that
+					navigator.pushView(ChangeMealDateAndTimeView,{
+						meal:mealEvent.meal
+					},CHANGE_MEAL_DATE_AND_TIME);
+				}
+			}
+			
+			private function addHandler():void {
+				var localdispatcher:EventDispatcher ;
+				
+				if (navigator.poppedViewReturnedObject != null) {
+					localdispatcher = new EventDispatcher();
+					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
+						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+						ModelLocator.getInstance().trackingList = new ArrayCollection();
+						
+						localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
+						localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
+						
+						Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
+					} 
+				}
+				
+				function getAllEventsAndFillUpMealsFinished(event:Event):void
+				{
+					localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, getAllEventsAndFillUpMealsFinished);
+					localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, getAllEventsAndFillUpMealsFinished);
+					ModelLocator.getInstance().trackingList.refresh();
+					
+					ModelLocator.getInstance().refreshMeals();
+					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	<s:navigationContent>
@@ -205,7 +251,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:VerticalLayout gap="0">
 				</s:VerticalLayout>
 			</s:layout>
-			<s:TextArea id="dateTimeAndMealName" width="100%" text="{dateTimeAndMealName_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('trackingeventHeight')}"/>
+			<s:Group id="dateTimeAndMealNameGroup" click="dateTimeAndMealNameClicked(event)">
+				<s:Label id="dateTimeAndMealName" left="5" top="15"  width="100%" text="{dateTimeAndMealName_text}"   height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('trackingeventHeight')}"/>
+			</s:Group>
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0x000000" weight="1"/>

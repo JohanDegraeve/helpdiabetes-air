@@ -55,6 +55,25 @@ package databaseclasses
 		private var _previousBGlevel:int;
 
 		private var _lastModifiedTimeStamp:Number;
+		
+		private var _meal:Meal;
+
+		/**
+		 * the meal that will hod this mealEvent<br> 
+		 */
+		public function get meal():Meal
+		{
+			return _meal;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set meal(value:Meal):void
+		{
+			_meal = value;
+		}
+
 
 		/**
 		 * the lastmodifiedtimestamp
@@ -125,7 +144,7 @@ package databaseclasses
 		 * if databaseStorage = false then creationTimeStamp must be not null<br>
 		 * new mealEventId is created if databaseStorage = true.
 		 */
-		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,timeStamp:Number,dispatcher:EventDispatcher, mealEventId:Number, lastModifiedTimeStamp:Number, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null) {
+		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,timeStamp:Number,dispatcher:EventDispatcher, mealEventId:Number, lastModifiedTimeStamp:Number, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null,mealThatHoldsThisMealEvent:Meal = null) {
 			this._mealName = mealName;
 			if (isNaN(insulinRatio))
 				this._insulinRatio = 0;
@@ -137,6 +156,7 @@ package databaseclasses
 			this._totalCarbs = 0;
 			this._totalKilocalories = 0;
 			this._correctionFactor = correctionFactor;
+			this._meal = mealThatHoldsThisMealEvent;
 			
 			if (!isNaN(lastModifiedTimeStamp))
 				this._lastModifiedTimeStamp = lastModifiedTimeStamp;
@@ -262,6 +282,7 @@ package databaseclasses
 		public function set timeStamp(timeStamp:Number):void
 		{
 			this._timeStamp = timeStamp;
+			updateMealEvent(mealName,insulinRatio,correctionFactor,previousBGlevel,lastModifiedTimeStamp,timeStamp);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
