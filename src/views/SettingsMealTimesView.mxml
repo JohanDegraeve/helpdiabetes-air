@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Metadata>
 		[ResourceBundle("settingsmealtimesview")]
+		[ResourceBundle("analytics")]
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
@@ -81,6 +82,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
+				trackerId = resourceManager.getString('analytics','trackeraccount');
 				back_label = resourceManager.getString('general','back');
 				breakfastTime = timeformatter.format(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))));
 				lunchTime = timeformatter.format(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))));
