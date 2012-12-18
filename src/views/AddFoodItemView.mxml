@@ -230,7 +230,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					
 				} else if (data.selectedFoodItem) {
 					//addfooditemview created via tracking => click on mealevent => click on selectedfooditem
-					defaultMealTimeSTamp = true;//should be false actually but anyway mealevent != null here so it will not be used
+					defaultMealTimeSTamp = false;//should be false actually but anyway mealevent != null here so it will not be used
 					retrievedFoodItem = new FoodItem((data.selectedFoodItem).itemDescription,new ArrayCollection([(data.selectedFoodItem).unit]),0);
 					description_textarea_text = retrievedFoodItem.itemDescription;
 					details_button_text = createDetailsButtonText(0,(data.selectedFoodItem).chosenAmount);
@@ -443,6 +443,17 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				} else {
 					//- get the selected meal (which may or may not already include a mealevent
 					//- create a selectedfooditem and add it
+					//but first change the timestamp
+					if (((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp < (new Date()).valueOf() 
+						&&
+						defaultMealTimeSTamp)
+						&&
+						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null
+						) {
+						trace("defaultmealtimestamp = " + defaultMealTimeSTamp);
+						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp = (new Date()).valueOf();
+					}
+					
 					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
 					.addSelectedFoodItem(
 						new SelectedFoodItem(new Date().valueOf(),

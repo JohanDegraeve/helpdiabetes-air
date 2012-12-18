@@ -257,6 +257,18 @@ package databaseclasses
 		 */
 		public static const SettingsRefreshToken:int=102;
 		public static const SettingsLastSyncTimeStamp:int=103;
+		
+		/**
+		 * index to array of column names in the foodtable in google docs, index points to the next column that needs to be created<br>
+		 * 0 = first one , 1 = second, ... if > size of array of column names, then all column names are created 
+		 */
+		public static const SettingsNextColumnToAdd:int=104;
+		
+		/**
+		 * A user may have installed this app on several devices. Only one device will upload the foodtable to google docs.<br>
+		 * This setting indicates if the foodtable has been or is being created by this instance. 
+		 */
+		public static const SettingsIMtheCreateorOfGoogleExcelFoodTable:int=105;
 
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -363,7 +375,9 @@ package databaseclasses
 			"",
 			"",//default access token
 			"",//default refresh token
-			"0"//lastsynctimestamp
+			"0",//lastsynctimestamp
+			"0",//index to column names for google excel foodtable
+			"false"//creator of foodtable on google excel
 		];
 		
 		private static var instance:Settings = new Settings();

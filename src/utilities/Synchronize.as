@@ -35,6 +35,9 @@ package utilities
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
+	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestHeader;
@@ -64,7 +67,31 @@ package utilities
 		[ResourceBundle("analytics")]
 		private static var googleRequestTablesUrl:String = "https://www.googleapis.com/fusiontables/v1/tables";
 		private static var googleSelectUrl:String = "https://www.googleapis.com/fusiontables/v1/query";
+		private static var googleDriveFilesUrl:String = "https://www.googleapis.com/drive/v2/files";
 		private static var googleTokenRefreshUrl:String = "https://accounts.google.com/o/oauth2/token";
+		/**
+		 * replace {key} by the spreadsheet key<br>
+		 * replace {worksheetid} by the worksheetid
+		 */
+		private static var googleExcelInsertRowInFoodTableUrl:String = "https://spreadsheets.google.com/feeds/list/{key}/{worksheetid}/private/full";
+		private var googleExcelDeleteWorkSheetUrl:String = "";
+//https://spreadsheets.google.com/feeds/spreadsheets/private/full
+		
+		/**
+		 * replace {key} by the spreadsheet key<br>
+		 */
+		private static var googleExcelFindFoodTableWorkSheetUrl:String = "https://spreadsheets.google.com/feeds/worksheets/{key}/private/full"
+		/**
+		 * replace {key} by the spreadsheet key<br>
+		 * replace {worksheetid} by the worksheetid
+		 */
+		private static var googleExcelUpdateCellUrl:String = "https://spreadsheets.google.com/feeds/cells/{key}/{worksheetid}/private/full";
+		/**
+		 * replace {key} by the spreadsheet key<br>
+		 * replace {worksheetid} by the worksheetid
+		 */
+		private static var googleExcelCreateWorkSheetUrl:String = "https://spreadsheets.google.com/feeds/worksheets/{key}/private/full";
+		
 		/**
 		 * the maximum number of tables when asking list of tables, 25 is also the default value that google applies.<br>
 		 */
@@ -203,6 +230,44 @@ package utilities
 			]
 		];
 		
+		private var googleExcelGoodTableColumnNames:Array = [
+			"description",
+			"unit1",	
+			"standardamount1",	
+			"kcal1",
+			"protein1",	
+			"carbo1",	
+			"fat1",
+			"unit2",	
+			"standardamount2",	
+			"kcal2",
+			"protein2",	
+			"carbo2",	
+			"fat2",
+			"unit3",	
+			"standardamount3",	
+			"kcal3",
+			"protein3",	
+			"carbo3",	
+			"fat3",
+			"unit4",	
+			"standardamount4",	
+			"kcal4",
+			"protein4",	
+			"carbo4",	
+			"fat4",
+			"unit5",	
+			"standardamount5",	
+			"kcal5",
+			"protein5",	
+			"carbo5",	
+			"fat5",
+		];
+		
+		/**
+		 * name of the spreadsheet used when uploading the foodtable 
+		 */
+		private static var foodtableName:String = "HelpDiabetesFoodTable";
 		
 		/**
 		 * list of elements (events, selectedfooditems) that need to get deleted=true in remote database 
@@ -219,7 +284,7 @@ package utilities
 		private var remoteElements:ArrayList;
 		/**
 		 * this array will just have all id's of the elements that were found remotely<br><br>
-		 * actually each element will be an array with two numbers, first the eventid, secondly the rowid if already retrieved and found, if not null as second element
+		 * actually each element will be an array with  two numbers, first the eventid, secondly the rowid if already retrieved and found, if not null as second element
 		 */
 		private var remoteElementIds:ArrayList;
 		
@@ -273,6 +338,9 @@ package utilities
 		
 		private var trackingListAlreadyModified:Boolean;
 		
+		private var helpDiabetesSpreadSheetKey:String;//key to spreadsheet in google docs that has foodtable
+		private var helpDiabetesWorkSheetId:String;//key to worksheet in google docs that has foodtable
+		
 		/**
 		 * constructor not to be used, get an instance with getInstance() 
 		 */
@@ -303,8 +371,9 @@ package utilities
 		 * if tracker is null, then no tracking will be done next time 
 		 */
 		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean):void {
-			//ModelLocator.getInstance().logString = "start method startSynchronize"+ "\n";;
-
+			helpDiabetesWorkSheetId = "";//not really necessary to reset it each time to empty string, but you never know it could be that user deletes the foodtable worksheet in between to syncs,
+			helpDiabetesSpreadSheetKey = "";//same comment
+			
 			tracker = callingTracker;
 			
 			retrievalCounter = 0;
@@ -397,7 +466,7 @@ package utilities
 				} else {
 					//some other kind of yet unidentified error 
 				}
-			} else  {
+			} else {
 				nextPageToken = eventAsJSONObject.nextPageToken;
 				if (eventAsJSONObject.items) {
 					//there are table names retrieved, let's go through them
@@ -420,12 +489,12 @@ package utilities
 				}
 			}
 		}
-				
+		
 		private function createMissingTables(event:Event = null): void {
 			if (traceNeeded)
 				trace("start method createMissingTables");
 			//ModelLocator.getInstance().logString += "start method createmissingtables"+ "\n";;
-
+			
 			if (event != null) {
 				//here we come if actually a table has just been created and an Event.COMPLETE is dispatched to notify the completion.
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -454,7 +523,7 @@ package utilities
 				//stop it, we seem to be in an endless loop
 				//ModelLocator.getInstance().logString += "error 2 : " + event.target.data;
 				syncFinished(false);
-			} else  {
+			} else {
 				var i:int=0;
 				//first find next missing table, for that one will try to create it
 				for (i = 0;i < tableNamesAndColumnNames.length;i++) {
@@ -504,7 +573,7 @@ package utilities
 		
 		private function startSync():void {
 			localElements = new ArrayList();
-						
+			
 			remoteElements = new ArrayList();
 			remoteElementIds = new ArrayList();
 			nextPageToken = null;//not sure if nextPageToken is used by google when doing a select
@@ -695,8 +764,8 @@ package utilities
 							if ((trackingList.getItemAt(l) as MedicinEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								/*if (!trackingListAlreadyModified) {
-									trackingListAlreadyModified = true;
-									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+								trackingListAlreadyModified = true;
+								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 								}*/
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
@@ -717,8 +786,8 @@ package utilities
 						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
 							localElementsUpdated = true;
 							/*if (!trackingListAlreadyModified) {
-								trackingListAlreadyModified = true;
-								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+							trackingListAlreadyModified = true;
+							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 							}*/
 							
 							/*trackingList.addItem*/(new MedicinEvent(
@@ -749,7 +818,7 @@ package utilities
 			if (traceNeeded)
 				trace("start method getTheBloodGlucoseEvents");
 			//ModelLocator.getInstance().logString += "start method getthebloodglucoseevents"+ "\n";
-
+			
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -903,8 +972,8 @@ package utilities
 								if (traceNeeded) trace ("bg event  = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).toString());
 								localElementsUpdated = true;
 								/*if (!trackingListAlreadyModified) {
-									trackingListAlreadyModified = true;
-									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+								trackingListAlreadyModified = true;
+								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 								}*/
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 									if (traceNeeded)
@@ -928,8 +997,8 @@ package utilities
 						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
 							localElementsUpdated = true;
 							/*if (!trackingListAlreadyModified) {
-								trackingListAlreadyModified = true;
-								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+							trackingListAlreadyModified = true;
+							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 							}*/
 							
 							/*trackingList.addItem*/(new BloodGlucoseEvent(
@@ -1107,8 +1176,8 @@ package utilities
 							if ((trackingList.getItemAt(l) as ExerciseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								/*if (!trackingListAlreadyModified) {
-									trackingListAlreadyModified = true;
-									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+								trackingListAlreadyModified = true;
+								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 								}*/
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 									(trackingList.getItemAt(l) as ExerciseEvent).deleteEvent();
@@ -1129,8 +1198,8 @@ package utilities
 						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
 							localElementsUpdated = true;
 							/*if (!trackingListAlreadyModified) {
-								trackingListAlreadyModified = true;
-								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+							trackingListAlreadyModified = true;
+							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 							}*/
 							
 							/*trackingList.addItem*/(new ExerciseEvent(
@@ -1343,8 +1412,8 @@ package utilities
 							if ((trackingList.getItemAt(l) as MealEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								/*if (!trackingListAlreadyModified) {
-									trackingListAlreadyModified = true;
-									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+								trackingListAlreadyModified = true;
+								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 								}*/
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 									if (traceNeeded)
@@ -1594,8 +1663,8 @@ package utilities
 									localElementsUpdated = true;
 									selectedFoodItemFound = true;
 									/*if (!trackingListAlreadyModified) {
-										trackingListAlreadyModified = true;
-										ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+									trackingListAlreadyModified = true;
+									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 									}*/
 									if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 										theSelectedFoodItem.deleteEvent();
@@ -1603,12 +1672,12 @@ package utilities
 										theSelectedFoodItem.updateSelectedFoodItem(
 											remoteElements.getItemAt(m)[positionDescription],
 											new Unit(
-											remoteElements.getItemAt(m)[positionUnitDescription],
-											remoteElements.getItemAt(m)[positionUnitStandardAmount],
-											remoteElements.getItemAt(m)[positionUnitKcal],
-											remoteElements.getItemAt(m)[positionUnitProtein],
-											remoteElements.getItemAt(m)[positionUnitCarbs],
-											remoteElements.getItemAt(m)[positionUnitFat]),
+												remoteElements.getItemAt(m)[positionUnitDescription],
+												remoteElements.getItemAt(m)[positionUnitStandardAmount],
+												remoteElements.getItemAt(m)[positionUnitKcal],
+												remoteElements.getItemAt(m)[positionUnitProtein],
+												remoteElements.getItemAt(m)[positionUnitCarbs],
+												remoteElements.getItemAt(m)[positionUnitFat]),
 											remoteElements.getItemAt(m)[positionModifiedTimeStamp],
 											remoteElements.getItemAt(m)[positionChosenAmount]);
 									}
@@ -1631,8 +1700,8 @@ package utilities
 										if ((trackingList.getItemAt(lstctr) as MealEvent).eventid == remoteElements.getItemAt(m)[positionMealEventId]) {
 											localElementsUpdated = true;
 											/*if (!trackingListAlreadyModified) {
-												trackingListAlreadyModified = true;
-												ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+											trackingListAlreadyModified = true;
+											ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 											}*/
 											(trackingList.getItemAt(lstctr) as MealEvent).addSelectedFoodItem(
 												new SelectedFoodItem(
@@ -2085,7 +2154,7 @@ package utilities
 						}  else {
 							//other kinds of events ?
 							//IF SELECTEDITEM THEN DONT UPDATE THE CREATIONTIMESTAMP
-
+							
 						}
 						k++;
 					}
@@ -2108,7 +2177,7 @@ package utilities
 				
 			} else {
 				//sync other kinds of tables like settings..
-				syncFinished(true);
+				googleExcelFindFoodTableSpreadSheet(null);
 			}
 			//there should not be code here
 		}
@@ -2145,14 +2214,14 @@ package utilities
 				} else {
 					//ModelLocator.getInstance().logString += "error 3 : " + event.target.data + "\n";;
 					/*if (trackingListAlreadyModified)
-						ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;*/
+					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;*/
 					syncFinished(false);
 				}
 			} catch (e:SyntaxError) {
 				//event.taregt.data is not json
 				if (event.type == "ioError") {
 					/*if (trackingListAlreadyModified)
-						ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;*/
+					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;*/
 					//an ioError, forget about it, the show doesn't go on
 					//ModelLocator.getInstance().logString += "error 4 : " + event.target.data+ "\n";;
 					syncFinished(false);
@@ -2340,12 +2409,12 @@ package utilities
 					
 					request.method = URLRequestMethod.POST;
 					loader = new URLLoader();
-
+					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
 					functionToRecall = deleteRemoteMedicinEvent;
 					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
 					functionToRemoveFromEventListener = deleteRemoteItems;
-
+					
 					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 					loader.load(request);
 					if (traceNeeded)
@@ -2387,7 +2456,7 @@ package utilities
 				}
 			}
 		}
-
+		
 		private function deleteRemoteExerciseEvent(event:Event, exerciseEvent:ExerciseEvent = null):void {
 			var request:URLRequest
 			
@@ -2470,7 +2539,7 @@ package utilities
 				}
 			}
 		}
-
+		
 		private function deleteRemoteMealEvent(event:Event, mealEvent:MealEvent = null):void {
 			var request:URLRequest
 			
@@ -2559,7 +2628,7 @@ package utilities
 		}
 		
 		private function deleteRemoteSelectedFoodItem(event:Event, selectedFoodItem:SelectedFoodItem = null):void {
-			var request:URLRequest
+			var request:URLRequest;
 			
 			if (traceNeeded)
 				trace("in method deleteremoteselectedfooditem");
@@ -2650,6 +2719,390 @@ package utilities
 			}
 		}
 		
+		private function googleExcelInsertFoodItems(event:Event = null):void {
+			var request:URLRequest;
+			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				syncFinished(true);
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelInsertFoodItems");
+				
+				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gsx=\"http://schemas.google.com/spreadsheets/2006/extended">\n';
+				outputString += '    <gsx:description>1</gsx:description>\n';
+				outputString += '</entry>\n';
+				outputString = outputString.replace(/\n/g, File.lineEnding);
+				
+				request = new URLRequest(googleExcelInsertRowInFoodTableUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId));
+				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/atom+xml"));
+				
+				request.data = outputString;
+				request.method = URLRequestMethod.POST;
+				
+				loader = new URLLoader();
+				functionToRecall = googleExcelInsertFoodItems;
+				loader.addEventListener(Event.COMPLETE,googleExcelInsertFoodItems);
+				functionToRemoveFromEventListener = googleExcelInsertFoodItems;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+			}
+		}
+		
+		private function googleExcelCreateHeader(event:Event = null):void  {
+			var request:URLRequest;
+			if (event != null)  {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				if ((event.target.data as String).search("updated") != -1) {
+					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,(new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAdd)) + 1).toString());
+					//seems insert of cel was successfull
+				} else {
+					syncFinished(false);
+					return;
+				}
+			} 
+			
+			if (traceNeeded)
+				trace("start method googleExcelCreateHeader");
+			
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAdd)) == googleExcelGoodTableColumnNames.length)  {
+				googleExcelInsertFoodItems();
+			} else {
+				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAdd)) + 1;//index starts at 0, but column number at 1
+				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
+				outputString += '    <gs:cell row="1" col="' + nextColumn + '" inputValue="' + googleExcelGoodTableColumnNames[nextColumn - 1] + '"/>\n';
+				outputString += '</entry>\n';
+				outputString = outputString.replace(/\n/g, File.lineEnding);
+				
+				request = new URLRequest(googleExcelUpdateCellUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId));
+				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/atom+xml"));
+				
+				request.data = outputString;
+				request.method = URLRequestMethod.POST;
+				
+				loader = new URLLoader();
+				functionToRecall = googleExcelCreateHeader;
+				loader.addEventListener(Event.COMPLETE,googleExcelCreateHeader);
+				functionToRemoveFromEventListener = googleExcelCreateHeader;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+			}
+		}
+		
+		/**
+		 * this function will create the foodtable on google excel, so it should only be called if it doesn't exist yet<br>
+		 * if excel sheet successfully created, then it will mark this instance of the app as the creator of the foodtable
+		 */
+		private function googleExcelCreateFoodTable(event:Event = null):void  {
+			var request:URLRequest;
+			
+			if (event != null)  {
+				//SHOULD BE CHECKING HERE WHAT CAN GO WRONG - BECAUSE I SEEM TO ASSUME HERE THAT THE FOODTABLE CREATION WILL ALWAYS BE SUCCESSFUL
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				Settings.getInstance().setSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable,"true");
+				
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = googleExcelCreateFoodTable;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+				} else {
+					if (eventAsJSONObject.id)  {
+						helpDiabetesSpreadSheetKey = eventAsJSONObject.id;
+						googleExcelCreateWorkSheet();
+					} else {
+						//something went wrong, syncfinished successfully because sync itself was ok
+					}
+				}
+				
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelCreateFoodTable");
+				request = new URLRequest(googleDriveFilesUrl);
+				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
+				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/json"));
+				
+				var jsonObject:Object = new Object();
+				jsonObject.mimeType = "application/vnd.google-apps.spreadsheet";
+				jsonObject.title = foodtableName;
+				var bodyString:String = JSON.stringify(jsonObject);
+				request.data = bodyString;
+				request.method = URLRequestMethod.POST;
+				
+				loader = new URLLoader();
+				functionToRecall = googleExcelCreateFoodTable;
+				loader.addEventListener(Event.COMPLETE,googleExcelCreateFoodTable);
+				functionToRemoveFromEventListener = googleExcelCreateFoodTable;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+			}
+		}
+		
+		/**
+		 * this function will create the worksheet in foodtable,  on google excel, so it should only be called if it doesn't exist yet<br>
+		 * it will mark this instance of the app as the creator of the foodtable
+		 */
+		private function googleExcelCreateWorkSheet(event:Event = null):void  {
+			var request:URLRequest;
+			
+			if (event != null)  {
+				//ASSUMING HERE THAT EVERHTHING WORKS FINE, BUT THINGS COULD BE GOING WRONG
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				//Settings.getInstance().setSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable,"true");
+				
+				//ASSUMING HERE THAT WORKSHEET CREATION WAS SUCCESSFULL, WHICH IS NOT SURE
+				var cratedWorkSheetAsXML:XML = new XML(event.target.data as String);
+				//info about namespaces found on http://userflex.files.wordpress.com/2008/06/getstatuscodeas.pdf and http://userflex.wordpress.com/2008/04/03/xml-ns-e4x/
+				var xmlns : Namespace;
+				// namespace declarations defined in the xml
+				var namespaces : Array = cratedWorkSheetAsXML.namespaceDeclarations();
+				// looks for the default namespace, i know that entry is in the default namespace, so that's what i'm looking for
+				for each (var ns : Namespace in namespaces)
+				{
+					if (ns.prefix == "")//there's two other in this kind of xml that google returns : openSearch and gs but I don't need xml objects of that kind
+					{
+						xmlns = ns;
+						break;
+					}
+				}
+				
+				
+				//ASSUMING HERE THAT EVERHTHING WORKS FINE, BUT THINGS COULD BE GOING WRONG
+				helpDiabetesWorkSheetId = cratedWorkSheetAsXML..xmlns::id;
+				var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesWorkSheetId.split("/");
+				helpDiabetesWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
+				
+				if (helpDiabetesWorkSheetId == "") {
+					//we can say here that something went wrong with the creation of the worksheet
+					//we'll stop but say that sync was successful, because that already ended successfully, it's just the creation of the worksheet that failed
+					syncFinished(true);
+					return;
+				} else {
+					googleExcelCreateHeader(null);
+				}
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelCreateWorkSheet");
+				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
+				outputString += '    <title>foodtable</title>\n';
+				outputString += '        <gs:rowCount>' + ModelLocator.getInstance().foodItemList.length + '</gs:rowCount>';
+				outputString += '        <gs:colCount>' + googleExcelGoodTableColumnNames.length + '</gs:colCount>';
+				outputString += '</entry>\n';
+				outputString = outputString.replace(/\n/g, File.lineEnding);
+				
+				request = new URLRequest(googleExcelCreateWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey));
+				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/atom+xml"));
+				
+				
+				request.data = outputString;
+				request.method = URLRequestMethod.POST;
+				
+				loader = new URLLoader();
+				functionToRecall = googleExcelCreateWorkSheet;
+				loader.addEventListener(Event.COMPLETE,googleExcelCreateWorkSheet);
+				functionToRemoveFromEventListener = googleExcelCreateWorkSheet;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+			}
+		}
+		
+		/**
+		 *  deletes "sheet 1" from the foodtable spreadsheet<br>
+		 * goal is that this can run in parallel with other calls op google docs, so it will not listen to events
+		 */
+		private function googleExcelDeleteWorkSheet1():void {
+			if (googleExcelDeleteWorkSheetUrl == "")
+				return;
+			
+			var request:URLRequest;
+			if (traceNeeded)
+				trace("start method googleExcelDeleteWorkSheet1");
+			request = new URLRequest(googleExcelDeleteWorkSheetUrl);//.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetIDOfSheet1));
+			googleExcelDeleteWorkSheetUrl = "";
+			request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+			request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
+			request.contentType = "application/x-www-form-urlencoded";
+						
+			request.method = URLRequestMethod.DELETE;
+			loader = new URLLoader();
+			//functionToRecall = ;not changing becaues this might be running in parallel with otheer calls
+			//loader.addEventListener(Event.COMPLETE,googleExcelFindFoodTableWorkSheet);
+			//functionToRemoveFromEventListener = googleExcelFindFoodTableWorkSheet;
+			//loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+			loader.load(request);
+			if (traceNeeded)
+				trace("loader : request = " + request.data); 
+			
+
+		}
+		
+		private function googleExcelFindFoodTableWorkSheet(event:Event = null):void {
+			var request:URLRequest;
+			if (event != null)  {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				
+				var workSheetListAsXML:XML = new XML(event.target.data as String);
+				//info about namespaces found on http://userflex.files.wordpress.com/2008/06/getstatuscodeas.pdf and http://userflex.wordpress.com/2008/04/03/xml-ns-e4x/
+				var xmlns : Namespace;
+				// namespace declarations defined in the xml
+				var namespaces : Array = workSheetListAsXML.namespaceDeclarations();
+				// looks for the default namespace, i know that entry is in the default namespace, so that's what i'm looking for
+				for each (var ns : Namespace in namespaces)
+				{
+					if (ns.prefix == "")//there's two other in this kind of xml that google returns : openSearch and gs but I don't need xml objects of that kind
+					{
+						xmlns = ns;
+						break;
+					}
+				}
+				
+				var entryXMLList:XMLList = new XMLList(workSheetListAsXML..xmlns::entry);
+				
+				for (var listCounter:int = 0 ; listCounter < entryXMLList.length();listCounter++)  {
+					var titleXML:XMLList = entryXMLList[listCounter]..xmlns::title;
+					if (entryXMLList[listCounter]..xmlns::title == "foodtable") {
+						helpDiabetesWorkSheetId = entryXMLList[listCounter]..xmlns::id;
+						var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesWorkSheetId.split("/");
+						helpDiabetesWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
+						
+					}
+					if (entryXMLList[listCounter]..xmlns::title == "Sheet 1") {
+						var linkListForThisentryXMLList:XMLList = new XMLList(entryXMLList[listCounter]..xmlns::link);
+						for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
+							if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
+								if (linkListForThisentryXMLList[linkListCounter].attribute("rel") == "edit")  {
+									googleExcelDeleteWorkSheetUrl = linkListForThisentryXMLList[linkListCounter].attribute("href"); 
+								}
+							}
+						}
+					}
+				}
+				if (googleExcelDeleteWorkSheetUrl != "")  {
+					googleExcelDeleteWorkSheet1();
+				}
+				
+				if (helpDiabetesWorkSheetId == "") {
+					//we'll have to create the worksheet but it could also be that we have to recreate the worksheet, in which case we reset columns to add to 0
+					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,"0");
+					googleExcelCreateWorkSheet(null);
+					return;
+				} else {
+					googleExcelCreateHeader(null);
+				}
+				
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelFindFoodTableWorkSheet");
+				request = new URLRequest(googleExcelFindFoodTableWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey));
+				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
+				request.contentType = "application/x-www-form-urlencoded";
+				
+				request.method = URLRequestMethod.GET;
+				loader = new URLLoader();
+				functionToRecall = googleExcelFindFoodTableWorkSheet;
+				loader.addEventListener(Event.COMPLETE,googleExcelFindFoodTableWorkSheet);
+				functionToRemoveFromEventListener = googleExcelFindFoodTableWorkSheet;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+			}
+		}
+		
+		
+		/**
+		 * will try to find the foodtable spreadsheet in google docs account<br>
+		 * if not found then googleExcelCreateFoodTable will be called<br>
+		 * if found and if imthecreater, then proceed to findfoodtableworksheet<br>
+		 * if found and im not the creator, then syncfinished. 
+		 */
+		private function googleExcelFindFoodTableSpreadSheet(event:Event = null):void  {
+			var request:URLRequest;
+			if (event != null)  {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = googleExcelFindFoodTableSpreadSheet;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+				} else {
+					if (eventAsJSONObject.items)  {
+						if (eventAsJSONObject.items.length > 0)  {
+							//foodtable found
+							if (Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true")  {
+								helpDiabetesSpreadSheetKey = eventAsJSONObject.items[0].id;
+								googleExcelFindFoodTableWorkSheet();
+							} else {
+								//this instance has not created the foodtable
+								syncFinished(true);
+							}
+						} else {
+							googleExcelCreateFoodTable();
+							Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,"0");
+						}
+					} else  {
+						googleExcelCreateFoodTable();
+						Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,"0");
+					}
+				}
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelFindFoodTableSpreadSheet");
+				request = new URLRequest(googleDriveFilesUrl);
+				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
+				request.contentType = "application/x-www-form-urlencoded";
+				var urlVariables:URLVariables = new URLVariables();
+				
+				urlVariables.q = "title = '" + foodtableName + "'";
+				request.data = urlVariables;
+				request.method = URLRequestMethod.GET;
+				loader = new URLLoader();
+				functionToRecall = googleExcelFindFoodTableSpreadSheet;
+				loader.addEventListener(Event.COMPLETE,googleExcelFindFoodTableSpreadSheet);
+				functionToRemoveFromEventListener = googleExcelFindFoodTableSpreadSheet;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+			}
+		}
+		
 		/**
 		 * to call when sync has finished 
 		 */
@@ -2667,7 +3120,7 @@ package utilities
 						trackingListAlreadyModified = true;
 						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 					}
-
+					
 					ModelLocator.getInstance().trackingList = new ArrayCollection();
 					
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
@@ -2694,7 +3147,7 @@ package utilities
 				syncRunning = true;
 				rerunNecessary = false;
 				synchronize();
-			} else  {
+			} else {
 				syncRunning = false;
 			}
 			
@@ -2714,8 +3167,6 @@ package utilities
 			listOfElementsToBeDeleted.addItem(object);
 		}
 	}
-	
-	
 }
 
 

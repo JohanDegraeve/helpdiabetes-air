@@ -145,11 +145,13 @@ package databaseclasses
 				} 
 				if (_mealEvent == null) {
 					//it's the first selectedfooditem, and if no timestamp was supplied then set _timestamp to current time
-					if (isNaN(timeStamp)) {
+					//correction 2012-12-09, this was a residu from a previous version where timestamp was a parameter  in addSelectedFoodItem
+					//but now timeStamp points to meal.timeStamp, which is never nan.
+					/*if (isNaN(timeStamp)) {
 						if (((new Date()).valueOf() - _timeStamp) > 0) {
 							_timeStamp = (new Date()).valueOf();
 						}
-					}
+					}*/
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
 					_mealEvent = new MealEvent(mealName,insulinRatio,new Number(Settings.getInstance().getSetting(Settings.SettingCORRECTION_FACTOR)), previousBGlevel,_timeStamp,localdispatcher,new Date().valueOf(),new Date().valueOf(),true,null,this as Meal);
