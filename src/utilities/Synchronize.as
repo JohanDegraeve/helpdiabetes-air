@@ -24,6 +24,7 @@ package utilities
 	import databaseclasses.Database;
 	import databaseclasses.DatabaseEvent;
 	import databaseclasses.ExerciseEvent;
+	import databaseclasses.FoodItem;
 	import databaseclasses.MealEvent;
 	import databaseclasses.MedicinEvent;
 	import databaseclasses.SelectedFoodItem;
@@ -75,7 +76,7 @@ package utilities
 		 */
 		private static var googleExcelInsertRowInFoodTableUrl:String = "https://spreadsheets.google.com/feeds/list/{key}/{worksheetid}/private/full";
 		private var googleExcelDeleteWorkSheetUrl:String = "";
-//https://spreadsheets.google.com/feeds/spreadsheets/private/full
+		//https://spreadsheets.google.com/feeds/spreadsheets/private/full
 		
 		/**
 		 * replace {key} by the spreadsheet key<br>
@@ -98,9 +99,13 @@ package utilities
 		private static var maxResults:int = 25;
 		
 		/**
-		 * how many minutes between two synchronisations 
+		 * how many minutes between two synchronisations, normal value
 		 */
-		private static var secondsBetweenTwoSync:int = 10;
+		private static var normalValueForSecondsBetweenTwoSync:int = 30;
+		/**
+		 * how many minutes between two synchronisations, actual value
+		 */
+		private var secondsBetweenTwoSync:int = normalValueForSecondsBetweenTwoSync;
 		
 		private static var googleError_Invalid_Credentials:String = "Invalid Credentials";
 		
@@ -341,6 +346,8 @@ package utilities
 		private var helpDiabetesSpreadSheetKey:String;//key to spreadsheet in google docs that has foodtable
 		private var helpDiabetesWorkSheetId:String;//key to worksheet in google docs that has foodtable
 		
+		private var foodItemIdBeingTreated:int;
+
 		/**
 		 * constructor not to be used, get an instance with getInstance() 
 		 */
@@ -371,20 +378,26 @@ package utilities
 		 * if tracker is null, then no tracking will be done next time 
 		 */
 		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean):void {
-			helpDiabetesWorkSheetId = "";//not really necessary to reset it each time to empty string, but you never know it could be that user deletes the foodtable worksheet in between to syncs,
-			helpDiabetesSpreadSheetKey = "";//same comment
-			
 			tracker = callingTracker;
+
+			if (!(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true"))//uploading foodtable can take a very long time 
+				secondsBetweenTwoSync = 3600;
+			else 
+				secondsBetweenTwoSync = normalValueForSecondsBetweenTwoSync;
 			
-			retrievalCounter = 0;
-			trackingList = ModelLocator.getInstance().trackingList;
-			localElementsUpdated  = false;
-			
+			if (traceNeeded)  {
+				trace("secondsBetweenTwoSync = " + secondsBetweenTwoSync);
+				trace("Settings.SettingsAllFoodItemsUploadedToGoogleExcel = " + Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel));
+			}
 			
 			var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > secondsBetweenTwoSync * 1000;
-			if (traceNeeded) {
-			}
+
 			if ((syncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!syncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
+				localElementsUpdated  = false;
+				retrievalCounter = 0;
+				helpDiabetesWorkSheetId = "";//not really necessary to reset it each time to empty string, but you never know it could be that user deletes the foodtable worksheet in between to syncs,
+				helpDiabetesSpreadSheetKey = "";//same comment
+				trackingList = ModelLocator.getInstance().trackingList;
 				currentSyncTimeStamp = new Date().valueOf();
 				lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
 				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
@@ -2720,24 +2733,66 @@ package utilities
 		}
 		
 		private function googleExcelInsertFoodItems(event:Event = null):void {
+			if (Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true")
+				return;
+			
 			var request:URLRequest;
 			if (event != null) {
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				syncFinished(true);
-			} else {
-				if (traceNeeded)
-					trace("start method googleExcelInsertFoodItems");
+				//not checking if there's an error in event, if we get here it should mean there wasn't an error - let's hope so
+				if (foodItemIdBeingTreated == ModelLocator.getInstance().foodItemList.length - 1) {
+					Settings.getInstance().setSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel,"true");
+					syncFinished(true);
+					return;
+				} // else we continue
+				Settings.getInstance().setSetting(Settings.SettingsNextRowToAdd,new Number(foodItemIdBeingTreated + 1).toString());
+			} else  {//first time we come here, we need to initialize foodItemIdBeingTreated
+				foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAdd));
+			}
+			if (traceNeeded)
+				trace("start method googleExcelInsertFoodItems");
+			
+			var dispatcher:EventDispatcher = new EventDispatcher();
+			var retrievedFoodItem:FoodItem;
+			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
+			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
+			foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAdd));
+			Database.getInstance().getUnitList((ModelLocator.getInstance().foodItemList.getItemAt(foodItemIdBeingTreated) as FoodItem) ,dispatcher);
+			
+			function unitListRetrieved (event:DatabaseEvent):void {
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
+				
+				//retrieved fooditem does not have a valid itemid, meaning it can not be used to manage the database
+				//(comment copied from AddFoodItemView, not sure why and what
+				retrievedFoodItem = new FoodItem((ModelLocator.getInstance().foodItemList.getItemAt(foodItemIdBeingTreated) as FoodItem).itemDescription,event.data as ArrayCollection,0);
 				
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gsx=\"http://schemas.google.com/spreadsheets/2006/extended">\n';
-				outputString += '    <gsx:description>1</gsx:description>\n';
+				outputString += '    <gsx:description><![CDATA[' + retrievedFoodItem.itemDescription + ']]></gsx:description>\n';
+				for (var unitCtr:int = 0;unitCtr < retrievedFoodItem.getNumberOfUnits() && unitCtr < 5;unitCtr++ ) {
+					outputString += '    <gsx:unit' + (unitCtr + 1) + '><![CDATA[' + retrievedFoodItem.getUnit(unitCtr).unitDescription + ']]></gsx:unit' + (unitCtr + 1) + '> \n';
+					outputString += '    <gsx:standardamount' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).standardAmount + '</gsx:standardamount' + (unitCtr + 1) + '>\n';
+					outputString += '    <gsx:kcal' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).kcal + '</gsx:kcal' + (unitCtr + 1) +  '>\n';
+					outputString += '    <gsx:protein' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).protein + '</gsx:protein' + (unitCtr + 1) + '>\n';
+					outputString += '    <gsx:carbo' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).carbs + '</gsx:carbo' + (unitCtr + 1) + '>\n';
+					outputString += '    <gsx:fat' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).fat + '</gsx:fat' + (unitCtr + 1) + '>\n';
+				}
 				outputString += '</entry>\n';
 				outputString = outputString.replace(/\n/g, File.lineEnding);
+
+				var newOutputString:String = outputString.replace(">-1<","><");
+				while (newOutputString != outputString) {
+					outputString = newOutputString;
+					newOutputString = outputString.replace(">-1<","><");
+				}
 				
 				request = new URLRequest(googleExcelInsertRowInFoodTableUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId));
 				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/atom+xml"));
+				if (traceNeeded)
+					trace("url = " + request.url);
 				
 				request.data = outputString;
 				request.method = URLRequestMethod.POST;
@@ -2750,6 +2805,13 @@ package utilities
 				loader.load(request);
 				if (traceNeeded)
 					trace("loader : request = " + request.data); 
+			}
+			
+			function unitListRetrievelError(event:DatabaseEvent):void {
+				trace("error in synchronize.ass, unitlistretrievalerror, event = " + event.target.toString());
+				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
+				syncFinished(true);//stop the sync, sync itself was ok, but not the upload of fooditems
 			}
 		}
 		
@@ -2803,6 +2865,8 @@ package utilities
 		 * if excel sheet successfully created, then it will mark this instance of the app as the creator of the foodtable
 		 */
 		private function googleExcelCreateFoodTable(event:Event = null):void  {
+			Settings.getInstance().setSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel,"false");
+			
 			var request:URLRequest;
 			
 			if (event != null)  {
@@ -2863,6 +2927,8 @@ package utilities
 		 * it will mark this instance of the app as the creator of the foodtable
 		 */
 		private function googleExcelCreateWorkSheet(event:Event = null):void  {
+			Settings.getInstance().setSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel,"false");
+			
 			var request:URLRequest;
 			
 			if (event != null)  {
@@ -2947,7 +3013,7 @@ package utilities
 			request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 			request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
 			request.contentType = "application/x-www-form-urlencoded";
-						
+			
 			request.method = URLRequestMethod.DELETE;
 			loader = new URLLoader();
 			//functionToRecall = ;not changing becaues this might be running in parallel with otheer calls
@@ -2958,7 +3024,7 @@ package utilities
 			if (traceNeeded)
 				trace("loader : request = " + request.data); 
 			
-
+			
 		}
 		
 		private function googleExcelFindFoodTableWorkSheet(event:Event = null):void {
@@ -3010,6 +3076,7 @@ package utilities
 				if (helpDiabetesWorkSheetId == "") {
 					//we'll have to create the worksheet but it could also be that we have to recreate the worksheet, in which case we reset columns to add to 0
 					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,"0");
+					Settings.getInstance().setSetting(Settings.SettingsNextRowToAdd,"0");
 					googleExcelCreateWorkSheet(null);
 					return;
 				} else {
@@ -3074,10 +3141,12 @@ package utilities
 						} else {
 							googleExcelCreateFoodTable();
 							Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,"0");
+							Settings.getInstance().setSetting(Settings.SettingsNextRowToAdd,"0");
 						}
 					} else  {
 						googleExcelCreateFoodTable();
 						Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,"0");
+						Settings.getInstance().setSetting(Settings.SettingsNextRowToAdd,"0");
 					}
 				}
 			} else {

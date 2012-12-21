@@ -269,7 +269,15 @@ package databaseclasses
 		 * This setting indicates if the foodtable has been or is being created by this instance. 
 		 */
 		public static const SettingsIMtheCreateorOfGoogleExcelFoodTable:int=105;
-
+		/**
+		 * index to fooditems table in the foodtable in google docs, index points to the next row that needs to be inserted<br>
+		 * 0 = first one , 1 = second, ... if > size of foodtable in the database installed here, then all rows are uploaded<br>
+		 * Once upload is finished, this value may not match anymore, because user may have downloaded a new database with a different size,
+		 * therefor the next setting is also important
+		 */
+		public static const SettingsNextRowToAdd:int=106;
+		public static const SettingsAllFoodItemsUploadedToGoogleExcel:int=107;
+		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
 			"none",// initially there will be no meal too which the last  fooditem has been added
@@ -377,7 +385,9 @@ package databaseclasses
 			"",//default refresh token
 			"0",//lastsynctimestamp
 			"0",//index to column names for google excel foodtable
-			"false"//creator of foodtable on google excel
+			"false",//creator of foodtable on google excel
+			"0",//SettingsNextRowToAdd
+			"false"//all fooditmes uploaded or not
 		];
 		
 		private static var instance:Settings = new Settings();
