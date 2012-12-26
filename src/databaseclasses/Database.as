@@ -377,7 +377,7 @@ package databaseclasses
 						if  ((o.id as int) != Settings.SettingsFirstStartUp || !databaseWasCopiedFromSampleFile) {
 							//retrievalresult[Settings.SettingsFirstStartUp] will remain null so it will get the value from the class later on
 							retrievalResult[(o.id as int)] = (o.value as String);
-							Settings.getInstance().setSettingWithoutDatabaseUpdate((o.id as int),(o.value as String));
+							Settings.getInstance().setSettingWithoutDatabaseUpdate((o.id as int),(o.value as String), new Number(o.lastmodifiedtimestamp as String));
 						}
 					}
 				}
@@ -402,7 +402,7 @@ package databaseclasses
 							UPDATE_SETTING;
 						sqlStatement.parameters[":id"] = id;
 						sqlStatement.parameters[":value"] = Settings.getInstance().getSetting(id);
-						sqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+						sqlStatement.parameters[":lastmodifiedtimestamp"] = Settings.getInstance().getSettingLastModifiedTimeStamp(id);
 						sqlStatement.execute();
 					} else {
 						addMissingSetting(id + 1);
@@ -1396,10 +1396,11 @@ package databaseclasses
 		}
 		
 		/**
-		 * should only be used by settings class, therefore it's package private
-		 * didn't test with the dispatcher
+		 * should only be used by settings class, therefore it's package private<br>
+		 * didn't test with the dispatcher<br>
+		 * if lastmodifedtimestamp = NaN then current date and time is stored
 		 */
-		internal function updateSetting(id:int,value:String, dispatcher:EventDispatcher):void {
+		internal function updateSetting(id:int,value:String, lastModifiedTimeStamp:Number, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -1415,7 +1416,7 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_SETTING;
 				localSqlStatement.parameters[":id"] = id;
 				localSqlStatement.parameters[":value"] = value;
-				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (isNaN(lastModifiedTimeStamp) ? (new Date()).valueOf() : lastModifiedTimeStamp);
 				localSqlStatement.addEventListener(SQLEvent.RESULT, settingUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, settingUpdateFailed);
 				localSqlStatement.execute();

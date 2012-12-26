@@ -51,8 +51,6 @@ package databaseclasses
 		 */
 		internal static const SettingNEXT_MEALEVENT_ID:int=2;
 		/**
-		 * id to be used when adding a new selected item<br>
-		 * only to be used within the database class therefore package private<br>
 		 * not used anymore
 		 */
 		internal static const SettingNEXT_SELECTEDITEM_ID:int=3;
@@ -390,6 +388,11 @@ package databaseclasses
 			"false"//all fooditmes uploaded or not
 		];
 		
+		/** array with lastmodifiedtimestamp<br> 
+		 * initialisation in the same way as settingsitself<br>
+		 */
+		private var settingsLastModifiedTimeStamp:Array;
+		
 		private static var instance:Settings = new Settings();
 		
 		public function Settings()
@@ -412,6 +415,11 @@ package databaseclasses
 			settings[SettingsExerciseType4] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype4');
 			settings[SettingsExerciseType5] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype5');
 			settings[SettingsFirstStartUp] = (new Date()).valueOf().toString();
+			
+			settingsLastModifiedTimeStamp = new Array(settings.length);
+			for (var i:int = 0;i < settingsLastModifiedTimeStamp.length;i++)
+				settingsLastModifiedTimeStamp[i] = new Number(0);
+			
 			instance = this;
 		}
 		
@@ -424,27 +432,43 @@ package databaseclasses
 		 * get the setting specified by the Setting id
 		 */
 		public function getSetting(settingId:int):String {
+			//trace("setting retrieved = " + settingId);
 			return settings[settingId];
 		}
 		
 		/**
-		 * Set the setting specified by the setting id, database will also be updated asynchronously<br>
-		 * If the settingid is the maxtrackingsize, then also lastsynctimestamp will be reset to current date - maxtrackingsize
+		 * get the lastmodifiedtimestamp for the setting specified by the Setting id
 		 */
-		public function setSetting(settingId:int, newValue:String):void {
+		public function getSettingLastModifiedTimeStamp(settingId:int):Number {
+			return settingsLastModifiedTimeStamp[settingId];
+		}
+		
+		/**
+		 * Set the setting specified by the setting id, database will also be updated asynchronously<br>
+		 * If the settingid is the maxtrackingsize, then also lastsynctimestamp will be reset to current date - maxtrackingsize<br>
+		 * if lastModifiedTimeStamp == null then current date and time are used
+		 */
+		public function setSetting(settingId:int, newValue:String,lastModifiedTimeStamp:Number = Number.NaN):void {
 			var dispatcher:EventDispatcher = new EventDispatcher();
 			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailure);
 			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,settingInsertionSuccess);
 			
 			var oldValue:String = settings[settingId];
+			var oldLastModifiedTimeStamp:Number = settingsLastModifiedTimeStamp[settingId] ;
 			
+			if (isNaN(lastModifiedTimeStamp))
+				lastModifiedTimeStamp = (new Date()).valueOf();
+			settingsLastModifiedTimeStamp[settingId] = lastModifiedTimeStamp; 
+				
 			settings[settingId] = newValue;
-			Database.getInstance().updateSetting(settingId,newValue,dispatcher);
+			
+			Database.getInstance().updateSetting(settingId, newValue, lastModifiedTimeStamp, dispatcher);
 			
 			function settingInsertionFailure(se:Event):void {
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailure);
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInsertionSuccess);
 				settings[settingId] = oldValue;
+				settingsLastModifiedTimeStamp[settingId] = oldLastModifiedTimeStamp;
 			}
 			
 			function settingInsertionSuccess(se:Event):void {
@@ -462,8 +486,12 @@ package databaseclasses
 			return settings.length;
 		}
 		
-		public function setSettingWithoutDatabaseUpdate(settingId:int, newValue:String):void {
+		public function setSettingWithoutDatabaseUpdate(settingId:int, newValue:String, lastModifiedTimeStamp:Number = Number.NaN):void {
+			if (isNaN(lastModifiedTimeStamp))
+				lastModifiedTimeStamp = (new Date()).valueOf();
+			
 			settings[settingId] = newValue;
+			settingsLastModifiedTimeStamp[settingId] = lastModifiedTimeStamp;
 		}
 		
 		private function getAmountOfSettings():int {

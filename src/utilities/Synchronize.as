@@ -232,6 +232,15 @@ package utilities
 					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
 				],
 				"Selected Food Items"//description
+			],
+			[	"HD-Settings",
+				"",	
+				[						
+					["id","NUMBER"],//the unique identifier
+					["value","STRING"],
+					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+				],
+				"Settings"//description
 			]
 		];
 		
@@ -280,16 +289,18 @@ package utilities
 		private var listOfElementsToBeDeleted:ArrayList;
 		
 		/**
-		 * list of objects found in local database 
+		 * list of objects found in local database
 		 */
 		private var localElements:ArrayList;
 		/**
-		 * list of objects found in remote database 
+		 * list of objects found in remote database<br>
+		 * in case of syncing settings, it is used differently
 		 */
 		private var remoteElements:ArrayList;
 		/**
 		 * this array will just have all id's of the elements that were found remotely<br><br>
-		 * actually each element will be an array with  two numbers, first the eventid, secondly the rowid if already retrieved and found, if not null as second element
+		 * actually each element will be an array with  two numbers, first the eventid, secondly the rowid if already retrieved and found, if not null as second element<br>
+		 * in case of syncing settings, it is used differently
 		 */
 		private var remoteElementIds:ArrayList;
 		
@@ -347,7 +358,7 @@ package utilities
 		private var helpDiabetesWorkSheetId:String;//key to worksheet in google docs that has foodtable
 		
 		private var foodItemIdBeingTreated:int;
-
+		
 		/**
 		 * constructor not to be used, get an instance with getInstance() 
 		 */
@@ -379,7 +390,7 @@ package utilities
 		 */
 		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean):void {
 			tracker = callingTracker;
-
+			
 			if (!(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true"))//uploading foodtable can take a very long time 
 				secondsBetweenTwoSync = 3600;
 			else 
@@ -391,7 +402,7 @@ package utilities
 			}
 			
 			var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > secondsBetweenTwoSync * 1000;
-
+			
 			if ((syncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!syncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
 				localElementsUpdated  = false;
 				retrievalCounter = 0;
@@ -509,6 +520,9 @@ package utilities
 			//ModelLocator.getInstance().logString += "start method createmissingtables"+ "\n";;
 			
 			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+
 				//here we come if actually a table has just been created and an Event.COMPLETE is dispatched to notify the completion.
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if  (eventAsJSONObject.error) {
@@ -1120,9 +1134,9 @@ package utilities
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				loader.load(request);
 				if (traceNeeded)
-					trace("get the medicinevents , loader : request = " + request.data); 
+					trace("get the exerciseevents , loader : request = " + request.data); 
 			} else {
-				//get the medicinevents in the trackinglist and store them in localElements.
+				//get the exerciseevents in the trackinglist and store them in localElements.
 				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
 				for (var i:int = 0; i < trackingList.length; i++) {
 					if (trackingList.getItemAt(i) is ExerciseEvent) {
@@ -1862,6 +1876,9 @@ package utilities
 			if (traceNeeded)
 				trace ("in method synclocalevents");
 			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
 				if  (eventAsJSONObject.error) {
@@ -2190,12 +2207,313 @@ package utilities
 				
 			} else {
 				//sync other kinds of tables like settings..
-				googleExcelFindFoodTableSpreadSheet(null);
+				remoteElements = new ArrayList();
+				remoteElementIds = new ArrayList();
+				localElements = new ArrayList();
+				getTheSettings(null);
 			}
 			//there should not be code here
 		}
 		
+		private function getTheSettings(event:Event = null):void {
+			//here remoteelements are all remote settings, since we queried on id > 3 and < 29
+			//we will go through them and any missing settingid will be added in remoteelementids
+			//any element in remotelements that needs no update (ie same modifiedtimestamp)  will be removed
+			//any element in remotelements that needs local update will be added in localElements and then removed from remotelements
+			//we will end up with remotelements that need remote update, localemenets that need local update, remoteelementids that need remote insert
+			//localelements will be all local elements that are not in the remotelements
+			
+			if (traceNeeded)
+				trace("start method getTheSettings");
+			
+			var positionId:int;
+			var positionValue:int;
+			var positionModifiedTimeStamp:int;
+			
+			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = getTheMedicinEvents;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+				} else {
+					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
+					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
+					var ctr:int;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[5][2][0][0] == eventAsJSONObject.columns[ctr])
+							positionId = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[5][2][1][0] == eventAsJSONObject.columns[ctr])
+							positionValue = ctr;
+					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
+						if (tableNamesAndColumnNames[5][2][2][0] == eventAsJSONObject.columns[ctr])
+							positionModifiedTimeStamp = ctr;
+					
+					if (eventAsJSONObject.rows) {
+						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
+							remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
+						}
+					}
+					nextPageToken = eventAsJSONObject.nextPageToken;
+				}
+			} 
+			
+			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
+				var request:URLRequest = new URLRequest(googleSelectUrl);
+				request.contentType = "application/x-www-form-urlencoded";
+				var urlVariables:URLVariables = new URLVariables();
+				
+				amountofSpaces = (amountofSpaces == 10) ? 0:amountofSpaces + 1;
+				var spaces:String = "";
+				urlVariables.sql = "SELECT * FROM " + spaces +
+					tableNamesAndColumnNames[5][1] +
+					" WHERE id > 3 AND id < 29";
+				
+				if (nextPageToken != null)
+					urlVariables.pageToken = nextPageToken;//probably not used
+				urlVariables.access_token = access_token;
+				request.data = urlVariables;
+				request.method = URLRequestMethod.GET;
+				loader = new URLLoader();
+				functionToRecall = getTheSettings;
+				loader.addEventListener(Event.COMPLETE,getTheSettings);
+				functionToRemoveFromEventListener = getTheSettings;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("get the settings " + " loader : request = " + request.data); 
+			} else {
+				//so time to start comparing
+				//here the remoteelements  need to be interpreted differently than with events
+				//but how ... well read the fucking code
+				var settingCtr:int;
+				for (settingCtr  = 3 + 1;settingCtr < 29;settingCtr++) {
+					var settingFoundInRemoteElements:Boolean = false;
+					//first see if that setting is in the remoteelements
+					for (var remoteElementCtr:int = 0;remoteElementCtr < remoteElements.length;remoteElementCtr++) {
+						if ((remoteElements.getItemAt(remoteElementCtr) as Array)[0] == settingCtr)  {
+							settingFoundInRemoteElements = true;
+							//we found a remote setting with same setting id as settingCtr
+							//so let's check the lastmodifiedtimestamp
+							if ((remoteElements.getItemAt(remoteElementCtr) as Array)[2] == Settings.getInstance().getSettingLastModifiedTimeStamp(settingCtr))  {
+								remoteElements.removeItemAt(remoteElementCtr);
+								remoteElementCtr--;
+								break;
+							} else  {
+								if ((remoteElements.getItemAt(remoteElementCtr) as Array)[2] < Settings.getInstance().getSettingLastModifiedTimeStamp(settingCtr))  {
+									//remote element needs to be updated
+									break;
+								} else {
+									//local element needs to be updated
+									localElements.addItem(remoteElements.getItemAt(remoteElementCtr) as Array);
+									remoteElements.removeItemAt(remoteElementCtr);
+									remoteElementCtr--;
+									break;
+								}
+							}
+						}
+					}
+					if (!settingFoundInRemoteElements)
+						remoteElementIds.addItem(settingCtr);
+				}
+				//we can start with updating the localElements
+				for (settingCtr = 0; settingCtr < localElements.length; settingCtr++) {
+					Settings.getInstance().
+						setSetting(
+							(localElements.getItemAt(settingCtr) as Array)[0],
+							(localElements.getItemAt(settingCtr) as Array)[1],
+							(localElements.getItemAt(settingCtr) as Array)[2]);
+				}
+				insertNextSetting(null);
+			}
+		}
 		
+		/**
+		 * take next setting in remoteelementids that need to be inserted remotely
+		 */
+		private function insertNextSetting(event:Event):void {
+			if (traceNeeded)
+				trace ("in method insertNextSetting");
+			if (event != null) {
+				if (functionToRemoveFromEventListener != null)
+					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = insertNextSetting;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+					return;
+				} else  {
+						//we assume here that insert was successful, not sure however
+						getSettingRowIds(null);
+						return;
+				}
+				
+			}
+			
+			if (remoteElementIds.length > 0) {
+				var request:URLRequest = new URLRequest(googleSelectUrl);
+				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				request.contentType = "application/x-www-form-urlencoded";
+				
+				var sqlStatement:String = "";
+				var i:int = 0;
+				while (i < remoteElementIds.length) {
+					sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[5][1] + " ";
+					sqlStatement += "(id,value,addedtoormodifiedintabletimestamp) VALUES (\'" +
+						(remoteElementIds.getItemAt(i) as int) + "\',\'" +
+						(Settings.getInstance().getSetting(remoteElementIds.getItemAt(i) as int)) + "\',\'" +
+						(Settings.getInstance().getSettingLastModifiedTimeStamp(remoteElementIds.getItemAt(i) as int)) +  "\')";
+					i++;
+				}
+				request.data = new URLVariables(
+					"sql=" + sqlStatement);
+				
+				request.method = URLRequestMethod.POST;
+				loader = new URLLoader();
+				functionToRecall = insertNextSetting;
+				loader.addEventListener(Event.COMPLETE,insertNextSetting);
+				functionToRemoveFromEventListener = insertNextSetting;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+
+			} else  {
+				
+				remoteElementIds = new ArrayList(remoteElements.toArray());//this is just to have remoteElementIds as arrayList with the same size as remoteElements
+				indexOfRetrievedRowId = 0;
+				getSettingRowIds(null);
+				return;
+			}
+		}
+		
+		
+		private function getSettingRowIds(event:Event = null):void  {
+			if (traceNeeded)
+				trace ("in method getSettingRowIds");
+			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = getSettingRowIds;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+					return;
+				} 
+				remoteElementIds.setItemAt(new Number(eventAsJSONObject.rows[0][0]),indexOfRetrievedRowId);
+				indexOfRetrievedRowId++;
+			} 
+			
+			if (indexOfRetrievedRowId < remoteElements.length)  {
+				var sqlStatement:String ;
+				sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[5][1] + " WHERE id = \'" + (remoteElements.getItemAt(indexOfRetrievedRowId) as Array)[0] + "\'";
+				var request:URLRequest = new URLRequest(googleSelectUrl);
+				request.contentType = "application/x-www-form-urlencoded";
+				var urlVariables:URLVariables = new URLVariables();
+				
+				urlVariables.sql = sqlStatement;
+				request.data = urlVariables;
+				urlVariables.access_token = access_token;
+				request.method = URLRequestMethod.GET;
+				loader = new URLLoader();
+				functionToRecall = getSettingRowIds;
+				loader.addEventListener(Event.COMPLETE,getSettingRowIds);
+				functionToRemoveFromEventListener = getSettingRowIds;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+			} else   {
+				updateRemoteSettings();
+			}
+		}
+		
+		private function updateRemoteSettings(event:Event = null):void  {
+			if (traceNeeded)
+				trace ("in method updateRemoteSettings");
+			if (event != null) {
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if  (eventAsJSONObject.error) {
+					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+						secondAttempt = true;
+						functionToRecall = getSettingRowIds;
+						functionToRemoveFromEventListener = null;
+						googleAPICallFailed(event);
+					} else {
+						//some other kind of yet unidentified error 
+					}
+					return;
+				} 
+				//if successful
+				remoteElements.removeItemAt(0);
+				remoteElementIds.removeItemAt(0);
+			}
+
+			if (remoteElements.length > 0)  {
+				var sqlStatement:String;
+				sqlStatement = "UPDATE " + tableNamesAndColumnNames[5][1] + " SET ";
+				sqlStatement += 
+					"id = \'" + (remoteElements.getItemAt(0) as Array)[0] + "\'," +
+					"value = \'" + Settings.getInstance().getSetting(new Number((remoteElements.getItemAt(0) as Array)[0]) as int) + "\'," +
+					"addedtoormodifiedintabletimestamp = \'" + 
+					((((new Date()).valueOf() - new Number(Settings.getInstance().getSettingLastModifiedTimeStamp(new Number((remoteElements.getItemAt(0) as Array)[0]) as int))) > 10000)
+						?
+						(new Date()).valueOf().toString() 
+						:
+						Settings.getInstance().getSettingLastModifiedTimeStamp(new Number((remoteElements.getItemAt(0) as Array)[0]) as int))
+					+
+					"\' WHERE ROWID = \'" +
+					remoteElementIds.getItemAt(0) + "\'";
+										
+				var request:URLRequest = new URLRequest(googleSelectUrl);
+				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				request.contentType = "application/x-www-form-urlencoded";
+				var urlVariables:URLVariables = new URLVariables();
+ 				urlVariables.sql = sqlStatement;
+				request.data = urlVariables;
+				request.method = URLRequestMethod.POST;
+				loader = new URLLoader();
+				functionToRecall = updateRemoteSettings;
+				loader.addEventListener(Event.COMPLETE,updateRemoteSettings);
+				functionToRemoveFromEventListener = updateRemoteSettings;
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				loader.load(request);
+				if (traceNeeded)
+					trace("loader : request = " + request.data); 
+			} else  {
+				googleExcelFindFoodTableSpreadSheet(null);
+			}
+
+		}
 		
 		private function googleAPICallFailed(event:Event):void {
 			if (functionToRemoveFromEventListener != null)
@@ -2286,11 +2604,10 @@ package utilities
 			var spaces:String = "";
 			for (var i:int = 0;i < amountofSpaces;i++)
 				spaces +=" ";
-			var whichTimeStamp:String = "addedtoormodifiedintabletimestamp";
 			returnValue = 
 				"SELECT * FROM " + spaces +
 				tableNamesAndColumnNames[index][1] +
-				" WHERE " + whichTimeStamp + " >= '" + lastSyncTimeStamp.toString() + "' AND " +
+				" WHERE addedtoormodifiedintabletimestamp >= '" + lastSyncTimeStamp.toString() + "' AND " +
 				"creationtimestamp >= '" + asOfTimeStamp.toString() + "'";
 			if (traceNeeded)
 				trace("querystring = " + returnValue);
@@ -2733,8 +3050,10 @@ package utilities
 		}
 		
 		private function googleExcelInsertFoodItems(event:Event = null):void {
-			if (Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true")
+			if (Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true")  {
+				syncFinished(true);
 				return;
+			}
 			
 			var request:URLRequest;
 			if (event != null) {
@@ -2781,7 +3100,7 @@ package utilities
 				}
 				outputString += '</entry>\n';
 				outputString = outputString.replace(/\n/g, File.lineEnding);
-
+				
 				var newOutputString:String = outputString.replace(">-1<","><");
 				while (newOutputString != outputString) {
 					outputString = newOutputString;
@@ -3177,6 +3496,9 @@ package utilities
 		 */
 		private function syncFinished(success:Boolean):void {
 			var localdispatcher:EventDispatcher = new EventDispatcher();
+			
+			if (traceNeeded)
+				trace("in sycFinished with success = " + success);
 			
 			if (success) {
 				//ModelLocator.getInstance().logString += "sync successful" + "\n";
