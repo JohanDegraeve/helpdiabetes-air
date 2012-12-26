@@ -513,8 +513,7 @@ package utilities
 				trace("start method createMissingTables");
 			
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventHasError(event,createMissingTables))
@@ -1806,8 +1805,7 @@ package utilities
 			if (traceNeeded)
 				trace ("in method synclocalevents");
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				
 				if (eventHasError(event,syncLocalEvents))
 					return;
@@ -2256,9 +2254,7 @@ package utilities
 			if (traceNeeded)
 				trace ("in method insertNextSetting");
 			if (event != null) {
-				if (functionToRemoveFromEventListener != null)
-					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				
 				if (eventHasError(event,insertNextSetting))
 					return;
@@ -2312,8 +2308,7 @@ package utilities
 			if (traceNeeded)
 				trace ("in method getSettingRowIds");
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventHasError(event,getSettingRowIds))
@@ -3225,8 +3220,7 @@ package utilities
 		private function googleExcelFindFoodTableWorkSheet(event:Event = null):void {
 			var request:URLRequest;
 			if (event != null)  {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				
 				var workSheetListAsXML:XML = new XML(event.target.data as String);
 				//info about namespaces found on http://userflex.files.wordpress.com/2008/06/getstatuscodeas.pdf and http://userflex.wordpress.com/2008/04/03/xml-ns-e4x/
@@ -3447,6 +3441,13 @@ package utilities
 			}
 			else 
 				return false;
+		}
+		
+		private function removeEventListeners():void  {
+			if (functionToRemoveFromEventListener != null)
+				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+
+			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 		}
 		
 	}
