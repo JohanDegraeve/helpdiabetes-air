@@ -477,8 +477,7 @@ package utilities
 			if (traceNeeded)
 				trace("start method tablesListRetrieved");
 			
-			loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+			removeEventListeners();
 			var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 			
 			if (eventHasError(event,synchronize))
@@ -627,8 +626,7 @@ package utilities
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheMedicinEvents))
@@ -823,8 +821,7 @@ package utilities
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheBloodGlucoseEvents))
@@ -1024,8 +1021,7 @@ package utilities
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheExerciseEvents))
@@ -1221,10 +1217,7 @@ package utilities
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
-				//ModelLocator.getInstance().logString += "in getthemealevents, receved an event, event.target.data = " + event.target.data + "\n";
-				
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheMealEvents))
@@ -1457,9 +1450,7 @@ package utilities
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
-				//ModelLocator.getInstance().logString += "in method getTheSelectedFoodItems, event != null"+ "\n";
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheSelectedFoodItems))
@@ -1703,8 +1694,7 @@ package utilities
 				trace ("in method getrowids");
 			//ModelLocator.getInstance().logString += "in method getrowids" + "\n";
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getRowIds))
@@ -2148,8 +2138,7 @@ package utilities
 			var positionModifiedTimeStamp:int;
 			
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheSettings))
@@ -2346,8 +2335,7 @@ package utilities
 			if (traceNeeded)
 				trace ("in method updateRemoteSettings");
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 
 				if (eventHasError(event,updateRemoteSettings))
 					return;
@@ -2395,9 +2383,7 @@ package utilities
 		}
 		
 		private function googleAPICallFailed(event:Event):void {
-			if (functionToRemoveFromEventListener != null)
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+			removeEventListeners();
 			
 			if (traceNeeded)
 				trace("in googleapicall failed : event.target.data = " + event.target.data as String);
@@ -2501,9 +2487,7 @@ package utilities
 			if (medicinEvent != null)
 				objectToBeDeleted = medicinEvent;
 			if (event != null)  {
-				if (functionToRemoveFromEventListener != null)
-					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					sqlStatement = "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
@@ -2588,9 +2572,7 @@ package utilities
 			if (bloodglucoseEvent != null)
 				objectToBeDeleted = bloodglucoseEvent;
 			if (event != null)  {
-				if (functionToRemoveFromEventListener != null)
-					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					sqlStatement = "UPDATE " + tableNamesAndColumnNames[1][1] + " SET ";
@@ -2674,9 +2656,7 @@ package utilities
 			if (exerciseEvent != null)
 				objectToBeDeleted = exerciseEvent;
 			if (event != null)  {
-				if (functionToRemoveFromEventListener != null)
-					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					sqlStatement = "UPDATE " + tableNamesAndColumnNames[2][1] + " SET ";
@@ -2757,9 +2737,7 @@ package utilities
 			if (mealEvent != null)
 				objectToBeDeleted = mealEvent;
 			if (event != null)  {
-				if (functionToRemoveFromEventListener != null)
-					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					sqlStatement = "UPDATE " + tableNamesAndColumnNames[3][1] + " SET ";
@@ -2844,9 +2822,7 @@ package utilities
 			if (selectedFoodItem != null)
 				objectToBeDeleted = selectedFoodItem;
 			if (event != null)  {
-				if (functionToRemoveFromEventListener != null)
-					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					var selectedItemToBeDeleted:Object = objectToBeDeleted as SelectedFoodItem;
@@ -2936,8 +2912,7 @@ package utilities
 			
 			var request:URLRequest;
 			if (event != null) {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				//not checking if there's an error in event, if we get here it should mean there wasn't an error - let's hope so
 				if (foodItemIdBeingTreated == ModelLocator.getInstance().foodItemList.length - 1) {
 					Settings.getInstance().setSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel,"true");
@@ -3016,8 +2991,7 @@ package utilities
 		private function googleExcelCreateHeader(event:Event = null):void  {
 			var request:URLRequest;
 			if (event != null)  {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				if ((event.target.data as String).search("updated") != -1) {
 					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,(new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAdd)) + 1).toString());
 					//seems insert of cel was successfull
@@ -3069,8 +3043,7 @@ package utilities
 			
 			if (event != null)  {
 				//SHOULD BE CHECKING HERE WHAT CAN GO WRONG - BECAUSE I SEEM TO ASSUME HERE THAT THE FOODTABLE CREATION WILL ALWAYS BE SUCCESSFUL
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				Settings.getInstance().setSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable,"true");
 				
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -3123,8 +3096,7 @@ package utilities
 			
 			if (event != null)  {
 				//ASSUMING HERE THAT EVERHTHING WORKS FINE, BUT THINGS COULD BE GOING WRONG
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				//Settings.getInstance().setSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable,"true");
 				
 				//ASSUMING HERE THAT WORKSHEET CREATION WAS SUCCESSFULL, WHICH IS NOT SURE
@@ -3302,8 +3274,7 @@ package utilities
 		private function googleExcelFindFoodTableSpreadSheet(event:Event = null):void  {
 			var request:URLRequest;
 			if (event != null)  {
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,googleExcelFindFoodTableSpreadSheet))
@@ -3443,7 +3414,12 @@ package utilities
 				return false;
 		}
 		
+		/**
+		 * cheks if functionToRemoveFromEventListner != null and if not removed from Event.COMPLETE<br>
+		 * removes eventlistener googleAPICallFailed from IOErrorEvent.IO_ERROR
+		 */
 		private function removeEventListeners():void  {
+
 			if (functionToRemoveFromEventListener != null)
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 
