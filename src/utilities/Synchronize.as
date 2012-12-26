@@ -481,16 +481,10 @@ package utilities
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 			var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 			
-			if  (eventAsJSONObject.error) {
-				if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-					secondAttempt = true;
-					functionToRecall = synchronize;
-					functionToRemoveFromEventListener = null;
-					googleAPICallFailed(event);
-				} else {
-					//some other kind of yet unidentified error 
-				}
-			} else {
+			if (eventHasError(event,synchronize))
+				return;
+			else
+			{
 				nextPageToken = eventAsJSONObject.nextPageToken;
 				if (eventAsJSONObject.items) {
 					//there are table names retrieved, let's go through them
@@ -517,26 +511,15 @@ package utilities
 		private function createMissingTables(event:Event = null): void {
 			if (traceNeeded)
 				trace("start method createMissingTables");
-			//ModelLocator.getInstance().logString += "start method createmissingtables"+ "\n";;
 			
 			if (event != null) {
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-
-				//here we come if actually a table has just been created and an Event.COMPLETE is dispatched to notify the completion.
+				
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-				if  (eventAsJSONObject.error) {
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = createMissingTables;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//ModelLocator.getInstance().logString += (event.target.data as String) + "\n";
-						//some other kind of yet unidentified error 
-					}
+				if (eventHasError(event,createMissingTables))
 					return;
-				} 
+				
 				for (var k:int = 0;k < tableNamesAndColumnNames.length;k++) {
 					if (tableNamesAndColumnNames[k][0] == eventAsJSONObject.name as String) {
 						tableNamesAndColumnNames[k][1] = eventAsJSONObject.tableId as String;
@@ -649,17 +632,9 @@ package utilities
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getTheMedicinEvents;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
-				} else {
+				if (eventHasError(event,getTheMedicinEvents))
+					return;
+				else {
 					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
 					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
 					var ctr:int;
@@ -853,17 +828,9 @@ package utilities
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getTheBloodGlucoseEvents;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
-				} else {
+				if (eventHasError(event,getTheBloodGlucoseEvents))
+					return;
+				else {
 					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
 					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
 					var ctr:int;
@@ -1062,17 +1029,9 @@ package utilities
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getTheMedicinEvents;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
-				} else {
+				if (eventHasError(event,getTheExerciseEvents))
+					return;
+				else {
 					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
 					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
 					var ctr:int;
@@ -1269,19 +1228,9 @@ package utilities
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getTheMealEvents;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-						//ModelLocator.getInstance().logString += "Error in Synchronize.as - unidentified cause 1  : " + (event.target.data as String) + "\n";
-						syncFinished(false);
-					}
-				} else {
+				if (eventHasError(event,getTheMealEvents))
+					return;
+				else {
 					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
 					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
 					var ctr:int;
@@ -1514,19 +1463,9 @@ package utilities
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getTheMealEvents;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error
-						//ModelLocator.getInstance().logString += "in method gettheselecteditems, unidentified error"+ "\n";
-						//ModelLocator.getInstance().logString += "event.target.data = " + event.target.data + "\n";
-					}
-				} else {
+				if (eventHasError(event,getTheSelectedFoodItems))
+					return;
+				else {
 					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
 					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
 					var ctr:int;
@@ -1769,17 +1708,8 @@ package utilities
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getRowIds;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
+				if (eventHasError(event,getRowIds))
 					return;
-				} 
 				
 				remoteElementIds.getItemAt(indexOfRetrievedRowId)[1] =  new Number(eventAsJSONObject.rows[0][0]);
 			} 
@@ -1878,20 +1808,9 @@ package utilities
 			if (event != null) {
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getRowIds;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
+				if (eventHasError(event,syncLocalEvents))
 					return;
-				} 
 			}
 			
 			if (localElements.length > 0) {
@@ -2235,17 +2154,9 @@ package utilities
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getTheMedicinEvents;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
-				} else {
+				if (eventHasError(event,getTheSettings))
+					return;
+				else {
 					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
 					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
 					var ctr:int;
@@ -2348,23 +2259,13 @@ package utilities
 				if (functionToRemoveFromEventListener != null)
 					loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = insertNextSetting;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
+				if (eventHasError(event,insertNextSetting))
 					return;
-				} else  {
-						//we assume here that insert was successful, not sure however
-						getSettingRowIds(null);
-						return;
+				else  {
+					//we assume here that insert was successful, not sure however
+					getSettingRowIds(null);
+					return;
 				}
 				
 			}
@@ -2396,7 +2297,7 @@ package utilities
 				loader.load(request);
 				if (traceNeeded)
 					trace("loader : request = " + request.data); 
-
+				
 			} else  {
 				
 				remoteElementIds = new ArrayList(remoteElements.toArray());//this is just to have remoteElementIds as arrayList with the same size as remoteElements
@@ -2413,19 +2314,11 @@ package utilities
 			if (event != null) {
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getSettingRowIds;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				if (eventHasError(event,getSettingRowIds))
 					return;
-				} 
+				
 				remoteElementIds.setItemAt(new Number(eventAsJSONObject.rows[0][0]),indexOfRetrievedRowId);
 				indexOfRetrievedRowId++;
 			} 
@@ -2460,24 +2353,15 @@ package utilities
 			if (event != null) {
 				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-				
-				if  (eventAsJSONObject.error) {
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = getSettingRowIds;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
+
+				if (eventHasError(event,updateRemoteSettings))
 					return;
-				} 
+				
 				//if successful
 				remoteElements.removeItemAt(0);
 				remoteElementIds.removeItemAt(0);
 			}
-
+			
 			if (remoteElements.length > 0)  {
 				var sqlStatement:String;
 				sqlStatement = "UPDATE " + tableNamesAndColumnNames[5][1] + " SET ";
@@ -2493,12 +2377,12 @@ package utilities
 					+
 					"\' WHERE ROWID = \'" +
 					remoteElementIds.getItemAt(0) + "\'";
-										
+				
 				var request:URLRequest = new URLRequest(googleSelectUrl);
 				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
- 				urlVariables.sql = sqlStatement;
+				urlVariables.sql = sqlStatement;
 				request.data = urlVariables;
 				request.method = URLRequestMethod.POST;
 				loader = new URLLoader();
@@ -2512,7 +2396,7 @@ package utilities
 			} else  {
 				googleExcelFindFoodTableSpreadSheet(null);
 			}
-
+			
 		}
 		
 		private function googleAPICallFailed(event:Event):void {
@@ -3196,17 +3080,9 @@ package utilities
 				
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = googleExcelCreateFoodTable;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
-				} else {
+				if (eventHasError(event,googleExcelCreateFoodTable))
+					return;
+				else {
 					if (eventAsJSONObject.id)  {
 						helpDiabetesSpreadSheetKey = eventAsJSONObject.id;
 						googleExcelCreateWorkSheet();
@@ -3436,17 +3312,9 @@ package utilities
 				loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if  (eventAsJSONObject.error) {
-					
-					if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
-						secondAttempt = true;
-						functionToRecall = googleExcelFindFoodTableSpreadSheet;
-						functionToRemoveFromEventListener = null;
-						googleAPICallFailed(event);
-					} else {
-						//some other kind of yet unidentified error 
-					}
-				} else {
+				if (eventHasError(event,googleExcelFindFoodTableSpreadSheet))
+					return;
+				else {
 					if (eventAsJSONObject.items)  {
 						if (eventAsJSONObject.items.length > 0)  {
 							//foodtable found
@@ -3557,6 +3425,30 @@ package utilities
 		public function addObjectToBeDeleted(object:Object):void {
 			listOfElementsToBeDeleted.addItem(object);
 		}
+		
+		/**
+		 * checks if there's an error, if yes then <br>
+		 * - calls googleAPICallFailed with event as parameter <br>
+		 * - sets functionToReCall to functionToRecallIfError<br>
+		 * returns true if there's an error, returns false if no error
+		 */
+		private function eventHasError(event:Event,functionToRecallIfError:Function):Boolean  {
+			var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+			
+			if  (eventAsJSONObject.error) {
+				if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+					secondAttempt = true;
+					functionToRecall = functionToRecallIfError;
+					googleAPICallFailed(event);
+					return true;
+				} else {
+					return true;//some other kind of yet unidentified error 
+				}
+			}
+			else 
+				return false;
+		}
+		
 	}
 }
 
