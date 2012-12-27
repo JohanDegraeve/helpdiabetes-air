@@ -429,80 +429,72 @@ package utilities
 		 * if there's a valid access_token or refresh_token, then this method will synchronize the database with 
 		 * Google Fusion Tables 
 		 */
-		private function synchronize():void {
-			trackingListAlreadyModified = false;
-			if (traceNeeded)
-				trace("start method synchronize");
-			//ModelLocator.getInstance().logString += "start method synchronize"+ "\n";;
+		private function synchronize(event:Event = null):void {
 			
-			//we could be arriving here after a retempt, example, first time failed due to invalid credentials, token refresh occurs, with success, we come back to here
-			//first thing to do is to removeeventlisteners
-			
-			access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-			
-			if (access_token.length == 0  ) {
-				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
-				//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
-				syncFinished(false);
-			} else {
-				if (tracker != null && !alReadyGATracked) {
-					tracker.trackPageview( "Synchronize-SyncStarted" );
-					alReadyGATracked = true;
-				}
+			if (event != null)  {
+				removeEventListeners();
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				//first get all the tables 
-				var request:URLRequest = new URLRequest(googleRequestTablesUrl);
-				request.contentType = "application/x-www-form-urlencoded";
-				var urlVariables:URLVariables = new URLVariables();
-				urlVariables.access_token = access_token;
-				urlVariables.maxResults = maxResults;
-				if (nextPageToken != null)
-					urlVariables.pageToken = nextPageToken;
-				request.data = urlVariables;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = synchronize;
-				loader.addEventListener(Event.COMPLETE,tablesListRetrieved);
-				functionToRemoveFromEventListener = tablesListRetrieved;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded) {
-					trace("loader : url = " + request.url);
-					trace("loader : request = " + request.data); 
-				}
-			}
-		}
-		
-		private function tablesListRetrieved(event:Event):void {
-			if (traceNeeded)
-				trace("start method tablesListRetrieved");
-			
-			removeEventListeners();
-			var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-			
-			if (eventHasError(event,synchronize))
-				return;
-			else
-			{
-				nextPageToken = eventAsJSONObject.nextPageToken;
-				if (eventAsJSONObject.items) {
-					//there are table names retrieved, let's go through them
-					for (var i:int = 0;i < eventAsJSONObject.items.length;i++) {
-						//go through each item, see if name matches one in the tablelist, if so store tableid
-						for (var j:int = 0;j < tableNamesAndColumnNames.length;j++) {
-							if (eventAsJSONObject.items[i].name == tableNamesAndColumnNames[j][0]) {
-								if (traceNeeded)
-									trace("found a table : " + eventAsJSONObject.items[i].name);
-								tableNamesAndColumnNames[j][1] = eventAsJSONObject.items[i].tableId;	
+				if (eventHasError(event,synchronize))
+					return;
+				else
+				{
+					nextPageToken = eventAsJSONObject.nextPageToken;
+					if (eventAsJSONObject.items) {
+						//there are table names retrieved, let's go through them
+						for (var i:int = 0;i < eventAsJSONObject.items.length;i++) {
+							//go through each item, see if name matches one in the tablelist, if so store tableid
+							for (var j:int = 0;j < tableNamesAndColumnNames.length;j++) {
+								if (eventAsJSONObject.items[i].name == tableNamesAndColumnNames[j][0]) {
+									if (traceNeeded)
+										trace("found a table : " + eventAsJSONObject.items[i].name);
+									tableNamesAndColumnNames[j][1] = eventAsJSONObject.items[i].tableId;	
+								}
 							}
 						}
 					}
+					if (nextPageToken != null)
+						//there's more tables, get the next list
+						synchronize(); 
+					else {
+						createMissingTables();
+					}
 				}
-				if (nextPageToken != null)
-					//there's more tables, get the next list
-					synchronize(); 
-				else {
-					createMissingTables();
+			} else  {
+				trackingListAlreadyModified = false;
+				if (traceNeeded)
+					trace("start method synchronize");
+				//ModelLocator.getInstance().logString += "start method synchronize"+ "\n";;
+				
+				//we could be arriving here after a retempt, example, first time failed due to invalid credentials, token refresh occurs, with success, we come back to here
+				//first thing to do is to removeeventlisteners
+				
+				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
+				
+				if (access_token.length == 0  ) {
+					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
+					//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
+					syncFinished(false);
+				} else {
+					if (tracker != null && !alReadyGATracked) {
+						tracker.trackPageview( "Synchronize-SyncStarted" );
+						alReadyGATracked = true;
+					}
+					
+					//first get all the tables
+					var urlVariables:URLVariables = new URLVariables();
+					urlVariables.maxResults = maxResults;
+					if (nextPageToken != null)
+						urlVariables.pageToken = nextPageToken;
+					
+					createAndLoadURLRequest(
+						googleRequestTablesUrl,
+						URLRequestMethod.GET,
+						urlVariables,
+						null,
+						synchronize,
+						true,
+						null);
 				}
 			}
 		}
@@ -544,15 +536,9 @@ package utilities
 					startSync();
 				} else {
 					
-					var request:URLRequest = new URLRequest(googleRequestTablesUrl);
-					request.requestHeaders.push(new URLRequestHeader("Content-Type","application/json"));
-					request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent","Google APIs Explorer"));
-					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-					
 					var jsonObject:Object = new Object();
 					jsonObject.isExportable = "false";
 					jsonObject.name = tableNamesAndColumnNames[i][0];
-					
 					var columns:ArrayList = new ArrayList();
 					for (var l:int = 0;l < tableNamesAndColumnNames[i][2].length;l++) {
 						var jsonObject2:Object =  new Object();
@@ -563,17 +549,8 @@ package utilities
 					jsonObject.columns = columns.toArray();
 					
 					jsonObject.description =   tableNamesAndColumnNames[i][3];
-					var bodyString:String = JSON.stringify(jsonObject);
-					request.data = bodyString;
-					request.method = URLRequestMethod.POST;
-					loader = new URLLoader();
-					functionToRecall = createMissingTables;
-					loader.addEventListener(Event.COMPLETE,createMissingTables);
-					functionToRemoveFromEventListener = createMissingTables;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
+
+					createAndLoadURLRequest(googleRequestTablesUrl,URLRequestMethod.POST,null,JSON.stringify(jsonObject),createMissingTables,true,"application/json");
 				}
 				
 			}			
@@ -678,25 +655,13 @@ package utilities
 			} 
 			
 			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
-				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				
 				urlVariables.sql = createSQLQueryToSelectAll(0);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
-				urlVariables.access_token = access_token;
-				request.data = urlVariables;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = getTheMedicinEvents;
-				loader.addEventListener(Event.COMPLETE,getTheMedicinEvents);
-				functionToRemoveFromEventListener = getTheMedicinEvents;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("get the medicinevents " + " loader : request = " + request.data); 
+
+				createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.GET,urlVariables,null,getTheMedicinEvents,true,null);
+				var request:URLRequest = new URLRequest(googleSelectUrl);
 			} else {
 				//get the medicinevents in the trackinglist and store them in localElements.
 				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
@@ -741,7 +706,6 @@ package utilities
 							} else {
 								//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
 								remoteElements.removeItemAt(k);
-								//remoteElementIds.removeItemAt(k);
 								localElements.removeItemAt(j);
 								j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 								break;//jump out of th einnter for loop
@@ -762,10 +726,6 @@ package utilities
 						if (trackingList.getItemAt(l) is MedicinEvent) {
 							if ((trackingList.getItemAt(l) as MedicinEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
-								/*if (!trackingListAlreadyModified) {
-								trackingListAlreadyModified = true;
-								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-								}*/
 								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
 									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
 								} else {
@@ -784,12 +744,7 @@ package utilities
 						//but only if deleted is false
 						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
 							localElementsUpdated = true;
-							/*if (!trackingListAlreadyModified) {
-							trackingListAlreadyModified = true;
-							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-							}*/
-							
-							/*trackingList.addItem*/(new MedicinEvent(
+							(new MedicinEvent(
 								remoteElements.getItemAt(m)[positionValue],
 								remoteElements.getItemAt(m)[positionMedicinname],
 								remoteElements.getItemAt(m)[positionId],
@@ -873,25 +828,12 @@ package utilities
 			} 
 			
 			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
-				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				
 				urlVariables.sql = createSQLQueryToSelectAll(1);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
-				urlVariables.access_token = access_token;
-				request.data = urlVariables;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = getTheBloodGlucoseEvents;
-				loader.addEventListener(Event.COMPLETE,getTheBloodGlucoseEvents);
-				functionToRemoveFromEventListener = getTheBloodGlucoseEvents;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("get the bloodglucoseevents , loader : request = " + request.data); 
+
+				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheBloodGlucoseEvents,true,null);
 			} else {
 				//get the bloodglucoseevents in the trackinglist and store them in localElements.
 				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
@@ -1017,7 +959,6 @@ package utilities
 			
 			if (traceNeeded)
 				trace("start method getTheExerciseEvents");
-			//ModelLocator.getInstance().logString += "start method getTheExerciseEvents"+ "\n";
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -1070,25 +1011,11 @@ package utilities
 			} 
 			
 			if (event == null || nextPageToken != null) {//two reasons to try to fetch data from google
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
-				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				
 				urlVariables.sql = createSQLQueryToSelectAll(2);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
-				urlVariables.access_token = access_token;
-				request.data = urlVariables;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = getTheExerciseEvents;
-				loader.addEventListener(Event.COMPLETE,getTheExerciseEvents);
-				functionToRemoveFromEventListener = getTheExerciseEvents;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("get the exerciseevents , loader : request = " + request.data); 
+				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheExerciseEvents,true,null);
 			} else {
 				//get the exerciseevents in the trackinglist and store them in localElements.
 				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
@@ -1275,25 +1202,12 @@ package utilities
 			} 
 			
 			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
-				//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				
 				urlVariables.sql = createSQLQueryToSelectAll(3);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
-				urlVariables.access_token = access_token;
-				request.data = urlVariables;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = getTheMealEvents;
-				loader.addEventListener(Event.COMPLETE,getTheMealEvents);
-				functionToRemoveFromEventListener = getTheMealEvents;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("get the mealevents " + " loader : request = " + request.data); 
+
+				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheMealEvents,true,null);
 			} else {
 				for (var i:int = 0; i < trackingList.length; i++) {
 					if (trackingList.getItemAt(i) is MealEvent) {
@@ -1523,26 +1437,11 @@ package utilities
 			} 
 			
 			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
-				//ModelLocator.getInstance().logString += "in gettheselectedfooditems, event = null or nextpagetoken != null" + "\n";;
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
-				
 				urlVariables.sql = createSQLQueryToSelectAll(4);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
-				urlVariables.access_token = access_token;
-				request.data = urlVariables;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = getTheSelectedFoodItems;
-				loader.addEventListener(Event.COMPLETE,getTheSelectedFoodItems);
-				functionToRemoveFromEventListener = getTheSelectedFoodItems;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("get the selectedfooditems " + " loader : request = " + request.data); 
-				//ModelLocator.getInstance().logString += " loader : request = " + request.data + "\n";;
+				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheSelectedFoodItems,true,null);
 			} else {
 				for (var i:int = 0; i < trackingList.length; i++) {
 					if (trackingList.getItemAt(i) is MealEvent) {
@@ -1769,29 +1668,17 @@ package utilities
 			if (sqlStatement.length == 0) {
 				syncLocalEvents(null);
 			} else {
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
-				
 				urlVariables.sql = sqlStatement;
-				request.data = urlVariables;
-				urlVariables.access_token = access_token;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = getRowIds;
-				loader.addEventListener(Event.COMPLETE,getRowIds);
-				functionToRemoveFromEventListener = getRowIds;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+
+				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getRowIds,true,null);
 			}
 		}
 		
 		/**
 		 * inserts and updates local events to remote server
 		 */
-		private function syncLocalEvents(event:Event):void {
+		private function syncLocalEvents(event:Event = null):void {
 			if (traceNeeded)
 				trace ("in method synclocalevents");
 			if (event != null) {
@@ -1802,10 +1689,6 @@ package utilities
 			}
 			
 			if (localElements.length > 0) {
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				request.contentType = "application/x-www-form-urlencoded";
-				
 				//start with the medicinevents
 				var previousTypeOfEventAlreadyUsed:Boolean = false;
 				var sqlStatement:String = "";
@@ -2098,18 +1981,11 @@ package utilities
 				}
 				
 				if (sqlStatement.length != 0) {
-					request.data = new URLVariables(
-						"sql=" + sqlStatement);
-					
-					request.method = URLRequestMethod.POST;
-					loader = new URLLoader();
-					functionToRecall = syncLocalEvents;
-					loader.addEventListener(Event.COMPLETE,syncLocalEvents);
-					functionToRemoveFromEventListener = syncLocalEvents;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
+					var request:URLRequest = new URLRequest(googleSelectUrl);
+					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+					request.contentType = "application/x-www-form-urlencoded";
+
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,syncLocalEvents,true,null);
 				}
 				
 			} else {
@@ -2167,29 +2043,18 @@ package utilities
 			} 
 			
 			if (event == null || nextPageToken != null ) {//two reasons to try to fetch data from google
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
-				
 				amountofSpaces = (amountofSpaces == 10) ? 0:amountofSpaces + 1;
 				var spaces:String = "";
+				for (var i:int = 0;i < amountofSpaces;i++)
+					spaces +=" ";
 				urlVariables.sql = "SELECT * FROM " + spaces +
 					tableNamesAndColumnNames[5][1] +
 					" WHERE id > 3 AND id < 29";
-				
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;//probably not used
-				urlVariables.access_token = access_token;
-				request.data = urlVariables;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = getTheSettings;
-				loader.addEventListener(Event.COMPLETE,getTheSettings);
-				functionToRemoveFromEventListener = getTheSettings;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("get the settings " + " loader : request = " + request.data); 
+
+				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheSettings,true,null);
 			} else {
 				//so time to start comparing
 				//here the remoteelements  need to be interpreted differently than with events
@@ -2256,9 +2121,6 @@ package utilities
 			}
 			
 			if (remoteElementIds.length > 0) {
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				request.contentType = "application/x-www-form-urlencoded";
 				
 				var sqlStatement:String = "";
 				var i:int = 0;
@@ -2270,19 +2132,9 @@ package utilities
 						(Settings.getInstance().getSettingLastModifiedTimeStamp(remoteElementIds.getItemAt(i) as int)) +  "\')";
 					i++;
 				}
-				request.data = new URLVariables(
-					"sql=" + sqlStatement);
 				
-				request.method = URLRequestMethod.POST;
-				loader = new URLLoader();
-				functionToRecall = insertNextSetting;
-				loader.addEventListener(Event.COMPLETE,insertNextSetting);
-				functionToRemoveFromEventListener = insertNextSetting;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
-				
+				createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,insertNextSetting,true,null);
+
 			} else  {
 				
 				remoteElementIds = new ArrayList(remoteElements.toArray());//this is just to have remoteElementIds as arrayList with the same size as remoteElements
@@ -2310,22 +2162,11 @@ package utilities
 			if (indexOfRetrievedRowId < remoteElements.length)  {
 				var sqlStatement:String ;
 				sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[5][1] + " WHERE id = \'" + (remoteElements.getItemAt(indexOfRetrievedRowId) as Array)[0] + "\'";
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.contentType = "application/x-www-form-urlencoded";
+
 				var urlVariables:URLVariables = new URLVariables();
-				
 				urlVariables.sql = sqlStatement;
-				request.data = urlVariables;
-				urlVariables.access_token = access_token;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = getSettingRowIds;
-				loader.addEventListener(Event.COMPLETE,getSettingRowIds);
-				functionToRemoveFromEventListener = getSettingRowIds;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+
+				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getSettingRowIds,true,null);
 			} else   {
 				updateRemoteSettings();
 			}
@@ -2361,21 +2202,10 @@ package utilities
 					"\' WHERE ROWID = \'" +
 					remoteElementIds.getItemAt(0) + "\'";
 				
-				var request:URLRequest = new URLRequest(googleSelectUrl);
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.sql = sqlStatement;
-				request.data = urlVariables;
-				request.method = URLRequestMethod.POST;
-				loader = new URLLoader();
-				functionToRecall = updateRemoteSettings;
-				loader.addEventListener(Event.COMPLETE,updateRemoteSettings);
-				functionToRemoveFromEventListener = updateRemoteSettings;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+
+				createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,urlVariables,null,updateRemoteSettings,true,null);
 			} else  {
 				googleExcelFindFoodTableSpreadSheet(null);
 			}
@@ -2480,8 +2310,6 @@ package utilities
 		}
 		
 		private function deleteRemoteMedicinEvent(event:Event,medicinEvent:MedicinEvent = null):void {
-			var request:URLRequest
-			
 			if (traceNeeded)
 				trace("in method deleteremotemedicinevent");
 			if (medicinEvent != null)
@@ -2490,7 +2318,7 @@ package utilities
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
-					sqlStatement = "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
+					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
 						"medicinname = \'" + (objectToBeDeleted as MedicinEvent).medicinName + "\'," +
@@ -2507,25 +2335,9 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
-					
-					request = new URLRequest(googleSelectUrl);
-					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-					request.data = new URLVariables(
-						"sql=" + sqlStatement);
-					
-					request.method = URLRequestMethod.POST;
-					loader = new URLLoader();
-					
-					//in case delete would fail, and functiontorecall is called, then we arrive back here, well understood with event=null and medicinevent = null
-					//but with objecttobedeleted != null
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
+
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
-					functionToRecall = deleteRemoteMedicinEvent;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
-					functionToRemoveFromEventListener = deleteRemoteItems;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
 				} else {
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
 					deleteRemoteItems();
@@ -2534,39 +2346,20 @@ package utilities
 				if (traceNeeded)
 					trace("start method deleteMedicinEvent");
 				
-				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-				var sqlStatement:String;
 				
 				if (access_token.length == 0 ) {
 					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				} else {
 					
-					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[0][1] + " WHERE id = \'" + medicinEvent.eventid + "\'";
-					request = new URLRequest(googleSelectUrl);
-					request.contentType = "application/x-www-form-urlencoded";
-					var urlVariables:URLVariables = new URLVariables();
-					//request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-					
-					urlVariables.sql = sqlStatement;
-					urlVariables.access_token = access_token;
-					request.data = urlVariables;
-					request.method = URLRequestMethod.GET;
-					loader = new URLLoader();
-					functionToRecall = deleteRemoteMedicinEvent;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteMedicinEvent);
-					functionToRemoveFromEventListener = deleteRemoteMedicinEvent;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
+					createAndLoadURLRequest(googleSelectUrl,null,
+						new URLVariables("sql=" + "SELECT ROWID FROM " + tableNamesAndColumnNames[0][1] + " WHERE id = \'" + medicinEvent.eventid + "\'"),
+						null,deleteRemoteMedicinEvent,true,null);
 				}
 			}
 		}
 		
 		private function deleteRemoteBloodGlucoseEvent(event:Event, bloodglucoseEvent:BloodGlucoseEvent = null):void {
-			var request:URLRequest
-			
 			if (traceNeeded)
 				trace("in method deleteremotebloodglucoseevent");
 			if (bloodglucoseEvent != null)
@@ -2575,7 +2368,7 @@ package utilities
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
-					sqlStatement = "UPDATE " + tableNamesAndColumnNames[1][1] + " SET ";
+					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[1][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
 						"unit = \'" + (objectToBeDeleted as BloodGlucoseEvent).unit + "\'," +
@@ -2592,24 +2385,9 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
-					
-					request = new URLRequest(googleSelectUrl);
-					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-					request.data = new URLVariables(
-						"sql=" + sqlStatement);
-					
-					request.method = URLRequestMethod.POST;
-					loader = new URLLoader();
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
 					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
-					functionToRecall = deleteRemoteMedicinEvent;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
-					functionToRemoveFromEventListener = deleteRemoteItems;
-					
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
 				} else {
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
 					deleteRemoteItems();
@@ -2618,39 +2396,24 @@ package utilities
 				if (traceNeeded)
 					trace("start method deleteBloodGlucoseEvent");
 				
-				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-				var sqlStatement:String;
 				
 				if (access_token.length == 0 ) {
 					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				} else {
-					
-					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[1][1] + " WHERE id = \'" + bloodglucoseEvent.eventid + "\'";
-					request = new URLRequest(googleSelectUrl);
-					request.contentType = "application/x-www-form-urlencoded";
-					var urlVariables:URLVariables = new URLVariables();
-					
-					urlVariables.sql = sqlStatement;
-					urlVariables.access_token = access_token;
-					request.data = urlVariables;
-					request.method = URLRequestMethod.GET;
-					loader = new URLLoader();
-					functionToRecall = deleteRemoteBloodGlucoseEvent;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteBloodGlucoseEvent);
-					functionToRemoveFromEventListener = deleteRemoteBloodGlucoseEvent;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
-					
+					createAndLoadURLRequest(
+						googleSelectUrl,
+						null,
+						new URLVariables("sql=" + "SELECT ROWID FROM " + tableNamesAndColumnNames[1][1] + " WHERE id = \'" + bloodglucoseEvent.eventid + "\'"),
+						null,
+						deleteRemoteBloodGlucoseEvent,
+						true,
+						null);
 				}
 			}
 		}
 		
 		private function deleteRemoteExerciseEvent(event:Event, exerciseEvent:ExerciseEvent = null):void {
-			var request:URLRequest
-			
 			if (traceNeeded)
 				trace("in method deleteremoteexerciseevent");
 			if (exerciseEvent != null)
@@ -2659,7 +2422,7 @@ package utilities
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
-					sqlStatement = "UPDATE " + tableNamesAndColumnNames[2][1] + " SET ";
+					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[2][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
 						"level = \'" + (objectToBeDeleted as ExerciseEvent).level + "\'," +
@@ -2675,22 +2438,9 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
-					
-					request = new URLRequest(googleSelectUrl);
-					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-					request.data = new URLVariables(
-						"sql=" + sqlStatement);
-					
-					request.method = URLRequestMethod.POST;
-					loader = new URLLoader();
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
+
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
-					functionToRecall = deleteRemoteMedicinEvent;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
-					functionToRemoveFromEventListener = deleteRemoteItems;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
 				} else {
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
 					deleteRemoteItems();
@@ -2698,40 +2448,19 @@ package utilities
 			} else {
 				if (traceNeeded)
 					trace("start method deleteExerciseEvent");
-				
-				
+								
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-				var sqlStatement:String;
-				
+
 				if (access_token.length == 0 ) {
 					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				} else {
 					
-					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[2][1] + " WHERE id = \'" + exerciseEvent.eventid + "\'";
-					request = new URLRequest(googleSelectUrl);
-					request.contentType = "application/x-www-form-urlencoded";
-					var urlVariables:URLVariables = new URLVariables();
-					
-					urlVariables.sql = sqlStatement;
-					urlVariables.access_token = access_token;
-					request.data = urlVariables;
-					request.method = URLRequestMethod.GET;
-					loader = new URLLoader();
-					functionToRecall = deleteRemoteExerciseEvent;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteExerciseEvent);
-					functionToRemoveFromEventListener = deleteRemoteExerciseEvent;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
-					
+					createAndLoadURLRequest(googleSelectUrl,null,new URLVariables("sql=" + "SELECT ROWID FROM " + tableNamesAndColumnNames[2][1] + " WHERE id = \'" + exerciseEvent.eventid + "\'"),null,deleteRemoteExerciseEvent,true,null);
 				}
 			}
 		}
 		
 		private function deleteRemoteMealEvent(event:Event, mealEvent:MealEvent = null):void {
-			var request:URLRequest
-			
 			if (traceNeeded)
 				trace("in method deleteremotemealevent");
 			if (mealEvent != null)
@@ -2740,7 +2469,7 @@ package utilities
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
-					sqlStatement = "UPDATE " + tableNamesAndColumnNames[3][1] + " SET ";
+					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[3][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
 						"mealname = \'" + (objectToBeDeleted as MealEvent).mealName + "\'," +
@@ -2759,22 +2488,9 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
 					
-					request = new URLRequest(googleSelectUrl);
-					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-					request.data = new URLVariables(
-						"sql=" + sqlStatement);
-					
-					request.method = URLRequestMethod.POST;
-					loader = new URLLoader();
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
-					functionToRecall = deleteRemoteMedicinEvent;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
-					functionToRemoveFromEventListener = deleteRemoteItems;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
 				} else {
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
 					deleteRemoteItems();
@@ -2783,40 +2499,17 @@ package utilities
 				if (traceNeeded)
 					trace("start method deleteRemoteMealEvent");
 				
-				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-				var sqlStatement:String;
 				
 				if (access_token.length == 0 ) {
 					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
-					
 				} else {
-					
-					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[3][1] + " WHERE id = \'" + mealEvent.eventid + "\'";
-					request = new URLRequest(googleSelectUrl);
-					request.contentType = "application/x-www-form-urlencoded";
-					var urlVariables:URLVariables = new URLVariables();
-					
-					urlVariables.sql = sqlStatement;
-					urlVariables.access_token = access_token;
-					request.data = urlVariables;
-					request.method = URLRequestMethod.GET;
-					loader = new URLLoader();
-					functionToRecall = deleteRemoteMealEvent;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteMealEvent);
-					functionToRemoveFromEventListener = deleteRemoteMealEvent;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
-					
+					createAndLoadURLRequest(googleSelectUrl,null,new URLVariables("sql=" + "SELECT ROWID FROM " + tableNamesAndColumnNames[3][1] + " WHERE id = \'" + mealEvent.eventid + "\'"),null,deleteRemoteMealEvent,true,null);
 				}
 			}
 		}
 		
 		private function deleteRemoteSelectedFoodItem(event:Event, selectedFoodItem:SelectedFoodItem = null):void {
-			var request:URLRequest;
-			
 			if (traceNeeded)
 				trace("in method deleteremoteselectedfooditem");
 			if (selectedFoodItem != null)
@@ -2826,7 +2519,7 @@ package utilities
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.rows) {//if rows doesn't exist then there wasn't a remote element with that eventid
 					var selectedItemToBeDeleted:Object = objectToBeDeleted as SelectedFoodItem;
-					sqlStatement = "UPDATE " + tableNamesAndColumnNames[4][1] + " SET ";
+					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[4][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + selectedItemToBeDeleted.eventid.toString() + "\'," +
 						"description = \'" + (selectedItemToBeDeleted).itemDescription + "\'," +
@@ -2850,22 +2543,10 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
-					
-					request = new URLRequest(googleSelectUrl);
-					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-					request.data = new URLVariables(
-						"sql=" + sqlStatement);
-					
-					request.method = URLRequestMethod.POST;
-					loader = new URLLoader();
+	
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
+
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
-					functionToRecall = deleteRemoteMedicinEvent;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteItems);
-					functionToRemoveFromEventListener = deleteRemoteItems;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
 				} else {
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
 					deleteRemoteItems();
@@ -2874,32 +2555,12 @@ package utilities
 				if (traceNeeded)
 					trace("start method deleteRemoteSelectedFoodItem");
 				
-				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-				var sqlStatement:String;
 				
 				if (access_token.length == 0 ) {
 					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
-					
 				} else {
-					
-					sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[4][1] + " WHERE id = \'" + selectedFoodItem.eventid + "\'";
-					request = new URLRequest(googleSelectUrl);
-					request.contentType = "application/x-www-form-urlencoded";
-					var urlVariables:URLVariables = new URLVariables();
-					
-					urlVariables.sql = sqlStatement;
-					urlVariables.access_token = access_token;
-					request.data = urlVariables;
-					request.method = URLRequestMethod.GET;
-					loader = new URLLoader();
-					functionToRecall = deleteRemoteSelectedFoodItem;
-					loader.addEventListener(Event.COMPLETE,deleteRemoteSelectedFoodItem);
-					functionToRemoveFromEventListener = deleteRemoteSelectedFoodItem;
-					loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
+					createAndLoadURLRequest(googleSelectUrl,null,new URLVariables("sql=" + "SELECT ROWID FROM " + tableNamesAndColumnNames[4][1] + " WHERE id = \'" + selectedFoodItem.eventid + "\'"),null,deleteRemoteSelectedFoodItem,true,null);
 				}
 			}
 		}
@@ -2910,7 +2571,6 @@ package utilities
 				return;
 			}
 			
-			var request:URLRequest;
 			if (event != null) {
 				removeEventListeners();
 				//not checking if there's an error in event, if we get here it should mean there wasn't an error - let's hope so
@@ -2961,23 +2621,13 @@ package utilities
 					newOutputString = outputString.replace(">-1<","><");
 				}
 				
-				request = new URLRequest(googleExcelInsertRowInFoodTableUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId));
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/atom+xml"));
-				if (traceNeeded)
-					trace("url = " + request.url);
-				
-				request.data = outputString;
-				request.method = URLRequestMethod.POST;
-				
-				loader = new URLLoader();
-				functionToRecall = googleExcelInsertFoodItems;
-				loader.addEventListener(Event.COMPLETE,googleExcelInsertFoodItems);
-				functionToRemoveFromEventListener = googleExcelInsertFoodItems;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+				createAndLoadURLRequest(googleExcelInsertRowInFoodTableUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId),
+					URLRequestMethod.POST,
+					null,
+					outputString,
+					googleExcelInsertFoodItems,
+					true,
+					"application/atom+xml");
 			}
 			
 			function unitListRetrievelError(event:DatabaseEvent):void {
@@ -2989,7 +2639,6 @@ package utilities
 		}
 		
 		private function googleExcelCreateHeader(event:Event = null):void  {
-			var request:URLRequest;
 			if (event != null)  {
 				removeEventListeners();
 				if ((event.target.data as String).search("updated") != -1) {
@@ -3014,21 +2663,14 @@ package utilities
 				outputString += '</entry>\n';
 				outputString = outputString.replace(/\n/g, File.lineEnding);
 				
-				request = new URLRequest(googleExcelUpdateCellUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId));
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/atom+xml"));
-				
-				request.data = outputString;
-				request.method = URLRequestMethod.POST;
-				
-				loader = new URLLoader();
-				functionToRecall = googleExcelCreateHeader;
-				loader.addEventListener(Event.COMPLETE,googleExcelCreateHeader);
-				functionToRemoveFromEventListener = googleExcelCreateHeader;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+				createAndLoadURLRequest(
+					googleExcelUpdateCellUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId),
+					URLRequestMethod.POST,
+					null,
+					outputString,
+					googleExcelCreateHeader,
+					true,
+					"application/atom+xml");
 			}
 		}
 		
@@ -3038,8 +2680,6 @@ package utilities
 		 */
 		private function googleExcelCreateFoodTable(event:Event = null):void  {
 			Settings.getInstance().setSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel,"false");
-			
-			var request:URLRequest;
 			
 			if (event != null)  {
 				//SHOULD BE CHECKING HERE WHAT CAN GO WRONG - BECAUSE I SEEM TO ASSUME HERE THAT THE FOODTABLE CREATION WILL ALWAYS BE SUCCESSFUL
@@ -3062,26 +2702,18 @@ package utilities
 			} else {
 				if (traceNeeded)
 					trace("start method googleExcelCreateFoodTable");
-				request = new URLRequest(googleDriveFilesUrl);
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
-				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/json"));
 				
 				var jsonObject:Object = new Object();
 				jsonObject.mimeType = "application/vnd.google-apps.spreadsheet";
 				jsonObject.title = foodtableName;
-				var bodyString:String = JSON.stringify(jsonObject);
-				request.data = bodyString;
-				request.method = URLRequestMethod.POST;
 				
-				loader = new URLLoader();
-				functionToRecall = googleExcelCreateFoodTable;
-				loader.addEventListener(Event.COMPLETE,googleExcelCreateFoodTable);
-				functionToRemoveFromEventListener = googleExcelCreateFoodTable;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+				createAndLoadURLRequest(
+					googleDriveFilesUrl,
+					URLRequestMethod.POST,
+					null,
+					JSON.stringify(jsonObject),googleExcelCreateFoodTable,
+					true,
+					"application/json");
 			}
 		}
 		
@@ -3091,8 +2723,6 @@ package utilities
 		 */
 		private function googleExcelCreateWorkSheet(event:Event = null):void  {
 			Settings.getInstance().setSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel,"false");
-			
-			var request:URLRequest;
 			
 			if (event != null)  {
 				//ASSUMING HERE THAT EVERHTHING WORKS FINE, BUT THINGS COULD BE GOING WRONG
@@ -3140,22 +2770,14 @@ package utilities
 				outputString += '</entry>\n';
 				outputString = outputString.replace(/\n/g, File.lineEnding);
 				
-				request = new URLRequest(googleExcelCreateWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey));
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				request.requestHeaders.push(new URLRequestHeader("Content-Type","application/atom+xml"));
-				
-				
-				request.data = outputString;
-				request.method = URLRequestMethod.POST;
-				
-				loader = new URLLoader();
-				functionToRecall = googleExcelCreateWorkSheet;
-				loader.addEventListener(Event.COMPLETE,googleExcelCreateWorkSheet);
-				functionToRemoveFromEventListener = googleExcelCreateWorkSheet;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+				createAndLoadURLRequest(
+					googleExcelCreateWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey),
+					URLRequestMethod.POST,
+					null,
+					outputString,
+					googleExcelCreateWorkSheet,
+					true,
+					"application/atom+xml");
 			}
 		}
 		
@@ -3167,30 +2789,13 @@ package utilities
 			if (googleExcelDeleteWorkSheetUrl == "")
 				return;
 			
-			var request:URLRequest;
 			if (traceNeeded)
 				trace("start method googleExcelDeleteWorkSheet1");
-			request = new URLRequest(googleExcelDeleteWorkSheetUrl);//.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetIDOfSheet1));
+			createAndLoadURLRequest(googleExcelDeleteWorkSheetUrl,URLRequestMethod.DELETE,null,null,null,false,null);
 			googleExcelDeleteWorkSheetUrl = "";
-			request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-			request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
-			request.contentType = "application/x-www-form-urlencoded";
-			
-			request.method = URLRequestMethod.DELETE;
-			loader = new URLLoader();
-			//functionToRecall = ;not changing becaues this might be running in parallel with otheer calls
-			//loader.addEventListener(Event.COMPLETE,googleExcelFindFoodTableWorkSheet);
-			//functionToRemoveFromEventListener = googleExcelFindFoodTableWorkSheet;
-			//loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-			loader.load(request);
-			if (traceNeeded)
-				trace("loader : request = " + request.data); 
-			
-			
 		}
 		
 		private function googleExcelFindFoodTableWorkSheet(event:Event = null):void {
-			var request:URLRequest;
 			if (event != null)  {
 				removeEventListeners();
 				
@@ -3247,20 +2852,14 @@ package utilities
 			} else {
 				if (traceNeeded)
 					trace("start method googleExcelFindFoodTableWorkSheet");
-				request = new URLRequest(googleExcelFindFoodTableWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey));
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
-				request.contentType = "application/x-www-form-urlencoded";
-				
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = googleExcelFindFoodTableWorkSheet;
-				loader.addEventListener(Event.COMPLETE,googleExcelFindFoodTableWorkSheet);
-				functionToRemoveFromEventListener = googleExcelFindFoodTableWorkSheet;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+				createAndLoadURLRequest(
+					googleExcelFindFoodTableWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey),
+					null,
+					null,
+					null,
+					googleExcelFindFoodTableWorkSheet,
+					true,
+					null);
 			}
 		}
 		
@@ -3272,7 +2871,6 @@ package utilities
 		 * if found and im not the creator, then syncfinished. 
 		 */
 		private function googleExcelFindFoodTableSpreadSheet(event:Event = null):void  {
-			var request:URLRequest;
 			if (event != null)  {
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -3304,23 +2902,17 @@ package utilities
 			} else {
 				if (traceNeeded)
 					trace("start method googleExcelFindFoodTableSpreadSheet");
-				request = new URLRequest(googleDriveFilesUrl);
-				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
-				request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
-				request.contentType = "application/x-www-form-urlencoded";
 				var urlVariables:URLVariables = new URLVariables();
-				
 				urlVariables.q = "title = '" + foodtableName + "'";
-				request.data = urlVariables;
-				request.method = URLRequestMethod.GET;
-				loader = new URLLoader();
-				functionToRecall = googleExcelFindFoodTableSpreadSheet;
-				loader.addEventListener(Event.COMPLETE,googleExcelFindFoodTableSpreadSheet);
-				functionToRemoveFromEventListener = googleExcelFindFoodTableSpreadSheet;
-				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-				loader.load(request);
-				if (traceNeeded)
-					trace("loader : request = " + request.data); 
+
+				createAndLoadURLRequest(
+					googleDriveFilesUrl,
+					null,
+					urlVariables,
+					null,
+					googleExcelFindFoodTableSpreadSheet,
+					true,
+					null);
 			}
 		}
 		
@@ -3426,6 +3018,65 @@ package utilities
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 		}
 		
+		/**
+		 * creates URL request and loads it<br>
+		 * if paramFunctionToRecall != null then <br>
+		 * - eventlistener is registered for that function for Event.COMPLETE<br>
+		 * - paramFunctionToRecall is assigned to variable functionToRemoveFromEventListener<br>
+		 * - paramFunctionToRecall is assigned to variable functionToRecall<br>
+		 * if addIOErrorListener then a listener will be added for the event IOErrorEvent.IO_ERROR, with function googleAPICallFailed<br>
+		 * if ContentType = null then default ContentType = application/x-www-form-urlencoded<br>
+		 * access_token will be added to urlVariables, if urlVariables != null<br>
+		 * if requestMethod == null then GET is taken as default value
+		 */
+		private function createAndLoadURLRequest(url:String,requestMethod:String,urlVariables:URLVariables, data:String, paramFunctionToRecall:Function,addIOErrorListener:Boolean,contentType:String):void {
+			var request:URLRequest = new URLRequest(url);
+			loader = new URLLoader();
+			
+			//all requestmethods
+			if (!urlVariables)  {
+				request.requestHeaders.push(new URLRequestHeader("X-JavaScript-User-Agent", "Google APIs Explorer"));
+			}
+			
+			if (!contentType) {
+				contentType = "application/x-www-form-urlencoded";
+			}
+			request.contentType = contentType;
+			
+			if (!requestMethod)
+				requestMethod = URLRequestMethod.GET;
+			request.method = requestMethod;
+
+			//requestMethod = POST
+			if (requestMethod == URLRequestMethod.POST) {
+				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+			} else {
+				if (!urlVariables)  {
+					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
+				} else  {
+					urlVariables.access_token = access_token;
+				}
+			}
+			
+			if (data != null)
+				request.data = data;
+			else if (urlVariables != null)
+				request.data = urlVariables;
+			
+			if (paramFunctionToRecall != null) {
+				loader.addEventListener(Event.COMPLETE,paramFunctionToRecall);
+				functionToRecall = paramFunctionToRecall;
+				functionToRemoveFromEventListener = paramFunctionToRecall;
+			}
+			
+			if (addIOErrorListener)
+				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
+						
+			loader.load(request);
+			if (traceNeeded)
+				trace("loader : request = " + request.data); 
+			
+		}	
 	}
 }
 
