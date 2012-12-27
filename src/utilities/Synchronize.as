@@ -119,10 +119,10 @@ package utilities
 		 * <br>
 		 * immediateRunNecessary is a parameter in the synchronize method<br>
 		 * <br>
-		 * If  (syncRunning is true and currentSyncTimeStamp > 5 minutes ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 5 minutes ago)), then run the sync, reset timestamp of startrun to current time, 
+		 * If  (syncRunning is true and currentSyncTimeStamp > 30 seconds ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 30 seconds ago)), then run the sync, reset timestamp of startrun to current time, 
 		 * set rerunnecessary to false<br>
 		 * <br>
-		 * If  (syncRunning is true and currentSyncTimeStamp < 5 minutes ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
+		 * If  (syncRunning is true and currentSyncTimeStamp < 30 seconds ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
 		 */
 		private var currentSyncTimeStamp:Number;
 		/**
@@ -131,10 +131,10 @@ package utilities
 		 * <br>
 		 * immediateRunNecessary is a parameter in the synchronize method<br>
 		 * <br>
-		 * If  (syncRunning is true and currentSyncTimeStamp > 5 minutes ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 5 minutes ago)), then run the sync, reset timestamp of startrun to current time, 
+		 * If  (syncRunning is true and currentSyncTimeStamp > 30 seconds ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 30 seconds ago)), then run the sync, reset timestamp of startrun to current time, 
 		 * set rerunnecessary to false<br>
 		 * <br>
-		 * If  (syncRunning is true and currentSyncTimeStamp < 5 minutes ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
+		 * If  (syncRunning is true and currentSyncTimeStamp < 30 seconds ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
 		 */
 		private var syncRunning:Boolean;
 		/**
@@ -143,10 +143,10 @@ package utilities
 		 * <br>
 		 * immediateRunNecessary is a parameter in the synchronize method<br>
 		 * <br>
-		 * If  (syncRunning is true and currentSyncTimeStamp > 5 minutes ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 5 minutes ago)), then run the sync, reset timestamp of startrun to current time, 
+		 * If  (syncRunning is true and currentSyncTimeStamp > 30 seconds ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 30 seconds ago)), then run the sync, reset timestamp of startrun to current time, 
 		 * set rerunnecessary to false<br>
 		 * <br>
-		 * If  (syncRunning is true and currentSyncTimeStamp < 5 minutes ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
+		 * If  (syncRunning is true and currentSyncTimeStamp < 30 seconds ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
 		 */
 		private var rerunNecessary:Boolean;
 		
@@ -320,14 +320,12 @@ package utilities
 		private static var instance:Synchronize = new Synchronize();
 		
 		private var loader:URLLoader;
-		/**when a function tries to access google api, but that fails due to invalid access_token, then the token
+		
+		/**
+		 * when a function tries to access google api, but that fails due to invalid access_token, then the token
 		 * should be refreshed, this variable will store the function to retry as soon as token is refreshed
 		 */
 		private var functionToRecall:Function;
-		/**
-		 * this will be the event listener to remove
-		 */
-		private var functionToRemoveFromEventListener:Function;
 		
 		/**
 		 * nextpagetoken received from google while accessing list of tables, .. <br>
@@ -382,10 +380,10 @@ package utilities
 		}
 		
 		/**
-		 * If  (syncRunning is true and currentSyncTimeStamp > 5 minutes ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 5 minutes ago)), then run the sync, reset timestamp of startrun to current time, 
+		 * If  (syncRunning is true and currentSyncTimeStamp > 30 seconds ago) or  (syncRunning is false & (immediateRunNecessary or currentSyncTimeStamp > 30 seconds ago)), then run the sync, reset timestamp of startrun to current time, 
 		 * set rerunnecessary to false<br>
 		 * <br>
-		 * If  (syncRunning is true and currentSyncTimeStamp < 5 minutes ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything.<br>
+		 * If  (syncRunning is true and currentSyncTimeStamp < 30 seconds ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything.<br>
 		 * if tracker is null, then no tracking will be done next time 
 		 */
 		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean):void {
@@ -3012,8 +3010,8 @@ package utilities
 		 */
 		private function removeEventListeners():void  {
 
-			if (functionToRemoveFromEventListener != null)
-				loader.removeEventListener(Event.COMPLETE,functionToRemoveFromEventListener);
+			if (functionToRecall != null)
+				loader.removeEventListener(Event.COMPLETE,functionToRecall);
 
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 		}
@@ -3066,7 +3064,6 @@ package utilities
 			if (paramFunctionToRecall != null) {
 				loader.addEventListener(Event.COMPLETE,paramFunctionToRecall);
 				functionToRecall = paramFunctionToRecall;
-				functionToRemoveFromEventListener = paramFunctionToRecall;
 			}
 			
 			if (addIOErrorListener)
