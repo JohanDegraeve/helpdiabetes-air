@@ -155,6 +155,30 @@ package utilities
 		 */
 		private var asOfTimeStamp:Number
 		
+		/////columnnames
+		private static var ColumnName_id:String = "id";
+		private static var ColumnName_medicinname:String = "medicinname";
+		private static var ColumnName_value:String = "value";
+		private static var ColumnName_creationtimestamp:String = "creationtimestamp";
+		private static var ColumnName_modifiedtimestamp:String = "modifiedtimestamp";
+		private static var ColumnName_deleted:String = "deleted";
+		private static var ColumnName_addedtoormodifiedintabletimestamp:String = "addedtoormodifiedintabletimestamp";
+		private static var ColumnName_unit:String = "unit";
+		private static var ColumnName_level:String = "level";
+		private static var ColumnName_mealname:String = "mealname";
+		private static var ColumnName_insulinratio:String = "insulinratio";
+		private static var ColumnName_correctionfactor:String = "correctionfactor";
+		private static var ColumnName_previousbglevel:String = "previousbglevel";
+		private static var ColumnName_description:String = "description";
+		private static var ColumnName_unitdescription:String = "unitdescription";
+		private static var ColumnName_unitstandardamount:String = "unitstandardamount";
+		private static var ColumnName_unitkcal:String = "unitkcal";
+		private static var ColumnName_unitprotein:String = "unitprotein";
+		private static var ColumnName_unitcarbs:String = "unitcarbs";
+		private static var ColumnName_unitfat:String = "unitfat";
+		private static var ColumnName_chosenamount:String = "chosenamount";
+		private static var ColumnName_mealeventid:String = "mealeventid";
+		
 		/**
 		 * tablename, tableid and list of columns with columnname and type <br>
 		 * tableid "" string means there's no table i known yet
@@ -163,89 +187,89 @@ package utilities
 			[	"HD-MedicinEvent",
 				"",	
 				[						
-					["id","NUMBER"],//the unique identifier
-					["medicinname","STRING"],//medicin name
-					["value","NUMBER"],//amount of medicin
-					["creationtimestamp","NUMBER"],//timestamp that the event was created
-					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
-					["deleted","STRING"],//was the event deleted or not
-					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_medicinname,"STRING"],//medicin name
+					[ColumnName_value,"NUMBER"],//amount of medicin
+					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
+					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
+					[ColumnName_deleted,"STRING"],//was the event deleted or not
+					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"MedicinEvents"//description
 			],
 			[	"HD-BloodglucoseEvent",
 				"",	
 				[						
-					["id","NUMBER"],//the unique identifier
-					["unit","STRING"],//unit name
-					["value","NUMBER"],//value
-					["creationtimestamp","NUMBER"],//timestamp that the event was created
-					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
-					["deleted","STRING"],//was the event deleted or not
-					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_unit,"STRING"],//unit name
+					[ColumnName_value,"NUMBER"],//value
+					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
+					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
+					[ColumnName_deleted,"STRING"],//was the event deleted or not
+					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"BloodglucoseEvents"//description
 			],
 			[	"HD-ExerciseEvent",
 				"",	
 				[						
-					["id","NUMBER"],//the unique identifier
-					["level","STRING"],//unit name
-					["creationtimestamp","NUMBER"],//timestamp that the event was created
-					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
-					["deleted","STRING"],//was the event deleted or not
-					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_level,"STRING"],//unit name
+					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
+					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
+					[ColumnName_deleted,"STRING"],//was the event deleted or not
+					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"ExerciseEvents"//description
 			],
 			[	"HD-MealEvent",
 				"",	
 				[						
-					["id","NUMBER"],//the unique identifier
-					["mealname","STRING"],
-					["insulinratio","NUMBER"],
-					["correctionfactor","NUMBER"],
-					["previousbglevel","NUMBER"],
-					["creationtimestamp","NUMBER"],//timestamp that the event was created
-					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
-					["deleted","STRING"],//was the event deleted or not
-					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_mealname,"STRING"],
+					[ColumnName_insulinratio,"NUMBER"],
+					[ColumnName_correctionfactor,"NUMBER"],
+					[ColumnName_previousbglevel,"NUMBER"],
+					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
+					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
+					[ColumnName_deleted,"STRING"],//was the event deleted or not
+					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"MealEvents"//description
 			],
 			[	"HD-SelectedFoodItem",
 				"",	
 				[						
-					["id","NUMBER"],//the unique identifier
-					["description","STRING"],
-					["unitdescription","STRING"],
-					["unitstandardamount","NUMBER"],
-					["unitkcal","NUMBER"],
-					["unitprotein","NUMBER"],
-					["unitcarbs","NUMBER"],
-					["unitfat","NUMBER"],
-					["chosenamount","NUMBER"],
-					["mealeventid","NUMBER"],
-					["creationtimestamp","NUMBER"],//timestamp that the event was created, in case of selectedfooditems, creationtimestamp will not really be usefull
-					["modifiedtimestamp","NUMBER"],//timestamp that the event was last modified
-					["deleted","STRING"],//was the event deleted or not
-					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_description,"STRING"],
+					[ColumnName_unitdescription,"STRING"],
+					[ColumnName_unitstandardamount,"NUMBER"],
+					[ColumnName_unitkcal,"NUMBER"],
+					[ColumnName_unitprotein,"NUMBER"],
+					[ColumnName_unitcarbs,"NUMBER"],
+					[ColumnName_unitfat,"NUMBER"],
+					[ColumnName_chosenamount,"NUMBER"],
+					[ColumnName_mealeventid,"NUMBER"],
+					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created, in case of selectedfooditems, creationtimestamp will not really be usefull
+					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
+					[ColumnName_deleted,"STRING"],//was the event deleted or not
+					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"Selected Food Items"//description
 			],
 			[	"HD-Settings",
 				"",	
 				[						
-					["id","NUMBER"],//the unique identifier
-					["value","STRING"],
-					["addedtoormodifiedintabletimestamp","NUMBER"]//the timestamp that the row was added to the table
+					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_value,"STRING"],
+					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"Settings"//description
 			]
 		];
 		
 		private var googleExcelGoodTableColumnNames:Array = [
-			"description",
+			ColumnName_description,
 			"unit1",	
 			"standardamount1",	
 			"kcal1",
@@ -588,12 +612,7 @@ package utilities
 		
 		private function getTheMedicinEvents(event:Event = null):void {
 			var positionId:int;
-			var positionMedicinname:int;
-			var positionValue:int;
-			var positionCreationTimeStamp:int;
-			var positionModifiedTimeStamp:int;
-			var positionDeleted:int;
-			var positionAddedTimeStamp:int;
+			var eventAsJSONObject:Object;
 			
 			if (traceNeeded)
 				trace("start method getTheMedicinEvents");
@@ -602,35 +621,12 @@ package utilities
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
 				removeEventListeners();
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				eventAsJSONObject = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheMedicinEvents))
 					return;
 				else {
-					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
-					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
-					var ctr:int;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[0][2][0][0] == eventAsJSONObject.columns[ctr])
-							positionId = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[0][2][1][0] == eventAsJSONObject.columns[ctr])
-							positionMedicinname = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[0][2][2][0] == eventAsJSONObject.columns[ctr])
-							positionValue = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[0][2][3][0] == eventAsJSONObject.columns[ctr])
-							positionCreationTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[0][2][4][0] == eventAsJSONObject.columns[ctr])
-							positionModifiedTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[0][2][5][0] == eventAsJSONObject.columns[ctr])
-							positionDeleted = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[0][2][6][0] == eventAsJSONObject.columns[ctr])
-							positionAddedTimeStamp = ctr;
+					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
 					
 					var elementAlreadyThere:Boolean;
 					if (eventAsJSONObject.rows) {
@@ -676,10 +672,10 @@ package utilities
 					for (var k:int = 0; k < remoteElements.length; k++) {
 						if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as MedicinEvent).eventid) {
 							//got a matching element, let's see if we need to remove it from both lists
-							if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as MedicinEvent).lastModifiedTimestamp) {
+							if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]) != (localElements.getItemAt(j) as MedicinEvent).lastModifiedTimestamp) {
 								//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
 								//but first let's see if the remoteelement has the deleted flag set
-								if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+								if (((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][5][0])] as String) == "true") {
 									//its a deleted item remove it from both lists
 									remoteElements.removeItemAt(k);
 									if (!trackingListAlreadyModified) {
@@ -692,7 +688,7 @@ package utilities
 									j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 									break;
 								} else {
-									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as MedicinEvent).lastModifiedTimestamp) {
+									if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]) < (localElements.getItemAt(j) as MedicinEvent).lastModifiedTimestamp) {
 										remoteElements.removeItemAt(k);
 										break;
 									} else {
@@ -724,14 +720,14 @@ package utilities
 						if (trackingList.getItemAt(l) is MedicinEvent) {
 							if ((trackingList.getItemAt(l) as MedicinEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
-								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][5][0])] as String) == "true") {
 									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as MedicinEvent).updateMedicinEvent(
-										remoteElements.getItemAt(m)[positionMedicinname],
-										remoteElements.getItemAt(m)[positionValue],
-										new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
-										new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]));
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][1][0])],
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
+										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
+										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]));
 								}
 								break;
 							}
@@ -740,14 +736,14 @@ package utilities
 					if (l == trackingList.length) {
 						//it means we didn't find the remotelement in the trackinglist, so we need to create it
 						//but only if deleted is false
-						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
+						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][5][0])] as String) == "false") {
 							localElementsUpdated = true;
 							(new MedicinEvent(
-								remoteElements.getItemAt(m)[positionValue],
-								remoteElements.getItemAt(m)[positionMedicinname],
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][1][0])],
 								remoteElements.getItemAt(m)[positionId],
-								new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
-								new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
+								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]),
 								true));
 						}
 					}
@@ -760,12 +756,7 @@ package utilities
 		
 		private function getTheBloodGlucoseEvents(event:Event = null):void {
 			var positionId:int;
-			var positionUnit:int;
-			var positionValue:int;
-			var positionCreationTimeStamp:int;
-			var positionModifiedTimeStamp:int;
-			var positionDeleted:int;
-			var positionAddedTimeStamp:int;
+			var eventAsJSONObject:Object;
 			
 			if (traceNeeded)
 				trace("start method getTheBloodGlucoseEvents");
@@ -775,35 +766,12 @@ package utilities
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
 				removeEventListeners();
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				eventAsJSONObject = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheBloodGlucoseEvents))
 					return;
 				else {
-					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
-					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
-					var ctr:int;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[1][2][0][0] == eventAsJSONObject.columns[ctr])
-							positionId = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[1][2][1][0] == eventAsJSONObject.columns[ctr])
-							positionUnit = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[1][2][2][0] == eventAsJSONObject.columns[ctr])
-							positionValue = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[1][2][3][0] == eventAsJSONObject.columns[ctr])
-							positionCreationTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[1][2][4][0] == eventAsJSONObject.columns[ctr])
-							positionModifiedTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[1][2][5][0] == eventAsJSONObject.columns[ctr])
-							positionDeleted = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[1][2][6][0] == eventAsJSONObject.columns[ctr])
-							positionAddedTimeStamp = ctr;
+					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
 					
 					var elementAlreadyThere:Boolean;
 					if (eventAsJSONObject.rows) {
@@ -849,10 +817,10 @@ package utilities
 						if (localElements.getItemAt(j) is BloodGlucoseEvent)  {
 							if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as BloodGlucoseEvent).eventid) {
 								//got a matching element, let's see if we need to remove it from both lists
-								if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
+								if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) != (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
 									//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
 									//but first let's see if the remoteelement has the deleted flag set
-									if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+									if (((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 										//its a deleted item remove it from both lists
 										remoteElements.removeItemAt(k);
 										if (!trackingListAlreadyModified) {
@@ -865,7 +833,7 @@ package utilities
 										j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 										break;
 									} else {
-										if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
+										if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) < (localElements.getItemAt(j) as BloodGlucoseEvent).lastModifiedTimestamp) {
 											remoteElements.removeItemAt(k);
 											break;
 										} else {
@@ -905,17 +873,17 @@ package utilities
 								trackingListAlreadyModified = true;
 								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 								}*/
-								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 									if (traceNeeded)
 										trace("call to bloodglucoseevent.deleteevent");
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).deleteEvent();
 								} else {
 									if (traceNeeded) trace("call to update bloodglucoseevent");
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).updateBloodGlucoseEvent(
-										remoteElements.getItemAt(m)[positionUnit],
-										remoteElements.getItemAt(m)[positionValue],
-										new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
-										new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]));
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unit)],
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_value)],
+										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
+										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]));
 								}
 								break;
 							}
@@ -924,7 +892,7 @@ package utilities
 					if (l == trackingList.length) {
 						//it means we didn't find the remotelement in the trackinglist, so we need to create it
 						//but only if deleted is false
-						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
+						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "false") {
 							localElementsUpdated = true;
 							/*if (!trackingListAlreadyModified) {
 							trackingListAlreadyModified = true;
@@ -932,11 +900,11 @@ package utilities
 							}*/
 							
 							/*trackingList.addItem*/(new BloodGlucoseEvent(
-								remoteElements.getItemAt(m)[positionValue],
-								remoteElements.getItemAt(m)[positionUnit],
-								remoteElements.getItemAt(m)[positionId],
-								new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
-								new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_value)],
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unit)],
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)],
+								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
+								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
 						}
 					}
@@ -949,11 +917,7 @@ package utilities
 		
 		private function getTheExerciseEvents(event:Event = null):void {
 			var positionId:int;
-			var positionLevel:int;
-			var positionCreationTimeStamp:int;
-			var positionModifiedTimeStamp:int;
-			var positionDeleted:int;
-			var positionAddedTimeStamp:int;
+			var eventAsJSONObject:Object;
 			
 			if (traceNeeded)
 				trace("start method getTheExerciseEvents");
@@ -961,32 +925,12 @@ package utilities
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
 				removeEventListeners();
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				eventAsJSONObject = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheExerciseEvents))
 					return;
 				else {
-					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
-					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
-					var ctr:int;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][0][0] == eventAsJSONObject.columns[ctr])
-							positionId = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][1][0] == eventAsJSONObject.columns[ctr])
-							positionLevel = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][2][0] == eventAsJSONObject.columns[ctr])
-							positionCreationTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][3][0] == eventAsJSONObject.columns[ctr])
-							positionModifiedTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][4][0] == eventAsJSONObject.columns[ctr])
-							positionDeleted = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[2][2][5][0] == eventAsJSONObject.columns[ctr])
-							positionAddedTimeStamp = ctr;
+					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
 					
 					var elementAlreadyThere:Boolean;
 					if (eventAsJSONObject.rows) {
@@ -1031,10 +975,10 @@ package utilities
 						if (localElements.getItemAt(j) is ExerciseEvent) {
 							if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as ExerciseEvent).eventid) {
 								//got a matching element, let's see if we need to remove it from both lists
-								if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
+								if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) != (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
 									//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
 									//but first let's see if the remoteelement has the deleted flag set
-									if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+									if (((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 										//its a deleted item remove it from both lists
 										remoteElements.removeItemAt(k);
 										if (!trackingListAlreadyModified) {
@@ -1047,7 +991,7 @@ package utilities
 										j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 										break;
 									} else {
-										if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
+										if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) < (localElements.getItemAt(j) as ExerciseEvent).lastModifiedTimestamp) {
 											remoteElements.removeItemAt(k);
 											break;
 										} else {
@@ -1085,13 +1029,13 @@ package utilities
 								trackingListAlreadyModified = true;
 								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 								}*/
-								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 									(trackingList.getItemAt(l) as ExerciseEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as ExerciseEvent).updateExerciseEvent(
-										remoteElements.getItemAt(m)[positionLevel],
-										new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
-										new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_level)],
+										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
+										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										"");
 								}
 								break;
@@ -1101,7 +1045,7 @@ package utilities
 					if (l == trackingList.length) {
 						//it means we didn't find the remotelement in the trackinglist, so we need to create it
 						//but only if deleted is false
-						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
+						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "false") {
 							localElementsUpdated = true;
 							/*if (!trackingListAlreadyModified) {
 							trackingListAlreadyModified = true;
@@ -1109,11 +1053,11 @@ package utilities
 							}*/
 							
 							/*trackingList.addItem*/(new ExerciseEvent(
-								remoteElements.getItemAt(m)[positionLevel],
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_level)],
 								"",
 								remoteElements.getItemAt(m)[positionId],
-								new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
-								new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
+								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
 						}
 					}
@@ -1127,14 +1071,7 @@ package utilities
 		
 		private function getTheMealEvents(event:Event = null):void {
 			var positionId:int;
-			var positionMealName:int;
-			var positionInsulinRatio:int;
-			var positionCFFactor:int;
-			var positionPreviousBGLevel:int;
-			var positionCreationTimeStamp:int;
-			var positionModifiedTimeStamp:int;
-			var positionDeleted:int;
-			var positionAddedTimeStamp:int;
+			var eventAsJSONObject:Object;
 			
 			if (traceNeeded)
 				trace("start method getTheMealEvents");
@@ -1143,41 +1080,12 @@ package utilities
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
 				removeEventListeners();
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				eventAsJSONObject = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheMealEvents))
 					return;
 				else {
-					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
-					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
-					var ctr:int;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[3][2][0][0] == eventAsJSONObject.columns[ctr])
-							positionId = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[3][2][1][0] == eventAsJSONObject.columns[ctr])
-							positionMealName = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[3][2][2][0] == eventAsJSONObject.columns[ctr])
-							positionInsulinRatio = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[3][2][3][0] == eventAsJSONObject.columns[ctr])
-							positionCFFactor = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[3][2][4][0] == eventAsJSONObject.columns[ctr])
-							positionPreviousBGLevel = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[3][2][5][0] == eventAsJSONObject.columns[ctr])
-							positionCreationTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[3][2][6][0] == eventAsJSONObject.columns[ctr])
-							positionModifiedTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[3][2][7][0] == eventAsJSONObject.columns[ctr])
-							positionDeleted = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[3][2][8][0] == eventAsJSONObject.columns[ctr])
-							positionAddedTimeStamp = ctr;
+					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
 					
 					var elementAlreadyThere:Boolean;
 					if (eventAsJSONObject.rows) {
@@ -1228,11 +1136,11 @@ package utilities
 									//ModelLocator.getInstance().logString += "3" + "\n";
 									
 									//got a matching element, let's see if we need to remove it from both lists
-									if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
+									if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) != (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
 										//ModelLocator.getInstance().logString += "4" + "\n";
 										//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
 										//but first let's see if the remoteelement has the deleted flag set
-										if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+										if (((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 											//ModelLocator.getInstance().logString += "5" + "\n";
 											//its a deleted item remove it from both lists
 											remoteElements.removeItemAt(k);
@@ -1247,7 +1155,7 @@ package utilities
 											break;
 										} else {
 											//ModelLocator.getInstance().logString += "6" + "\n";
-											if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
+											if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) < (localElements.getItemAt(j) as MealEvent).lastModifiedTimeStamp) {
 												//ModelLocator.getInstance().logString += "7" + "\n";
 												remoteElements.removeItemAt(k);
 												break;
@@ -1295,18 +1203,18 @@ package utilities
 								trackingListAlreadyModified = true;
 								ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 								}*/
-								if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 									if (traceNeeded)
 										trace("in synchronize.as, calling mealevent.deleteevent");
 									(trackingList.getItemAt(l) as MealEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as MealEvent).updateMealEvent(
-										remoteElements.getItemAt(m)[positionMealName],
-										remoteElements.getItemAt(m)[positionInsulinRatio],
-										remoteElements.getItemAt(m)[positionCFFactor],
-										remoteElements.getItemAt(m)[positionPreviousBGLevel],
-										new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
-										new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]));
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_mealname)],
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_insulinratio)],
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_correctionfactor)],
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_previousbglevel)],
+										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
+										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]));
 								}
 								break;
 							}
@@ -1315,7 +1223,7 @@ package utilities
 					if (l == trackingList.length) {
 						//it means we didn't find the remotelement in the trackinglist, so we need to create it
 						//but only if deleted is false
-						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
+						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "false") {
 							localElementsUpdated = true;
 							if (!trackingListAlreadyModified) {
 								trackingListAlreadyModified = true;
@@ -1323,14 +1231,14 @@ package utilities
 							}
 							
 							trackingList.addItem(new MealEvent(//in contradiction to medicin/bloodglucose and exerciseevents, I must add new mealevents to the trackinglist, because if i don't, the adding of selectedfooditems would fail because I wouldn't find the mealevent
-								remoteElements.getItemAt(m)[positionMealName],
-								remoteElements.getItemAt(m)[positionInsulinRatio],
-								remoteElements.getItemAt(m)[positionCFFactor],
-								remoteElements.getItemAt(m)[positionPreviousBGLevel],
-								new Number(remoteElements.getItemAt(m)[positionCreationTimeStamp]),
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_mealname)],
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_insulinratio)],
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_correctionfactor)],
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_previousbglevel)],
+								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								null,
 								remoteElements.getItemAt(m)[positionId],
-								new Number(remoteElements.getItemAt(m)[positionModifiedTimeStamp]),
+								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
 						}
 					}
@@ -1342,19 +1250,7 @@ package utilities
 		
 		private function getTheSelectedFoodItems(event:Event = null):void {
 			var positionId:int;
-			var positionDescription:int;
-			var positionUnitDescription:int;
-			var positionUnitStandardAmount:int;
-			var positionUnitKcal:int;
-			var positionUnitProtein:int;
-			var positionUnitCarbs:int;
-			var positionUnitFat:int;
-			var positionChosenAmount:int;
-			var positionMealEventId:int;
-			var positionCreationTimeStamp:int;
-			var positionModifiedTimeStamp:int;
-			var positionDeleted:int;
-			var positionAddedTimeStamp:int;
+			var eventAsJSONObject:Object;
 			
 			if (traceNeeded)
 				trace("start method getTheSelectedItems");
@@ -1363,56 +1259,12 @@ package utilities
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
 				removeEventListeners();
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				eventAsJSONObject = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheSelectedFoodItems))
 					return;
 				else {
-					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
-					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
-					var ctr:int;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][0][0] == eventAsJSONObject.columns[ctr])
-							positionId = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][1][0] == eventAsJSONObject.columns[ctr])
-							positionDescription = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][2][0] == eventAsJSONObject.columns[ctr])
-							positionUnitDescription = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][3][0] == eventAsJSONObject.columns[ctr])
-							positionUnitStandardAmount = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][4][0] == eventAsJSONObject.columns[ctr])
-							positionUnitKcal = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][5][0] == eventAsJSONObject.columns[ctr])
-							positionUnitProtein = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][6][0] == eventAsJSONObject.columns[ctr])
-							positionUnitCarbs = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][7][0] == eventAsJSONObject.columns[ctr])
-							positionUnitFat = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][8][0] == eventAsJSONObject.columns[ctr])
-							positionChosenAmount = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][9][0] == eventAsJSONObject.columns[ctr])
-							positionMealEventId = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][10][0] == eventAsJSONObject.columns[ctr])
-							positionCreationTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][11][0] == eventAsJSONObject.columns[ctr])
-							positionModifiedTimeStamp = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][12][0] == eventAsJSONObject.columns[ctr])
-							positionDeleted = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[4][2][13][0] == eventAsJSONObject.columns[ctr])
-							positionAddedTimeStamp = ctr;
+					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
 					
 					var elementAlreadyThere:Boolean;
 					if (eventAsJSONObject.rows) {
@@ -1461,10 +1313,10 @@ package utilities
 						for (var k:int = 0; k < remoteElements.length; k++) {
 							if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as SelectedFoodItem).eventid) {
 								//got a matching element, let's see if we need to remove it from both lists
-								if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) != (localElements.getItemAt(j) as SelectedFoodItem).lastModifiedTimestamp) {
+								if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) != (localElements.getItemAt(j) as SelectedFoodItem).lastModifiedTimestamp) {
 									//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
 									//but first let's see if the remoteelement has the deleted flag set
-									if (((remoteElements.getItemAt(k) as Array)[positionDeleted] as String) == "true") {
+									if (((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 										//its a deleted item remove it from both lists
 										remoteElements.removeItemAt(k);
 										(localElements.getItemAt(j) as SelectedFoodItem).deleteEvent();//delete from local database
@@ -1477,7 +1329,7 @@ package utilities
 										j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 										break;
 									} else {
-										if (new Number((remoteElements.getItemAt(k) as Array)[positionModifiedTimeStamp]) < (localElements.getItemAt(j) as SelectedFoodItem).lastModifiedTimestamp) {
+										if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) < (localElements.getItemAt(j) as SelectedFoodItem).lastModifiedTimestamp) {
 											remoteElements.removeItemAt(k);
 											break;
 										} else {
@@ -1519,20 +1371,20 @@ package utilities
 									trackingListAlreadyModified = true;
 									ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 									}*/
-									if ((remoteElements.getItemAt(m)[positionDeleted] as String) == "true") {
+									if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 										theSelectedFoodItem.deleteEvent();
 									} else {
 										theSelectedFoodItem.updateSelectedFoodItem(
-											remoteElements.getItemAt(m)[positionDescription],
+											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_description)],
 											new Unit(
-												remoteElements.getItemAt(m)[positionUnitDescription],
-												remoteElements.getItemAt(m)[positionUnitStandardAmount],
-												remoteElements.getItemAt(m)[positionUnitKcal],
-												remoteElements.getItemAt(m)[positionUnitProtein],
-												remoteElements.getItemAt(m)[positionUnitCarbs],
-												remoteElements.getItemAt(m)[positionUnitFat]),
-											remoteElements.getItemAt(m)[positionModifiedTimeStamp],
-											remoteElements.getItemAt(m)[positionChosenAmount]);
+												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitdescription)],
+												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitstandardamount)],
+												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitkcal)],
+												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitprotein)],
+												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitcarbs)],
+												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitfat)]),
+											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)],
+											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_chosenamount)]);
 									}
 									break;
 									//l =  trackingList.length;
@@ -1545,12 +1397,12 @@ package utilities
 					if (l == trackingList.length) {
 						//it means we didn't find the remotelement in the trackinglist, so we need to create it
 						//but only if deleted is false
-						if (((remoteElements.getItemAt(m) as Array)[positionDeleted] as String) == "false") {
+						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "false") {
 							//we need to find the mealevent
 							for (var lstctr:int = 0; lstctr < trackingList.length; lstctr++) {
 								if (trackingList.getItemAt(lstctr) is MealEvent) {
 									if ((trackingList.getItemAt(lstctr) as MealEvent).timeStamp >= asOfTimeStamp) {
-										if ((trackingList.getItemAt(lstctr) as MealEvent).eventid == remoteElements.getItemAt(m)[positionMealEventId]) {
+										if ((trackingList.getItemAt(lstctr) as MealEvent).eventid == remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_mealeventid)]) {
 											localElementsUpdated = true;
 											/*if (!trackingListAlreadyModified) {
 											trackingListAlreadyModified = true;
@@ -1559,17 +1411,17 @@ package utilities
 											(trackingList.getItemAt(lstctr) as MealEvent).addSelectedFoodItem(
 												new SelectedFoodItem(
 													remoteElements.getItemAt(m)[positionId],
-													remoteElements.getItemAt(m)[positionDescription],
+													remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_description)],
 													new Unit(
-														remoteElements.getItemAt(m)[positionUnitDescription],
-														remoteElements.getItemAt(m)[positionUnitStandardAmount],
-														remoteElements.getItemAt(m)[positionUnitKcal],
-														remoteElements.getItemAt(m)[positionUnitProtein],
-														remoteElements.getItemAt(m)[positionUnitCarbs],
-														remoteElements.getItemAt(m)[positionUnitFat]
+														remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitdescription)],
+														remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitstandardamount)],
+														remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitkcal)],
+														remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitprotein)],
+														remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitcarbs)],
+														remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitfat)]
 													),
-													remoteElements.getItemAt(m)[positionChosenAmount],
-													remoteElements.getItemAt(m)[positionModifiedTimeStamp]
+													remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_chosenamount)],
+													remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]
 												),
 												null)
 										}
@@ -2008,28 +1860,16 @@ package utilities
 				trace("start method getTheSettings");
 			
 			var positionId:int;
-			var positionValue:int;
-			var positionModifiedTimeStamp:int;
+			var eventAsJSONObject:Object;
 			
 			if (event != null) {
 				removeEventListeners();
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				eventAsJSONObject = JSON.parse(event.target.data as String);
 				
 				if (eventHasError(event,getTheSettings))
 					return;
 				else {
-					//just to be sure, we need to find the order of the columns in our jsonobject .. boring
-					//we might be going several times through this, in case nextPageToken is not null, should give the same result each time.
-					var ctr:int;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[5][2][0][0] == eventAsJSONObject.columns[ctr])
-							positionId = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[5][2][1][0] == eventAsJSONObject.columns[ctr])
-							positionValue = ctr;
-					for (ctr = 0;ctr < eventAsJSONObject.columns.length;ctr++)
-						if (tableNamesAndColumnNames[5][2][2][0] == eventAsJSONObject.columns[ctr])
-							positionModifiedTimeStamp = ctr;
+					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
 					
 					if (eventAsJSONObject.rows) {
 						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
@@ -2062,16 +1902,16 @@ package utilities
 					var settingFoundInRemoteElements:Boolean = false;
 					//first see if that setting is in the remoteelements
 					for (var remoteElementCtr:int = 0;remoteElementCtr < remoteElements.length;remoteElementCtr++) {
-						if ((remoteElements.getItemAt(remoteElementCtr) as Array)[0] == settingCtr)  {
+						if ((remoteElements.getItemAt(remoteElementCtr) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_id)] == settingCtr)  {
 							settingFoundInRemoteElements = true;
 							//we found a remote setting with same setting id as settingCtr
 							//so let's check the lastmodifiedtimestamp
-							if ((remoteElements.getItemAt(remoteElementCtr) as Array)[2] == Settings.getInstance().getSettingLastModifiedTimeStamp(settingCtr))  {
+							if ((remoteElements.getItemAt(remoteElementCtr) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_addedtoormodifiedintabletimestamp)] == Settings.getInstance().getSettingLastModifiedTimeStamp(settingCtr))  {
 								remoteElements.removeItemAt(remoteElementCtr);
 								remoteElementCtr--;
 								break;
 							} else  {
-								if ((remoteElements.getItemAt(remoteElementCtr) as Array)[2] < Settings.getInstance().getSettingLastModifiedTimeStamp(settingCtr))  {
+								if ((remoteElements.getItemAt(remoteElementCtr) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_addedtoormodifiedintabletimestamp)] < Settings.getInstance().getSettingLastModifiedTimeStamp(settingCtr))  {
 									//remote element needs to be updated
 									break;
 								} else {
@@ -2091,9 +1931,9 @@ package utilities
 				for (settingCtr = 0; settingCtr < localElements.length; settingCtr++) {
 					Settings.getInstance().
 						setSetting(
-							(localElements.getItemAt(settingCtr) as Array)[0],
-							(localElements.getItemAt(settingCtr) as Array)[1],
-							(localElements.getItemAt(settingCtr) as Array)[2]);
+							(localElements.getItemAt(settingCtr) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_id)],
+							(localElements.getItemAt(settingCtr) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_value)],
+							(localElements.getItemAt(settingCtr) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_addedtoormodifiedintabletimestamp)]);
 				}
 				insertNextSetting(null);
 			}
@@ -2300,7 +2140,7 @@ package utilities
 			returnValue = 
 				"SELECT * FROM " + spaces +
 				tableNamesAndColumnNames[index][1] +
-				" WHERE addedtoormodifiedintabletimestamp >= '" + lastSyncTimeStamp.toString() + "' AND " +
+				" WHERE " + ColumnName_addedtoormodifiedintabletimestamp +  ">= '" + lastSyncTimeStamp.toString() + "' AND " +
 				"creationtimestamp >= '" + asOfTimeStamp.toString() + "'";
 			if (traceNeeded)
 				trace("querystring = " + returnValue);

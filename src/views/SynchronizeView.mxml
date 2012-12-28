@@ -53,9 +53,9 @@
 				_authorizationCode = value;
 				if (value == "") return;
 				
-				button.label = resourceManager.getString('synchronizeview','startsynchronizing') ;
-				button.visible = true;
-				button.addEventListener(MouseEvent.CLICK,getAccessTokenAndRefreshToken);
+				buttonAuthenticateToGoogle.label = resourceManager.getString('synchronizeview','startsynchronizing') ;
+				buttonAuthenticateToGoogle.visible = true;
+				buttonAuthenticateToGoogle.addEventListener(MouseEvent.CLICK,getAccessTokenAndRefreshToken);
 			}
 
 			
@@ -72,7 +72,7 @@
 				
 				back_label = resourceManager.getString('general','back');
 				if (!alreadyAuthorised)
-					button.addEventListener(MouseEvent.CLICK,buttonClicked);
+					buttonAuthenticateToGoogle.addEventListener(MouseEvent.CLICK,buttonClicked);
 
 			}
 			
@@ -81,7 +81,7 @@
 				authorizationcodeTextAreaVisible = true;
 				alreadyAuthorised = true;//not really true, but we want to hide the button
 				topLabelText = resourceManager.getString('synchronizeview','copyauthorizationcode');
-				button.removeEventListener(MouseEvent.CLICK,buttonClicked);
+				buttonAuthenticateToGoogle.removeEventListener(MouseEvent.CLICK,buttonClicked);
 			}
 			
 			private function authorizationcodeTextAreaClicked():void {
@@ -133,6 +133,7 @@
 		</s:layout>
 		<s:Label id="topLabel" y="0" x="0" width="100%" text="{topLabelText}" />
 		<s:TextArea id="authorizationcodeTextArea" y="0" x="0" width="100%"  text="@{authorizationCode_text}" click="authorizationcodeTextAreaClicked()" visible="{authorizationcodeTextAreaVisible}"/>
-		<s:Button id="button" width="100%" label="{resourceManager.getString('synchronizeview','authenticatetogoogle')}" visible="{!alreadyAuthorised}"/>
+		<s:Button id="buttonAuthenticateToGoogle" width="100%" label="{resourceManager.getString('synchronizeview','authenticatetogoogle')}" visible="{!alreadyAuthorised}"/>
+		<s:Button id="buttonDownLoadFoodTable" width="100%" label="{resourceManager.getString('synchronizeview','authenticatetogoogle')}" visible="{!alreadyAuthorised}"/>
 	</s:Group>
 </s:View>
