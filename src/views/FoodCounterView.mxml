@@ -93,6 +93,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onCreationComplete():void {
+				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,initiateRetrievalOfFoodItemList);
 
 				thisView = this;
 				
@@ -188,10 +189,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						resourceManager.localeChain.push(localeChainAsArray[j]);
 					}
 					
-					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
-					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
-					Database.getInstance().getAllFoodItemDescriptions(dispatcher);
-					
+					initiateRetrievalOfFoodItemList();
+										
 					if (firstStartUp) {
 						licensePopUp = new AlertPopUp();
 						licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
@@ -200,29 +199,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							resourceManager.getString('settingsview','copyright') +
 							resourceManager.getString('settingsview','infoabouttext');
 						licensePopUp.show(thisView,textToShow);
-					}
+					} else
+						Synchronize.getInstance().startSynchronize(tracker,false);
 
-				}
-				
-				function onInitError(event:Event):void
-				{	
-					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
-					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
-				}
-				
-				function retrieveFoodItemList(de:DatabaseEvent):void {
-					foodItems = new ArrayCollection();
-					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
-					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
-					
-					if (de.data && de.data is Array) {
-						for each ( var o:Object in de.data )
-						{
-							foodItems.addItem(new FoodItem(o.description as String, new ArrayCollection(), o.itemid as int));
-						}
-						ModelLocator.getInstance().foodItemList = foodItems;
-					} 
-					Synchronize.getInstance().startSynchronize(tracker,false);
 				}
 				
 				function licenseAccepted(event: PopUpEvent):void {
@@ -234,12 +213,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				}
 				
+				function onInitError(event:Event):void
+				{	
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
+				}
+			}
+			
+			public function initiateRetrievalOfFoodItemList(event:Event = null):void  {
+				var dispatcher:EventDispatcher = new EventDispatcher();
+				var newFoodItemList:ArrayCollection = new ArrayCollection();
+
+				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
+				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
+				Database.getInstance().getAllFoodItemDescriptions(dispatcher);
+
+				function retrieveFoodItemList(de:DatabaseEvent):void {
+					foodItems = new ArrayCollection();
+					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
+					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
+					
+					if (de.data && de.data is Array) {
+						for each ( var o:Object in de.data )
+						{
+							newFoodItemList.addItem(new FoodItem(o.description as String, new ArrayCollection(), o.itemid as int));
+						}
+						foodItems = newFoodItemList;
+						ModelLocator.getInstance().foodItemList = foodItems;
+					} 
+				}
+				
 				function onRetrieveListError(event:Event):void
 				{	
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
 				}
 			}
+			
 
 			
 			private function selectFoodItem(event:IndexChangeEvent):void {

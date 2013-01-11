@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2012  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!--
+initial setup of sync settings
+-->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" title="SynchronizeView"
+		xmlns:s="library://ns.adobe.com/flex/spark"
 		initialize="onInitialize()">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -30,24 +50,24 @@
 			private var _authorizationCode:String;
 			
 			private static var googleAuthUrl:String = "https://accounts.google.com/o/oauth2/token";
-
+			
 			[Bindable]
 			private var back_label:String;
 			
 			[Bindable]
-			private var alreadyAuthorised:Boolean;
-			[Bindable]
 			private var authorizationcodeTextAreaVisible:Boolean;
 			[Bindable]
-			private var topLabelText:String;
+			private var topLabelText1:String;
+			[Bindable]
+			private var topLabelText2:String;
 			
-
+			
 			[Bindable]
 			private function get authorizationCode_text():String
 			{
 				return _authorizationCode;
 			}
-
+			
 			private function set authorizationCode_text(value:String):void
 			{
 				_authorizationCode = value;
@@ -57,30 +77,37 @@
 				buttonAuthenticateToGoogle.visible = true;
 				buttonAuthenticateToGoogle.addEventListener(MouseEvent.CLICK,getAccessTokenAndRefreshToken);
 			}
-
+			
 			
 			private var loader:URLLoader;
 			
 			private function onInitialize():void {
-				alreadyAuthorised = Settings.getInstance().getSetting(Settings.SettingsAccessToken) != "";
-				authorizationcodeTextAreaVisible = false;
-				if (!alreadyAuthorised)
-					topLabelText = resourceManager.getString('synchronizeview','synchronizewithgoogledocs');
-				else 
-					topLabelText = resourceManager.getString('synchronizeview','alreadyauthorized') + '\n' +
-						resourceManager.getString('synchronizeview','synchronisationwillstart');
-				
 				back_label = resourceManager.getString('general','back');
-				if (!alreadyAuthorised)
-					buttonAuthenticateToGoogle.addEventListener(MouseEvent.CLICK,buttonClicked);
+				title = resourceManager.getString('synchronizeview','titlesettingssync');
 
+				if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) != "") {
+					//access token is not empty but still we got here, this is because user started syncing, then went to other tab, and back to this tab,
+					//apparently oninitialize gets called
+					setViewInStatusSynchronizing();
+					
+					Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
+
+				} else {
+					authorizationcodeTextAreaVisible = false;
+					topLabelText1 = resourceManager.getString('synchronizeview','synchronizewithgoogledocs1');
+					topLabelText2 = resourceManager.getString('synchronizeview','synchronizewithgoogledocs2');
+					
+					resourceManager.getString('synchronizeview','synchronisationwillstart');
+					
+					buttonAuthenticateToGoogle.addEventListener(MouseEvent.CLICK,buttonClicked);
+				}
 			}
 			
 			private function buttonClicked(event:MouseEvent):void {
 				navigateToURL(new URLRequest("https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/fusiontables.readonly https://www.googleapis.com/auth/fusiontables https://spreadsheets.google.com/feeds https://docs.google.com/feeds&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&client_id=" + resourceManager.getString('client_secret','client_id') + "&hl=nl&from_login=1&as=6d24e440f72448b2&pli=1"));
 				authorizationcodeTextAreaVisible = true;
-				alreadyAuthorised = true;//not really true, but we want to hide the button
-				topLabelText = resourceManager.getString('synchronizeview','copyauthorizationcode');
+				topLabelText1 = resourceManager.getString('synchronizeview','copyauthorizationcode');
+				topLabelText2 = "";
 				buttonAuthenticateToGoogle.removeEventListener(MouseEvent.CLICK,buttonClicked);
 			}
 			
@@ -92,10 +119,10 @@
 				var request:URLRequest = new URLRequest(googleAuthUrl);
 				request.contentType = "application/x-www-form-urlencoded";
 				request.data = new URLVariables("code=" + authorizationCode_text + "&" + 
-								"client_id=" + resourceManager.getString('client_secret','client_id') + "&" +
-								"client_secret=" + resourceManager.getString('client_secret','client_secret') + "&" +
-								"redirect_uri=urn:ietf:wg:oauth:2.0:oob" + "&" +
-								"grant_type=authorization_code");
+					"client_id=" + resourceManager.getString('client_secret','client_id') + "&" +
+					"client_secret=" + resourceManager.getString('client_secret','client_secret') + "&" +
+					"redirect_uri=urn:ietf:wg:oauth:2.0:oob" + "&" +
+					"grant_type=authorization_code");
 				request.method = URLRequestMethod.POST;
 				loader = new URLLoader();
 				loader.addEventListener(Event.COMPLETE,getAccessTokenAndRefreshTokenResult);
@@ -110,15 +137,31 @@
 			}
 			
 			private function getAccessTokenAndRefreshTokenResult(event:Event):void {
+				setViewInStatusSynchronizing();
 				//hier is de refreshtoken gelukt.
 				loader.removeEventListener(ResultEvent.RESULT,getAccessTokenAndRefreshTokenResult);
 				loader.removeEventListener(FaultEvent.FAULT,getAccessTokenAndRefreshTokenFault);
 				var temp:Object = JSON.parse(event.target.data as String);
 				Settings.getInstance().setSetting(Settings.SettingsAccessToken,temp.access_token);
 				Settings.getInstance().setSetting(Settings.SettingsRefreshToken,temp.refresh_token);
-				topLabelText = resourceManager.getString('synchronizeview','alreadyauthorized') + '\n' +
-					resourceManager.getString('synchronizeview','synchronisationwillstart');
+				Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
 				Synchronize.getInstance().startSynchronize(null,true);
+			}
+			
+			/**
+			 * just to set status of texts buttons, ... corresponding to status where sync is ongoing for the first time, ie most probably uploading foodtable 
+			 */
+			private function setViewInStatusSynchronizing():void {
+				buttonAuthenticateToGoogle.visible = false;
+				authorizationcodeTextArea.visible = false;
+				topLabelText1 = resourceManager.getString('synchronizeview','alreadyauthorized') + '\n' +
+					resourceManager.getString('synchronizeview','synchronisationwillstart');
+				topLabelText2 = "";
+			}
+			
+			private function onSyncFinishedEvent(event:Event):void {
+				navigator.popView();
+				navigator.pushView(SynchronizeView2);
 			}
 			
 		]]>
@@ -131,9 +174,9 @@
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:Label id="topLabel" y="0" x="0" width="100%" text="{topLabelText}" />
-		<s:TextArea id="authorizationcodeTextArea" y="0" x="0" width="100%"  text="@{authorizationCode_text}" click="authorizationcodeTextAreaClicked()" visible="{authorizationcodeTextAreaVisible}"/>
-		<s:Button id="buttonAuthenticateToGoogle" width="100%" label="{resourceManager.getString('synchronizeview','authenticatetogoogle')}" visible="{!alreadyAuthorised}"/>
-		<s:Button id="buttonDownLoadFoodTable" width="100%" label="{resourceManager.getString('synchronizeview','authenticatetogoogle')}" visible="{!alreadyAuthorised}"/>
+		<s:Label id="topLabel1" width="100%" text="{topLabelText1}" />
+		<s:TextArea id="authorizationcodeTextArea" width="100%"  height = "{authorizationcodeTextAreaVisible ? 100:0}" text="@{authorizationCode_text}" click="authorizationcodeTextAreaClicked()" visible="{authorizationcodeTextAreaVisible}"/>
+		<s:Button id="buttonAuthenticateToGoogle" width="100%" label="{resourceManager.getString('synchronizeview','buttonauthenticatetogoogletext')}"  visible="{!authorizationcodeTextAreaVisible}"/>
+		<s:Label id="topLabel2" width="100%" top = "5" text="{topLabelText2}" />
 	</s:Group>
 </s:View>

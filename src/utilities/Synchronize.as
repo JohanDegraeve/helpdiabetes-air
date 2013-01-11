@@ -63,7 +63,7 @@ package utilities
 	 * class with function to synchronize with google docs, and to export tracking history 
 	 *
 	 */
-	public class Synchronize
+	public class Synchronize extends EventDispatcher
 	{
 		[ResourceBundle("analytics")]
 		private static var googleRequestTablesUrl:String = "https://www.googleapis.com/fusiontables/v1/tables";
@@ -74,14 +74,14 @@ package utilities
 		 * replace {key} by the spreadsheet key<br>
 		 * replace {worksheetid} by the worksheetid
 		 */
-		private static var googleExcelInsertRowInFoodTableUrl:String = "https://spreadsheets.google.com/feeds/list/{key}/{worksheetid}/private/full";
+		private static var googleExcelManageWorkSheetUrl:String = "https://spreadsheets.google.com/feeds/list/{key}/{worksheetid}/private/full";
 		private var googleExcelDeleteWorkSheetUrl:String = "";
 		//https://spreadsheets.google.com/feeds/spreadsheets/private/full
 		
 		/**
 		 * replace {key} by the spreadsheet key<br>
 		 */
-		private static var googleExcelFindFoodTableWorkSheetUrl:String = "https://spreadsheets.google.com/feeds/worksheets/{key}/private/full"
+		private static var googleExcelFindWorkSheetUrl:String = "https://spreadsheets.google.com/feeds/worksheets/{key}/private/full"
 		/**
 		 * replace {key} by the spreadsheet key<br>
 		 * replace {worksheetid} by the worksheetid
@@ -149,6 +149,32 @@ package utilities
 		 * If  (syncRunning is true and currentSyncTimeStamp < 30 seconds ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything. 
 		 */
 		private var rerunNecessary:Boolean;
+		
+		/**
+		 * if findAllSpreadSheetsWaiting is called while sync running, then this value needs to be set to true<br>
+		 * as soon as sync is finished, this variable will be checked and if necessary findallspreadsheets will be launched 
+		 */
+		private var findAllSpreadSheetsWaiting:Boolean;
+		
+		/**
+		 * if downloadfoodtablespreadsheet is called while sync running, then this value needs to be set to true<br>
+		 * as soon as sync is finished, this variable will be checked and if necessary downloadfoodtable will be launched 
+		 */
+		private var downloadFoodTableSpreadSheetWaiting:Boolean;
+		
+		/**
+		 * if findallworksheetsinfoodtable is called while sync running, then this value needs to be set to true<br>
+		 * as soon as sync is finished, this variable will be checked and if necessary findallworksheetsinfoodtable will be launched 
+		 */
+		private var findAllWorkSheetsInFoodTableSpreadSheetWaiting:Boolean;
+		/**
+		 * if  findAllWorkSheetsInFoodTableSpreadSheetWaiting or downloadFoodTableSpreadSheetWaiting = true, then this variable points to the spreadsheet index to find or download
+		 */
+		private var indexOfSpreadSheetToFind:int;
+		/**
+		 * if  downloadFoodTableSpreadSheetWaiting = true, then this variable points to the worksheet index to download
+		 */
+		private var indexOfWorkSheetToFind:int;
 		
 		/**
 		 * this is the earliest creationtimestamp of the events that will be taken into account 
@@ -302,6 +328,14 @@ package utilities
 			"fat5",
 		];
 		
+		private var foodValueNames:Array = [
+			"standardamount",	
+			"kcal",
+			"protein",	
+			"carbs",	
+			"fat",
+		];
+		
 		/**
 		 * name of the spreadsheet used when uploading the foodtable 
 		 */
@@ -382,6 +416,75 @@ package utilities
 		private var foodItemIdBeingTreated:int;
 		
 		/**
+		 * used for event dispatching, when sync finished, no matter if it was successful or not
+		 */
+		public static const SYNC_FINISHED:String="sync_finished";
+		
+		/**
+		 * used for event dispatching, when dispatched, it means there's a result of fetching spreadsheets from google docs account<br>
+		 * it doesn't say anything about the result, just that there is a result 
+		 */
+		public static const SPREADSHEET_LIST_RETRIEVED:String="spreadsheet_list_retrieved";
+
+		/**
+		 * used for event dispatching, when dispatched, it means there's a result of downloading foodtable from google docs account<br>
+		 * it doesn't say anything about the result, just that there is a result 
+		 */
+		public static const FOODTABLE_DOWNLOADED:String="foodtable_downloaded";
+		/**
+		 * used for event dispatching, when dispatched, it means there's a result of retrieving spreadsheets from google docs account<br>
+		 * it doesn't say anything about the result, just that there is a result 
+		 */
+		public static const WORKSHEETS_IN_FOODTABLE_RETRIEVED:String = "worksheets_in_foodtable_retrieved";
+
+		private var _foodtable:XML = <foodtable/>;
+
+		/**
+		 * foodtable downloaded, if null then download failed
+		 */
+		public function get foodtable():XML
+		{
+			return _foodtable;
+		}
+		
+		private var _workSheetList:ArrayList;
+
+		/**
+		 * list of worksheets in selected spreadsheetlist
+		 */
+		public function get workSheetList():ArrayList
+		{
+			return _workSheetList;
+		}
+		
+		private var _spreadSheetList:ArrayList;
+
+		/**
+		 * list of spreadsheets retrieved from google docs. objects will be so called items (see google docs documentation or check the code)
+		 */
+		public function get spreadSheetList():ArrayList
+		{
+			return _spreadSheetList;
+		}
+		
+		public static const prefix_default:String = "";
+		public static const prefix_gs:String = "gs";
+		private static var _namespace_default:Namespace;
+
+		public function get namespace_default():Namespace
+		{
+			return _namespace_default;
+		}
+
+		private static var _namespace_gs:Namespace;
+
+		public function get namespace_gs():Namespace
+		{
+			return _namespace_gs;
+		}
+
+		
+		/**
 		 * constructor not to be used, get an instance with getInstance() 
 		 */
 		public function Synchronize()
@@ -390,7 +493,12 @@ package utilities
 				throw new Error("Synchronize class can only be accessed through Synchronize.getInstance()");	
 			}
 			syncRunning = false;
+			findAllSpreadSheetsWaiting = false;
+			downloadFoodTableSpreadSheetWaiting = false;
+			findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
+			
 			rerunNecessary = false;
+			
 			amountofSpaces = 0;
 			alReadyGATracked = false;//only one google analytics tracking per instance
 			listOfElementsToBeDeleted = new ArrayList();
@@ -413,7 +521,11 @@ package utilities
 		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean):void {
 			tracker = callingTracker;
 			
-			if (!(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true"))//uploading foodtable can take a very long time 
+			if (
+				(!(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true"))
+			    &&
+				(Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true")
+			   )//uploading foodtable can take a very long time 
 				secondsBetweenTwoSync = 3600;
 			else 
 				secondsBetweenTwoSync = normalValueForSecondsBetweenTwoSync;
@@ -438,6 +550,9 @@ package utilities
 				syncRunning = true;
 				currentSyncTimeStamp = new Date().valueOf();
 				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
+				findAllSpreadSheetsWaiting = false;
+				downloadFoodTableSpreadSheetWaiting = false;
+				findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
 				synchronize();
 			} else {
 				if (immediateRunNecessary) {
@@ -2459,7 +2574,7 @@ package utilities
 					newOutputString = outputString.replace(">-1<","><");
 				}
 				
-				createAndLoadURLRequest(googleExcelInsertRowInFoodTableUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId),
+				createAndLoadURLRequest(googleExcelManageWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId),
 					URLRequestMethod.POST,
 					null,
 					outputString,
@@ -2570,22 +2685,24 @@ package utilities
 				//ASSUMING HERE THAT WORKSHEET CREATION WAS SUCCESSFULL, WHICH IS NOT SURE
 				var cratedWorkSheetAsXML:XML = new XML(event.target.data as String);
 				//info about namespaces found on http://userflex.files.wordpress.com/2008/06/getstatuscodeas.pdf and http://userflex.wordpress.com/2008/04/03/xml-ns-e4x/
-				var xmlns : Namespace;
-				// namespace declarations defined in the xml
 				var namespaces : Array = cratedWorkSheetAsXML.namespaceDeclarations();
-				// looks for the default namespace, i know that entry is in the default namespace, so that's what i'm looking for
+				// looks for the  namespaces that i need
 				for each (var ns : Namespace in namespaces)
 				{
-					if (ns.prefix == "")//there's two other in this kind of xml that google returns : openSearch and gs but I don't need xml objects of that kind
+					if (ns.prefix == prefix_default)//there's two other in this kind of xml that google returns : openSearch and gs but I don't need xml objects of that kind
 					{
-						xmlns = ns;
+						_namespace_default = ns;
+						break;
+					}
+					if (ns.prefix == prefix_gs)
+					{
+						_namespace_gs = ns;
 						break;
 					}
 				}
 				
-				
 				//ASSUMING HERE THAT EVERHTHING WORKS FINE, BUT THINGS COULD BE GOING WRONG
-				helpDiabetesWorkSheetId = cratedWorkSheetAsXML..xmlns::id;
+				helpDiabetesWorkSheetId = cratedWorkSheetAsXML.._namespace_default::id;
 				var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesWorkSheetId.split("/");
 				helpDiabetesWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
 				
@@ -2655,7 +2772,7 @@ package utilities
 				var entryXMLList:XMLList = new XMLList(workSheetListAsXML..xmlns::entry);
 				
 				for (var listCounter:int = 0 ; listCounter < entryXMLList.length();listCounter++)  {
-					var titleXML:XMLList = entryXMLList[listCounter]..xmlns::title;
+					//var titleXML:XMLList = entryXMLList[listCounter]..xmlns::title;
 					if (entryXMLList[listCounter]..xmlns::title == "foodtable") {
 						helpDiabetesWorkSheetId = entryXMLList[listCounter]..xmlns::id;
 						var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesWorkSheetId.split("/");
@@ -2691,7 +2808,7 @@ package utilities
 				if (traceNeeded)
 					trace("start method googleExcelFindFoodTableWorkSheet");
 				createAndLoadURLRequest(
-					googleExcelFindFoodTableWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey),
+					googleExcelFindWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey),
 					null,
 					null,
 					null,
@@ -2758,43 +2875,34 @@ package utilities
 		 * to call when sync has finished 
 		 */
 		private function syncFinished(success:Boolean):void {
-			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
+			if (!syncRunning)//syncfinished must have been called although sync is not running, not need to process any further
+				return;
+			
+			this.dispatchEvent(new Event(SYNC_FINISHED));
+			
+			var localdispatcher:EventDispatcher = new EventDispatcher();
+						
 			if (traceNeeded)
 				trace("in sycFinished with success = " + success);
 			
 			if (success) {
-				//ModelLocator.getInstance().logString += "sync successful" + "\n";
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
 				lastSyncTimeStamp = currentSyncTimeStamp;
-				
-				if (localElementsUpdated) {
-					localElementsUpdated = false;
-					if (!trackingListAlreadyModified) {//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
-						trackingListAlreadyModified = true;
-						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-					}
-					
-					ModelLocator.getInstance().trackingList = new ArrayCollection();
-					
-					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
-					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-					
-					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
-				}
-			} else {
-				if (localElementsUpdated) {
-					if (!trackingListAlreadyModified) {//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
-						trackingListAlreadyModified = true;
-						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-					}
-					ModelLocator.getInstance().trackingList = new ArrayCollection();
-					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
-					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
-				}
 			}
 			
+			if (localElementsUpdated) {
+				localElementsUpdated = false;
+				if (!trackingListAlreadyModified) {//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
+					trackingListAlreadyModified = true;
+					ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+				}
+				ModelLocator.getInstance().trackingList = new ArrayCollection();
+				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
+				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
+				Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
+			}
+
 			if (rerunNecessary) {
 				currentSyncTimeStamp = new Date().valueOf();
 				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
@@ -2803,6 +2911,16 @@ package utilities
 				synchronize();
 			} else {
 				syncRunning = false;
+				if (findAllSpreadSheetsWaiting) {
+					findAllSpreadSheetsWaiting = false;
+					googleExcelFindAllSpreadSheets();
+				} else if (downloadFoodTableSpreadSheetWaiting) {
+					downloadFoodTableSpreadSheetWaiting = false;
+					googleExcelDownloadFoodTableSpreadSheet();
+				} else if (findAllWorkSheetsInFoodTableSpreadSheetWaiting) {
+					findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
+					googleExcelFindAllWorkSheetsInFoodTableSpreadSheet(null,-1);
+				}
 			}
 			
 			function getAllEventsAndFillUpMealsFinished(event:Event):void
@@ -2911,9 +3029,222 @@ package utilities
 						
 			loader.load(request);
 			if (traceNeeded)
-				trace("loader : request = " + request.data); 
+				trace("loader : url = " + request.url + ", request.data = " + request.data); 
+		}
+		
+		public function googleExcelFindAllSpreadSheets(event:Event = null):void  {
+			if (syncRunning) {
+				findAllSpreadSheetsWaiting=true;
+				return;
+			}
+			if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) == "")  {
+				//should normally not happen because when access_token is blank then option to load foodtable should not even be shown to user
+				//but you never know
+				_spreadSheetList = new ArrayList();
+				this.dispatchEvent(new Event(SPREADSHEET_LIST_RETRIEVED));
+				return;
+			}
+			if (event != null)  {
+				removeEventListeners();
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				_spreadSheetList = new ArrayList();
+				
+				if (eventHasError(event,googleExcelFindAllSpreadSheets)) {
+					this.dispatchEvent(new Event(SPREADSHEET_LIST_RETRIEVED));
+					return;
+				}
+				else {
+					if (eventAsJSONObject.items)  {
+						if (eventAsJSONObject.items.length > 0) {
+							//spreadsheets found
+							//...application/vnd.google-apps.spreadsheet   eventAsJSONObject.items[0].id;
+							for (var itemLength:int = 0;itemLength < eventAsJSONObject.items.length;itemLength++) {
+								if (eventAsJSONObject.items[itemLength].mimeType)
+									if (eventAsJSONObject.items[itemLength].mimeType == "application/vnd.google-apps.spreadsheet")
+										_spreadSheetList.addItem(eventAsJSONObject.items[itemLength]);
+							}
+							this.dispatchEvent(new Event(SPREADSHEET_LIST_RETRIEVED));
+						} else {
+							this.dispatchEvent(new Event(SPREADSHEET_LIST_RETRIEVED));
+							return;
+						}
+					} else  {
+						this.dispatchEvent(new Event(SPREADSHEET_LIST_RETRIEVED));
+						return;
+					}
+				}
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelFindAllSpreadSheets");
+				_spreadSheetList = new ArrayList();
+				
+				createAndLoadURLRequest(
+					googleDriveFilesUrl,
+					null,
+					null,
+					null,
+					googleExcelFindAllSpreadSheets,
+					false,
+					null);
+			}
+		}
+
+		/**
+		 * gets the list of worksheets in the specified spreadsheet.<br>
+		 * spreadSheetIndex points to the spreadsheet in _spreadSheetList<br>
+		 * value of spreadSheetIndex - 1 means the value of indexOfSpreadSheetToFind needs to be used iso spreadSheetIndex
+		 */
+		public function googleExcelFindAllWorkSheetsInFoodTableSpreadSheet(event:Event = null,spreadSheetIndex:Number = -1):void {
+			if (spreadSheetIndex != -1)
+				indexOfSpreadSheetToFind = spreadSheetIndex;
+			if (syncRunning) {
+				findAllWorkSheetsInFoodTableSpreadSheetWaiting = true;
+				return;
+			}
+			if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) == "")  {
+				_workSheetList = new ArrayList();
+				this.dispatchEvent(new Event(WORKSHEETS_IN_FOODTABLE_RETRIEVED));
+				return;
+			}
+			if (event != null)  {
+				_workSheetList = new ArrayList();
+				removeEventListeners();
+				
+				var workSheetListAsXML:XML = new XML(event.target.data as String);
+				//info about namespaces found on http://userflex.files.wordpress.com/2008/06/getstatuscodeas.pdf and http://userflex.wordpress.com/2008/04/03/xml-ns-e4x/
+				var cratedWorkSheetAsXML:XML = new XML(event.target.data as String);
+				var namespaces : Array = cratedWorkSheetAsXML.namespaceDeclarations();
+				// looks for the  namespaces that i need
+				for each (var ns : Namespace in namespaces)
+				{
+					if (ns.prefix == prefix_default)//there's two other in this kind of xml that google returns : openSearch and gs but I don't need xml objects of that kind
+					{
+						_namespace_default = ns;
+						break;
+					}
+					if (ns.prefix == prefix_gs)
+					{
+						_namespace_gs = ns;
+						break;
+					}
+				}
+				
+				
+				var entryXMLList:XMLList = new XMLList(workSheetListAsXML.._namespace_default::entry);
+				
+				for (var listCounter:int = 0; listCounter < entryXMLList.length(); listCounter++)  {
+					_workSheetList.addItem(entryXMLList[listCounter]);
+				}
+				
+				this.dispatchEvent(new Event(WORKSHEETS_IN_FOODTABLE_RETRIEVED));
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelFindAllWorkSheetsInFoodTableSpreadSheet");
+				_workSheetList = new ArrayList();
+				
+				createAndLoadURLRequest(
+					googleExcelFindWorkSheetUrl.replace("{key}",spreadSheetList.getItemAt(indexOfSpreadSheetToFind).id),
+					null,
+					null,
+					null,
+					googleExcelFindAllWorkSheetsInFoodTableSpreadSheet,
+					false,
+					null);
+			}
 			
-		}	
+		}
+		
+		public function googleExcelDownloadFoodTableSpreadSheet(event:Event = null,spreadSheetIndex:Number = -1,workSheetIndex:Number = -1):void  {
+			_foodtable = null;
+			if (syncRunning) {
+				downloadFoodTableSpreadSheetWaiting = true;
+				return;
+			}
+
+			if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) == "")  {
+				//should normally not happen because when access_token is blank then option to load foodtable should not even be shown to user
+				//but you never know
+				this.dispatchEvent(new Event(FOODTABLE_DOWNLOADED));
+				return;
+			}
+			if (event != null)  {
+				removeEventListeners();
+				
+				if (eventHasError(event,googleExcelDownloadFoodTableSpreadSheet)) {
+					this.dispatchEvent(new Event(FOODTABLE_DOWNLOADED));
+					return;
+				}
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				var entryCtr:int = 0;
+				while (entryCtr < eventAsJSONObject.feed.entry.length && eventAsJSONObject.feed.entry[entryCtr].gs$cell.row == 1) 
+					entryCtr++;//ignore the first row because these are the column names
+
+				var fooditemlist:XML = <fooditemlist/>;
+
+				while (entryCtr < eventAsJSONObject.feed.entry.length) {
+					var row:int = eventAsJSONObject.feed.entry[entryCtr].gs$cell.row;
+					var fooditem:XML = <fooditem/>;
+					fooditem.description = eventAsJSONObject.feed.entry[entryCtr].content.$t;
+					var unitlist:XML = <unitlist/>;
+					var unit:XML = null;
+					entryCtr++;
+					while (entryCtr < eventAsJSONObject.feed.entry.length && eventAsJSONObject.feed.entry[entryCtr].gs$cell.row == row) {
+						if ((eventAsJSONObject.feed.entry[entryCtr].gs$cell.col - 2 ) % 6 == 0) {//the column has a unitname
+							if (unit != null)
+								unitlist.appendChild(unit);
+							unit = <unit/>;
+							unit.description = eventAsJSONObject.feed.entry[entryCtr].gs$cell.$t;
+							entryCtr++;
+						} else  {
+							unit.appendChild(
+								(new XML("<"+foodValueNames[(eventAsJSONObject.feed.entry[entryCtr].gs$cell.col - 2 ) % 6 - 1]+"/>"))
+								.appendChild(eventAsJSONObject.feed.entry[entryCtr].gs$cell.$t)
+							);
+							entryCtr++;
+						}
+					}
+					unitlist.appendChild(unit);
+					fooditem.appendChild(unitlist);
+					
+					fooditemlist.appendChild(fooditem);
+					_foodtable = <foodtable/>;
+					var datetimeformatter:DateTimeFormatter = new DateTimeFormatter();
+					datetimeformatter.dateTimePattern = "yyyyMMddHHmmss";
+					_foodtable.timestamp=datetimeformatter.format(new Date());
+					_foodtable.source="";
+				}
+				
+				_foodtable.appendChild(fooditemlist);
+				
+				this.dispatchEvent(new Event(FOODTABLE_DOWNLOADED));
+				
+				//if (traceNeeded)
+					//trace("foodtable = " + _foodtable.toString());
+				return;
+				
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelDownloadFoodTableSpreadSheet");
+
+				if (spreadSheetIndex != -1)
+					indexOfSpreadSheetToFind = spreadSheetIndex;
+				if (workSheetIndex != -1)
+					indexOfWorkSheetToFind = workSheetIndex;
+				helpDiabetesWorkSheetId = _workSheetList.getItemAt(indexOfWorkSheetToFind).._namespace_default::id;
+				var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesWorkSheetId.split("/");
+				helpDiabetesWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
+				
+				createAndLoadURLRequest(
+					googleExcelUpdateCellUrl.replace("{key}",spreadSheetList.getItemAt(indexOfSpreadSheetToFind).id).replace("{worksheetid}",helpDiabetesWorkSheetId),
+					null,
+					new URLVariables("alt=json"),
+					null,
+					googleExcelDownloadFoodTableSpreadSheet,
+					false,
+					null);
+			}
+		}
 	}
 }
 

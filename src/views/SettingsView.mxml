@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		initialize="init()"
-		actionBarVisible="false"
+		actionBarVisible="true"
 		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -66,8 +66,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ResourceManager.getInstance().getString("settingsview","database"),
 				ResourceManager.getInstance().getString("settingsview","language"),
 				ResourceManager.getInstance().getString("settingsview","infoabout"),
-				ResourceManager.getInstance().getString("settingsview","resethelptext"),
-				ResourceManager.getInstance().getString("settingsview","googlesync")
+				ResourceManager.getInstance().getString("settingsview","googlesync"),
+				ResourceManager.getInstance().getString("settingsview","resethelptext")
 			]);	
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -85,7 +85,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
-				title =  ResourceManager.getInstance().getString("settingsview","settings");
+				title =  ResourceManager.getInstance().getString("settingsview","titlesettings");
 				if (debugging) 
 					menuList.addItem("debug info");
 			}
@@ -171,6 +171,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						alertPopUp.show(this,textToShow);
 						break;
 					case 8:
+						if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) == "" 
+							|| 
+							(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "false"
+								&&
+								Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true"))
+							navigator.pushView(SynchronizeView);
+						else 
+							navigator.pushView(SynchronizeView2);
+						break;
+					case 9:
 						if (tracker == null) {
 							tracker = new MyGATracker( this, trackerId, "AS3", false );
 						}
@@ -182,12 +192,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						textToShow = 
 						resourceManager.getString('settingsview','resethelptextdone') ;
-
+						
 						alertPopUp.show(this,textToShow);
 						
-						break;
-					case 9:
-						navigator.pushView(SynchronizeView);
 						break;
 					/*case 10 :
 						alertPopUp = new AlertPopUp();

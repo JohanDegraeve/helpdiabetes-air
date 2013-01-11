@@ -50,7 +50,7 @@ package databaseclasses
 	/**
 	 * Database class is a singleton
 	 */ 
-	public final class Database 
+	public final class Database extends EventDispatcher
 	{
 		import mx.core.FlexGlobals;
 		import mx.resources.ResourceBundle;
@@ -139,6 +139,8 @@ package databaseclasses
 			"DELETE FROM mealevents where mealeventid = :mealeventid";
 		private const DELETE_ROW_IN_TABLE_SELECTED_FOODITEMS_MATCHING_SELECTEDFOODITEMID:String = 
 			"DELETE FROM selectedfooditems where selectedfooditemid = :selectedfooditemid";
+		private const DELETE_ALL_FOODITEMS:String = "DELETE FROM fooditems";
+		private const DELETE_ALL_UNITS:String = "DELETE FROM units";
 		/**
 		 * SELECT * FROM settings 
 		 */
@@ -197,6 +199,29 @@ package databaseclasses
 		private const INSERT_EXERCISEEVENT:String = "INSERT INTO exerciseevents (exerciseeventid, level, creationtimestamp, comment_2, lastmodifiedtimestamp) VALUES (:exerciseeventid, :level, :creationtimestamp, :comment_2, :lastmodifiedtimestamp)";
 		
 		private var databaseWasCopiedFromSampleFile:Boolean = false;
+		
+		/**
+		 * used for event dispatching, when dispatched, it means there's a new fooddatabase in the database stored successfully
+		 */
+		public static const NEW_FOOD_DATABASE_STORED_SUCCESS:String = "new_food_database_stored_success";
+		/**
+		 * used for event dispatching, when dispatched, storing new database failed
+		 */
+		public static const NEW_FOOD_DATABASE_STORED_FAILED:String = "new_food_database_stored_failure";
+		/**
+		 * process of installing new foodtable in database is sending status update
+		 */
+		public static const NEW_FOOD_DATABASE_STATUS_UPDATE:String = "new_food_database_status_update";
+		/**
+		 * text to use in downloadfoodtableview, for showing status 
+		 */
+		private var _newFoodDatabaseStatus:String = "";
+		
+		public function get newFoodDatabaseStatus():String
+		{
+			return _newFoodDatabaseStatus;
+		}
+
 		
 		/**
 		 * constructor, should not be used, use getInstance()
@@ -769,7 +794,7 @@ package databaseclasses
 				if (se.data != null)
 					finishedCreatingTables();
 				else
-					loadFoodTable();
+					loadFoodTableInternal(finishedCreatingTables);
 			}
 			
 			function checkSourceError(se:DatabaseEvent):void {
@@ -841,6 +866,54 @@ package databaseclasses
 				trace("Failed to insert a food item. Database0021");
 				if (dispatcher != null)
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
+			}
+		}
+		
+		/**
+		 * deletes all fooditems from the database and also the units
+		 */
+		private function deleteFoodDatabase(dispatcher:EventDispatcher):void {
+			var localSqlStatement:SQLStatement = new SQLStatement();
+			localSqlStatement.sqlConnection = aConn;
+			localSqlStatement.text = DELETE_ALL_FOODITEMS;
+			localSqlStatement.addEventListener(SQLEvent.RESULT, foodItemsDeleted);
+			localSqlStatement.addEventListener(SQLErrorEvent.ERROR, foodItemDeletionFailed);
+			localSqlStatement.execute();
+			
+			function foodItemDeletionFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemsDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemDeletionFailed);
+				trace("Failed to delete fooditems from database");
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
+			}
+			
+			function foodItemsDeleted(se:SQLEvent):void  {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,foodItemsDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,foodItemDeletionFailed);
+				trace("fooditems deleted from database");
+				localSqlStatement = new SQLStatement();
+				localSqlStatement.sqlConnection = aConn;
+				localSqlStatement.text = DELETE_ALL_UNITS;
+				localSqlStatement.addEventListener(SQLEvent.RESULT, unitsDeleted);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, unitDeletionFailed);
+				localSqlStatement.execute();
+			}
+
+			function unitDeletionFailed(see:SQLErrorEvent):void {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitsDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitDeletionFailed);
+				trace("Failed to delete units from database");
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
+			}
+			
+			function unitsDeleted(se:SQLEvent):void  {
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitsDeleted);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitDeletionFailed);
+				trace("units deleted from database");
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.RESULT_EVENT));
 			}
 		}
 		
@@ -919,16 +992,64 @@ package databaseclasses
 		
 		
 		
+		/**
+		 * deletes fooddatabase<br>
+		 * stores data in xml into database<br>
+		 * dispatches event when finished 
+		 */
+		public function loadFoodTable(foodtable:XML = null):void {
+			var localDispatcher:EventDispatcher = new EventDispatcher();
+
+			localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
+			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
+			
+			deleteFoodDatabase(localDispatcher);
+
+			function fooddatabaseDeleted(se:DatabaseEvent):void {
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
+				loadFoodTableInternal(externalXMLLoaded,foodtable);
+			}
+			
+			function foodDatabaseDeletionFailed(see:DatabaseEvent):void {
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
+				trace("Failed to delete the fooddatabase");
+				externalXMLLoaded(false);
+			}
+		}
 		
 		/**
-		 * loads the XML sourcefile and populates the database
+		 * 
+		 * if success then xml download was ok<br>
+		 * dispatches NEW_FOOD_DATABASE_STORED_SUCCESS or NEW_FOOD_DATABASE_STORED_FAILED depending on success
 		 */
-		private function loadFoodTable():void {
+		private function externalXMLLoaded(success:Boolean = true):void {
+			if (success)
+				this.dispatchEvent(new Event(NEW_FOOD_DATABASE_STORED_SUCCESS));
+			else
+				this.dispatchEvent(new Event(NEW_FOOD_DATABASE_STORED_FAILED));
+		}
+		
+		/**
+		 * loads the XML sourcefile and populates the database<br>
+		 * if foodtable == null then foodtable from xml file stored in application is used<br>
+		 * functionToCallWhenFinished is obviously function to call when finished
+		 */
+		private function loadFoodTableInternal(functionToCallWhenFinished:Function,foodtable:XML = null):void {
 			
-			var sourceFile:File = File.applicationDirectory.resolvePath("assets/database/" + xmlFileName);
-			var fileStream:FileStream = new FileStream();
-			var dispatcher:EventDispatcher = new EventDispatcher();
 			var foodtableXML:XML;
+
+			if (foodtable != null)
+				foodtableXML = foodtable;
+			else {
+				var sourceFile:File = File.applicationDirectory.resolvePath("assets/database/" + xmlFileName);
+				var fileStream:FileStream = new FileStream();
+				fileStream.open(sourceFile,FileMode.READ);
+				foodtableXML = new XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
+			}
+			
+			var dispatcher:EventDispatcher = new EventDispatcher();
 			var unitListXMLList:XMLList;
 			var foodItemDescriptionsXMLList:XMLList;
 			var foodItemListCounter:int;
@@ -937,9 +1058,6 @@ package databaseclasses
 			var foodItemListSize:int;
 			var actualFoodItemRowId:int;
 			
-			trace("HelpDiabetes-air = loadFoodTable - before opening file");
-			fileStream.open(sourceFile,FileMode.READ);
-			foodtableXML = new XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
 			foodItemListSize = foodtableXML.fooditemlist.fooditem.length();
 			foodItemListCounter = 0;
 			
@@ -968,8 +1086,14 @@ package databaseclasses
 			
 			function goOnWithFoodItems():void {
 				if (foodItemListCounter == foodItemListSize) {
-					finishedCreatingTables();					
+					functionToCallWhenFinished();					
 				} else {
+					//send status update
+					if ((foodItemListSize - foodItemListCounter)%10 == 0) {
+						_newFoodDatabaseStatus = foodItemListCounter + " {outof} " + foodItemListSize + " {elementsloaded} ";
+						(instance as EventDispatcher).dispatchEvent(new Event(NEW_FOOD_DATABASE_STATUS_UPDATE));
+					}
+						
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, foodItemInserted);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, foodItemInsertionError);
 					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
