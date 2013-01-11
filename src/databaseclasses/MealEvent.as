@@ -282,6 +282,7 @@ package databaseclasses
 		public function set timeStamp(timeStamp:Number):void
 		{
 			this._timeStamp = timeStamp;
+			_lastModifiedTimeStamp = (new Date()).valueOf();
 			updateMealEvent(mealName,insulinRatio,correctionFactor,previousBGlevel,lastModifiedTimeStamp,timeStamp);
 		}
 		
