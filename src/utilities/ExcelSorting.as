@@ -17,11 +17,14 @@
  */
 package utilities
 {
+	import databaseclasses.FoodItem;
+	
 	import model.ModelLocator;
 	
 	import mx.collections.ArrayCollection;
 	
-	import databaseclasses.FoodItem;
+	import spark.collections.Sort;
+	import spark.collections.SortField;
 
 	public class ExcelSorting
 	{
@@ -36,7 +39,7 @@ package utilities
 			41,  42, 43, 44, 9,  10, 11, 12, 13, 14,
 			15,  16, 17, 18, 19, 20, 21, 22, 23, 24,
 			25,  26, 38, 45, 46, 47, 48, 49, 50, 33,
-			51,  52, 53, 88,  0, 34, 55, 56,115,120,//44 which is ascii code for , is being mapped to 0, this is because , will never be shown in list, should not appear in text, and only appears in byte range as delimiter between the different fields
+			51,  52, 53, 88, 54, 34, 55, 56,115,120,
 			122,124,125,126,127,128,129,130, 57, 58,
 			89,  90, 91, 59, 60,147,149,153,157,167,
 			170,172,174,184,186,188,190,192,196,213,
@@ -62,20 +65,40 @@ package utilities
 		 private var previousSearchString:String = null;
 		 private var firstIndex:Array;
 		 private var lastIndex:Array;
-		 private var foodItemList:ArrayCollection;
-		 
-		 
+		 private var _foodItemList:ArrayCollection;
+		 private var sortField:SortField;
+		 private var sort:Sort;
 
-		public function ExcelSorting(foodItemList:ArrayCollection)
+		 public function get foodItemList():ArrayCollection
+		 {
+			 return _foodItemList;
+		 }
+		 		 
+		/**
+		 * if foodItemList == null then an empty arraycollection will be created 
+		 */
+		 public function ExcelSorting(newFoodItemList:ArrayCollection = null)
 		{
 			firstIndex = new Array(ModelLocator.getInstance().maximumSearchStringLength);
 			lastIndex = new Array(ModelLocator.getInstance().maximumSearchStringLength);
 			firstIndex[0] = 0;
-			this.foodItemList = foodItemList;
-			//lastIndex[0] = this.foodItemList.length; need to do this later because at the moment this object is created, the foodItemList could still be empty
-			
+			if (newFoodItemList == null)
+				_foodItemList = new ArrayCollection();
+			else
+				_foodItemList = newFoodItemList;
+			sortField = new SortField();
+			sortField.name = "itemDescription"
+			sortField.compareFunction = compareFoodItemDescriptions;
+			sort = new Sort();
+			sort.fields = [sortField];
+			newFoodItemList.sort = sort;
 		}
-		
+		 
+		public static function compareFoodItemDescriptions(a:Object,b:Object):int {
+			//var returnvalue:int = compareStrings((a as FoodItem).itemDescription,(b as FoodItem).itemDescription);
+			return compareStrings((a as FoodItem).itemDescription,(b as FoodItem).itemDescription);
+		}
+				
 		/**
 		 * Compares two characters using Excel sorting rules.<br>
 		 * @param characterA the first character to be compared to  <br>
@@ -101,7 +124,7 @@ package utilities
 			var index:int = 0;//index to first character that should be searched for
 			var result:Array = [0,0];			
 			
-			lastIndex[0] = this.foodItemList.length -1; 
+			lastIndex[0] = this._foodItemList.length -1; 
 			
 			/**
 			 * first of all check if previousSearchString contains anything and if
@@ -173,7 +196,7 @@ package utilities
 			temp = high + 1;//this becomes the highest start value
 			while (low < temp) {
 				mid = (low + temp)/2;
-				be = ((this.foodItemList.getItemAt(mid-1)) as FoodItem).itemDescription;
+				be = ((this._foodItemList.getItemAt(mid-1)) as FoodItem).itemDescription;
 				belength = be.length;
 				if (!(belength > index))//b is a string which is shorter than the enteredstring, so definitely before the enteredstring (smaller than)
 				{low = mid+1;}
@@ -192,7 +215,7 @@ package utilities
 			if (low > high) {
 				
 			} else {
-				be = ((this.foodItemList.getItemAt(low-1)) as FoodItem).itemDescription;
+				be = ((this._foodItemList.getItemAt(low-1)) as FoodItem).itemDescription;
 				belength = be.length;
 				if (belength > index) {
 					if ((low < (high + 1)) && (compareToAsInExcel(be.charCodeAt(index), value) == 0))
@@ -228,7 +251,7 @@ package utilities
 			while (high > temp) {
 				if ((high + temp)%2 > 0) {mid = (high+temp)/2+1;}
 				else {mid = (high+temp)/2;}
-				be = ((this.foodItemList.getItemAt(mid-1)) as FoodItem).itemDescription;
+				be = ((this._foodItemList.getItemAt(mid-1)) as FoodItem).itemDescription;
 				belength = be.length;
 				if (!(belength > index))//be is a string which is shorter than the enteredstring, so definitely before the enteredstring (smaller than)
 				{temp = mid;}
@@ -245,7 +268,7 @@ package utilities
 			if (high < low) {
 				//returnvalue = -1;
 			} else {
-				be = ((this.foodItemList.getItemAt(high-1)) as FoodItem).itemDescription;
+				be = ((this._foodItemList.getItemAt(high-1)) as FoodItem).itemDescription;
 				belength = be.length;
 				if (belength > index) {
 					if (((low-1) < high) && (compareToAsInExcel(be.charCodeAt(index), value) == 0))
@@ -259,9 +282,14 @@ package utilities
 		}
 		
 		/**
-		 * compares the strings according to excel rules 
+		 * compares the strings according to excel rules <br>
+		 * returns -1 if stringA comes before stringB<br>
+		 * returns 0 if appear on same level (not necessarily equal, eg a = A<br>
+		 * returns 1 if stringA comes after string B
+		 * 
 		 **/
 		static public function compareStrings ( stringA:String ,stringB:String):int {
+			//trace("in comparestrings, stringA =  " + stringA + " and stringB = " + stringB);
 			var returnvalue:int = 0;
 			var index:int = 0;
 			

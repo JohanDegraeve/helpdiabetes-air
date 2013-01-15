@@ -952,10 +952,8 @@ package databaseclasses
 				if (dispatcher != null)
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 			}
-			
 		};
-		
-		
+				
 		/**
 		 * msql query for getting source<br>
 		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
@@ -995,17 +993,21 @@ package databaseclasses
 		/**
 		 * deletes fooddatabase<br>
 		 * stores data in xml into database<br>
+		 * if overWriteDatabase then existing database will first be deleted<br>
 		 * dispatches event when finished 
 		 */
-		public function loadFoodTable(foodtable:XML = null):void {
+		public function loadFoodTable(overWriteDatabase:Boolean,foodtable:XML = null):void {
 			var localDispatcher:EventDispatcher = new EventDispatcher();
 
-			localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
-			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
-			
-			deleteFoodDatabase(localDispatcher);
+			if (overWriteDatabase) {
+				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
+				localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
+				deleteFoodDatabase(localDispatcher);
+			} else  {
+				fooddatabaseDeleted();				
+			}
 
-			function fooddatabaseDeleted(se:DatabaseEvent):void {
+			function fooddatabaseDeleted(se:DatabaseEvent = null):void {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
 				loadFoodTableInternal(externalXMLLoaded,foodtable);
@@ -1130,13 +1132,14 @@ package databaseclasses
 				} else {
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
 					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
-					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
+					var temp:Object = unitListXMLList[unitListCounter ];
+					
 					insertUnit(unitListXMLList[unitListCounter ].description,
 						unitListXMLList[unitListCounter ].standardamount,
-						unitListXMLList[unitListCounter ].kcal,
-						unitListXMLList[unitListCounter ].protein,
-						unitListXMLList[unitListCounter ].carbs,
-						unitListXMLList[unitListCounter ].fat,
+						unitListXMLList[unitListCounter ].kcal != undefined ? unitListXMLList[unitListCounter ].kcal : - 1,
+						unitListXMLList[unitListCounter ].protein != undefined ? unitListXMLList[unitListCounter ].protein : - 1,
+						unitListXMLList[unitListCounter ].carbs != undefined ? unitListXMLList[unitListCounter ].carbs : - 1,
+						unitListXMLList[unitListCounter ].fat != undefined ? unitListXMLList[unitListCounter ].fat : - 1,
 						actualFoodItemRowId,
 						dispatcher);
 					unitListCounter++;

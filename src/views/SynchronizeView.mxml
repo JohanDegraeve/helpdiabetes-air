@@ -160,8 +160,10 @@ initial setup of sync settings
 			}
 			
 			private function onSyncFinishedEvent(event:Event):void {
-				navigator.popView();
-				navigator.pushView(SynchronizeView2);
+				if (navigator != null) {
+					navigator.popView();
+					navigator.pushView(SynchronizeView2);
+				}
 			}
 			
 		]]>

@@ -50,6 +50,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
 			import mx.core.FlexGlobals;
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
@@ -71,12 +72,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			public var listOfOptionsArray:Array ;
 			
-			private var excelSorting:ExcelSorting;
+			private static var excelSorting:ExcelSorting;
 			
 			private var notificationPopUp:Notification;
 			
 			private var elementPicker:elementFromListPicker;
-			private var  foodItems:ArrayCollection;
+			//private var  foodItems:ArrayCollection;
 
 			private var timer:Timer;
 			private var licensePopUp:AlertPopUp;
@@ -220,26 +221,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 			}
 			
-			public function initiateRetrievalOfFoodItemList(event:Event = null):void  {
+			public function initiateRetrievalOfFoodItemList(event:Event = null):void {
 				var dispatcher:EventDispatcher = new EventDispatcher();
-				var newFoodItemList:ArrayCollection = new ArrayCollection();
 
 				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,retrieveFoodItemList);
 				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onRetrieveListError);
 				Database.getInstance().getAllFoodItemDescriptions(dispatcher);
 
 				function retrieveFoodItemList(de:DatabaseEvent):void {
-					foodItems = new ArrayCollection();
+					//foodItems = new ArrayCollection();
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
 					
+					ModelLocator.getInstance().foodItemList = new ArrayCollection();
+					excelSorting = new ExcelSorting(ModelLocator.getInstance().foodItemList);
+					
 					if (de.data && de.data is Array) {
-						for each ( var o:Object in de.data )
-						{
-							newFoodItemList.addItem(new FoodItem(o.description as String, new ArrayCollection(), o.itemid as int));
+						for each (var o:Object in de.data) {
+							excelSorting.foodItemList.addItem(new FoodItem(o.description as String, new ArrayCollection(), o.itemid as int));
 						}
-						foodItems = newFoodItemList;
-						ModelLocator.getInstance().foodItemList = foodItems;
+						excelSorting.foodItemList.refresh();
 					} 
 				}
 				
@@ -249,9 +250,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
 				}
 			}
-			
-
-			
+						
 			private function selectFoodItem(event:IndexChangeEvent):void {
 				if (tracker == null) {
 					tracker = new MyGATracker( this, trackerId, "AS3", false );
@@ -265,11 +264,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function searchTextChanged():void {
-				if (excelSorting == null)
-					excelSorting = new ExcelSorting(ModelLocator.getInstance().foodItemList);
-				var result:int = excelSorting.getFirstMatchingItem(searchtext.text);
 				fooditemlist.ensureIndexIsVisible(fooditemlist.dataProvider.length - 1);
-				fooditemlist.ensureIndexIsVisible(result);				
+				fooditemlist.ensureIndexIsVisible(excelSorting.getFirstMatchingItem(searchtext.text));				
 			}
 			
 			private function displayFoodItem(item:Object):String {

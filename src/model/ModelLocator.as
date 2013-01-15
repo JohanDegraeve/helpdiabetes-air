@@ -40,9 +40,6 @@ package model
 	import spark.components.List;
 	import spark.components.View;
 	
-	import utilities.ExcelSorting;
-
-
 	/**
 	 * has some data fields used throughout the application<br>
 	 * - 
@@ -73,12 +70,26 @@ package model
 		public var maximumSearchStringLength:int = 25;
 		
 		/**** Add bindable application data here ***/
+		private var _foodItemList:ArrayCollection = new ArrayCollection(); 
+
+		[Bindable]
 		/**
 		 * list of fooditems used throughout the application<br>
 		 * in the first place used in foodcounterview 
 		 */
-		[Bindable]
-		public var foodItemList:ArrayCollection = new ArrayCollection(); 
+		public function get foodItemList():ArrayCollection
+		{
+			return _foodItemList;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set foodItemList(value:ArrayCollection):void
+		{
+			_foodItemList = value;
+		}
+
 
 		/**
 		 * list of meals, mainly used in addfooditem, and also somewhere else, being reset each time addfooditem is opened

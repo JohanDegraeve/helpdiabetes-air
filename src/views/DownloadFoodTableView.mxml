@@ -36,24 +36,22 @@
 		
 			private var _selectedSpreadSheetIndex:int;
 			
-			private static var popToFirstViewNecessary:Boolean = false;
+			//private static var popToFirstViewNecessary:Boolean = false;
 
-			public function get selectedSpreadSheetIndex():int
-			{
-				return _selectedSpreadSheetIndex;
-			}
-
+			private static var downloadOptions:ArrayList;
+			
 			private var _selectedWorkSheetIndex:int;
 
-			public function get selectedWorkSheetIndex():int
-			{
-				return _selectedWorkSheetIndex;
-			}
-			
 			private function onInitialize():void {
-				if (popToFirstViewNecessary) {
+				/*if (popToFirstViewNecessary) {
 					navigator.popToFirstView();
 					popToFirstViewNecessary = false;
+				}*/
+				
+				if (downloadOptions == null) {
+					downloadOptions = new ArrayList();
+					downloadOptions.addItem(resourceManager.getString('downloadfoodtableview','overwrite'));
+					downloadOptions.addItem(resourceManager.getString('downloadfoodtableview','append'));
 				}
 				back_label = resourceManager.getString('general','back');
 				title = resourceManager.getString('downloadfoodtableview','title');
@@ -112,7 +110,9 @@
 			}
 			
 			private function displaySpreadSheetTittle(item:Object):String {
-				if (!(item is XML))
+				if (item is String)
+					return item as String;
+				if (!(item is XML)) 
 					return item.title;
 				
 				var namespace:Namespace = Synchronize.getInstance().namespace_default;
@@ -121,68 +121,28 @@
 			}
 			
 			private function selectedWorkSheet(event:IndexChangeEvent = null):void {
+				spreadSheetList.removeEventListener(Event.CHANGE,selectedWorkSheet);
 				spreadSheetList.visible = false;
 				if (event == null)
 					_selectedWorkSheetIndex = 0;
 				else
 					_selectedWorkSheetIndex = event.newIndex;
 				
-				topText.text = resourceManager.getString('downloadfoodtableview','importingspreadsheet') + 
-					" " + 
-					displaySpreadSheetTittle(Synchronize.getInstance().spreadSheetList.getItemAt(_selectedSpreadSheetIndex)) +
-					", " +
-					resourceManager.getString('downloadfoodtableview','worksheet') +
-					" " +
-					displaySpreadSheetTittle(Synchronize.getInstance().workSheetList.getItemAt(_selectedWorkSheetIndex));
+				topText.text = resourceManager.getString('downloadfoodtableview','overwriteorappend') ;
+				itemList = downloadOptions;
+				spreadSheetList.visible = true
 				
-				Synchronize.getInstance().addEventListener(Synchronize.FOODTABLE_DOWNLOADED,onFoodTableDownloaded);
-				Synchronize.getInstance().googleExcelDownloadFoodTableSpreadSheet(null,_selectedSpreadSheetIndex,_selectedWorkSheetIndex);
+				spreadSheetList.addEventListener(Event.CHANGE,selectedDownLoadOption);
 			}
-			
-			private function onFoodTableDownloaded(event:Event):void {
-				Synchronize.getInstance().removeEventListener(Synchronize.FOODTABLE_DOWNLOADED,onFoodTableDownloaded);	
-				
-				topText.text = resourceManager.getString('downloadfoodtableview','storingnewfoodtable');
 
-				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,onFoodTableStoredInDatabase);
-				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_FAILED,onFoodTableStoredInDatabase);
-				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STATUS_UPDATE,onFoodTableStatusUpdate);
+			private function selectedDownLoadOption(event:IndexChangeEvent):void {
+				var dataObject:Object = new Object();
+				dataObject.selectedWorkSheetIndex = _selectedWorkSheetIndex;
+				dataObject.selectedSpreadSheetIndex = _selectedSpreadSheetIndex;
+				dataObject.overWriteDatabase = (event.newIndex == 0);
+				navigator.pushView(DownloadFoodTableView2,dataObject);
+			}
 
-				Database.getInstance().loadFoodTable(Synchronize.getInstance().foodtable);
-			}
-			
-			private function onFoodTableStatusUpdate(event:Event):void {
-				topText.text = resourceManager.getString('downloadfoodtableview','storingnewfoodtable') +
-					"\n"+
-					Database.getInstance().
-						newFoodDatabaseStatus.
-							replace("{outof}",resourceManager.getString('downloadfoodtableview','outof')).
-							replace("{elementsloaded}",resourceManager.getString('downloadfoodtableview','elementsloaded'));					                          
-											
-			}
-			
-			private function onFoodTableStoredInDatabase(event:Event):void {
-				Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,onFoodTableStoredInDatabase);
-				Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STORED_FAILED,onFoodTableStoredInDatabase);
-				alertPopUp = new AlertPopUp();
-				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-				if (event.type == Database.NEW_FOOD_DATABASE_STORED_SUCCESS) 
-					alertPopUp.show(this,resourceManager.getString('downloadfoodtableview','newfoodtablestoredsuccess'));
-				else
-					alertPopUp.show(this,resourceManager.getString('downloadfoodtableview','newfoodtablestoredfailed'));
-
-				function okClicked(event: PopUpEvent):void {
-					if (alertPopUp != null) {
-						PopUpManager.removePopUp(alertPopUp);
-						if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
-							alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
-						}
-						if (navigator)
-							navigator.popView();
-						popToFirstViewNecessary = true;
-					}
-				}
-			}
 		]]>
 	</fx:Script>
 	<s:navigationContent>

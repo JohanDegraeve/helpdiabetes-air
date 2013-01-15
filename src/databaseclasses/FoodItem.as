@@ -19,8 +19,6 @@ package databaseclasses
 {
 	import mx.collections.ArrayCollection;
 	
-	import utilities.ExcelSorting;
-	
 	public class FoodItem
 	{
 		private var _itemDescription:String;
@@ -58,14 +56,6 @@ package databaseclasses
 			unitList.addItem(newUnit);
 		}
 		
-		/**
-		 * compares the itemdescriptions according to excel rules 
-		 **/
-		public function compareTo(foodItemToCompare:FoodItem):int {
-			return ExcelSorting.compareStrings(this._itemDescription,foodItemToCompare._itemDescription);
-		}
-		
-
 		public function getNumberOfUnits():int {
 			return unitList.length;
 		}

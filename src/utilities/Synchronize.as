@@ -50,12 +50,13 @@ package utilities
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
-	import mx.formatters.DateFormatter;
 	import mx.resources.ResourceManager;
 	import mx.utils.Base64Encoder;
 	
 	import myComponents.TrackingViewElement;
 	
+	import spark.collections.Sort;
+	import spark.collections.SortField;
 	import spark.components.Application;
 	import spark.formatters.DateTimeFormatter;
 	
@@ -3130,8 +3131,7 @@ package utilities
 				while (entryCtr < eventAsJSONObject.feed.entry.length && eventAsJSONObject.feed.entry[entryCtr].gs$cell.row == 1) 
 					entryCtr++;//ignore the first row because these are the column names
 
-				var fooditemlist:XML = <fooditemlist/>;
-
+				var foodItemListArray:ArrayCollection  = new ArrayCollection();			
 				while (entryCtr < eventAsJSONObject.feed.entry.length) {
 					var row:int = eventAsJSONObject.feed.entry[entryCtr].gs$cell.row;
 					var fooditem:XML = <fooditem/>;
@@ -3157,20 +3157,31 @@ package utilities
 					unitlist.appendChild(unit);
 					fooditem.appendChild(unitlist);
 					
-					fooditemlist.appendChild(fooditem);
-					_foodtable = <foodtable/>;
-					var datetimeformatter:DateTimeFormatter = new DateTimeFormatter();
-					datetimeformatter.dateTimePattern = "yyyyMMddHHmmss";
-					_foodtable.timestamp=datetimeformatter.format(new Date());
-					_foodtable.source="";
+					foodItemListArray.addItem(fooditem);
 				}
 				
+				var sortField:SortField = new SortField();
+				var sort:Sort = new Sort();
+				sortField.name = "description"
+				sortField.compareFunction = compareFoodItemDescriptions;
+				sort.fields = [sortField];
+				foodItemListArray.sort = sort;
+				foodItemListArray.refresh();
+				
+				var fooditemlist:XML = <fooditemlist/>;
+				for (var listlength:int = 0;listlength < foodItemListArray.length;listlength++)
+					fooditemlist.appendChild(foodItemListArray.getItemAt(listlength));
+
+				_foodtable = <foodtable/>;
+		
+				var datetimeformatter:DateTimeFormatter = new DateTimeFormatter();
+				datetimeformatter.dateTimePattern = "yyyyMMddHHmmss";
+				_foodtable.timestamp=datetimeformatter.format(new Date());
+				_foodtable.source="";
 				_foodtable.appendChild(fooditemlist);
 				
 				this.dispatchEvent(new Event(FOODTABLE_DOWNLOADED));
 				
-				//if (traceNeeded)
-					//trace("foodtable = " + _foodtable.toString());
 				return;
 				
 			} else {
@@ -3203,6 +3214,12 @@ package utilities
 			}
 
 		}
+		
+		public static function compareFoodItemDescriptions(a:Object,b:Object):int {
+			//trace("in compare a = " + (a as XML).description.text() + ", b = " + (b as XML).description.text());
+			return ExcelSorting.compareStrings((a as XML).description.text(),(b as XML).description.text());
+		}
+		
 	}
 }
 
