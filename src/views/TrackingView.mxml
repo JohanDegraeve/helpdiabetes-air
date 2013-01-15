@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*" 
 		initialize="onInitialize()"
-		actionBarVisible="false">
+		>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -61,6 +61,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
+				title = resourceManager.getString('trackingview','logbook');
+				
 				lastClickOnTrackingView = (new Date()).valueOf();
 				trackerId = resourceManager.getString('analytics','trackeraccount');
 			}
