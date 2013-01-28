@@ -53,6 +53,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 					case 0:
 						navigator.pushView(DownloadFoodTableView);
 						break;
+					case 1:
+						navigator.pushView(UploadTrackingView);
 				}
 			}
 			

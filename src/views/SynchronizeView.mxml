@@ -89,9 +89,7 @@ initial setup of sync settings
 					//access token is not empty but still we got here, this is because user started syncing, then went to other tab, and back to this tab,
 					//apparently oninitialize gets called
 					setViewInStatusSynchronizing();
-					
 					Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
-
 				} else {
 					authorizationcodeTextAreaVisible = false;
 					topLabelText1 = resourceManager.getString('synchronizeview','synchronizewithgoogledocs1');

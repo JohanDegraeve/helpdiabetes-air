@@ -53,12 +53,15 @@ package utilities
 	import mx.resources.ResourceManager;
 	import mx.utils.Base64Encoder;
 	
+	import myComponents.IListElement;
 	import myComponents.TrackingViewElement;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
 	import spark.components.Application;
 	import spark.formatters.DateTimeFormatter;
+	
+	[ResourceBundle("synchronize")] 
 	
 	/**
 	 * class with function to synchronize with google docs, and to export tracking history 
@@ -168,6 +171,14 @@ package utilities
 		 * as soon as sync is finished, this variable will be checked and if necessary findallworksheetsinfoodtable will be launched 
 		 */
 		private var findAllWorkSheetsInFoodTableSpreadSheetWaiting:Boolean;
+		//////////// Waiting Booleans in upload tracking
+		private var createlogbookheaderWaiting:Boolean;
+		private var createlogbookWaiting:Boolean;
+		private var createlogbookworksheetWaiting:Boolean;
+		private var findlogbookspreadsheetWaiting:Boolean;
+		private var findlogbookworksheetWaiting:Boolean;
+		private var insertlogbookeventsWaiting:Boolean;
+		////////////
 		/**
 		 * if  findAllWorkSheetsInFoodTableSpreadSheetWaiting or downloadFoodTableSpreadSheetWaiting = true, then this variable points to the spreadsheet index to find or download
 		 */
@@ -295,7 +306,7 @@ package utilities
 			]
 		];
 		
-		private var googleExcelGoodTableColumnNames:Array = [
+		private var googleExcelFoodTableColumnNames:Array = [
 			ColumnName_description,
 			"unit1",	
 			"standardamount1",	
@@ -337,10 +348,30 @@ package utilities
 			"fat",
 		];
 		
+		private var googleExcelLogBookColumnNames:Array = new Array;
+		
+		//indexes into googleExcelLogBookColumnNames
+		private static const foodValueNames_Index_date:int = 0;
+		private static const foodValueNames_Index_time:int = 1;
+		private static const foodValueNames_Index_eventtype:int = 2;
+		private static const foodValueNames_Index_bloodglucosevalue:int = 3;
+		private static const foodValueNames_Index_medicinvalue:int = 4;
+		private static const foodValueNames_Index_exerciselevel:int = 5;
+		private static const foodValueNames_Index_medicintype:int = 6;
+		private static const foodValueNames_Index_mealtype:int = 7;
+		private static const foodValueNames_Index_mealcarbamount:int = 8;
+		private static const foodValueNames_Index_mealinsulinratio:int = 9;
+		private static const foodValueNames_Index_mealcalculatedinsulin:int = 10;
+		private static const foodValueNames_Index_mealselecteditems:int = 11;
+		
 		/**
 		 * name of the spreadsheet used when uploading the foodtable 
 		 */
 		private static var foodtableName:String = "HelpDiabetesFoodTable";
+		/**
+		 * name of the spreadsheet used when uploading the logbook 
+		 */
+		private static var logBookName:String = "HelpDiabetesLogBook";
 		
 		/**
 		 * list of elements (events, selectedfooditems) that need to get deleted=true in remote database 
@@ -411,8 +442,10 @@ package utilities
 		
 		private var trackingListAlreadyModified:Boolean;
 		
-		private var helpDiabetesSpreadSheetKey:String;//key to spreadsheet in google docs that has foodtable
-		private var helpDiabetesWorkSheetId:String;//key to worksheet in google docs that has foodtable
+		private var helpDiabetesFoodTableSpreadSheetKey:String;//key to spreadsheet in google docs that has foodtable
+		private var helpDiabetesFoodTableWorkSheetId:String;//key to worksheet in google docs that has foodtable
+		private var helpDiabetesLogBookSpreadSheetKey:String;
+		private var helpDiabetesLogBookWorkSheetId:String;//key to worksheet in google docs that has logbook
 		
 		private var foodItemIdBeingTreated:int;
 		
@@ -426,7 +459,7 @@ package utilities
 		 * it doesn't say anything about the result, just that there is a result 
 		 */
 		public static const SPREADSHEET_LIST_RETRIEVED:String="spreadsheet_list_retrieved";
-
+		
 		/**
 		 * used for event dispatching, when dispatched, it means there's a result of downloading foodtable from google docs account<br>
 		 * it doesn't say anything about the result, just that there is a result 
@@ -437,9 +470,37 @@ package utilities
 		 * it doesn't say anything about the result, just that there is a result 
 		 */
 		public static const WORKSHEETS_IN_FOODTABLE_RETRIEVED:String = "worksheets_in_foodtable_retrieved";
-
+		/**
+		 * used for event dispatching<br>
+		 */
+		public static const CREATING_LOGBOOK_SPREADSHEET:String = "creating_logbook";
+		/**
+		 * used for event dispatching<br>
+		 */
+		public static const SEARCHING_LOGBOOK:String = "searching_lobook_spreadsheet";
+		/**
+		 * used for event dispatching<br>
+		 */
+		public static const CREATING_LOGBOOK_WORKSHEET:String = "creating_logbook_worksheet";
+		/**
+		 * used for event dispatching<br>
+		 */
+		public static const CREATING_LOGBOOK_HEADERS:String = "creating_logbook_headers";
+		/**
+		 * used for event dispatching<br>
+		 */
+		public static const INSERTING_NEW_EVENTS:String = "inserting_new_events";
+		/**
+		 * used for event dispatching<br>
+		 */
+		public static const EVENTS_UPLOADED:String = "events_uploaded";
+		/**
+		 * used for event dispatching<br>
+		 */
+		public static const SEARCHING_LOGBOOK_WORKSHEET:String = "searching_logbook_worksheet";
+		
 		private var _foodtable:XML = <foodtable/>;
-
+		
 		/**
 		 * foodtable downloaded, if null then download failed
 		 */
@@ -449,7 +510,7 @@ package utilities
 		}
 		
 		private var _workSheetList:ArrayList;
-
+		
 		/**
 		 * list of worksheets in selected spreadsheetlist
 		 */
@@ -459,7 +520,7 @@ package utilities
 		}
 		
 		private var _spreadSheetList:ArrayList;
-
+		
 		/**
 		 * list of spreadsheets retrieved from google docs. objects will be so called items (see google docs documentation or check the code)
 		 */
@@ -471,19 +532,19 @@ package utilities
 		public static const prefix_default:String = "";
 		public static const prefix_gs:String = "gs";
 		private static var _namespace_default:Namespace;
-
+		
 		public function get namespace_default():Namespace
 		{
 			return _namespace_default;
 		}
-
+		
 		private static var _namespace_gs:Namespace;
-
+		
 		public function get namespace_gs():Namespace
 		{
 			return _namespace_gs;
 		}
-
+		
 		
 		/**
 		 * constructor not to be used, get an instance with getInstance() 
@@ -498,6 +559,13 @@ package utilities
 			downloadFoodTableSpreadSheetWaiting = false;
 			findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
 			
+			createlogbookheaderWaiting = false;
+			createlogbookWaiting = false;
+			createlogbookworksheetWaiting = false;
+			findlogbookspreadsheetWaiting = false;
+			findlogbookworksheetWaiting = false;
+			insertlogbookeventsWaiting = false;
+			
 			rerunNecessary = false;
 			
 			amountofSpaces = 0;
@@ -505,6 +573,18 @@ package utilities
 			listOfElementsToBeDeleted = new ArrayList();
 			instance = this;
 			currentSyncTimeStamp = 0;
+			googleExcelLogBookColumnNames[foodValueNames_Index_date] = ResourceManager.getInstance().getString('uploadtrackingview','date');
+			googleExcelLogBookColumnNames[foodValueNames_Index_time] = ResourceManager.getInstance().getString('uploadtrackingview','time');
+			googleExcelLogBookColumnNames[foodValueNames_Index_eventtype] = ResourceManager.getInstance().getString('uploadtrackingview','eventtype');
+			googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue] = ResourceManager.getInstance().getString('uploadtrackingview','bloodglucosevalue');
+			googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue] = ResourceManager.getInstance().getString('uploadtrackingview','medicinvalue');
+			googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel] = ResourceManager.getInstance().getString('uploadtrackingview','exerciselevel');
+			googleExcelLogBookColumnNames[foodValueNames_Index_medicintype] = ResourceManager.getInstance().getString('uploadtrackingview','medicintype');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealtype] = ResourceManager.getInstance().getString('uploadtrackingview','mealtype');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealcarbamount');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio] = ResourceManager.getInstance().getString('uploadtrackingview','mealinsulinratio');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin] = ResourceManager.getInstance().getString('uploadtrackingview','mealcalculatedinsulin');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems] = ResourceManager.getInstance().getString('uploadtrackingview','mealselecteditems');
 		}
 		
 		public static function getInstance():Synchronize {
@@ -524,9 +604,9 @@ package utilities
 			
 			if (
 				(!(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true"))
-			    &&
+				&&
 				(Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true")
-			   )//uploading foodtable can take a very long time 
+			)//uploading foodtable can take a very long time 
 				secondsBetweenTwoSync = 3600;
 			else 
 				secondsBetweenTwoSync = normalValueForSecondsBetweenTwoSync;
@@ -541,8 +621,8 @@ package utilities
 			if ((syncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!syncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
 				localElementsUpdated  = false;
 				retrievalCounter = 0;
-				helpDiabetesWorkSheetId = "";//not really necessary to reset it each time to empty string, but you never know it could be that user deletes the foodtable worksheet in between to syncs,
-				helpDiabetesSpreadSheetKey = "";//same comment
+				helpDiabetesFoodTableWorkSheetId = "";//not really necessary to reset it each time to empty string, but you never know it could be that user deletes the foodtable worksheet in between to syncs,
+				helpDiabetesFoodTableSpreadSheetKey = "";//same comment
 				trackingList = ModelLocator.getInstance().trackingList;
 				currentSyncTimeStamp = new Date().valueOf();
 				lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
@@ -554,6 +634,14 @@ package utilities
 				findAllSpreadSheetsWaiting = false;
 				downloadFoodTableSpreadSheetWaiting = false;
 				findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
+
+				createlogbookheaderWaiting = false;
+				createlogbookWaiting = false;
+				createlogbookworksheetWaiting = false;
+				findlogbookspreadsheetWaiting = false;
+				findlogbookworksheetWaiting = false;
+				insertlogbookeventsWaiting = false;
+
 				synchronize();
 			} else {
 				if (immediateRunNecessary) {
@@ -687,7 +775,7 @@ package utilities
 					jsonObject.columns = columns.toArray();
 					
 					jsonObject.description =   tableNamesAndColumnNames[i][3];
-
+					
 					createAndLoadURLRequest(googleRequestTablesUrl,URLRequestMethod.POST,null,JSON.stringify(jsonObject),createMissingTables,true,"application/json");
 				}
 				
@@ -769,7 +857,7 @@ package utilities
 				urlVariables.sql = createSQLQueryToSelectAll(0);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
-
+				
 				createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.GET,urlVariables,null,getTheMedicinEvents,true,null);
 				var request:URLRequest = new URLRequest(googleSelectUrl);
 			} else {
@@ -911,7 +999,7 @@ package utilities
 				urlVariables.sql = createSQLQueryToSelectAll(1);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
-
+				
 				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheBloodGlucoseEvents,true,null);
 			} else {
 				//get the bloodglucoseevents in the trackinglist and store them in localElements.
@@ -1203,7 +1291,7 @@ package utilities
 				urlVariables.sql = createSQLQueryToSelectAll(3);
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;
-
+				
 				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheMealEvents,true,null);
 			} else {
 				for (var i:int = 0; i < trackingList.length; i++) {
@@ -1589,7 +1677,7 @@ package utilities
 			} else {
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.sql = sqlStatement;
-
+				
 				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getRowIds,true,null);
 			}
 		}
@@ -1903,7 +1991,7 @@ package utilities
 					var request:URLRequest = new URLRequest(googleSelectUrl);
 					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 					request.contentType = "application/x-www-form-urlencoded";
-
+					
 					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,syncLocalEvents,true,null);
 				}
 				
@@ -1918,7 +2006,7 @@ package utilities
 		}
 		
 		private function getTheSettings(event:Event = null):void {
-			//here remoteelements are all remote settings, since we queried on id > 3 and < 29
+			//here remoteelements are all remote settings, since we queried on id > 2 and < 29
 			//we will go through them and any missing settingid will be added in remoteelementids
 			//any element in remotelements that needs no update (ie same modifiedtimestamp)  will be removed
 			//any element in remotelements that needs local update will be added in localElements and then removed from remotelements
@@ -1957,17 +2045,17 @@ package utilities
 					spaces +=" ";
 				urlVariables.sql = "SELECT * FROM " + spaces +
 					tableNamesAndColumnNames[5][1] +
-					" WHERE id > 3 AND id < 29";
+					" WHERE id > 2 AND id < 29";
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;//probably not used
-
+				
 				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheSettings,true,null);
 			} else {
 				//so time to start comparing
 				//here the remoteelements  need to be interpreted differently than with events
 				//but how ... well read the fucking code
 				var settingCtr:int;
-				for (settingCtr  = 3 + 1;settingCtr < 29;settingCtr++) {
+				for (settingCtr  = 2 + 1;settingCtr < 29;settingCtr++) {
 					var settingFoundInRemoteElements:Boolean = false;
 					//first see if that setting is in the remoteelements
 					for (var remoteElementCtr:int = 0;remoteElementCtr < remoteElements.length;remoteElementCtr++) {
@@ -2024,11 +2112,9 @@ package utilities
 					getSettingRowIds(null);
 					return;
 				}
-				
 			}
 			
 			if (remoteElementIds.length > 0) {
-				
 				var sqlStatement:String = "";
 				var i:int = 0;
 				while (i < remoteElementIds.length) {
@@ -2039,19 +2125,15 @@ package utilities
 						(Settings.getInstance().getSettingLastModifiedTimeStamp(remoteElementIds.getItemAt(i) as int)) +  "\')";
 					i++;
 				}
-				
 				createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,insertNextSetting,true,null);
-
 			} else  {
-				
 				remoteElementIds = new ArrayList(remoteElements.toArray());//this is just to have remoteElementIds as arrayList with the same size as remoteElements
 				indexOfRetrievedRowId = 0;
 				getSettingRowIds(null);
 				return;
 			}
 		}
-		
-		
+				
 		private function getSettingRowIds(event:Event = null):void  {
 			if (traceNeeded)
 				trace ("in method getSettingRowIds");
@@ -2069,10 +2151,10 @@ package utilities
 			if (indexOfRetrievedRowId < remoteElements.length)  {
 				var sqlStatement:String ;
 				sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[5][1] + " WHERE id = \'" + (remoteElements.getItemAt(indexOfRetrievedRowId) as Array)[0] + "\'";
-
+				
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.sql = sqlStatement;
-
+				
 				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getSettingRowIds,true,null);
 			} else   {
 				updateRemoteSettings();
@@ -2084,7 +2166,7 @@ package utilities
 				trace ("in method updateRemoteSettings");
 			if (event != null) {
 				removeEventListeners();
-
+				
 				if (eventHasError(event,updateRemoteSettings))
 					return;
 				
@@ -2111,7 +2193,7 @@ package utilities
 				
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.sql = sqlStatement;
-
+				
 				createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,urlVariables,null,updateRemoteSettings,true,null);
 			} else  {
 				googleExcelFindFoodTableSpreadSheet(null);
@@ -2145,18 +2227,10 @@ package utilities
 					if (traceNeeded)
 						trace("loader : request = " + request.data); 
 				} else {
-					//ModelLocator.getInstance().logString += "error 3 : " + event.target.data + "\n";;
-					/*if (trackingListAlreadyModified)
-					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;*/
 					syncFinished(false);
 				}
 			} catch (e:SyntaxError) {
-				//event.taregt.data is not json
 				if (event.type == "ioError") {
-					/*if (trackingListAlreadyModified)
-					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;*/
-					//an ioError, forget about it, the show doesn't go on
-					//ModelLocator.getInstance().logString += "error 4 : " + event.target.data+ "\n";;
 					syncFinished(false);
 				}
 			}
@@ -2243,7 +2317,7 @@ package utilities
 						eventAsJSONObject.rows[0][0] + "\'";
 					
 					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
-
+					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
 				} else {
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
@@ -2346,7 +2420,7 @@ package utilities
 						eventAsJSONObject.rows[0][0] + "\'";
 					
 					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
-
+					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
 				} else {
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
@@ -2355,9 +2429,9 @@ package utilities
 			} else {
 				if (traceNeeded)
 					trace("start method deleteExerciseEvent");
-								
+				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-
+				
 				if (access_token.length == 0 ) {
 					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				} else {
@@ -2450,9 +2524,9 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
-	
+					
 					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
-
+					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
 				} else {
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);
@@ -2472,6 +2546,88 @@ package utilities
 			}
 		}
 		
+		private function googleExcelInsertLogBookEvents(event:Event = null):void {
+			if (syncRunning) {
+				insertlogbookeventsWaiting=true;
+				return;
+			}
+
+			if (event != null) {
+				removeEventListeners();
+			} else  {
+			}
+			if (traceNeeded)
+				trace("start method googleExcelInsertLogBookEvents");
+			this.dispatchEvent(new Event(INSERTING_NEW_EVENTS));
+			var dateFormatter:DateTimeFormatter =  new DateTimeFormatter();
+			dateFormatter.dateTimePattern = ResourceManager.getInstance().getString('uploadtrackingview','datepattern');
+			dateFormatter.useUTC = false;
+			dateFormatter.setStyle("locale",Capabilities.language.substr(0,2));
+			var timeFormatter:DateTimeFormatter = new DateTimeFormatter();
+			timeFormatter.dateTimePattern = ResourceManager.getInstance().getString('uploadtrackingview','timepattern');
+			timeFormatter.useUTC = false;
+			timeFormatter.setStyle("locale",Capabilities.language.substr(0,2));
+			
+			for (var trackinglistcntr:int = 0;trackinglistcntr < ModelLocator.getInstance().trackingList.length;trackinglistcntr++) {
+				var trackElement:IListElement = ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) as IListElement;
+				if (trackElement.timeStamp > new Number(Settings.getInstance().getSetting(Settings.SettingLastUploadedEventTimeStamp))) {
+					var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+					outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gsx=\"http://schemas.google.com/spreadsheets/2006/extended">\n';
+					outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_date],dateFormatter.format(trackElement.timeStamp));
+					outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_time],timeFormatter.format(trackElement.timeStamp));
+					if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is MealEvent) {
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamemeal'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealtype],(trackElement as MealEvent).mealName);
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount],(trackElement as MealEvent).totalCarbs.toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio],(trackElement as MealEvent).insulinRatio.toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin],((Math.round((trackElement as MealEvent).calculatedInsulinAmount*10))/10).toString());
+						var selectedItems:ArrayCollection = (trackElement as MealEvent).selectedFoodItems;
+						var selectedItemsString:String = "";
+						for (var selecteditemscntr:int = 0;selecteditemscntr < selectedItems.length;selecteditemscntr++) {
+							selectedItemsString += (selectedItems.getItemAt(selecteditemscntr) as SelectedFoodItem).chosenAmount + ' ' + (selectedItems.getItemAt(selecteditemscntr) as SelectedFoodItem).unit.unitDescription + ' ' + (selectedItems.getItemAt(selecteditemscntr) as SelectedFoodItem).itemDescription;
+							if (selecteditemscntr < selectedItems.length)
+								selectedItemsString += "\n";
+						}
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems],selectedItemsString);
+					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is BloodGlucoseEvent) {
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamebloodglucose'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue],new Number((trackElement as BloodGlucoseEvent).bloodGlucoseLevel).toString());
+					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is ExerciseEvent) {
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnameexercise'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel],(trackElement as ExerciseEvent).level);
+					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is MedicinEvent) {
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamemedicin'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicintype],(trackElement as MedicinEvent).medicinName);
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue],new Number((trackElement as MedicinEvent).amount).toString());
+					} else {
+						//it's a dayline, no need to export
+						Settings.getInstance().setSetting(Settings.SettingLastUploadedEventTimeStamp,trackElement.timeStamp.toString());
+						googleExcelInsertLogBookEvents();
+						break;
+					}
+					
+					outputString += '</entry>\n';
+					outputString = outputString.replace(/\n/g, File.lineEnding);
+					
+					createAndLoadURLRequest(googleExcelManageWorkSheetUrl.replace("{key}",helpDiabetesLogBookSpreadSheetKey).replace("{worksheetid}",helpDiabetesLogBookWorkSheetId),
+						URLRequestMethod.POST,
+						null,
+						outputString,
+						googleExcelInsertLogBookEvents,
+						true,
+						"application/atom+xml");
+					Settings.getInstance().setSetting(Settings.SettingLastUploadedEventTimeStamp,trackElement.timeStamp.toString());
+					break;
+				}
+			}
+			if (trackinglistcntr == ModelLocator.getInstance().trackingList.length) 
+				this.dispatchEvent(new Event(EVENTS_UPLOADED));
+		}
+		
+		private function createGSXElement(tagName:String,contents:String):String {
+			return  '<gsx:' + tagName + '><![CDATA[' + contents + ']]></gsx:' + tagName + '> \n';
+		}
+		
 		private function googleExcelInsertFoodItems(event:Event = null):void {
 			if (Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true")  {
 				syncFinished(true);
@@ -2486,9 +2642,9 @@ package utilities
 					syncFinished(true);
 					return;
 				} // else we continue
-				Settings.getInstance().setSetting(Settings.SettingsNextRowToAdd,new Number(foodItemIdBeingTreated + 1).toString());
+				Settings.getInstance().setSetting(Settings.SettingsNextRowToAddInFoodTable,new Number(foodItemIdBeingTreated + 1).toString());
 			} else  {//first time we come here, we need to initialize foodItemIdBeingTreated
-				foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAdd));
+				foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAddInFoodTable));
 			}
 			if (traceNeeded)
 				trace("start method googleExcelInsertFoodItems");
@@ -2497,7 +2653,7 @@ package utilities
 			var retrievedFoodItem:FoodItem;
 			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
-			foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAdd));
+			foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAddInFoodTable));
 			Database.getInstance().getUnitList((ModelLocator.getInstance().foodItemList.getItemAt(foodItemIdBeingTreated) as FoodItem) ,dispatcher);
 			
 			function unitListRetrieved (event:DatabaseEvent):void {
@@ -2528,7 +2684,7 @@ package utilities
 					newOutputString = outputString.replace(">-1<","><");
 				}
 				
-				createAndLoadURLRequest(googleExcelManageWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId),
+				createAndLoadURLRequest(googleExcelManageWorkSheetUrl.replace("{key}",helpDiabetesFoodTableSpreadSheetKey).replace("{worksheetid}",helpDiabetesFoodTableWorkSheetId),
 					URLRequestMethod.POST,
 					null,
 					outputString,
@@ -2545,11 +2701,51 @@ package utilities
 			}
 		}
 		
-		private function googleExcelCreateHeader(event:Event = null):void  {
+		private function googleExcelCreateLogBookHeader(event:Event = null):void  {
+			if (syncRunning) {
+				createlogbookheaderWaiting=true;
+				return;
+			}
+
 			if (event != null)  {
 				removeEventListeners();
 				if ((event.target.data as String).search("updated") != -1) {
-					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,(new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAdd)) + 1).toString());
+					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInLogBook,(new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInLogBook)) + 1).toString());
+					//seems insert of cel was successfull
+				} else {
+				}
+			} 
+			
+			if (traceNeeded)
+				trace("start method googleExcelCreateLogBookHeader");
+			
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInLogBook)) == googleExcelLogBookColumnNames.length)  {
+				googleExcelInsertLogBookEvents();
+			} else {
+				this.dispatchEvent(new Event(CREATING_LOGBOOK_HEADERS));
+				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInLogBook)) + 1;//index starts at 0, but column number at 1
+				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
+				outputString += '    <gs:cell row="1" col="' + nextColumn + '" inputValue="' + googleExcelLogBookColumnNames[nextColumn - 1] + '"/>\n';
+				outputString += '</entry>\n';
+				outputString = outputString.replace(/\n/g, File.lineEnding);
+				
+				createAndLoadURLRequest(
+					googleExcelUpdateCellUrl.replace("{key}",helpDiabetesLogBookSpreadSheetKey).replace("{worksheetid}",helpDiabetesLogBookWorkSheetId),
+					URLRequestMethod.POST,
+					null,
+					outputString,
+					googleExcelCreateLogBookHeader,
+					false,
+					"application/atom+xml");
+			}
+		}
+		
+		private function googleExcelCreateFoodTableHeader(event:Event = null):void  {
+			if (event != null)  {
+				removeEventListeners();
+				if ((event.target.data as String).search("updated") != -1) {
+					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInFoodTable,(new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) + 1).toString());
 					//seems insert of cel was successfull
 				} else {
 					syncFinished(false);
@@ -2560,26 +2756,73 @@ package utilities
 			if (traceNeeded)
 				trace("start method googleExcelCreateHeader");
 			
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAdd)) == googleExcelGoodTableColumnNames.length)  {
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) == googleExcelFoodTableColumnNames.length)  {
 				googleExcelInsertFoodItems();
 			} else {
-				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAdd)) + 1;//index starts at 0, but column number at 1
+				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) + 1;//index starts at 0, but column number at 1
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
-				outputString += '    <gs:cell row="1" col="' + nextColumn + '" inputValue="' + googleExcelGoodTableColumnNames[nextColumn - 1] + '"/>\n';
+				outputString += '    <gs:cell row="1" col="' + nextColumn + '" inputValue="' + googleExcelFoodTableColumnNames[nextColumn - 1] + '"/>\n';
 				outputString += '</entry>\n';
 				outputString = outputString.replace(/\n/g, File.lineEnding);
 				
 				createAndLoadURLRequest(
-					googleExcelUpdateCellUrl.replace("{key}",helpDiabetesSpreadSheetKey).replace("{worksheetid}",helpDiabetesWorkSheetId),
+					googleExcelUpdateCellUrl.replace("{key}",helpDiabetesFoodTableSpreadSheetKey).replace("{worksheetid}",helpDiabetesFoodTableWorkSheetId),
 					URLRequestMethod.POST,
 					null,
 					outputString,
-					googleExcelCreateHeader,
+					googleExcelCreateFoodTableHeader,
 					true,
 					"application/atom+xml");
 			}
 		}
+		
+		
+		/**
+		 * this function will create the logbook on google excel, so it should only be called if it doesn't exist yet<br>
+		 */
+		private function googleExcelCreateLogBook(event:Event = null):void  {
+			if (syncRunning) {
+				createlogbookWaiting=true;
+				return;
+			}
+
+			if (event != null)  {
+				//SHOULD BE CHECKING HERE WHAT CAN GO WRONG - BECAUSE I SEEM TO ASSUME HERE THAT THE LOGBOOK CREATION WILL ALWAYS BE SUCCESSFUL
+				removeEventListeners();
+				
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if (eventHasError(event,googleExcelCreateLogBook))
+					return;
+				else {
+					if (eventAsJSONObject.id)  {
+						helpDiabetesLogBookSpreadSheetKey = eventAsJSONObject.id;
+						googleExcelCreateLogBookWorkSheet();
+					} else {
+						//something went wrong, syncfinished successfully because sync itself was ok
+					}
+				}
+				
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelCreateLoogBook");
+				this.dispatchEvent(new Event(CREATING_LOGBOOK_SPREADSHEET));
+				var jsonObject:Object = new Object();
+				jsonObject.mimeType = "application/vnd.google-apps.spreadsheet";
+				jsonObject.title = logBookName;
+				
+				createAndLoadURLRequest(
+					googleDriveFilesUrl,
+					URLRequestMethod.POST,
+					null,
+					JSON.stringify(jsonObject),googleExcelCreateLogBook,
+					false,
+					"application/json");
+			}
+		}
+		
+		
 		
 		/**
 		 * this function will create the foodtable on google excel, so it should only be called if it doesn't exist yet<br>
@@ -2599,8 +2842,8 @@ package utilities
 					return;
 				else {
 					if (eventAsJSONObject.id)  {
-						helpDiabetesSpreadSheetKey = eventAsJSONObject.id;
-						googleExcelCreateWorkSheet();
+						helpDiabetesFoodTableSpreadSheetKey = eventAsJSONObject.id;
+						googleExcelCreateFoodTableWorkSheet();
 					} else {
 						//something went wrong, syncfinished successfully because sync itself was ok
 					}
@@ -2624,11 +2867,79 @@ package utilities
 			}
 		}
 		
+		
+		/**
+		 * this function will create the worksheet in logbook,  on google excel, so it should only be called if it doesn't exist yet<br>
+		 */
+		private function googleExcelCreateLogBookWorkSheet(event:Event = null):void  {
+			if (syncRunning) {
+				createlogbookworksheetWaiting=true;
+				return;
+			}
+
+			
+			if (event != null)  {
+				//ASSUMING HERE THAT EVERHTHING WORKS FINE, BUT THINGS COULD BE GOING WRONG
+				removeEventListeners();
+				
+				//ASSUMING HERE THAT WORKSHEET CREATION WAS SUCCESSFULL, WHICH IS NOT SURE
+				var createdWorkSheetAsXML:XML = new XML(event.target.data as String);
+				//info about namespaces found on http://userflex.files.wordpress.com/2008/06/getstatuscodeas.pdf and http://userflex.wordpress.com/2008/04/03/xml-ns-e4x/
+				var namespaces : Array = createdWorkSheetAsXML.namespaceDeclarations();
+				// looks for the  namespaces that i need
+				for each (var ns : Namespace in namespaces)
+				{
+					if (ns.prefix == prefix_default)//there's two other in this kind of xml that google returns : openSearch and gs but I don't need xml objects of that kind
+					{
+						_namespace_default = ns;
+						break;
+					}
+					if (ns.prefix == prefix_gs)
+					{
+						_namespace_gs = ns;
+						break;
+					}
+				}
+				
+				//ASSUMING HERE THAT EVERHTHING WORKS FINE, BUT THINGS COULD BE GOING WRONG
+				helpDiabetesLogBookWorkSheetId = createdWorkSheetAsXML.._namespace_default::id;
+				var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesLogBookWorkSheetId.split("/");
+				helpDiabetesLogBookWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
+				
+				if (helpDiabetesLogBookWorkSheetId == "") {
+					//we can say here that something went wrong with the creation of the worksheet
+					return;
+				} else {
+					googleExcelCreateLogBookHeader(null);
+				}
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelCreateLogBookWorkSheet");
+				this.dispatchEvent(new Event(CREATING_LOGBOOK_WORKSHEET));
+				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
+				outputString += '    <title>logbook</title>\n';
+				outputString += '        <gs:rowCount>' + 10 + '</gs:rowCount>';
+				outputString += '        <gs:colCount>' + googleExcelLogBookColumnNames.length + '</gs:colCount>';
+				outputString += '</entry>\n';
+				outputString = outputString.replace(/\n/g, File.lineEnding);
+				
+				createAndLoadURLRequest(
+					googleExcelCreateWorkSheetUrl.replace("{key}",helpDiabetesLogBookSpreadSheetKey),
+					URLRequestMethod.POST,
+					null,
+					outputString,
+					googleExcelCreateLogBookWorkSheet,
+					true,
+					"application/atom+xml");
+			}
+		}
+		
 		/**
 		 * this function will create the worksheet in foodtable,  on google excel, so it should only be called if it doesn't exist yet<br>
 		 * it will mark this instance of the app as the creator of the foodtable
 		 */
-		private function googleExcelCreateWorkSheet(event:Event = null):void  {
+		private function googleExcelCreateFoodTableWorkSheet(event:Event = null):void  {
 			Settings.getInstance().setSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel,"false");
 			
 			if (event != null)  {
@@ -2656,17 +2967,17 @@ package utilities
 				}
 				
 				//ASSUMING HERE THAT EVERHTHING WORKS FINE, BUT THINGS COULD BE GOING WRONG
-				helpDiabetesWorkSheetId = cratedWorkSheetAsXML.._namespace_default::id;
-				var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesWorkSheetId.split("/");
-				helpDiabetesWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
+				helpDiabetesFoodTableWorkSheetId = cratedWorkSheetAsXML.._namespace_default::id;
+				var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesFoodTableWorkSheetId.split("/");
+				helpDiabetesFoodTableWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
 				
-				if (helpDiabetesWorkSheetId == "") {
+				if (helpDiabetesFoodTableWorkSheetId == "") {
 					//we can say here that something went wrong with the creation of the worksheet
 					//we'll stop but say that sync was successful, because that already ended successfully, it's just the creation of the worksheet that failed
 					syncFinished(true);
 					return;
 				} else {
-					googleExcelCreateHeader(null);
+					googleExcelCreateFoodTableHeader(null);
 				}
 			} else {
 				if (traceNeeded)
@@ -2675,16 +2986,16 @@ package utilities
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
 				outputString += '    <title>foodtable</title>\n';
 				outputString += '        <gs:rowCount>' + ModelLocator.getInstance().foodItemList.length + '</gs:rowCount>';
-				outputString += '        <gs:colCount>' + googleExcelGoodTableColumnNames.length + '</gs:colCount>';
+				outputString += '        <gs:colCount>' + googleExcelFoodTableColumnNames.length + '</gs:colCount>';
 				outputString += '</entry>\n';
 				outputString = outputString.replace(/\n/g, File.lineEnding);
 				
 				createAndLoadURLRequest(
-					googleExcelCreateWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey),
+					googleExcelCreateWorkSheetUrl.replace("{key}",helpDiabetesFoodTableSpreadSheetKey),
 					URLRequestMethod.POST,
 					null,
 					outputString,
-					googleExcelCreateWorkSheet,
+					googleExcelCreateFoodTableWorkSheet,
 					true,
 					"application/atom+xml");
 			}
@@ -2704,33 +3015,30 @@ package utilities
 			googleExcelDeleteWorkSheetUrl = "";
 		}
 		
-		private function googleExcelFindFoodTableWorkSheet(event:Event = null):void {
+		private function googleExcelFindLogBookWorkSheet(event:Event = null):void {
+			if (syncRunning) {
+				findlogbookworksheetWaiting=true;
+				return;
+			}
+
 			if (event != null)  {
 				removeEventListeners();
-				
 				var workSheetListAsXML:XML = new XML(event.target.data as String);
-				//info about namespaces found on http://userflex.files.wordpress.com/2008/06/getstatuscodeas.pdf and http://userflex.wordpress.com/2008/04/03/xml-ns-e4x/
 				var xmlns : Namespace;
-				// namespace declarations defined in the xml
 				var namespaces : Array = workSheetListAsXML.namespaceDeclarations();
-				// looks for the default namespace, i know that entry is in the default namespace, so that's what i'm looking for
-				for each (var ns : Namespace in namespaces)
-				{
-					if (ns.prefix == "")//there's two other in this kind of xml that google returns : openSearch and gs but I don't need xml objects of that kind
-					{
+				for each (var ns : Namespace in namespaces) {
+					if (ns.prefix == "") {
 						xmlns = ns;
 						break;
 					}
 				}
-				
+				helpDiabetesLogBookWorkSheetId = "";
 				var entryXMLList:XMLList = new XMLList(workSheetListAsXML..xmlns::entry);
-				
-				for (var listCounter:int = 0 ; listCounter < entryXMLList.length();listCounter++)  {
-					//var titleXML:XMLList = entryXMLList[listCounter]..xmlns::title;
-					if (entryXMLList[listCounter]..xmlns::title == "foodtable") {
-						helpDiabetesWorkSheetId = entryXMLList[listCounter]..xmlns::id;
-						var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesWorkSheetId.split("/");
-						helpDiabetesWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
+				for (var listCounter:int = 0 ; listCounter < entryXMLList.length();listCounter++) {
+					if (entryXMLList[listCounter]..xmlns::title == "logbook") {
+						helpDiabetesLogBookWorkSheetId = entryXMLList[listCounter]..xmlns::id;
+						var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesLogBookWorkSheetId.split("/");
+						helpDiabetesLogBookWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
 						
 					}
 					if (entryXMLList[listCounter]..xmlns::title == "Sheet 1") {
@@ -2744,25 +3052,98 @@ package utilities
 						}
 					}
 				}
-				if (googleExcelDeleteWorkSheetUrl != "")  {
+				if (googleExcelDeleteWorkSheetUrl != "" && entryXMLList.length() > 1)  {
+					googleExcelDeleteWorkSheet1();
+				}
+				if (helpDiabetesLogBookWorkSheetId != null) {
+					if (helpDiabetesLogBookWorkSheetId == "") {
+						Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInLogBook,"0");
+						Settings.getInstance().setSetting(Settings.SettingLastUploadedEventTimeStamp,"0");
+						googleExcelCreateLogBookWorkSheet(null);
+						return;
+					}
+					else googleExcelCreateLogBookHeader(null);
+				} else {
+					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInLogBook,"0");
+					Settings.getInstance().setSetting(Settings.SettingLastUploadedEventTimeStamp,"0");
+					googleExcelCreateLogBookWorkSheet(null);
+				}
+				
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelFindLogBookWorkSheet");
+				this.dispatchEvent(new Event(SEARCHING_LOGBOOK_WORKSHEET));
+				createAndLoadURLRequest(
+					googleExcelFindWorkSheetUrl.replace("{key}",helpDiabetesLogBookSpreadSheetKey),
+					null,
+					null,
+					null,
+					googleExcelFindLogBookWorkSheet,
+					false,
+					null);
+			}
+		}
+		
+		private function googleExcelFindFoodTableWorkSheet(event:Event = null):void {
+			if (event != null)  {
+				removeEventListeners();
+				
+				var workSheetListAsXML:XML = new XML(event.target.data as String);
+				//info about namespaces found on http://userflex.files.wordpress.com/2008/06/getstatuscodeas.pdf and http://userflex.wordpress.com/2008/04/03/xml-ns-e4x/
+				var xmlns : Namespace;
+				// namespace declarations defined in the xml
+				var namespaces : Array = workSheetListAsXML.namespaceDeclarations();
+				// looks for the default namespace, i know that entry is in the default namespace, so that's what i'm looking for
+				for each (var ns : Namespace in namespaces) {
+					if (ns.prefix == "") {
+						xmlns = ns;
+						break;
+					}
+				}
+				var entryXMLList:XMLList = new XMLList(workSheetListAsXML..xmlns::entry);
+				for (var listCounter:int = 0 ; listCounter < entryXMLList.length();listCounter++)  {
+					//var titleXML:XMLList = entryXMLList[listCounter]..xmlns::title;
+					if (entryXMLList[listCounter]..xmlns::title == "foodtable") {
+						helpDiabetesFoodTableWorkSheetId = entryXMLList[listCounter]..xmlns::id;
+						var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesFoodTableWorkSheetId.split("/");
+						helpDiabetesFoodTableWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
+						
+					}
+					if (entryXMLList[listCounter]..xmlns::title == "Sheet 1") {
+						var linkListForThisentryXMLList:XMLList = new XMLList(entryXMLList[listCounter]..xmlns::link);
+						for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
+							if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
+								if (linkListForThisentryXMLList[linkListCounter].attribute("rel") == "edit")  {
+									googleExcelDeleteWorkSheetUrl = linkListForThisentryXMLList[linkListCounter].attribute("href"); 
+								}
+							}
+						}
+					}
+				}
+				if (googleExcelDeleteWorkSheetUrl != "" && entryXMLList.length() > 1)  {
 					googleExcelDeleteWorkSheet1();
 				}
 				
-				if (helpDiabetesWorkSheetId == "") {
-					//we'll have to create the worksheet but it could also be that we have to recreate the worksheet, in which case we reset columns to add to 0
-					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,"0");
-					Settings.getInstance().setSetting(Settings.SettingsNextRowToAdd,"0");
-					googleExcelCreateWorkSheet(null);
-					return;
+				if (helpDiabetesFoodTableWorkSheetId != null) {
+					if (helpDiabetesFoodTableWorkSheetId == "") {
+						//we'll have to create the worksheet but it could also be that we have to recreate the worksheet, in which case we reset columns to add to 0
+						Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInFoodTable,"0");
+						Settings.getInstance().setSetting(Settings.SettingsNextRowToAddInFoodTable,"0");
+						googleExcelCreateFoodTableWorkSheet(null);
+						return;
+					} else
+						googleExcelCreateFoodTableHeader(null);
 				} else {
-					googleExcelCreateHeader(null);
+					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInFoodTable,"0");
+					Settings.getInstance().setSetting(Settings.SettingsNextRowToAddInFoodTable,"0");
+					googleExcelCreateFoodTableWorkSheet(null);
 				}
 				
 			} else {
 				if (traceNeeded)
 					trace("start method googleExcelFindFoodTableWorkSheet");
 				createAndLoadURLRequest(
-					googleExcelFindWorkSheetUrl.replace("{key}",helpDiabetesSpreadSheetKey),
+					googleExcelFindWorkSheetUrl.replace("{key}",helpDiabetesFoodTableSpreadSheetKey),
 					null,
 					null,
 					null,
@@ -2791,7 +3172,7 @@ package utilities
 						if (eventAsJSONObject.items.length > 0)  {
 							//foodtable found
 							if (Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true")  {
-								helpDiabetesSpreadSheetKey = eventAsJSONObject.items[0].id;
+								helpDiabetesFoodTableSpreadSheetKey = eventAsJSONObject.items[0].id;
 								googleExcelFindFoodTableWorkSheet();
 							} else {
 								//this instance has not created the foodtable
@@ -2799,13 +3180,13 @@ package utilities
 							}
 						} else {
 							googleExcelCreateFoodTable();
-							Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,"0");
-							Settings.getInstance().setSetting(Settings.SettingsNextRowToAdd,"0");
+							Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInFoodTable,"0");
+							Settings.getInstance().setSetting(Settings.SettingsNextRowToAddInFoodTable,"0");
 						}
 					} else  {
 						googleExcelCreateFoodTable();
-						Settings.getInstance().setSetting(Settings.SettingsNextColumnToAdd,"0");
-						Settings.getInstance().setSetting(Settings.SettingsNextRowToAdd,"0");
+						Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInFoodTable,"0");
+						Settings.getInstance().setSetting(Settings.SettingsNextRowToAddInFoodTable,"0");
 					}
 				}
 			} else {
@@ -2813,7 +3194,7 @@ package utilities
 					trace("start method googleExcelFindFoodTableSpreadSheet");
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.q = "title = '" + foodtableName + "'";
-
+				
 				createAndLoadURLRequest(
 					googleDriveFilesUrl,
 					null,
@@ -2821,6 +3202,56 @@ package utilities
 					null,
 					googleExcelFindFoodTableSpreadSheet,
 					true,
+					null);
+			}
+		}
+		
+		/**
+		 * will try to find the logbook spreadsheet in google docs account<br>
+		 * if not found then googleExcelCreateLogBook will be called<br>
+		 */
+		private function googleExcelFindLogBookSpreadSheet(event:Event = null):void  {
+			if (syncRunning) {
+				findlogbookspreadsheetWaiting=true;
+				return;
+			}
+
+			if (event != null)  {
+				removeEventListeners();
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if (eventHasError(event,googleExcelFindLogBookSpreadSheet))
+					return;
+				else {
+					if (eventAsJSONObject.items)  {
+						if (eventAsJSONObject.items.length > 0)  {
+							helpDiabetesLogBookSpreadSheetKey = eventAsJSONObject.items[0].id;
+							googleExcelFindLogBookWorkSheet();
+						} else {
+							googleExcelCreateLogBook();
+							Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInLogBook,"0");
+							Settings.getInstance().setSetting(Settings.SettingLastUploadedEventTimeStamp,"0");
+						}
+					} else  {
+						googleExcelCreateLogBook();
+						Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInLogBook,"0");
+						Settings.getInstance().setSetting(Settings.SettingLastUploadedEventTimeStamp,"0");
+					}
+				}
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelFindLogBookSpreadSheet");
+				this.dispatchEvent(new Event(SEARCHING_LOGBOOK));
+				var urlVariables:URLVariables = new URLVariables();
+				urlVariables.q = "title = '" + logBookName + "'";
+				
+				createAndLoadURLRequest(
+					googleDriveFilesUrl,
+					null,
+					urlVariables,
+					null,
+					googleExcelFindLogBookSpreadSheet,
+					false,
 					null);
 			}
 		}
@@ -2836,7 +3267,7 @@ package utilities
 			this.dispatchEvent(new Event(SYNC_FINISHED));
 			
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-						
+			
 			if (traceNeeded)
 				trace("in sycFinished with success = " + success);
 			
@@ -2853,7 +3284,7 @@ package utilities
 				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
 				Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
 			}
-
+			
 			if (rerunNecessary) {
 				currentSyncTimeStamp = new Date().valueOf();
 				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
@@ -2871,7 +3302,25 @@ package utilities
 				} else if (findAllWorkSheetsInFoodTableSpreadSheetWaiting) {
 					findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
 					googleExcelFindAllWorkSheetsInFoodTableSpreadSheet(null,-1);
-				}
+				} else if (createlogbookheaderWaiting) {
+					createlogbookheaderWaiting = false;
+					googleExcelCreateLogBookHeader(null);
+				} else if (createlogbookWaiting) {
+					createlogbookWaiting = false;
+					googleExcelCreateLogBook(null);
+				} else if (createlogbookworksheetWaiting) {
+					createlogbookworksheetWaiting = false;
+					googleExcelCreateLogBookWorkSheet(null);
+				} else if (findlogbookspreadsheetWaiting) {
+					findlogbookspreadsheetWaiting = false;
+					googleExcelFindLogBookSpreadSheet(null);
+				} else if (findlogbookworksheetWaiting) {
+					findlogbookworksheetWaiting = false;
+					googleExcelFindLogBookWorkSheet(null);
+				} else if (insertlogbookeventsWaiting) {
+					insertlogbookeventsWaiting = false;
+					googleExcelInsertLogBookEvents(null);
+				} 
 			}
 			
 			function getAllEventsAndFillUpMealsFinished(event:Event):void
@@ -2888,6 +3337,10 @@ package utilities
 		
 		public function addObjectToBeDeleted(object:Object):void {
 			listOfElementsToBeDeleted.addItem(object);
+		}
+		
+		public function uploadLogBook():void {
+			googleExcelFindLogBookSpreadSheet();
 		}
 		
 		/**
@@ -2918,10 +3371,10 @@ package utilities
 		 * removes eventlistener googleAPICallFailed from IOErrorEvent.IO_ERROR
 		 */
 		private function removeEventListeners():void  {
-
+			
 			if (functionToRecall != null)
 				loader.removeEventListener(Event.COMPLETE,functionToRecall);
-
+			
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 		}
 		
@@ -2953,7 +3406,7 @@ package utilities
 			if (!requestMethod)
 				requestMethod = URLRequestMethod.GET;
 			request.method = requestMethod;
-
+			
 			//requestMethod = POST
 			if (requestMethod == URLRequestMethod.POST) {
 				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
@@ -2977,7 +3430,7 @@ package utilities
 			
 			if (addIOErrorListener)
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
-						
+			
 			loader.load(request);
 			if (traceNeeded)
 				trace("loader : url = " + request.url + ", request.data = " + request.data); 
@@ -3039,7 +3492,7 @@ package utilities
 					null);
 			}
 		}
-
+		
 		/**
 		 * gets the list of worksheets in the specified spreadsheet.<br>
 		 * spreadSheetIndex points to the spreadsheet in _spreadSheetList<br>
@@ -3111,7 +3564,7 @@ package utilities
 				downloadFoodTableSpreadSheetWaiting = true;
 				return;
 			}
-
+			
 			if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) == "")  {
 				//should normally not happen because when access_token is blank then option to load foodtable should not even be shown to user
 				//but you never know
@@ -3130,7 +3583,7 @@ package utilities
 				var entryCtr:int = 0;
 				while (entryCtr < eventAsJSONObject.feed.entry.length && eventAsJSONObject.feed.entry[entryCtr].gs$cell.row == 1) 
 					entryCtr++;//ignore the first row because these are the column names
-
+				
 				var foodItemListArray:ArrayCollection  = new ArrayCollection();			
 				while (entryCtr < eventAsJSONObject.feed.entry.length) {
 					var row:int = eventAsJSONObject.feed.entry[entryCtr].gs$cell.row;
@@ -3171,9 +3624,9 @@ package utilities
 				var fooditemlist:XML = <fooditemlist/>;
 				for (var listlength:int = 0;listlength < foodItemListArray.length;listlength++)
 					fooditemlist.appendChild(foodItemListArray.getItemAt(listlength));
-
+				
 				_foodtable = <foodtable/>;
-		
+				
 				var datetimeformatter:DateTimeFormatter = new DateTimeFormatter();
 				datetimeformatter.dateTimePattern = "yyyyMMddHHmmss";
 				_foodtable.timestamp=datetimeformatter.format(new Date());
@@ -3187,17 +3640,17 @@ package utilities
 			} else {
 				if (traceNeeded)
 					trace("start method googleExcelDownloadFoodTableSpreadSheet");
-
+				
 				if (spreadSheetIndex != -1)
 					indexOfSpreadSheetToFind = spreadSheetIndex;
 				if (workSheetIndex != -1)
 					indexOfWorkSheetToFind = workSheetIndex;
-				helpDiabetesWorkSheetId = _workSheetList.getItemAt(indexOfWorkSheetToFind).._namespace_default::id;
-				var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesWorkSheetId.split("/");
-				helpDiabetesWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
+				helpDiabetesFoodTableWorkSheetId = _workSheetList.getItemAt(indexOfWorkSheetToFind).._namespace_default::id;
+				var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesFoodTableWorkSheetId.split("/");
+				helpDiabetesFoodTableWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
 				
 				createAndLoadURLRequest(
-					googleExcelUpdateCellUrl.replace("{key}",spreadSheetList.getItemAt(indexOfSpreadSheetToFind).id).replace("{worksheetid}",helpDiabetesWorkSheetId),
+					googleExcelUpdateCellUrl.replace("{key}",spreadSheetList.getItemAt(indexOfSpreadSheetToFind).id).replace("{worksheetid}",helpDiabetesFoodTableWorkSheetId),
 					null,
 					new URLVariables("alt=json"),
 					null,
@@ -3212,7 +3665,7 @@ package utilities
 				trackingListAlreadyModified = true;
 				ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 			}
-
+			
 		}
 		
 		public static function compareFoodItemDescriptions(a:Object,b:Object):int {

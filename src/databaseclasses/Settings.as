@@ -51,9 +51,9 @@ package databaseclasses
 		 */
 		internal static const SettingNEXT_MEALEVENT_ID:int=2;
 		/**
-		 * not used anymore
+		 * creationtimestamp of the last event that was uploaded to google excel logbook
 		 */
-		internal static const SettingNEXT_SELECTEDITEM_ID:int=3;
+		public static const SettingLastUploadedEventTimeStamp:int=3;
 		/**
 		 * insulinratio breakfast, amount of carbs per unit of insulin
 		 */ 
@@ -255,14 +255,12 @@ package databaseclasses
 		 */
 		public static const SettingsRefreshToken:int=102;
 		public static const SettingsLastSyncTimeStamp:int=103;
-		
 		/**
 		 * index to array of column names in the foodtable in google docs, index points to the next column that needs to be created<br>
 		 * 0 = first one , 1 = second, ... if > size of array of column names, then all column names are created 
 		 */
-		public static const SettingsNextColumnToAdd:int=104;
-		
-		/**
+		public static const SettingsNextColumnToAddInFoodTable:int=104;
+				/**
 		 * A user may have installed this app on several devices. Only one device will upload the foodtable to google docs.<br>
 		 * This setting indicates if the foodtable has been or is being created by this instance. 
 		 */
@@ -273,8 +271,13 @@ package databaseclasses
 		 * Once upload is finished, this value may not match anymore, because user may have downloaded a new database with a different size,
 		 * therefor the next setting is also important
 		 */
-		public static const SettingsNextRowToAdd:int=106;
+		public static const SettingsNextRowToAddInFoodTable:int=106;
 		public static const SettingsAllFoodItemsUploadedToGoogleExcel:int=107;
+		/**
+		 * index to array of column names in the logbook in google docs, index points to the next column that needs to be created<br>
+		 * 0 = first one , 1 = second, ... if > size of array of column names, then all column names are created 
+		 */
+		public static const SettingsNextColumnToAddInLogBook:int=108;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -385,7 +388,8 @@ package databaseclasses
 			"0",//index to column names for google excel foodtable
 			"false",//creator of foodtable on google excel
 			"0",//SettingsNextRowToAdd
-			"false"//all fooditmes uploaded or not
+			"false",//all fooditmes uploaded or not
+			"0"
 		];
 		
 		/** array with lastmodifiedtimestamp<br> 

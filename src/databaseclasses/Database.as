@@ -402,7 +402,7 @@ package databaseclasses
 						if  ((o.id as int) != Settings.SettingsFirstStartUp || !databaseWasCopiedFromSampleFile) {
 							//retrievalresult[Settings.SettingsFirstStartUp] will remain null so it will get the value from the class later on
 							retrievalResult[(o.id as int)] = (o.value as String);
-							Settings.getInstance().setSettingWithoutDatabaseUpdate((o.id as int),(o.value as String), new Number(o.lastmodifiedtimestamp as String));
+							Settings.getInstance().setSettingWithoutDatabaseUpdate((o.id as int),(o.value as String), o.lastmodifiedtimestamp);
 						}
 					}
 				}
