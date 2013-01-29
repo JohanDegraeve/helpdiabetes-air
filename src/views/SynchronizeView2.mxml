@@ -30,16 +30,26 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.Settings;
+			
 			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
 			
+			import myComponents.AlertPopUp;
+			
 			import spark.events.IndexChangeEvent;
+			import spark.events.PopUpEvent;
+			
+			import utilities.Synchronize;
 			[Bindable]
 			private var back_label:String;
+			private var alertPopUp:AlertPopUp;
 
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_downloadfoodtable"),
-				ResourceManager.getInstance().getString("synchronizeview","menuitem_exporttracking")
+				ResourceManager.getInstance().getString("synchronizeview","menuitem_exporttracking"),
+				ResourceManager.getInstance().getString("synchronizeview","menuitem_resyncall")
 			]);	
 
 			private function onInitialize():void {
@@ -55,6 +65,24 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						break;
 					case 1:
 						navigator.pushView(UploadTrackingView);
+						break;
+					case 2:
+						Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,"0");
+						Synchronize.getInstance().startSynchronize(null,true);
+						
+						alertPopUp = new AlertPopUp();
+						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+						alertPopUp.show(this,resourceManager.getString('settingsview','syncstarted'));
+						break;
+
+				}
+				function okClicked(event: PopUpEvent):void {
+					if (alertPopUp != null) {
+						PopUpManager.removePopUp(alertPopUp);
+						if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+							alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+						}
+					}
 				}
 			}
 			

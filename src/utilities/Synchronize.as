@@ -60,9 +60,7 @@ package utilities
 	import spark.collections.SortField;
 	import spark.components.Application;
 	import spark.formatters.DateTimeFormatter;
-	
-	[ResourceBundle("synchronize")] 
-	
+		
 	/**
 	 * class with function to synchronize with google docs, and to export tracking history 
 	 *
@@ -70,6 +68,7 @@ package utilities
 	public class Synchronize extends EventDispatcher
 	{
 		[ResourceBundle("analytics")]
+		[ResourceBundle("uploadtrackingview")] 
 		private static var googleRequestTablesUrl:String = "https://www.googleapis.com/fusiontables/v1/tables";
 		private static var googleSelectUrl:String = "https://www.googleapis.com/fusiontables/v1/query";
 		private static var googleDriveFilesUrl:String = "https://www.googleapis.com/drive/v2/files";
