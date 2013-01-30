@@ -108,7 +108,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					if (fooditemlist.hasEventListener(Event.CHANGE)) {
 						helpCallOut = new HelpCallOut();
 						helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
-						helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditSelectedItem;
+						helpCallOut.settingId = 0;
 						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 						helpCallOut.verticalPosition = "before";
 						helpCallOut.open(fooditemlist,true);
@@ -117,9 +117,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('editmealeventview','editdateandtime');
+				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				helpCallOut.open(dateTimeAndMealNameGroup,true);
+			}
+
+			private function helptext2Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
 			}
 			
+
 			private function onInitialize():void {
 				trackerId = resourceManager.getString('analytics','trackeraccount');
 
@@ -161,7 +171,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 					}
 
-					if (!fooditemlist.hasEventListener(Event.CHANGE)) {
+					if (!itemsAreEditable) {
 						fooditemlist.addEventListener(Event.CHANGE,onClickButNotEditable);
 						itemsAreEditable = false;
 					}
@@ -205,11 +215,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function dateTimeAndMealNameClicked(event:Event):void  {
-				if (mealEvent.meal != null)   {//meal date and time can only be changed if meal != null, that means future, current ans previous meal, but older meals than that
+				if (itemsAreEditable)   {//meal date and time can only be changed if meal != null, that means future, current ans previous meal, but older meals can not have a date change
 					navigator.pushView(ChangeMealDateAndTimeView,{
 						meal:mealEvent.meal
 					},CHANGE_MEAL_DATE_AND_TIME);
-				}
+				} else
+					onClickButNotEditable(null);
 			}
 			
 			private function addHandler():void {
