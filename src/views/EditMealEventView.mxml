@@ -108,7 +108,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					if (fooditemlist.hasEventListener(Event.CHANGE)) {
 						helpCallOut = new HelpCallOut();
 						helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
-						helpCallOut.settingId = 0;
+						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
 						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 						helpCallOut.verticalPosition = "before";
 						helpCallOut.open(fooditemlist,true);
@@ -120,8 +120,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 				helpCallOut = new HelpCallOut();
 				helpCallOut.helpText = resourceManager.getString('editmealeventview','editdateandtime');
-				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
+				helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditDateAndTime;
 				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				helpCallOut.verticalPosition = "after";
 				helpCallOut.open(dateTimeAndMealNameGroup,true);
 			}
 

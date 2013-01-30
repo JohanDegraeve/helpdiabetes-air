@@ -185,7 +185,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							tracker = new MyGATracker( this, trackerId, "AS3", false );
 						}
 						tracker.trackPageview( "SetingsView-resetHelpText" );
-						for (var i:int = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;i <= Settings.SettingsHelpTextEditBGEventViewOkButton;i++) {
+						for (var i:int = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;i <= Settings.SettingsHelpText100;i++) {
 							Settings.getInstance().setSetting(i,"true");
 						}
 						alertPopUp = new AlertPopUp();

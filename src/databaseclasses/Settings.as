@@ -198,7 +198,7 @@ package databaseclasses
 		public static const SettingsHelpTextEditMedicinEventViewOkButton:int=50;
 		public static const SettingsHelpTextEditExerciseEventViewOkButton:int=51;
 		public static const SettingsHelpTextEditBGEventViewOkButton:int=52;
-		public static const SettingsHelpText53:int=53;
+		public static const SettingsHelpTextEditMealEventViewEditDateAndTime:int=53;
 		public static const SettingsHelpText54:int=54;
 		public static const SettingsHelpText55:int=55;
 		public static const SettingsHelpText56:int=56;
@@ -334,7 +334,7 @@ package databaseclasses
 			"true",//ok buttons for medicin event, exercise event and bloodglucoseevent
 			"true",
 			"true",
-			"",
+			"true",//number 53
 			"",
 			"",
 			"",
