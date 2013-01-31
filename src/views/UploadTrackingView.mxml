@@ -20,9 +20,12 @@
 			private var topLabelText2:String;
 			[Bindable]
 			private var back_label:String;
+			
+			private var eventCounter:int;
 
 			protected function onInitialize(event:FlexEvent):void
 			{
+				eventCounter = 1;
 				topLabelText1 = resourceManager.getString('uploadtrackingview','uploadinglogbook');
 				back_label = resourceManager.getString('general','back');
 				title = resourceManager.getString('synchronizeview','titlesettingssync');
@@ -32,8 +35,11 @@
 				Synchronize.getInstance().addEventListener(Synchronize.CREATING_LOGBOOK_HEADERS,onEvent);
 				Synchronize.getInstance().addEventListener(Synchronize.INSERTING_NEW_EVENTS,onEvent);
 				Synchronize.getInstance().addEventListener(Synchronize.SEARCHING_LOGBOOK_WORKSHEET,onEvent);
-				Synchronize.getInstance().addEventListener(Synchronize.EVENTS_UPLOADED,onEvent);
-				Synchronize.getInstance().uploadLogBook();
+				Synchronize.getInstance().addEventListener(Synchronize.EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS,onEvent);
+				Synchronize.getInstance().addEventListener(Synchronize.WAITING_FOR_SYNC_TO_FINISH,onEvent);
+				Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onEvent);
+				topLabelText2 = resourceManager.getString('uploadtrackingview','firstsyncingthesettings');
+				Synchronize.getInstance().startSynchronize(null,true,true);
 			}
 			
 			private function onEvent(event:Event):void {
@@ -47,11 +53,32 @@
 					topLabelText2 = resourceManager.getString('uploadtrackingview','creatinglogbookheaders');
 				} else if (event.type == Synchronize.INSERTING_NEW_EVENTS) {
 					topLabelText2 = resourceManager.getString('uploadtrackingview','insertingnewevents');
+					topLabelText2 += " : " + eventCounter++;
 				} else if (event.type == Synchronize.SEARCHING_LOGBOOK_WORKSHEET) {
 					topLabelText2 = resourceManager.getString('uploadtrackingview','searchinglogbookworksheet');
-				} else if (event.type == Synchronize.EVENTS_UPLOADED) {
-					topLabelText2 = resourceManager.getString('uploadtrackingview','eventsuploaded');
+				} else if (event.type == Synchronize.EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS) {
+					topLabelText2 = resourceManager.getString('uploadtrackingview','eventsuploadednowsyncingthesettings');
+					Synchronize.getInstance().removeEventListener(Synchronize.CREATING_LOGBOOK_SPREADSHEET,onEvent);
+					Synchronize.getInstance().removeEventListener(Synchronize.SEARCHING_LOGBOOK,onEvent);
+					Synchronize.getInstance().removeEventListener(Synchronize.CREATING_LOGBOOK_WORKSHEET,onEvent);
+					Synchronize.getInstance().removeEventListener(Synchronize.CREATING_LOGBOOK_HEADERS,onEvent);
+					Synchronize.getInstance().removeEventListener(Synchronize.INSERTING_NEW_EVENTS,onEvent);
+					Synchronize.getInstance().removeEventListener(Synchronize.SEARCHING_LOGBOOK_WORKSHEET,onEvent);
+					Synchronize.getInstance().removeEventListener(Synchronize.EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS,onEvent);
+					Synchronize.getInstance().removeEventListener(Synchronize.WAITING_FOR_SYNC_TO_FINISH,onEvent);
+					Synchronize.getInstance().removeEventListener(Synchronize.SYNC_FINISHED,onEvent);
+					
+					Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,finishing);
+				} else if (event.type == Synchronize.WAITING_FOR_SYNC_TO_FINISH) {
+					topLabelText2 = resourceManager.getString('uploadtrackingview','waitingforsynctofinish');
+				} else if (event.type == Synchronize.SYNC_FINISHED) {
+					Synchronize.getInstance().uploadLogBook();
 				} 
+			}
+			
+			private function finishing(event:Event):void {
+				if (navigator)
+					navigator.popToFirstView();
 			}
 			
 		]]>

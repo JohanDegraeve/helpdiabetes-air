@@ -492,11 +492,15 @@ package utilities
 		/**
 		 * used for event dispatching<br>
 		 */
-		public static const EVENTS_UPLOADED:String = "events_uploaded";
+		public static const EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS:String = "events_uploaded";
 		/**
 		 * used for event dispatching<br>
 		 */
 		public static const SEARCHING_LOGBOOK_WORKSHEET:String = "searching_logbook_worksheet";
+		/**
+		 * used for event dispatching<br>
+		 */
+		public static const WAITING_FOR_SYNC_TO_FINISH:String = "waiting_for_sync_to_finish";
 		
 		private var _foodtable:XML = <foodtable/>;
 		
@@ -596,9 +600,10 @@ package utilities
 		 * set rerunnecessary to false<br>
 		 * <br>
 		 * If  (syncRunning is true and currentSyncTimeStamp < 30 seconds ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything.<br>
-		 * if tracker is null, then no tracking will be done next time 
+		 * if tracker is null, then no tracking will be done next time <br>
+		 * onlySyncTheSettings =  if true synchronize will jump immediately to syncing the settings, assuming all tables are already there. Should only be true if it's sure that tables are existing on google docs account
 		 */
-		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean):void {
+		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean,onlySyncTheSettings:Boolean = false):void {
 			tracker = callingTracker;
 			
 			if (
@@ -641,7 +646,10 @@ package utilities
 				findlogbookworksheetWaiting = false;
 				insertlogbookeventsWaiting = false;
 
-				synchronize();
+				if (onlySyncTheSettings)
+					getTheSettings();
+				else
+					synchronize();
 			} else {
 				if (immediateRunNecessary) {
 					rerunNecessary = true;
@@ -2619,8 +2627,10 @@ package utilities
 					break;
 				}
 			}
-			if (trackinglistcntr == ModelLocator.getInstance().trackingList.length) 
-				this.dispatchEvent(new Event(EVENTS_UPLOADED));
+			if (trackinglistcntr == ModelLocator.getInstance().trackingList.length) {
+				this.dispatchEvent(new Event(EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS));
+				startSynchronize(null,true,true);
+			}
 		}
 		
 		private function createGSXElement(tagName:String,contents:String):String {
@@ -3211,10 +3221,11 @@ package utilities
 		 */
 		private function googleExcelFindLogBookSpreadSheet(event:Event = null):void  {
 			if (syncRunning) {
+				this.dispatchEvent(new Event(WAITING_FOR_SYNC_TO_FINISH));
 				findlogbookspreadsheetWaiting=true;
 				return;
-			}
-
+			} 
+			
 			if (event != null)  {
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
