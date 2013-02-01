@@ -1655,7 +1655,7 @@ package databaseclasses
 		/**
 		 * new bloodglucoselevel event will be added to the database<br>
 		 */
-		internal function createNewBloodGlucoseEvent(level:int,timeStamp:Number,newLastModifiedTimeStamp:Number,unit:String,bloodglucoseeventid:Number, dispatcher:EventDispatcher = null ):void {
+		internal function createNewBloodGlucoseEvent(level:Number,timeStamp:Number,newLastModifiedTimeStamp:Number,unit:String,bloodglucoseeventid:Number, dispatcher:EventDispatcher = null ):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -1672,6 +1672,8 @@ package databaseclasses
 				localSqlStatement.parameters[":bloodglucoseeventid"] =  bloodglucoseeventid;
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
+				if (unit  == ResourceManager.getInstance().getString('general','mmoll'))
+					level = level * 10;
 				localSqlStatement.parameters[":value"] = level;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, bloodGlucoseLevelCreated);
@@ -1928,8 +1930,10 @@ package databaseclasses
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
 							deleteBloodGlucoseEvent(o.bloodglucoseeventid as Number);
 						} else {
-							
-							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(o.value as Number,o.unit as String, o.bloodglucoseeventid as Number, o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
+							var tempLevel:Number = o.value as Number;
+							if (o.unit as String  == ResourceManager.getInstance().getString('general','mmoll'))
+								tempLevel = tempLevel/10;
+							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(tempLevel as Number,o.unit as String, o.bloodglucoseeventid as Number, o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
 							var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2391,7 +2395,7 @@ package databaseclasses
 		/**
 		 * bloodglucoseevent with specified bloodglucoseeventid is updated with new values  level and unit
 		 */ 	
-		internal function updateBloodGlucoseEvent(bloodglucoseEventId:Number,unit:String,bloodGlucoseLevel:int,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
+		internal function updateBloodGlucoseEvent(bloodglucoseEventId:Number,unit:String,bloodGlucoseLevel:Number,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -2406,6 +2410,8 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_BLOODGLUCOSEEVENT;
 				localSqlStatement.parameters[":id"] = bloodglucoseEventId;
 				localSqlStatement.parameters[":unit"] = unit;
+				if (unit  == ResourceManager.getInstance().getString('general','mmoll'))
+					bloodGlucoseLevel = bloodGlucoseLevel * 10;
 				localSqlStatement.parameters[":value"] = bloodGlucoseLevel;
 				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;

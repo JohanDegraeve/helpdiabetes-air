@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import model.ModelLocator;
 			
 			import mx.managers.PopUpManager;
+			import mx.resources.ResourceManager;
 			
 			import myComponents.AmountPicker;
 			import myComponents.DatePicker;
@@ -149,8 +150,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function meteringResultClicked(e:MouseEvent = null):void {
 				amountPicker = new AmountPicker();
 				amountPicker.amount = meteringResult.label;
-				amountPicker.decimalDigits = 0;
-				amountPicker.maxNonDecimalDigits = 3;
+				if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mmoll") {
+					amountPicker.decimalDigits = 1;
+					amountPicker.maxNonDecimalDigits = 2;
+				} else {
+					amountPicker.decimalDigits = 0;
+					amountPicker.maxNonDecimalDigits = 3;
+				}
 				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
 				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 				amountPicker.labelText1 = meteringText.text;

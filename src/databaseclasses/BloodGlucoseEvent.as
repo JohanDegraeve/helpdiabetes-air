@@ -26,7 +26,7 @@ package databaseclasses
 	public class BloodGlucoseEvent extends TrackingViewElement implements IListElement
 	{
 		private var _timeStamp:Number;
-		private var _bloodGlucoseLevel:int;
+		private var _bloodGlucoseLevel:Number;
 		
 		private var _unit:String;
 
@@ -59,7 +59,7 @@ package databaseclasses
 		 * if creationTimeStamp = null, then current date and time is used<br>
 		 * if newLastModifiedTimestamp = null, then current date and time is used
 		 */
-		public function BloodGlucoseEvent(glucoseLevel:int, unit:String, bloodglucoseEventId:Number, creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true )
+		public function BloodGlucoseEvent(glucoseLevel:Number, unit:String, bloodglucoseEventId:Number, creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true )
 		{
 			this._bloodGlucoseLevel = glucoseLevel;	
 			this._unit = unit;
@@ -79,12 +79,12 @@ package databaseclasses
 		}
 		
 		
-		public function get bloodGlucoseLevel():int
+		public function get bloodGlucoseLevel():Number
 		{
 			return _bloodGlucoseLevel;
 		}
 
-		private function set bloodGlucoseLevel(value:int):void
+		private function set bloodGlucoseLevel(value:Number):void
 		{
 			_bloodGlucoseLevel = value;
 		}
@@ -103,7 +103,7 @@ package databaseclasses
 		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
 		 * if newComment = null then an empty string will be used<br>
 		 */
-		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:int,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number):void {
+		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:Number,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number):void {
 			unit = newUnit;
 			_bloodGlucoseLevel = newBloodGlucoseLevel;
 
@@ -135,7 +135,7 @@ package databaseclasses
 			returnValue += "eventid = " + eventid + "\n";
 			returnValue = "timeStamp = " + timeStamp+ "\n";
 			returnValue += "ladmodifiedtimestamp = " + _lastModifiedTimestamp+ "\n";
-			returnValue += "bloodglucoselevel = " + _bloodGlucoseLevel+ "\n";
+			returnValue += "bloodglucoselevel = " + _bloodGlucoseLevel.toString() + "\n";
 			returnValue += "unit = " + unit+ "\n";
 			 
 			return returnValue;
