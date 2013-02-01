@@ -2567,7 +2567,7 @@ package utilities
 					if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is MealEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamemeal'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealtype],(trackElement as MealEvent).mealName);
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount],(trackElement as MealEvent).totalCarbs.toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount],(Math.round((trackElement as MealEvent).totalCarbs)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio],(trackElement as MealEvent).insulinRatio.toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin],((Math.round((trackElement as MealEvent).calculatedInsulinAmount*10))/10).toString());
 						var selectedItems:ArrayCollection = (trackElement as MealEvent).selectedFoodItems;
