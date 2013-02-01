@@ -3033,11 +3033,13 @@ package utilities
 						
 					}
 					if (entryXMLList[listCounter]..xmlns::title == "Sheet 1") {
-						var linkListForThisentryXMLList:XMLList = new XMLList(entryXMLList[listCounter]..xmlns::link);
-						for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
-							if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
-								if (linkListForThisentryXMLList[linkListCounter].attribute("rel") == "edit")  {
-									googleExcelDeleteWorkSheetUrl = linkListForThisentryXMLList[linkListCounter].attribute("href"); 
+						if (entryXMLList.length() > 1) {
+							var linkListForThisentryXMLList:XMLList = new XMLList(entryXMLList[listCounter]..xmlns::link);
+							for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
+								if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
+									if (linkListForThisentryXMLList[linkListCounter].attribute("rel") == "edit")  {
+										googleExcelDeleteWorkSheetUrl = linkListForThisentryXMLList[linkListCounter].attribute("href"); 
+									}
 								}
 							}
 						}
@@ -3101,11 +3103,13 @@ package utilities
 						
 					}
 					if (entryXMLList[listCounter]..xmlns::title == "Sheet 1") {
-						var linkListForThisentryXMLList:XMLList = new XMLList(entryXMLList[listCounter]..xmlns::link);
-						for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
-							if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
-								if (linkListForThisentryXMLList[linkListCounter].attribute("rel") == "edit")  {
-									googleExcelDeleteWorkSheetUrl = linkListForThisentryXMLList[linkListCounter].attribute("href"); 
+						if (entryXMLList.length() > 1)  {
+							var linkListForThisentryXMLList:XMLList = new XMLList(entryXMLList[listCounter]..xmlns::link);
+							for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
+								if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
+									if (linkListForThisentryXMLList[linkListCounter].attribute("rel") == "edit")  {
+										googleExcelDeleteWorkSheetUrl = linkListForThisentryXMLList[linkListCounter].attribute("href"); 
+									}
 								}
 							}
 						}
