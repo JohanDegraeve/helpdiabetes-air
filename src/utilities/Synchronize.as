@@ -615,11 +615,6 @@ package utilities
 			else 
 				secondsBetweenTwoSync = normalValueForSecondsBetweenTwoSync;
 			
-			if (traceNeeded)  {
-				trace("secondsBetweenTwoSync = " + secondsBetweenTwoSync);
-				trace("Settings.SettingsAllFoodItemsUploadedToGoogleExcel = " + Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel));
-			}
-			
 			var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > secondsBetweenTwoSync * 1000;
 			
 			if ((syncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!syncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
@@ -869,7 +864,6 @@ package utilities
 				var request:URLRequest = new URLRequest(googleSelectUrl);
 			} else {
 				//get the medicinevents in the trackinglist and store them in localElements.
-				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
 				for (var i:int = 0; i < trackingList.length; i++) {
 					if (trackingList.getItemAt(i) is MedicinEvent) {
 						if ((trackingList.getItemAt(i) as MedicinEvent).timeStamp >= asOfTimeStamp)
@@ -968,7 +962,6 @@ package utilities
 			
 			if (traceNeeded)
 				trace("start method getTheBloodGlucoseEvents");
-			//ModelLocator.getInstance().logString += "start method getthebloodglucoseevents"+ "\n";
 			
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
@@ -1010,7 +1003,6 @@ package utilities
 				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheBloodGlucoseEvents,true,null);
 			} else {
 				//get the bloodglucoseevents in the trackinglist and store them in localElements.
-				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
 				for (var i:int = 0; i < trackingList.length; i++) {
 					if (trackingList.getItemAt(i) is BloodGlucoseEvent) {
 						if ((trackingList.getItemAt(i) as BloodGlucoseEvent).timeStamp >= asOfTimeStamp)
@@ -1071,15 +1063,10 @@ package utilities
 					for (l = 0; l < trackingList.length;l++) {
 						if (trackingList.getItemAt(l) is BloodGlucoseEvent) {
 							if ((trackingList.getItemAt(l) as BloodGlucoseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
-								if (traceNeeded) trace("find an element in with same eventid");
-								if (traceNeeded) trace ("bg event  = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).toString());
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
-									if (traceNeeded)
-										trace("call to bloodglucoseevent.deleteevent");
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).deleteEvent();
 								} else {
-									if (traceNeeded) trace("call to update bloodglucoseevent");
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).updateBloodGlucoseEvent(
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unit)],
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_value)],
@@ -1157,7 +1144,6 @@ package utilities
 				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getTheExerciseEvents,true,null);
 			} else {
 				//get the exerciseevents in the trackinglist and store them in localElements.
-				//trace("filtering events, asOfTimeStamp = " + asOfTimeStamp + ", lastSyncTimeStamp = " + lastSyncTimeStamp);
 				for (var i:int = 0; i < trackingList.length; i++) {
 					if (trackingList.getItemAt(i) is ExerciseEvent) {
 						if ((trackingList.getItemAt(i) as ExerciseEvent).timeStamp >= asOfTimeStamp)
@@ -1261,7 +1247,6 @@ package utilities
 			
 			if (traceNeeded)
 				trace("start method getTheMealEvents");
-			//ModelLocator.getInstance().logString += "start method getTheMealEvents"+ "\n";
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -1374,7 +1359,6 @@ package utilities
 				//we've got to start updating
 				if (traceNeeded)
 					trace("there are " + remoteElements.length + " remote elements to store or update locally");
-				//ModelLocator.getInstance().logString += "in getthemealevents, ready to start updating, remoteElements.length = " + remoteElements.length + "\n";
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the medicinevent in the trackinglist that has the same id
 					var l:int=0;
@@ -1384,7 +1368,6 @@ package utilities
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 									if (traceNeeded)
-										trace("in synchronize.as, calling mealevent.deleteevent");
 									(trackingList.getItemAt(l) as MealEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as MealEvent).updateMealEvent(
@@ -1429,7 +1412,6 @@ package utilities
 			
 			if (traceNeeded)
 				trace("start method getTheSelectedItems");
-			//ModelLocator.getInstance().logString += "start method getTheSelectedFoodItems" + "\n";
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -2703,7 +2685,7 @@ package utilities
 			}
 			
 			function unitListRetrievelError(event:DatabaseEvent):void {
-				trace("error in synchronize.ass, unitlistretrievalerror, event = " + event.target.toString());
+				trace("error in synchronize.as, unitlistretrievalerror, event = " + event.target.toString());
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 				syncFinished(true);//stop the sync, sync itself was ok, but not the upload of fooditems
