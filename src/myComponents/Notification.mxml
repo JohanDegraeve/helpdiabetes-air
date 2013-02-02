@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2011  hippoandfriends
+Copyright (C) 2013  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,12 +29,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var _notificationText:String;
 			
 			[Bindable]
+
 			public function get notificationText():String
+
 			{
 				return _notificationText;
 			}
 			
 			public function set notificationText(value:String):void
+
 			{
 				_notificationText = value;
 			}

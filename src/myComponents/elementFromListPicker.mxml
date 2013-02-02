@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2011  hippoandfriends
+Copyright (C) 2013  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ to chose an element from a list of a maximum number of elements
 			 * elements arraycollection, maximum amount of elements = 10 ? 
 			 */
 			public function get elements():ArrayCollection
+
 			{
 				return _elements;
 			}
@@ -57,7 +58,9 @@ to chose an element from a list of a maximum number of elements
 			/**
 			 * @private
 			 */
+
 			public function set elements(value:ArrayCollection):void
+
 			{
 				if (value.length > maxElements)
 					throw new Error("maximum number of elements exceeded, maximum = " + maxElements + ". Received = " + value.length);

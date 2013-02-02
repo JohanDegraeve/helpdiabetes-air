@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2011  hippoandfriends
+ Copyright (C) 2013  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -61,24 +61,37 @@ package databaseclasses
 		}
 
 		[Bindable]
+
 		public function get itemDescription():String
+
 		{
+
 			return _itemDescription;
+
 		}
 
 		public function set itemDescription(value:String):void
+
 		{
+
 			_itemDescription = value;
+
 		}
 
 		internal function get itemid():int
+
 		{
+
 			return _itemid;
+
 		}
 
 		internal function set itemid(value:int):void
+
 		{
+
 			_itemid = value;
+
 		}
 		
 

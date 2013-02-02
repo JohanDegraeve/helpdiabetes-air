@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2011  hippoandfriends
+ Copyright (C) 2013  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -508,6 +508,7 @@ package utilities
 		 * foodtable downloaded, if null then download failed
 		 */
 		public function get foodtable():XML
+
 		{
 			return _foodtable;
 		}
@@ -518,6 +519,7 @@ package utilities
 		 * list of worksheets in selected spreadsheetlist
 		 */
 		public function get workSheetList():ArrayList
+
 		{
 			return _workSheetList;
 		}
@@ -528,6 +530,7 @@ package utilities
 		 * list of spreadsheets retrieved from google docs. objects will be so called items (see google docs documentation or check the code)
 		 */
 		public function get spreadSheetList():ArrayList
+
 		{
 			return _spreadSheetList;
 		}
@@ -537,6 +540,7 @@ package utilities
 		private static var _namespace_default:Namespace;
 		
 		public function get namespace_default():Namespace
+
 		{
 			return _namespace_default;
 		}
@@ -544,6 +548,7 @@ package utilities
 		private static var _namespace_gs:Namespace;
 		
 		public function get namespace_gs():Namespace
+
 		{
 			return _namespace_gs;
 		}

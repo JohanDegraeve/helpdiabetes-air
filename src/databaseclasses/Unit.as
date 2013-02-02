@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2011  hippoandfriends
+ Copyright (C) 2013  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -86,96 +86,138 @@ package databaseclasses
 		 * The amount of units, to which number of kilocalories, proteins, carbs and fat correspond, always > 0
 		 */
 		public function get standardAmount():int
+
 		{
+
 			return _standardAmount;
+
 		}
 
 		/**
 		 * @private
 		 */
+
 		public function set standardAmount(value:int):void
+
 		{
+
 			_standardAmount = value;
+
 		}
 
 		/**
 		 * amount of kilocalories, < 0 if amount is unknown
 		 */
 		public function get kcal():int
+
 		{
+
 			return _kcal;
+
 		}
 
 		/**
 		 * @private
 		 */
+
 		public function set kcal(value:int):void
+
 		{
+
 			_kcal = value;
+
 		}
 
 		/**
 		 * Desriptive text
 		 */
 		public function get unitDescription():String
+
 		{
+
 			return _unitDescription;
+
 		}
 
 		/**
 		 * @private
 		 */
+
 		public function set unitDescription(value:String):void
+
 		{
+
 			_unitDescription = value;
+
 		}
 
 		/**
 		 * amount of Proteins in grams, < 0 if amount is unknown 
 		 */
 		public function get protein():Number
+
 		{
+
 			return _protein;
+
 		}
 
 		/**
 		 * @private
 		 */
+
 		public function set protein(value:Number):void
+
 		{
+
 			_protein = value;
+
 		}
 
 		/**
 		 * amount of carbs in grams, always >= 0
 		 */
 		public function get carbs():Number
+
 		{
+
 			return _carbs;
+
 		}
 
 		/**
 		 * @private
 		 */
+
 		public function set carbs(value:Number):void
+
 		{
+
 			_carbs = value;
+
 		}
 
 		/**
 		 * amount of fat in grams, < 0 if amount is unknown
 		 */
 		public function get fat():Number
+
 		{
+
 			return _fat;
+
 		}
 
 		/**
 		 * @private
 		 */
+
 		public function set fat(value:Number):void
+
 		{
+
 			_fat = value;
+
 		}
 
 		

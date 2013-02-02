@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2011  hippoandfriends
+ Copyright (C) 2013  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -73,11 +73,13 @@ package model
 		private var _foodItemList:ArrayCollection = new ArrayCollection(); 
 
 		[Bindable]
+
 		/**
 		 * list of fooditems used throughout the application<br>
 		 * in the first place used in foodcounterview 
 		 */
 		public function get foodItemList():ArrayCollection
+
 		{
 			return _foodItemList;
 		}
@@ -85,7 +87,9 @@ package model
 		/**
 		 * @private
 		 */
+
 		public function set foodItemList(value:ArrayCollection):void
+
 		{
 			_foodItemList = value;
 		}
@@ -110,6 +114,7 @@ package model
 		 * there are no elements in the _trackingList, then it stays -1
 		 */
 		public function get trackingEventToShow():Number
+
 		{
 			if (_trackingEventToShow == -1)
 				if (_trackingList.length > 0)
@@ -120,7 +125,9 @@ package model
 		/**
 		 * @private
 		 */
+
 		public function set trackingEventToShow(value:Number):void
+
 		{
 			_trackingEventToShow = value;
 		}
@@ -155,6 +162,7 @@ package model
 		//public var logString:String;
 
 		[Bindable]
+
 		/**
 		 * copyOfTrackingList is the arraycollection used as list in the trackingview<br>
 		 * trackingList is the list that will be maintained, copy is simply set equal to trackinglist, but when doing lots of changes
@@ -165,6 +173,7 @@ package model
 		 * any item in the _trackingList must be of a class extended from TrackingViewElement
 		 */
 		public function get trackingList():ArrayCollection
+
 		{
 			return _trackingList;
 		}
@@ -172,7 +181,9 @@ package model
 		/**
 		 * @private
 		 */
+
 		public function set trackingList(value:ArrayCollection):void
+
 		{
 			_trackingList = value;
 			//create the sort for the _trackingList and the meals
@@ -195,11 +206,13 @@ package model
 		 * any item in the _trackingList must be of a class extended from TrackingViewElement
 		 */
 		public function get copyOfTrackingList():ArrayCollection
+
 		{
 			return _copyOfTrackingList;
 		}
 
 		public function set copyOfTrackingList(value:ArrayCollection):void
+
 		{
 			_copyOfTrackingList = value;
 		}
@@ -238,6 +251,7 @@ package model
 		/**
 		 * offset to be used top and bottom of a label itemrenderer, to make sure the text is in the middle
 		public static function get offSetSoThatTextIsInTheMiddle():Number
+
 		{
 			if (_offSetSoThatTextIsInTheMiddle == 0)
 				_offSetSoThatTextIsInTheMiddle = (StyleableTextFieldCalculatedHeight - StyleableTextFieldPreferredHeight)/2;
@@ -335,8 +349,11 @@ package model
 		 * initialized to -1 which means invalid value, it's the database initialization that will set it to a valid value
 		 */
 		public function get selectedMeal():int
+
 		{
+
 			return _selectedMeal;
+
 		}
 
 		/**
@@ -347,7 +364,9 @@ package model
 		 * When selectedMeal is changed, then also tarckingEventToShow gets the new value
 		 */
 		public function set selectedMeal(value:int):void
+
 		{
+
 			if (_selectedMeal == -1) {
 				_selectedMeal = value;
 				this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_INITIALIZED));
@@ -582,20 +601,27 @@ package model
 		}
 
 		[Bindable]
+
 		/**
 		 * list of meals, initialized by database initiation<br>
 		 * to be used when selecting a meal in addfooditemview.
 		 */
 		public function get meals():ArrayCollection
+
 		{
+
 			return _meals;
+
 		}
 
 		/**
 		 * @private
 		 */
+
 		private function set meals(value:ArrayCollection):void
+
 		{
+
 			_meals = value;
 			//create the sort for the _trackingList and the meals
 			_meals.sort = dataSort;
@@ -614,6 +640,7 @@ package model
 		 * the oldest dayline in the tracking list represented as Number, this is the UTC time  in ms, since 1970...
 		 */
 		public function get oldestDayLineStoredInTrackingList():Number
+
 		{
 			return _oldestDayLineStoredInTrackingList;
 		}
@@ -621,7 +648,9 @@ package model
 		/**
 		 * @private
 		 */
+
 		public function set oldestDayLineStoredInTrackingList(value:Number):void
+
 		{
 			_oldestDayLineStoredInTrackingList = value;
 		}
@@ -630,6 +659,7 @@ package model
 		 * the youngest dayline in the tracking list represented as Number, this is the UTC time  in ms, since 1970...
 		 */
 		public function get youngestDayLineStoredInTrackingList():Number
+
 		{
 			return _youngestDayLineStoredInTrackingList;
 		}
@@ -637,7 +667,9 @@ package model
 		/**
 		 * @private
 		 */
+
 		public function set youngestDayLineStoredInTrackingList(value:Number):void
+
 		{
 			_youngestDayLineStoredInTrackingList = value;
 		}

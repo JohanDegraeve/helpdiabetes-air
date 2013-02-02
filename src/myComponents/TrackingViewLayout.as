@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2011  hippoandfriends
+ Copyright (C) 2013  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ package myComponents
 		 * indexToY returns the y coordinate of object with specified index
 		 */
 		public static function getIndexToY(index:int):int
+
 		{
 			if (_indexToY == null)
 				return 0;
@@ -54,6 +55,7 @@ package myComponents
 		private var _currentFirstIndexInView:int;
 
 		public function get currentFirstIndexInView():int
+
 		{
 			return _currentFirstIndexInView;
 		}
@@ -61,6 +63,7 @@ package myComponents
 		private var _currentLastIndexInView:int;
 
 		public function get currentLastIndexInView():int
+
 		{
 			return _currentLastIndexInView;
 		}

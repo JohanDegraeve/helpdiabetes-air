@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2011  hippoandfriends
+ Copyright (C) 2013  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ package databaseclasses
 		private var _medicinName:String;
 		
 		public function get medicinName():String
+
 		{
 			return _medicinName;
 		}
@@ -37,6 +38,7 @@ package databaseclasses
 		private var _amount:Number;
 		
 		public function get amount():Number
+
 		{
 			return _amount;
 		}
@@ -44,11 +46,13 @@ package databaseclasses
 		private var _lastModifiedTimestamp:Number;
 		
 		public function get lastModifiedTimestamp():Number
+
 		{
 			return _lastModifiedTimestamp;
 		}
 		
 		internal function set lastModifiedTimestamp(value:Number):void
+
 		{
 			_lastModifiedTimestamp = value;
 		}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2011  hippoandfriends
+Copyright (C) 2013  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -78,6 +78,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * It is necessary that the views that can be pushed by trackingview, call this method each time they are initialized and if pushed by trackingview, or reactivated ?
 			 */
 			public static function popToFirstViewNecessary():Boolean
+
 			{
 				if (isNaN(lastClickOnTrackingView)) {
 					lastClickOnTrackingView = (new Date()).valueOf();
