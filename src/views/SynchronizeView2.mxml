@@ -53,6 +53,11 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			]);	
 
 			private function onInitialize():void {
+				if (Settings.getInstance().getSetting(Settings.SettingsRefreshToken) == "") {
+					if (navigator)
+						navigator.popToFirstView();
+					return;
+				}
 				back_label = resourceManager.getString('general','back');
 				title = resourceManager.getString('synchronizeview','titlesettingssync');
 				menulist.addEventListener(Event.CHANGE,selectedElementChanged);

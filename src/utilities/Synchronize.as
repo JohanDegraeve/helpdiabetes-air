@@ -3103,7 +3103,7 @@ package utilities
 						
 					}
 					if (entryXMLList[listCounter]..xmlns::title == "Sheet 1") {
-						if (entryXMLList.length() > 1)  {
+						if (entryXMLList.length() > 1) {
 							var linkListForThisentryXMLList:XMLList = new XMLList(entryXMLList[listCounter]..xmlns::link);
 							for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
 								if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
