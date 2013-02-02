@@ -76,36 +76,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			protected function type1_changeHandler(event:TextOperationEvent):void
-
 			{
-
-				Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
-				Synchronize.getInstance().startSynchronize(tracker,true);
+				if (medicinText1 != Settings.getInstance().getSetting(Settings.SettingsInsulinType1)) {
+					Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
+					Synchronize.getInstance().startSynchronize(tracker,true);
+				}
 			}
 			
 			protected function type2_changeHandler(event:TextOperationEvent):void
 
 			{
-				Settings.getInstance().setSetting(Settings.SettingsInsulinType2,medicinText2);
-				Synchronize.getInstance().startSynchronize(tracker,true);
+				if (medicinText2 != Settings.getInstance().getSetting(Settings.SettingsInsulinType2)) {
+					Settings.getInstance().setSetting(Settings.SettingsInsulinType2,medicinText2);
+					Synchronize.getInstance().startSynchronize(tracker,true);
+				}
 			}
 			
 			protected function type3_changeHandler(event:TextOperationEvent):void
 			{
-				Settings.getInstance().setSetting(Settings.SettingsInsulinType3,medicinText3);
-				Synchronize.getInstance().startSynchronize(tracker,true);
+				if (medicinText3 != Settings.getInstance().getSetting(Settings.SettingsInsulinType3)) {
+					Settings.getInstance().setSetting(Settings.SettingsInsulinType3,medicinText3);
+					Synchronize.getInstance().startSynchronize(tracker,true);
+				}
 			}
 			
 			protected function type4_changeHandler(event:TextOperationEvent):void
 			{
-				Settings.getInstance().setSetting(Settings.SettingsInsulinType4,medicinText4);
-				Synchronize.getInstance().startSynchronize(tracker,true);
+				if (medicinText4 != Settings.getInstance().getSetting(Settings.SettingsInsulinType4)) {
+					Settings.getInstance().setSetting(Settings.SettingsInsulinType4,medicinText4);
+					Synchronize.getInstance().startSynchronize(tracker,true);
+				}
 			}
 			
 			protected function type5_changeHandler(event:TextOperationEvent):void
 			{
-				Settings.getInstance().setSetting(Settings.SettingsInsulinType5,medicinText5);
-				Synchronize.getInstance().startSynchronize(tracker,true);
+				if (medicinText5 != Settings.getInstance().getSetting(Settings.SettingsInsulinType5)) {
+					Settings.getInstance().setSetting(Settings.SettingsInsulinType5,medicinText5);
+					Synchronize.getInstance().startSynchronize(tracker,true);
+				}
 			}
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void

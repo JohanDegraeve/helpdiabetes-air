@@ -478,8 +478,6 @@ package databaseclasses
 			function settingInsertionSuccess(se:Event):void {
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailure);
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInsertionSuccess);
-				if (settingId == SettingsMAXTRACKINGSIZE)
-					setSetting(SettingsLastSyncTimeStamp,((new Date()).valueOf() - SettingsMAXTRACKINGSIZE * 24 * 3600 * 1000).toString());
 			}
 		}
 		

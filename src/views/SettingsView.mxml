@@ -46,6 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.events.PopUpEvent;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			private var elementPicker:elementFromListPicker;
 			private var alertPopUp:AlertPopUp;
@@ -118,6 +119,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					else if (event.index == 1)
 						Settings.getInstance().setSetting(Settings.SettingsBLOODGLUCOSE_UNIT,"mmoll");
 					settingsList.selectedIndex = -1;
+					Synchronize.getInstance().startSynchronize(tracker,true);
 				}
 			}
 			

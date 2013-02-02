@@ -3327,7 +3327,6 @@ package utilities
 				
 				ModelLocator.getInstance().refreshMeals();
 				ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
-				// now populate ModelLocator.getInstance().meals
 			}
 		}
 		
