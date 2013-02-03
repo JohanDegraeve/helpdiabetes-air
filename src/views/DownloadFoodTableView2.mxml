@@ -76,7 +76,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					", " +
 					resourceManager.getString('downloadfoodtableview','worksheet') +
 					" " +
-					displaySpreadSheetTittle(Synchronize.getInstance().workSheetList.getItemAt(_selectedWorkSheetIndex));
+					displaySpreadSheetTittle(Synchronize.getInstance().workSheetList.getItemAt(_selectedWorkSheetIndex)) +
+					"\n\n" +
+					resourceManager.getString('downloadfoodtableview','donotchangetab');
 				
 				Synchronize.getInstance().addEventListener(Synchronize.FOODTABLE_DOWNLOADED,onFoodTableDownloaded);
 				Synchronize.getInstance().googleExcelDownloadFoodTableSpreadSheet(null,_selectedSpreadSheetIndex,_selectedWorkSheetIndex);
@@ -99,7 +101,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function onFoodTableDownloaded(event:Event):void {
 				Synchronize.getInstance().removeEventListener(Synchronize.FOODTABLE_DOWNLOADED,onFoodTableDownloaded);	
 				
-				topText.text = resourceManager.getString('downloadfoodtableview','storingnewfoodtable');
+				topText.text = resourceManager.getString('downloadfoodtableview','storingnewfoodtable') +
+				"\n\n" +
+				resourceManager.getString('downloadfoodtableview','donotchangetab');
 				
 				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,onFoodTableStoredInDatabase);
 				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_FAILED,onFoodTableStoredInDatabase);
@@ -114,7 +118,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					Database.getInstance().
 					newFoodDatabaseStatus.
 					replace("{outof}",resourceManager.getString('downloadfoodtableview','outof')).
-					replace("{elementsloaded}",resourceManager.getString('downloadfoodtableview','elementsloaded'));					                          				
+					replace("{elementsloaded}",resourceManager.getString('downloadfoodtableview','elementsloaded')) +
+					"\n\n" +
+					resourceManager.getString('downloadfoodtableview','donotchangetab');
+;					                          				
 			}
 			
 			private function onFoodTableStoredInDatabase(event:Event):void {
