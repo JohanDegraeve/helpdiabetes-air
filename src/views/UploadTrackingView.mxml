@@ -55,8 +55,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				Synchronize.getInstance().addEventListener(Synchronize.EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS,onEvent);
 				Synchronize.getInstance().addEventListener(Synchronize.WAITING_FOR_SYNC_TO_FINISH,onEvent);
 				Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onEvent);
-				topLabelText2 = resourceManager.getString('uploadtrackingview','firstsyncingthesettings');
-				Synchronize.getInstance().startSynchronize(null,true,true);
+				topLabelText2 = resourceManager.getString('uploadtrackingview','firstsyncall');
+				Synchronize.getInstance().startSynchronize(null,true,false);
 			}
 			
 			private function onEvent(event:Event):void {
