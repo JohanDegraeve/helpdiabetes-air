@@ -2211,7 +2211,7 @@ package databaseclasses
 		 * new medicin event will be added to the database<br>
 		 * here the medicineventid will get the value of current date and time as Number 
 		 */
-		internal function createNewMedicinEvent(amount:int,medicin:String, timeStamp:Number,newLastModifiedTimeStamp:Number,medicineventid:Number,dispatcher:EventDispatcher = null):void {
+		internal function createNewMedicinEvent(amount:Number,medicin:String, timeStamp:Number,newLastModifiedTimeStamp:Number,medicineventid:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
