@@ -60,7 +60,7 @@ package utilities
 	import spark.collections.SortField;
 	import spark.components.Application;
 	import spark.formatters.DateTimeFormatter;
-		
+	
 	/**
 	 * class with function to synchronize with google docs, and to export tracking history 
 	 *
@@ -448,6 +448,9 @@ package utilities
 		
 		private var foodItemIdBeingTreated:int;
 		
+		private static var callingDispatcher:EventDispatcher;
+
+		
 		/**
 		 * used for event dispatching, when sync finished, no matter if it was successful or not
 		 */
@@ -508,7 +511,7 @@ package utilities
 		 * foodtable downloaded, if null then download failed
 		 */
 		public function get foodtable():XML
-
+			
 		{
 			return _foodtable;
 		}
@@ -519,7 +522,7 @@ package utilities
 		 * list of worksheets in selected spreadsheetlist
 		 */
 		public function get workSheetList():ArrayList
-
+			
 		{
 			return _workSheetList;
 		}
@@ -530,7 +533,7 @@ package utilities
 		 * list of spreadsheets retrieved from google docs. objects will be so called items (see google docs documentation or check the code)
 		 */
 		public function get spreadSheetList():ArrayList
-
+			
 		{
 			return _spreadSheetList;
 		}
@@ -540,7 +543,7 @@ package utilities
 		private static var _namespace_default:Namespace;
 		
 		public function get namespace_default():Namespace
-
+			
 		{
 			return _namespace_default;
 		}
@@ -548,7 +551,7 @@ package utilities
 		private static var _namespace_gs:Namespace;
 		
 		public function get namespace_gs():Namespace
-
+			
 		{
 			return _namespace_gs;
 		}
@@ -638,14 +641,14 @@ package utilities
 				findAllSpreadSheetsWaiting = false;
 				downloadFoodTableSpreadSheetWaiting = false;
 				findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
-
+				
 				createlogbookheaderWaiting = false;
 				createlogbookWaiting = false;
 				createlogbookworksheetWaiting = false;
 				findlogbookspreadsheetWaiting = false;
 				findlogbookworksheetWaiting = false;
 				insertlogbookeventsWaiting = false;
-
+				
 				if (onlySyncTheSettings)
 					getTheSettings();
 				else
@@ -1373,7 +1376,7 @@ package utilities
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 									if (traceNeeded)
-									(trackingList.getItemAt(l) as MealEvent).deleteEvent();
+										(trackingList.getItemAt(l) as MealEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as MealEvent).updateMealEvent(
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_mealname)],
@@ -2127,7 +2130,7 @@ package utilities
 				return;
 			}
 		}
-				
+		
 		private function getSettingRowIds(event:Event = null):void  {
 			if (traceNeeded)
 				trace ("in method getSettingRowIds");
@@ -2545,7 +2548,7 @@ package utilities
 				insertlogbookeventsWaiting=true;
 				return;
 			}
-
+			
 			if (event != null) {
 				removeEventListeners();
 			} else  {
@@ -2702,7 +2705,7 @@ package utilities
 				createlogbookheaderWaiting=true;
 				return;
 			}
-
+			
 			if (event != null)  {
 				removeEventListeners();
 				if ((event.target.data as String).search("updated") != -1) {
@@ -2782,7 +2785,7 @@ package utilities
 				createlogbookWaiting=true;
 				return;
 			}
-
+			
 			if (event != null)  {
 				//SHOULD BE CHECKING HERE WHAT CAN GO WRONG - BECAUSE I SEEM TO ASSUME HERE THAT THE LOGBOOK CREATION WILL ALWAYS BE SUCCESSFUL
 				removeEventListeners();
@@ -2872,7 +2875,7 @@ package utilities
 				createlogbookworksheetWaiting=true;
 				return;
 			}
-
+			
 			
 			if (event != null)  {
 				//ASSUMING HERE THAT EVERHTHING WORKS FINE, BUT THINGS COULD BE GOING WRONG
@@ -3016,7 +3019,7 @@ package utilities
 				findlogbookworksheetWaiting=true;
 				return;
 			}
-
+			
 			if (event != null)  {
 				removeEventListeners();
 				var workSheetListAsXML:XML = new XML(event.target.data as String);
@@ -3558,7 +3561,11 @@ package utilities
 			
 		}
 		
-		public function googleExcelDownloadFoodTableSpreadSheet(event:Event = null,spreadSheetIndex:Number = -1,workSheetIndex:Number = -1):void  {
+		/**
+		 * initiatiates foodtable spreadsheet download from googleaccounts<br>
+		 *  dispatcher is used for dispatching failure notifications, it will dispatch DatabaseEvent, not logic because the errors will have nothing to do with database or database.as, but who cares .. 
+		 */
+		public function googleExcelDownloadFoodTableSpreadSheet(event:Event = null,spreadSheetIndex:Number = -1,workSheetIndex:Number = -1,dispatcher:EventDispatcher = null):void  {
 			_foodtable = null;
 			if (syncRunning) {
 				downloadFoodTableSpreadSheetWaiting = true;
@@ -3579,6 +3586,7 @@ package utilities
 					return;
 				}
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				if (eventAsJSONObject.feed.entry.length == 0) {dispatchFunction("The foodtable is empty.");return;}
 				
 				var entryCtr:int = 0;
 				while (entryCtr < eventAsJSONObject.feed.entry.length && eventAsJSONObject.feed.entry[entryCtr].gs$cell.row == 1) 
@@ -3600,6 +3608,7 @@ package utilities
 							unit.description = eventAsJSONObject.feed.entry[entryCtr].gs$cell.$t;
 							entryCtr++;
 						} else  {
+							if (unit ==  null) {dispatchFunction("A unit must have a name",row,unitlist.length + 1);return;}
 							unit.appendChild(
 								(new XML("<"+foodValueNames[(eventAsJSONObject.feed.entry[entryCtr].gs$cell.col - 2 ) % 6 - 1]+"/>"))
 								.appendChild(eventAsJSONObject.feed.entry[entryCtr].gs$cell.$t)
@@ -3607,9 +3616,39 @@ package utilities
 							entryCtr++;
 						}
 					}
+					
 					unitlist.appendChild(unit);
 					fooditem.appendChild(unitlist);
-					
+
+					//////verify unit contents
+					//check if mandatory fields exist
+					//unit description is already checked in synchronize.as
+					for (var unitListCounter:int = 0;unitListCounter < unitlist.unit.length();unitListCounter++) {
+						unit = unitlist.unit[unitListCounter];
+						
+						if (unit.carbs ==  undefined)  {dispatchFunction("Unit must have a carb value",row,unitListCounter + 1);return;}
+						if (unit.standardamount ==  undefined)  {dispatchFunction("Unit must have a standardamount",row,unitListCounter + 1);return;}
+						//replace , by . and check if parseable to number
+						
+						var standardamount:Number;
+						var carb:Number;
+						var kcal:Number = -1;
+						var protein:Number = -1;
+						var fat:Number = -1;
+						
+						if (isNaN(carb = new Number((unit.carbs).toString().replace(",",".")))) {dispatchFunction("Carb value must  be numeric",row,unitListCounter + 1,unit.carbs.toString());return;}
+						if (isNaN(standardamount = new Number((unit.standardamount).toString().replace(",",".")))) {dispatchFunction("standardamount value must be integer",row,unitListCounter + 1,unit.standardamount.toString());return;}
+						if (unit.kcal != undefined) if (isNaN(kcal = new Number((unit.kcal).toString().replace(",",".")))) {dispatchFunction("kcal value must  be integer",row,unitListCounter + 1,unit.kcal.toString());return;}
+						if (unit.protein != undefined) if (isNaN(protein = new Number((unit.protein).toString().replace(",",".")))) {dispatchFunction("protein value must  be numeric",row,unitListCounter + 1,unit.protein.toString());return;}
+						if (unit.fat != undefined) if (isNaN(fat = new Number((unit.fat).toString().replace(",",".")))) {dispatchFunction("fat value must  be numeric",row,unitListCounter + 1,unit.fat.toString());return;}
+						
+						//check integers if necessary
+						if (standardamount % 1 != 0)  {dispatchFunction("standardamount must be an integer number",row,unitListCounter + 1);return}
+						if (kcal != -1) if (kcal % 1 != 0)  {dispatchFunction("kcal must be an integer number",row,unitListCounter + 1);return}
+						
+					}
+					//////////
+										
 					foodItemListArray.addItem(fooditem);
 				}
 				
@@ -3641,6 +3680,8 @@ package utilities
 				if (traceNeeded)
 					trace("start method googleExcelDownloadFoodTableSpreadSheet");
 				
+				callingDispatcher =  dispatcher;
+				
 				if (spreadSheetIndex != -1)
 					indexOfSpreadSheetToFind = spreadSheetIndex;
 				if (workSheetIndex != -1)
@@ -3658,6 +3699,18 @@ package utilities
 					false,
 					null);
 			}
+			
+			function dispatchFunction(message:String, fooditemctr:int,unitcntr:int = 0,found:String=null):void  {
+				if (callingDispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					event.data = message + ", check the foodtable, row " + fooditemctr ;
+					if (unitcntr != 0) event.data += ", unit " + unitcntr + ".";
+					if (found != null) event.data += " Found \"" + found + "\"";
+					callingDispatcher.dispatchEvent(event);
+				}
+			}
+
+			
 		}
 		
 		private function copyTrackingListIfNotDoneYet():void {

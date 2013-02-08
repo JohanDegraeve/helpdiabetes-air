@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Script>
 		<![CDATA[
 			import databaseclasses.Database;
+			import databaseclasses.DatabaseEvent;
 			
 			import mx.collections.ArrayList;
 			import mx.events.FlexEvent;
@@ -55,7 +56,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var overWriteDatabase:Boolean;
 			
 			private static var popToFirstViewNecessary:Boolean = false;
-			
+			private var dispatcher:EventDispatcher;
+
 			private var _selectedWorkSheetIndex:int;
 						
 			private function onInitialize():void {
@@ -81,7 +83,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					resourceManager.getString('downloadfoodtableview','donotchangetab');
 				
 				Synchronize.getInstance().addEventListener(Synchronize.FOODTABLE_DOWNLOADED,onFoodTableDownloaded);
-				Synchronize.getInstance().googleExcelDownloadFoodTableSpreadSheet(null,_selectedSpreadSheetIndex,_selectedWorkSheetIndex);
+				dispatcher = new EventDispatcher();
+				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onLoadFoodTableError);
+				Synchronize.getInstance().googleExcelDownloadFoodTableSpreadSheet(null,_selectedSpreadSheetIndex,_selectedWorkSheetIndex,dispatcher);
 			}
 			
 			private function displaySpreadSheetTittle(item:Object):String {
@@ -109,7 +113,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_FAILED,onFoodTableStoredInDatabase);
 				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STATUS_UPDATE,onFoodTableStatusUpdate);
 				
-				Database.getInstance().loadFoodTable(overWriteDatabase,Synchronize.getInstance().foodtable);
+				dispatcher = new EventDispatcher();
+				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onLoadFoodTableError);
+
+				Database.getInstance().loadFoodTable(overWriteDatabase,Synchronize.getInstance().foodtable,dispatcher);
+			}
+			
+			private function onLoadFoodTableError(de:DatabaseEvent):void {
+				var errorMessage:String = resourceManager.getString('downloadfoodtableview','errorinfoodtable') +
+					"\n\n";
+				if (de.data) {
+					if (de.data is String) {
+						errorMessage += de.data as String;
+					}
+				}
+				
+				Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,onFoodTableStoredInDatabase);
+				Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STORED_FAILED,onFoodTableStoredInDatabase);
+				Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STATUS_UPDATE,onFoodTableStoredInDatabase);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onLoadFoodTableError);
+				
+				alertPopUp = new AlertPopUp();
+				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+				alertPopUp.show(this,errorMessage);
+				
+				function okClicked(event: PopUpEvent):void {
+					if (alertPopUp != null) {
+						PopUpManager.removePopUp(alertPopUp);
+						if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+							alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+						}
+						if (navigator)
+							navigator.popToFirstView();
+						else
+							popToFirstViewNecessary = true;
+					}
+				}
+
 			}
 			
 			private function onFoodTableStatusUpdate(event:Event):void {
@@ -121,12 +161,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					replace("{elementsloaded}",resourceManager.getString('downloadfoodtableview','elementsloaded')) +
 					"\n\n" +
 					resourceManager.getString('downloadfoodtableview','donotchangetab');
-;					                          				
 			}
 			
 			private function onFoodTableStoredInDatabase(event:Event):void {
 				Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,onFoodTableStoredInDatabase);
 				Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STORED_FAILED,onFoodTableStoredInDatabase);
+				Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STATUS_UPDATE,onFoodTableStoredInDatabase);
+				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,onLoadFoodTableError);
+				
 				alertPopUp = new AlertPopUp();
 				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 				if (event.type == Database.NEW_FOOD_DATABASE_STORED_SUCCESS) 

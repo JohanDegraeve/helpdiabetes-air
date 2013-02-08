@@ -995,11 +995,11 @@ package databaseclasses
 		 * deletes fooddatabase<br>
 		 * stores data in xml into database<br>
 		 * if overWriteDatabase then existing database will first be deleted<br>
-		 * dispatches event when finished 
+		 * lots of dispatching, better look in the code 
 		 */
-		public function loadFoodTable(overWriteDatabase:Boolean,foodtable:XML = null):void {
+		public function loadFoodTable(overWriteDatabase:Boolean,foodtable:XML = null,dispatcher:EventDispatcher = null):void {
 			var localDispatcher:EventDispatcher = new EventDispatcher();
-
+			
 			if (overWriteDatabase) {
 				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
 				localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
@@ -1011,13 +1011,15 @@ package databaseclasses
 			function fooddatabaseDeleted(se:DatabaseEvent = null):void {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
-				loadFoodTableInternal(externalXMLLoaded,foodtable);
+				loadFoodTableInternal(externalXMLLoaded,foodtable,dispatcher);
 			}
 			
 			function foodDatabaseDeletionFailed(see:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
 				trace("Failed to delete the fooddatabase");
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 				externalXMLLoaded(false);
 			}
 		}
@@ -1039,7 +1041,7 @@ package databaseclasses
 		 * if foodtable == null then foodtable from xml file stored in application is used<br>
 		 * functionToCallWhenFinished is obviously function to call when finished
 		 */
-		private function loadFoodTableInternal(functionToCallWhenFinished:Function,foodtable:XML = null):void {
+		private function loadFoodTableInternal(functionToCallWhenFinished:Function,foodtable:XML = null,dispatcher:EventDispatcher  = null):void {
 			
 			var foodtableXML:XML;
 
@@ -1052,7 +1054,7 @@ package databaseclasses
 				foodtableXML = new XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
 			}
 			
-			var dispatcher:EventDispatcher = new EventDispatcher();
+			var localDispatcher:EventDispatcher = new EventDispatcher();
 			var unitListXMLList:XMLList;
 			var foodItemDescriptionsXMLList:XMLList;
 			var foodItemListCounter:int;
@@ -1066,18 +1068,18 @@ package databaseclasses
 			
 			foodItemDescriptionsXMLList = foodtableXML.fooditemlist.fooditem.description;
 			
-			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, sourceInserted);
-			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, sourceInsertionError);
-			insertSource(foodtableXML.source == null ? "" : foodtableXML.source,dispatcher);
+			localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, sourceInserted);
+			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, sourceInsertionError);
+			insertSource(foodtableXML.source == null ? "" : foodtableXML.source,localDispatcher);
 			
 			function sourceInserted(se:DatabaseEvent):void {
-				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,sourceInserted);
-				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,sourceInsertionError);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,sourceInserted);
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,sourceInsertionError);
 				goOnWithFoodItems();
 			}
 			function sourceInsertionError(see:DatabaseEvent):void {
-				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,sourceInserted);
-				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,sourceInsertionError);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,sourceInserted);
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,sourceInsertionError);
 				trace("Failed to insert the source. Database0024");
 				if (globalDispatcher != null) {
 					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1085,6 +1087,8 @@ package databaseclasses
 					globalDispatcher.dispatchEvent(errorEvent);
 					globalDispatcher = null;
 				}
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 			}
 			
 			function goOnWithFoodItems():void {
@@ -1097,16 +1101,16 @@ package databaseclasses
 						(instance as EventDispatcher).dispatchEvent(new Event(NEW_FOOD_DATABASE_STATUS_UPDATE));
 					}
 						
-					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, foodItemInserted);
-					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, foodItemInsertionError);
+					localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, foodItemInserted);
+					localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, foodItemInsertionError);
 					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
-					insertFoodItem(foodItemDescriptionsXMLList[foodItemListCounter],dispatcher);
+					insertFoodItem(foodItemDescriptionsXMLList[foodItemListCounter],localDispatcher);
 				}
 			}
 			
 			function foodItemInserted(se:DatabaseEvent):void {
-				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemInserted);
-				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemInsertionError);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemInserted);
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemInsertionError);
 				unitListCounter = 0;
 				unitListXMLList = foodtableXML.fooditemlist.fooditem[foodItemListCounter].unitlist.unit;
 				unitListSize = unitListXMLList.length();
@@ -1116,8 +1120,8 @@ package databaseclasses
 			}
 			
 			function foodItemInsertionError(see:DatabaseEvent):void {
-				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemInserted);
-				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemInsertionError);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,foodItemInserted);
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodItemInsertionError);
 				trace("Failed to insert a fooditem. Database0025");
 				if (globalDispatcher != null) {
 					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1125,38 +1129,66 @@ package databaseclasses
 					globalDispatcher.dispatchEvent(errorEvent);
 					globalDispatcher = null;
 				}
+				if (dispatcher != null)
+					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 			}
 			
 			function goOnWithUnits():void {
 				if (unitListCounter == unitListSize) {
 					goOnWithFoodItems();					
 				} else {
-					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
-					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
-					var temp:Object = unitListXMLList[unitListCounter ];
+					localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
+					localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
+					var unit:XML = unitListXMLList[unitListCounter];
+					
+					//the following piece of code is the same functionality as in synchronize.as
+					//probably this here will never be used, it would only be the case if the tests in synchronize.as haven't been executed yet
+					//which is only the case for the xml file which is built into the app, which should never contain errors.
+					
+					//check if mandatory fields exist
+					//unit description is already checked in synchronize.as
+					if (unit.carbs ==  undefined)  {dispatchFunction("Unit must have a carb value",foodItemListCounter,unitListCounter + 1);return;}
+					if (unit.standardamount ==  undefined)  {dispatchFunction("Unit must have a standardamount",foodItemListCounter,unitListCounter + 1);return;}
+					//replace , by . and check if parseable to number
+					
+					var standardamount:Number;
+					var carb:Number;
+					var kcal:Number = -1;
+					var protein:Number = -1;
+					var fat:Number = -1;
+					
+					if (isNaN(carb = new Number((unit.carbs).toString().replace(",",".")))) {dispatchFunction("Carb value must  be numeric",foodItemListCounter,unitListCounter + 1,unit.carbs.toString());return;}
+					if (isNaN(standardamount = new Number((unit.standardamount).toString().replace(",",".")))) {dispatchFunction("standardamount value must be integer",foodItemListCounter,unitListCounter + 1,unit.standardamount.toString());return;}
+					if (unit.kcal != undefined) if (isNaN(kcal = new Number((unit.kcal).toString().replace(",",".")))) {dispatchFunction("kcal value must  be integer",foodItemListCounter,unitListCounter + 1,unit.kcal.toString());return;}
+					if (unit.protein != undefined) if (isNaN(protein = new Number((unit.protein).toString().replace(",",".")))) {dispatchFunction("protein value must  be numeric",foodItemListCounter,unitListCounter + 1,unit.protein.toString());return;}
+					if (unit.fat != undefined) if (isNaN(fat = new Number((unit.fat).toString().replace(",",".")))) {dispatchFunction("fat value must  be numeric",foodItemListCounter,unitListCounter + 1,unit.fat.toString());return;}
+					
+					//check integers if necessary
+					if (standardamount % 1 != 0)  {dispatchFunction("standardamount must be an integer number",foodItemListCounter,unitListCounter + 1);return}
+					if (kcal != -1) if (kcal % 1 != 0)  {dispatchFunction("kcal must be an integer number",foodItemListCounter,unitListCounter + 1);return}
+					
 					
 					insertUnit(unitListXMLList[unitListCounter ].description,
-						unitListXMLList[unitListCounter ].standardamount,
-						unitListXMLList[unitListCounter ].kcal != undefined ? unitListXMLList[unitListCounter ].kcal : - 1,
-						unitListXMLList[unitListCounter ].protein != undefined ? unitListXMLList[unitListCounter ].protein : - 1,
-						unitListXMLList[unitListCounter ].carbs != undefined ? unitListXMLList[unitListCounter ].carbs : - 1,
-						unitListXMLList[unitListCounter ].fat != undefined ? unitListXMLList[unitListCounter ].fat : - 1,
+						standardamount,
+						kcal,
+						protein,
+						carb,
+						fat,
 						actualFoodItemRowId,
-						dispatcher);
+						localDispatcher);
 					unitListCounter++;
-					
 				}
 			}
 			
 			function unitInserted(see:DatabaseEvent):void {
-				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
-				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
 				goOnWithUnits();
 			}
 			
 			function unitInsertionError(se:DatabaseEvent):void {
-				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
-				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
+				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, unitInserted);
+				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, unitInsertionError);
 				trace("Failed to insert a unit. Database0026");
 				if (globalDispatcher != null) {
 					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -1164,6 +1196,17 @@ package databaseclasses
 					globalDispatcher.dispatchEvent(errorEvent);
 					globalDispatcher = null;
 				}
+			}
+			
+			function dispatchFunction(message:String, fooditemctr:int,unitcntr:int = 0,found:String=null):void  {
+				if (dispatcher != null) {
+					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					event.data = message + ", check the foodtable, row " + foodItemListCounter ;
+					if (unitcntr != 0) event.data += ", unit " + (unitListCounter + 1) + ".";
+					if (found != null) event.data += " Found \"" + found + "\"";
+					dispatcher.dispatchEvent(event);
+				}
+				functionToCallWhenFinished();
 			}
 		}
 		
