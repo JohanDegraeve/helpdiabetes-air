@@ -70,7 +70,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					topLabelText2 = resourceManager.getString('uploadtrackingview','creatinglogbookheaders');
 				} else if (event.type == Synchronize.INSERTING_NEW_EVENTS) {
 					topLabelText2 = resourceManager.getString('uploadtrackingview','insertingnewevents');
-					topLabelText2 += " : " + eventCounter++;
+					topLabelText2 += " : " + eventCounter++ + "\n\n" 
+						+ resourceManager.getString('downloadfoodtableview','donotchangetab');
 				} else if (event.type == Synchronize.SEARCHING_LOGBOOK_WORKSHEET) {
 					topLabelText2 = resourceManager.getString('uploadtrackingview','searchinglogbookworksheet');
 				} else if (event.type == Synchronize.EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS) {
