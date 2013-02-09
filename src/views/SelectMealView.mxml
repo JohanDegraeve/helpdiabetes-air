@@ -95,11 +95,10 @@ view to show ModelLocator.getInstance().meals in a list
 					
 					//if it's a future meal without mealevent, we'll ask to user to enter start date and time of the meal
 					var theMeal:Meal = ModelLocator.getInstance().meals.getItemAt(event.newIndex) as Meal;
-					if (theMeal.hasMealEvent() || (theMeal.timeStamp < (new Date()).valueOf())) {
+					if (theMeal.hasMealEvent()) {
 						ModelLocator.getInstance().selectedMeal = event.newIndex;
 						navigator.popView();
 					} else {
-						
 						navigator.pushView(ChangeMealDateAndTimeView,{
 							meal:theMeal
 						},CHANGE_MEAL_DATE_AND_TIME);
