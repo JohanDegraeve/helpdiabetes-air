@@ -50,12 +50,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var elementPicker:elementFromListPicker;
 			private var alertPopUp:AlertPopUp;
-
+			
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
 			private var textToShow:String ;
 			private var debugging:Boolean = false;
-
+			
 			[ResourceBundle("settingsview")]
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
@@ -66,9 +66,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ResourceManager.getInstance().getString("settingsview","exercise"),
 				ResourceManager.getInstance().getString("settingsview","database"),
 				ResourceManager.getInstance().getString("settingsview","language"),
-				ResourceManager.getInstance().getString("settingsview","infoabout"),
+				ResourceManager.getInstance().getString("settingsview","resethelptext"),
 				ResourceManager.getInstance().getString("settingsview","googlesync"),
-				ResourceManager.getInstance().getString("settingsview","resethelptext")
+				ResourceManager.getInstance().getString("settingsview","infoabout")
 			]);	
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -83,7 +83,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function init():void {
 				trackerId = resourceManager.getString('analytics','trackeraccount');
-
+				
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
 				title =  ResourceManager.getInstance().getString("settingsview","titlesettings");
@@ -111,7 +111,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						tracker = new MyGATracker( elementPicker, trackerId, "AS3", false );
 					}
 					tracker.trackPageview( "SetingsView-bloodglucoseUnitChanged" );
-
+					
 					elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
 					PopUpManager.removePopUp(elementPicker);
 					if (event.index == 0)
@@ -162,14 +162,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						if (tracker == null) {
 							tracker = new MyGATracker( this, trackerId, "AS3", false );
 						}
-						tracker.trackPageview( "SetingsView-infoAndHelpShown" );
-
+						tracker.trackPageview( "SetingsView-resetHelpText" );
+						for (var i:int = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;i <= Settings.SettingsHelpText100;i++) {
+							Settings.getInstance().setSetting(i,"true");
+						}
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						textToShow = 
-							resourceManager.getString('settingsview','version') + 
-							resourceManager.getString('settingsview','copyright') +
-							resourceManager.getString('settingsview','infoabouttext');
+						resourceManager.getString('settingsview','resethelptextdone') ;
 						alertPopUp.show(this,textToShow);
 						break;
 					case 8:
@@ -186,24 +186,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						if (tracker == null) {
 							tracker = new MyGATracker( this, trackerId, "AS3", false );
 						}
-						tracker.trackPageview( "SetingsView-resetHelpText" );
-						for (var i:int = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;i <= Settings.SettingsHelpText100;i++) {
-							Settings.getInstance().setSetting(i,"true");
-						}
+						tracker.trackPageview( "SetingsView-infoAndHelpShown" );
+						
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						textToShow = 
-						resourceManager.getString('settingsview','resethelptextdone') ;
-						
+						resourceManager.getString('settingsview','version') + 
+						resourceManager.getString('settingsview','copyright') +
+						resourceManager.getString('settingsview','infoabouttext');
 						alertPopUp.show(this,textToShow);
-						
 						break;
-					/*case 10 :
-						alertPopUp = new AlertPopUp();
-						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-						textToShow = ModelLocator.getInstance().logString;
-						alertPopUp.show(this,textToShow);
-						break;*/						
 				}
 				
 				function okClicked(event: PopUpEvent):void {
@@ -214,7 +206,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 					}
 				}
-
+				
 				
 				function languageSelected(event: Event = null): void
 				{
@@ -222,7 +214,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						tracker = new MyGATracker( elementPicker, trackerId, "AS3", false );
 					}
 					tracker.trackPageview( "SetingsView-languageSelected" );
-
+					
 					if (elementPicker != null) {
 						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
 							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, languageSelected);
