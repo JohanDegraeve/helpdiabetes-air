@@ -2208,21 +2208,28 @@ package utilities
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				var message:String = eventAsJSONObject.error.message as String;
 				if (message == googleError_Invalid_Credentials) {
-					//get a new access_token
-					var request:URLRequest = new URLRequest(googleTokenRefreshUrl);
-					request.contentType = "application/x-www-form-urlencoded";
-					request.data = new URLVariables(
-						"client_id=" + ResourceManager.getInstance().getString('client_secret','client_id') + "&" +
-						"client_secret=" + ResourceManager.getInstance().getString('client_secret','client_secret') + "&" +
-						"refresh_token=" + Settings.getInstance().getSetting(Settings.SettingsRefreshToken) + "&" + 
-						"grant_type=refresh_token");
-					request.method = URLRequestMethod.POST;
-					loader = new URLLoader();
-					loader.addEventListener(Event.COMPLETE,accessTokenRefreshed);
-					loader.addEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
-					loader.load(request);
-					if (traceNeeded)
-						trace("loader : request = " + request.data); 
+					if (!secondAttempt) {
+						secondAttempt = true;
+						//get a new access_token
+						var request:URLRequest = new URLRequest(googleTokenRefreshUrl);
+						request.contentType = "application/x-www-form-urlencoded";
+						request.data = new URLVariables(
+							"client_id=" + ResourceManager.getInstance().getString('client_secret','client_id') + "&" +
+							"client_secret=" + ResourceManager.getInstance().getString('client_secret','client_secret') + "&" +
+							"refresh_token=" + Settings.getInstance().getSetting(Settings.SettingsRefreshToken) + "&" + 
+							"grant_type=refresh_token");
+						request.method = URLRequestMethod.POST;
+						loader = new URLLoader();
+						loader.addEventListener(Event.COMPLETE,accessTokenRefreshed);
+						loader.addEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
+						loader.load(request);
+						if (traceNeeded)
+							trace("loader : request = " + request.data); 
+					} else {
+						Settings.getInstance().setSetting(Settings.SettingsAccessToken,  "");
+						Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
+						syncFinished(false);
+					}
 				} else {
 					syncFinished(false);
 				}
