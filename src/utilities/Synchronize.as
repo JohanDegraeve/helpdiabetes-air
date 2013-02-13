@@ -2226,8 +2226,8 @@ package utilities
 						if (traceNeeded)
 							trace("loader : request = " + request.data); 
 					} else {
-						Settings.getInstance().setSetting(Settings.SettingsAccessToken,  "");
-						Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
+						//Settings.getInstance().setSetting(Settings.SettingsAccessToken,  "");
+						//Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
 						syncFinished(false);
 					}
 				} else {
@@ -2244,6 +2244,7 @@ package utilities
 			loader.removeEventListener(Event.COMPLETE,accessTokenRefreshed);
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
 			
+			secondAttempt = false;
 			var temp:Object = JSON.parse(event.target.data as String);
 			Settings.getInstance().setSetting(Settings.SettingsAccessToken,temp.access_token);
 			
@@ -2264,7 +2265,8 @@ package utilities
 			} catch (e:SyntaxError) {
 				//event.taregt.data is not json
 				if (event.type == "ioError") {
-					//an ioError, forget about it, the show doesn't go on
+					//an ioError, forget about it, the show doesn't go on but we reset secondAttempt
+					secondAttempt = false;
 				}
 			}
 		}
@@ -3369,7 +3371,7 @@ package utilities
 					googleAPICallFailed(event);
 					return true;
 				} else {
-					return true;//some other kind of yet unidentified error 
+					return true;
 				}
 			}
 			else 
