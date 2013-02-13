@@ -30,6 +30,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import air.net.URLMonitor;
+			
 			import databaseclasses.Settings;
 			
 			import mx.collections.ArrayCollection;
@@ -45,9 +47,11 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			[Bindable]
 			private var back_label:String;
 			private var alertPopUp:AlertPopUp;
+			private var monitor:URLMonitor;
 			
 			private static var helpUrl:String = "https://sites.google.com/site/hippoandfriends/synchronisation";
 
+			[Bindable]
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_downloadfoodtable"),
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_exporttracking"),
@@ -61,9 +65,23 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						navigator.popToFirstView();
 					return;
 				}
+								
+				monitor = new URLMonitor(new URLRequest("http://www.google.com"));
+				monitor.addEventListener(StatusEvent.STATUS, statusEventHandler);
+				monitor.start();
+				
 				back_label = resourceManager.getString('general','back');
 				title = resourceManager.getString('synchronizeview','titlesettingssync');
 				menulist.addEventListener(Event.CHANGE,selectedElementChanged);
+			}
+			
+			private function statusEventHandler(event:StatusEvent):void {
+				monitor.removeEventListener(StatusEvent.STATUS, statusEventHandler);
+				if (event.code != "Service.available") {
+					alertPopUp = new AlertPopUp();
+					alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+					alertPopUp.show(this,resourceManager.getString('settingsview','internetnotavailable'));
+				}
 			}
 			
 			private function selectedElementChanged(event:IndexChangeEvent):void {
@@ -85,15 +103,19 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 					case 3:
 						navigateToURL(new URLRequest(helpUrl));
 				}
-				function okClicked(event: PopUpEvent):void {
-					if (alertPopUp != null) {
-						PopUpManager.removePopUp(alertPopUp);
-						if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
-							alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
-						}
+			}
+			
+			private function okClicked(event: PopUpEvent):void {
+				if (alertPopUp != null) {
+					PopUpManager.removePopUp(alertPopUp);
+					if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+						alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
 					}
 				}
+				if (navigator)
+					navigator.popToFirstView();
 			}
+
 			
 		]]>
 	</fx:Script>
