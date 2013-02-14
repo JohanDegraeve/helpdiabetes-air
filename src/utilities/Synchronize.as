@@ -613,7 +613,6 @@ package utilities
 		 */
 		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean,onlySyncTheSettings:Boolean = false):void {
 			tracker = callingTracker;
-			
 			if (
 				(!(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true"))
 				&&
@@ -2200,7 +2199,6 @@ package utilities
 		
 		private function googleAPICallFailed(event:Event):void {
 			removeEventListeners();
-			
 			if (traceNeeded)
 				trace("in googleapicall failed : event.target.data = " + event.target.data as String);
 			//let's first see if the event.target.data has json
@@ -2208,7 +2206,7 @@ package utilities
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				var message:String = eventAsJSONObject.error.message as String;
 				if (message == googleError_Invalid_Credentials) {
-					if (!secondAttempt) {
+					//if (!secondAttempt) {
 						secondAttempt = true;
 						//get a new access_token
 						var request:URLRequest = new URLRequest(googleTokenRefreshUrl);
@@ -2225,11 +2223,11 @@ package utilities
 						loader.load(request);
 						if (traceNeeded)
 							trace("loader : request = " + request.data); 
-					} else {
+					//} else {
 						//Settings.getInstance().setSetting(Settings.SettingsAccessToken,  "");
 						//Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
-						syncFinished(false);
-					}
+						//syncFinished(false);
+					//}
 				} else {
 					syncFinished(false);
 				}
@@ -3363,7 +3361,6 @@ package utilities
 		 */
 		private function eventHasError(event:Event,functionToRecallIfError:Function):Boolean  {
 			var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-			
 			if  (eventAsJSONObject.error) {
 				if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
 					secondAttempt = true;

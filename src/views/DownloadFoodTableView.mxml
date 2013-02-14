@@ -81,8 +81,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function onSpreadSheetListRetrieved(event:Event):void {
 				itemList = Synchronize.getInstance().spreadSheetList;
 				Synchronize.getInstance().removeEventListener(Synchronize.SPREADSHEET_LIST_RETRIEVED,onSpreadSheetListRetrieved);
-				if (itemList.length == 0)
+				
+				if (itemList.length == 0) {
 					topText.text = resourceManager.getString('downloadfoodtableview','nospreadsheetsfound');
+				}
 				else  {
 					topText.text = resourceManager.getString('downloadfoodtableview','selectspreadsheetsfound');
 				}
