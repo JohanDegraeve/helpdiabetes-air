@@ -49,7 +49,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			private var alertPopUp:AlertPopUp;
 			private var monitor:URLMonitor;
 			
-			private static var helpUrl:String = "https://sites.google.com/site/hippoandfriends/synchronisation";
+			public static var helpUrl:String = "https://sites.google.com/site/hippoandfriends/synchronisation";
 
 			[Bindable]
 			private var menuList:ArrayCollection = 	new ArrayCollection([

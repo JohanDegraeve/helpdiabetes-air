@@ -57,10 +57,7 @@ initial setup of sync settings
 			[Bindable]
 			private var authorizationcodeTextAreaVisible:Boolean;
 			[Bindable]
-			private var topLabelText1:String;
-			[Bindable]
-			private var topLabelText2:String;
-			
+			private var topLabelText1:String;			
 			
 			[Bindable]
 			private function get authorizationCode_text():String
@@ -93,19 +90,24 @@ initial setup of sync settings
 				} else {
 					authorizationcodeTextAreaVisible = false;
 					topLabelText1 = resourceManager.getString('synchronizeview','synchronizewithgoogledocs1');
-					topLabelText2 = resourceManager.getString('synchronizeview','synchronizewithgoogledocs2');
 					
 					resourceManager.getString('synchronizeview','synchronisationwillstart');
 					
 					buttonAuthenticateToGoogle.addEventListener(MouseEvent.CLICK,buttonClicked);
+					
+					buttonHelp.addEventListener(MouseEvent.CLICK,helpButtonClicked);
+
 				}
+			}
+			
+			private function helpButtonClicked(event:MouseEvent):void {
+				navigateToURL(new URLRequest(SynchronizeView2.helpUrl));
 			}
 			
 			private function buttonClicked(event:MouseEvent):void {
 				navigateToURL(new URLRequest("https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/fusiontables.readonly https://www.googleapis.com/auth/fusiontables https://spreadsheets.google.com/feeds https://docs.google.com/feeds&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&client_id=" + resourceManager.getString('client_secret','client_id') + "&hl=nl&from_login=1&as=6d24e440f72448b2&pli=1"));
 				authorizationcodeTextAreaVisible = true;
 				topLabelText1 = resourceManager.getString('synchronizeview','copyauthorizationcode');
-				topLabelText2 = "";
 				buttonAuthenticateToGoogle.removeEventListener(MouseEvent.CLICK,buttonClicked);
 			}
 			
@@ -154,7 +156,6 @@ initial setup of sync settings
 				authorizationcodeTextArea.visible = false;
 				topLabelText1 = resourceManager.getString('synchronizeview','alreadyauthorized') + '\n' +
 					resourceManager.getString('synchronizeview','synchronisationwillstart');
-				topLabelText2 = "";
 			}
 			
 			private function onSyncFinishedEvent(event:Event):void {
@@ -177,6 +178,6 @@ initial setup of sync settings
 		<s:Label id="topLabel1" width="100%" text="{topLabelText1}" />
 		<s:TextArea id="authorizationcodeTextArea" width="100%"  height = "{authorizationcodeTextAreaVisible ? 100:0}" text="@{authorizationCode_text}" click="authorizationcodeTextAreaClicked()" visible="{authorizationcodeTextAreaVisible}"/>
 		<s:Button id="buttonAuthenticateToGoogle" width="100%" label="{resourceManager.getString('synchronizeview','buttonauthenticatetogoogletext')}"  visible="{!authorizationcodeTextAreaVisible}"/>
-		<s:Label id="topLabel2" width="100%" top = "5" text="{topLabelText2}" />
+		<s:Button id="buttonHelp" width="100%" label="{resourceManager.getString('synchronizeview','help')}"  visible="{!authorizationcodeTextAreaVisible}"/>
 	</s:Group>
 </s:View>
