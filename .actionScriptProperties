@@ -59,8 +59,8 @@
       </airSettings>
       <actionScriptSettings version="1"/>
     </buildTarget>
-    <buildTarget buildTargetName="com.adobe.flexide.multiplatform.ios.platform" iosSettingsVersion="1" provisioningFile="/Users/johandegraeve/Downloads/HelpDiabetes_for_iOS (1).mobileprovision" releasePackageType="ipa-app-store">
-      <airSettings airCertificatePath="/Volumes/Fileservers/JohanDegraeve/Allerlei/JohanDegraeveiOScertificateDistribution.p12" airTimestamp="true" anePathSet="true" version="1">
+    <buildTarget buildTargetName="com.adobe.flexide.multiplatform.ios.platform" iosSettingsVersion="1" provisioningFile="/Volumes/Fileservers/JohanDegraeve/Allerlei/HelpDiabetes_for_iPad_Johan_Degraeve.mobileprovision" releasePackageType="ipa-app-store">
+      <airSettings airCertificatePath="/Volumes/Fileservers/JohanDegraeve/Allerlei/JohanDegraeveiOScertificate.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
         <anePaths/>
       </airSettings>

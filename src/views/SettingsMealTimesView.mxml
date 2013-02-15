@@ -150,7 +150,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dateOrTimePicker = new TimePicker();
 				dateOrTimePicker.useUTC=true;
 				dateOrTimePicker.maxTime = new Date(new Number(143999999));//1 ms before midnight
-				dateOrTimePicker.minTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL)));
+				dateOrTimePicker.minTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL)));
 				(dateOrTimePicker as TimePicker).currentTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL)));
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, snackfastUntilTimeSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
