@@ -3603,6 +3603,8 @@ package utilities
 					var row:int = eventAsJSONObject.feed.entry[entryCtr].gs$cell.row;
 					var fooditem:XML = <fooditem/>;
 					fooditem.description = eventAsJSONObject.feed.entry[entryCtr].content.$t;
+					if (fooditem.description == "")
+						{dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','fooditemdescriptioncannotbeempty'),row,unitlist.length + 1);return;}
 					var unitlist:XML = <unitlist/>;
 					var unit:XML = null;
 					entryCtr++;
@@ -3614,7 +3616,7 @@ package utilities
 							unit.description = eventAsJSONObject.feed.entry[entryCtr].gs$cell.$t;
 							entryCtr++;
 						} else  {
-							if (unit ==  null) {dispatchFunction("A unit must have a name",row,unitlist.length + 1);return;}
+							if (unit ==  null) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','unitmusthaveaname'),row,unitlist.length + 1);return;}
 							unit.appendChild(
 								(new XML("<"+foodValueNames[(eventAsJSONObject.feed.entry[entryCtr].gs$cell.col - 2 ) % 6 - 1]+"/>"))
 								.appendChild(eventAsJSONObject.feed.entry[entryCtr].gs$cell.$t)
@@ -3632,8 +3634,8 @@ package utilities
 					for (var unitListCounter:int = 0;unitListCounter < unitlist.unit.length();unitListCounter++) {
 						unit = unitlist.unit[unitListCounter];
 						
-						if (unit.carbs ==  undefined)  {dispatchFunction("Unit must have a carb value",row,unitListCounter + 1);return;}
-						if (unit.standardamount ==  undefined)  {dispatchFunction("Unit must have a standardamount",row,unitListCounter + 1);return;}
+						if (unit.carbs ==  undefined)  {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','unitmusthaveacarbvalue'),row,unitListCounter + 1);return;}
+						if (unit.standardamount ==  undefined)  {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','unitmusthaveastandardamount'),row,unitListCounter + 1);return;}
 						//replace , by . and check if parseable to number
 						
 						var standardamount:Number;
@@ -3642,15 +3644,15 @@ package utilities
 						var protein:Number = -1;
 						var fat:Number = -1;
 						
-						if (isNaN(carb = new Number((unit.carbs).toString().replace(",",".")))) {dispatchFunction("Carb value must  be numeric",row,unitListCounter + 1,unit.carbs.toString());return;}
-						if (isNaN(standardamount = new Number((unit.standardamount).toString().replace(",",".")))) {dispatchFunction("standardamount value must be integer",row,unitListCounter + 1,unit.standardamount.toString());return;}
-						if (unit.kcal != undefined) if (isNaN(kcal = new Number((unit.kcal).toString().replace(",",".")))) {dispatchFunction("kcal value must  be integer",row,unitListCounter + 1,unit.kcal.toString());return;}
-						if (unit.protein != undefined) if (isNaN(protein = new Number((unit.protein).toString().replace(",",".")))) {dispatchFunction("protein value must  be numeric",row,unitListCounter + 1,unit.protein.toString());return;}
-						if (unit.fat != undefined) if (isNaN(fat = new Number((unit.fat).toString().replace(",",".")))) {dispatchFunction("fat value must  be numeric",row,unitListCounter + 1,unit.fat.toString());return;}
+						if (isNaN(carb = new Number((unit.carbs).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','carbvaluemustbenumeric'),row,unitListCounter + 1,unit.carbs.toString());return;}
+						if (isNaN(standardamount = new Number((unit.standardamount).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','standardamountmustbeinteger'),row,unitListCounter + 1,unit.standardamount.toString());return;}
+						if (unit.kcal != undefined) if (isNaN(kcal = new Number((unit.kcal).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','kcalvaluemustbeinteger'),row,unitListCounter + 1,unit.kcal.toString());return;}
+						if (unit.protein != undefined) if (isNaN(protein = new Number((unit.protein).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','proteinvaluemustbenumeric'),row,unitListCounter + 1,unit.protein.toString());return;}
+						if (unit.fat != undefined) if (isNaN(fat = new Number((unit.fat).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','fatvaluemustbenumeric'),row,unitListCounter + 1,unit.fat.toString());return;}
 						
 						//check integers if necessary
-						if (standardamount % 1 != 0)  {dispatchFunction("standardamount must be an integer number",row,unitListCounter + 1);return}
-						if (kcal != -1) if (kcal % 1 != 0)  {dispatchFunction("kcal must be an integer number",row,unitListCounter + 1);return}
+						if (standardamount % 1 != 0)  {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','standardamountmustbeinteger'),row,unitListCounter + 1);return}
+						if (kcal != -1) if (kcal % 1 != 0)  {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','kcalvaluemustbeinteger'),row,unitListCounter + 1);return}
 						
 					}
 					//////////
@@ -3709,9 +3711,9 @@ package utilities
 			function dispatchFunction(message:String, fooditemctr:int,unitcntr:int = 0,found:String=null):void  {
 				if (callingDispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
-					event.data = message + ", check the foodtable, row " + fooditemctr ;
-					if (unitcntr != 0) event.data += ", unit " + unitcntr + ".";
-					if (found != null) event.data += " Found \"" + found + "\"";
+					event.data = message + " " + ResourceManager.getInstance().getString('synchronizeview','checkthefoodtable') + fooditemctr ;
+					if (unitcntr != 0) event.data += ", " + ResourceManager.getInstance().getString('ownitemview','unit') + " " + unitcntr + ". ";
+					if (found != null) event.data +=  ResourceManager.getInstance().getString('synchronizeview','found') + " \"" + found + "\"";
 					callingDispatcher.dispatchEvent(event);
 				}
 			}

@@ -137,7 +137,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 * value only makes sense if mealevent = null,  
 			 */
 			private var defaultMealTimeSTamp:Boolean;
-
+			
 			private function init():void {
 				trackerId = resourceManager.getString('analytics','trackeraccount');
 			}
@@ -188,8 +188,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					ModelLocator.getInstance().refreshMeals();
 				
 				if (data.foodItem) {
-					defaultMealTimeSTamp = true;
 					//addfooditemview has been created via foodcounter view, so initial setup is necessary
+					defaultMealTimeSTamp = true;
 					TrashButton.visible = false;
 					var dispatcher:EventDispatcher = new EventDispatcher();
 					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
@@ -237,6 +237,15 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					amount_textinput_text = (data.selectedFoodItem).chosenAmount.toString();;
 					selectedUnit = 0;
 					TrashButton.visible = true;
+				} else if (data.ownFoodItem) {
+					//addfooditemview created via ownitemview
+					defaultMealTimeSTamp = true;
+					retrievedFoodItem = data.ownFoodItem as FoodItem;
+					description_textarea_text = retrievedFoodItem.itemDescription;
+					details_button_text = createDetailsButtonText(0,-1);
+					amount_textinput_text = retrievedFoodItem.getUnit(0).standardAmount.toString();
+					selectedUnit = 0;
+					TrashButton.visible = false;
 				} else { 
 					//addfooditem recreated after having pushed meal button and returning from selectmealview
 					defaultMealTimeSTamp = false;
@@ -288,7 +297,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					helpCallOut.open(addFoodItemGroup.button_5,true);
 				}
 			}
-
+			
 			private function helptext3Removed(event:Event):void {
 				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
 				helpCallOut = new HelpCallOut();
@@ -363,10 +372,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 */ 
 			private function popUpUnitList(track:Boolean=true,e:MouseEvent = null):void {
 				if (!tracker)
-				tracker = new MyGATracker( this, trackerId, "AS3", false );
+					tracker = new MyGATracker( this, trackerId, "AS3", false );
 				if (track)
 					tracker.trackPageview( "AddFoodItemView-unitSelectionButtonClicked" );
-
+				
 				var unitList:ArrayCollection = new ArrayCollection();
 				unitList.addItem((retrievedFoodItem.getUnit(0) as Unit).unitDescription);
 				for (var i:int = 1; i < retrievedFoodItem.getNumberOfUnits();i++)
@@ -388,10 +397,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					selectedUnit = event.index;
 					
 					//if (retrievedFoodItem.getUnit(event.index).standardAmount != 100)
-						amount_textinput_text = retrievedFoodItem.getUnit(event.index).standardAmount.toString();
+					amount_textinput_text = retrievedFoodItem.getUnit(event.index).standardAmount.toString();
 					//else
-						//set it to empty string, this allows the user to immediately start typing an amount
-						//amount_textinput_text = "";
+					//set it to empty string, this allows the user to immediately start typing an amount
+					//amount_textinput_text = "";
 				}
 			}
 			
@@ -407,16 +416,16 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 							+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 					} else {
 						returnValue = 
-						(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
-							"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
-						+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
+							(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
+								"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
+							+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
 							+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 					}
 				} else {
 					returnValue = 
-					(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
-						"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
-					+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
+						(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
+							"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
+						+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
 						+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
 				}
 				return returnValue;
@@ -429,7 +438,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (!tracker)
 					tracker = new MyGATracker( this, trackerId, "AS3", false );
 				tracker.trackPageview( "AddFoodItemView-AddButtonClicked" );
-
+				
 				navigator.popView();
 				searchText = "";
 				
@@ -449,7 +458,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						defaultMealTimeSTamp)
 						&&
 						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null
-						) {
+					) {
 						trace("defaultmealtimestamp = " + defaultMealTimeSTamp);
 						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp = (new Date()).valueOf();
 					}
@@ -498,7 +507,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (!tracker)
 					tracker = new MyGATracker( this, trackerId, "AS3", false );
 				tracker.trackPageview( "AddFoodItemView-MealButtonClicked" );
-
+				
 				data = new Object();
 				data.retrievedFoodItem = retrievedFoodItem;
 				data.selectedUnit = selectedUnit;
@@ -534,6 +543,11 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 * returns the searchtext, so foodcounterview can search again on the searchtext, may have been reset to empty string
 			 */
 			override public function createReturnObject():Object {
+				if (navigator.context != null) {
+					if (navigator.context.context != null)
+						if (navigator.context.context == OwnItemView.ADD_FOOD_ITEM)
+							return navigator.context;//used in case addfooditemview created via ownitemview, then navigator.context will be not null and will be equal to ADD_FOOD_ITEM
+				}
 				var returnObject:Object = new Object();
 				returnObject.searchText = searchText;
 				return returnObject;
@@ -552,10 +566,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (!tracker)
 					tracker = new MyGATracker( this, trackerId, "AS3", false );
 				tracker.trackPageview( "AddFoodItemView-deleteButtonClicked" );
-
+				
 				var localdispatcher:EventDispatcher;
 				var length:int 
-
+				
 				//in case we it is the last selectedfooditem being deleted, then also the mealevent will be deleted
 				//we need to make sure the previous tracking event is visible so we store the itemindex
 				var trackinglistPointer:Number = ModelLocator.getInstance().trackingList.getItemIndex(
@@ -573,14 +587,14 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				{
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
-
+					
 					localdispatcher = new EventDispatcher();
 					length = (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.selectedFoodItems.length;
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
 					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).deleteSelectedFoodItem(data.selectedFoodItem,localdispatcher);
 					navigator.popView();
-}
+				}
 				
 				function onNoClicked(event: PickerEvent): void
 				{
@@ -597,7 +611,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						if (trackinglistPointer > 0)
 							ModelLocator.getInstance().trackingEventToShow = 
 								(ModelLocator.getInstance().trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;						
-
+						
 						navigator.popView();
 					}
 				}

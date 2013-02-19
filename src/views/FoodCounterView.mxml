@@ -274,11 +274,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
-					if (navigator.poppedViewReturnedObject.object.searchText) {
-						searchtext.text = navigator.poppedViewReturnedObject.object.searchText;
-						timer = new Timer(200, 1);
-						timer.addEventListener(TimerEvent.TIMER,timerEnd);
-						timer.start();
+					if (navigator.poppedViewReturnedObject.object != null) {
+						if (navigator.poppedViewReturnedObject.object.searchText) {
+							if (navigator.poppedViewReturnedObject.object.searchText) {
+								searchtext.text = navigator.poppedViewReturnedObject.object.searchText;
+								timer = new Timer(200, 1);
+								timer.addEventListener(TimerEvent.TIMER,timerEnd);
+								timer.start();
+							}
+						}
 					}
 				}
 				
@@ -289,14 +293,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					searchTextChanged();
 				}
 			}
-
+			
+			private function addButtonClicked(event:MouseEvent):void {
+				navigator.pushView(OwnItemView,null);
+			}
 		]]>
 	</fx:Script>
 	
 	<s:titleContent>
 		<s:TextInput id="searchtext"  width="100%" change="searchTextChanged()"/>
-		
 	</s:titleContent>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
+	</s:actionContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.ListItemRenderer"
 			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem"
 			scrollSnappingMode="leadingEdge">

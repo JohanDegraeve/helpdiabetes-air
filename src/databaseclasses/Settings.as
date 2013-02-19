@@ -199,7 +199,7 @@ package databaseclasses
 		public static const SettingsHelpTextEditExerciseEventViewOkButton:int=51;
 		public static const SettingsHelpTextEditBGEventViewOkButton:int=52;
 		public static const SettingsHelpTextEditMealEventViewEditDateAndTime:int=53;
-		public static const SettingsHelpText54:int=54;
+		public static const SettingsHelpTextOwnFoodItemView:int=54;
 		public static const SettingsHelpText55:int=55;
 		public static const SettingsHelpText56:int=56;
 		public static const SettingsHelpText57:int=57;
@@ -335,7 +335,7 @@ package databaseclasses
 			"true",
 			"true",
 			"true",//number 53
-			"",
+			"true",//SettingsHelpTextOwnFoodItemView, 54
 			"",
 			"",
 			"",
