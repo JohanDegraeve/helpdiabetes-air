@@ -79,7 +79,7 @@ If settingid = 0, then helptext will always be shown
 				if (settingId == 0) {
 					super.open(owner,modal);
 				} else  {
-					if (Settings.getInstance().getSetting(settingId) == 'true') {
+					if (!(Settings.getInstance().getSetting(settingId) == 'false')) {
 						super.open(owner,modal);
 					}
 					else {
