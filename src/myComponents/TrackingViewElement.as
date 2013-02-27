@@ -39,7 +39,26 @@ package myComponents
 		{
 			_eventid = value;
 		}
-		
+
+		private var _mark:Boolean;
+
+		/**
+		 * used for instance by search in tracking list, if true then this element is in the result and to be shown for instance<br>
+		 * in first place only to be used for mealevents, but could be used for anything, can also be used in itemrenderer
+		 */
+		public function get mark():Boolean
+		{
+			return _mark;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set mark(value:Boolean):void
+		{
+			_mark = value;
+		}
+
 
 	}
 }

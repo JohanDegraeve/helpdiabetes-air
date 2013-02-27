@@ -200,11 +200,11 @@ package databaseclasses
 		public static const SettingsHelpTextEditBGEventViewOkButton:int=52;
 		public static const SettingsHelpTextEditMealEventViewEditDateAndTime:int=53;
 		public static const SettingsHelpTextOwnFoodItemView:int=54;
-		public static const SettingsHelpText55:int=55;
-		public static const SettingsHelpText56:int=56;
-		public static const SettingsHelpText57:int=57;
-		public static const SettingsHelpText58:int=58;
-		public static const SettingsHelpText59:int=59;
+		public static const SettingsHelpTextTrackingViewSearchButton:int=55;
+		public static const SettingsHelpTextTrackingView1:int=56;
+		public static const SettingsHelpTextTrackingViewUpButton:int=57;
+		public static const SettingsHelpTextTrackingViewDownButton:int=58;
+		public static const SettingsHelpTextTrackingViewCancelButton:int=59;
 		public static const SettingsHelpText60:int=60;
 		public static const SettingsHelpText61:int=61;
 		public static const SettingsHelpText62:int=62;
@@ -336,11 +336,11 @@ package databaseclasses
 			"true",
 			"true",//number 53
 			"true",//SettingsHelpTextOwnFoodItemView, 54
-			"",
-			"",
-			"",
-			"",
-			"",
+			"true",//55
+			"true",
+			"true",
+			"true",
+			"true",//59
 			"",
 			"",
 			"",

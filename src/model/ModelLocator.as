@@ -68,12 +68,51 @@ package model
 		private var foodTables:Array;
 		
 		public var maximumSearchStringLength:int = 25;
+
+		/**
+		 * if searchActive, then this is eventid of the lastmarked item , 0 means there's no item marked
+		 */
+		public var lastMarkedItemEventId:Number;
+		/**
+		 * if searchActive, then this is eventid of the firstmarked item, 0 means there's no item marked 
+		 */
+		public var firstMarkedItemEventId:Number;
 		
+		private  var _searchActive:Boolean = false;
+
+		[Bindable]
+		/**
+		 * used in tracking view, true means a search has been made, some elements in the tracking list are marked 
+		 */
+		public function get searchActive():Boolean
+		{
+			return _searchActive;
+		}
+
+		/**
+		 * sets searchActive<br>
+		 * set firstmarkeditemeventid and lastmarkeditemeventid to 0, and sets the mark for all trackingevents to false
+		 */
+		public function set searchActive(value:Boolean):void
+		{
+			if (_searchActive == value)
+				return;
+			_searchActive = value;
+			if (!_searchActive) {
+				firstMarkedItemEventId = 0;
+				lastMarkedItemEventId = 0;
+				for (var trackingcntr:int = 0;trackingcntr < trackingList.length;trackingcntr++) {
+					(trackingList.getItemAt(trackingcntr) as TrackingViewElement).mark = false;
+				}
+			}
+			this.dispatchEvent(new Event(ModelLocator.SEARCHACTIVE_CHANGED));
+		}
+
+
 		/**** Add bindable application data here ***/
 		private var _foodItemList:ArrayCollection = new ArrayCollection(); 
 
 		[Bindable]
-
 		/**
 		 * list of fooditems used throughout the application<br>
 		 * in the first place used in foodcounterview 
@@ -141,6 +180,10 @@ package model
 		 * used for event dispatching, when selectedMeal initialized, meaning changed from value -1 to value > 0<br>
 		 */
 		public static const SELECTEDMEAL_INITIALIZED:String="selected_meal_initialized";
+		/**
+		 * used for event dispatching, when searchactive changes, <br>
+		 */
+		public static const SEARCHACTIVE_CHANGED:String="searchactive_changed";
 		
 		/**
 		 * no comment 

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark"
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*" 
+		creationComplete="creationCompleteHandler(event)"
 		initialize="onInitialize()"
 		>
 	<fx:Declarations>
@@ -34,8 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import databaseclasses.BloodGlucoseEvent;
 			import databaseclasses.ExerciseEvent;
+			import databaseclasses.Meal;
 			import databaseclasses.MealEvent;
 			import databaseclasses.MedicinEvent;
+			import databaseclasses.SelectedFoodItem;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
 			
@@ -43,33 +46,73 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
 			
 			import myComponents.HelpCallOut;
 			import myComponents.IListElement;
 			import myComponents.PickerEvent;
+			import myComponents.TextPicker;
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
 			
 			import spark.skins.mobile.ListSkin;
 			
+			import utilities.ExcelSorting;
 			import utilities.MyGATracker;
 			
 			private static var lastClickOnTrackingView:Number;
+			private var textPicker:TextPicker;
+			private var helpCallOut:HelpCallOut;
 
-			private function helptext1Removed(event:Event):void {
-				
-			}
-			
 			private function onInitialize():void {
 				title = resourceManager.getString('trackingview','logbook');
 				
 				lastClickOnTrackingView = (new Date()).valueOf();
 				trackerId = resourceManager.getString('analytics','trackeraccount');
+				ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
+			}
+			
+			private function reDrawActionButtons(event:Event = null):void {
+				if (!navigator) return;
+				if (!navigator.actionBar.actionContent) return;
+				if (ModelLocator.getInstance().searchActive) {
+					if (navigator.actionBar.actionContent.indexOf(searchButton) != -1)
+						navigator.actionBar.actionGroup.removeElement(searchButton);
+					if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().lastMarkedItemEventId) {
+						upButton.alpha = 0.25;
+						downButton.alpha = 0.25
+					} else if (ModelLocator.getInstance().lastMarkedItemEventId == ModelLocator.getInstance().trackingEventToShow) {
+						downButton.alpha = 0.25;
+						upButton.alpha = 1;
+					} else if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().trackingEventToShow) {
+						upButton.alpha = 0.25;
+						downButton.alpha = 1;
+					} else  {
+						upButton.alpha = 1;
+						downButton.alpha = 1;
+					}
+					if (navigator.actionBar.actionContent.indexOf(upButton) == -1)  {
+						navigator.actionBar.actionGroup.addElement(upButton);
+						navigator.actionBar.actionGroup.addElement(downButton);
+						navigator.actionBar.actionGroup.addElement(cancelButton);
+					}
+				} else  {
+					if (navigator.actionBar.actionContent.indexOf(searchButton) == -1)  {
+						navigator.actionBar.actionGroup.addElement(searchButton);
+					}
+					if (navigator.actionBar.actionContent.indexOf(upButton) != -1)  {
+						navigator.actionBar.actionGroup.removeElement(upButton);
+						navigator.actionBar.actionGroup.removeElement(downButton);
+						navigator.actionBar.actionGroup.removeElement(cancelButton);
+					}
+				}
+				openHelpTexts();
 			}
 			
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
-
+			
 			/**
 			 * Will be used by views pushed by Trackingview (eg editbgeventview), if true then when the pushed view is opened, it will call poptofirstview<br>
 			 * This is to force for instance, that when a user has opened trackingview, click on editbgeventview, more than 15 minutes later goes again to tracking view,
@@ -125,8 +168,246 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					navigator.pushView(EditBGEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex));
 				}
 			}
+			
+			private function searchClicked(e:MouseEvent = null):void {
+				textPicker = new TextPicker();
+				textPicker.labelText1 = resourceManager.getString('trackingview','searchforfood');;
+				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
+				//textPicker.addEventListener(PickerEvent.PICKER_CANCEL, onTextCancel);
+				PopUpManager.addPopUp(textPicker, this, true);
+				PopUpManager.centerPopUp(textPicker);
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('trackingview','help_text_enterfoodtext');
+				helpCallOut.settingId = Settings.SettingsHelpTextTrackingView1;
+				//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+				helpCallOut.open(textPicker,true)
+			}
+			
+			private function onTextSet(event: PickerEvent): void
+			{
+				var cntr:int = 0;
+				var selitemctr:int = 0;
+				var mealEvent:MealEvent;
+				ModelLocator.getInstance().searchActive = false;
+				ModelLocator.getInstance().firstMarkedItemEventId = 0;
+				ModelLocator.getInstance().lastMarkedItemEventId = 0;
+				
+				if ((event.newValue as String) == "")
+					return;
+				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
+				var elementsFound:Boolean = false;
+				var splittedText:Array = (event.newValue as String).split(" ");
+				//search the first text, as long as it's not an empty space
+				var splittedTextCntr:int = 0;
+				for (;splittedTextCntr < splittedText.length;splittedTextCntr++) {
+					if (splittedText[splittedTextCntr] != "")
+						break;
+				}
+				if (splittedTextCntr == splittedText.length)
+					return;//there seem to be only space
+				
+				//start with the first substring
+				for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
+					if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MealEvent) {
+						mealEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent;
+						for (selitemctr = 0;selitemctr < mealEvent.selectedFoodItems.length;selitemctr++) {
+							if (ExcelSorting.stringAhasStringB((mealEvent.selectedFoodItems.getItemAt(selitemctr) as SelectedFoodItem).itemDescription,splittedText[0] as String)) {
+								mealEvent.mark = true;
+								elementsFound = true;
+								if (ModelLocator.getInstance().firstMarkedItemEventId == 0)
+									ModelLocator.getInstance().firstMarkedItemEventId = mealEvent.eventid;
+								ModelLocator.getInstance().lastMarkedItemEventId = mealEvent.eventid;
+								break;
+							}
+						}
+					}
+				}
+				
+				//now check for all marked items, if they also matchi the following substrings
+				splittedTextCntr = 1;
+				for (;splittedTextCntr < splittedText.length;splittedTextCntr++) {
+					//start with the first substring
+					for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
+						if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MealEvent) {
+							if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent).mark) {
+								mealEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent;
+								var mealEventHasTheTextInOneOfTheElements:Boolean = false;
+								for (selitemctr = 0;selitemctr < mealEvent.selectedFoodItems.length;selitemctr++) {
+									if ((ExcelSorting.stringAhasStringB((mealEvent.selectedFoodItems.getItemAt(selitemctr) as SelectedFoodItem).itemDescription,splittedText[splittedTextCntr] as String))) {
+										mealEventHasTheTextInOneOfTheElements = true;
+										break;
+									}
+								}
+								if (!mealEventHasTheTextInOneOfTheElements) {
+									mealEvent.mark = false;
+									if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().lastMarkedItemEventId) {
+										//as first and last are equal, it means there was originally only one marked item
+										//but that wasn't found with a second or third word, so we need to remove everything, 
+										cancelClicked();
+										return;
+									}
+									var cntr2:int;
+									if (ModelLocator.getInstance().firstMarkedItemEventId == mealEvent.eventid) {
+										//we need to find a new firstmarkeditem
+										for (cntr2 = cntr + 1;cntr2 < ModelLocator.getInstance().copyOfTrackingList.length;cntr2++) {
+											if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) is MealEvent) {
+												if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) as MealEvent).mark) {
+													ModelLocator.getInstance().firstMarkedItemEventId = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) as MealEvent).eventid;
+													break;
+												}
+											}
+										}
+									} 
+									if (ModelLocator.getInstance().lastMarkedItemEventId == mealEvent.eventid) {
+										//we need to find a new lastmarkeditem
+										for (cntr2 = cntr - 1;cntr2 >= 0;cntr2--) {
+											if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) is MealEvent) {
+												if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) as MealEvent).mark) {
+													ModelLocator.getInstance().lastMarkedItemEventId = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) as MealEvent).eventid;
+													break;
+												}
+											}
+										}
+									}  
+								}
+							}
+						}
+					}
+				}
+				(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
+				ModelLocator.getInstance().trackingList.refresh();//forces a redraw
+
+				if (elementsFound) {
+					ModelLocator.getInstance().trackingEventToShow = ModelLocator.getInstance().lastMarkedItemEventId;
+					ModelLocator.getInstance().searchActive = true;
+				}
+			}
+			
+			/*private function onTextCancel(event: PickerEvent): void
+			{
+				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
+				textPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTextCancel);
+			}*/
+						
+			private function upClicked(e:MouseEvent = null):void {
+				if (ModelLocator.getInstance().trackingEventToShow == ModelLocator.getInstance().firstMarkedItemEventId)
+					return;
+				//first find the location of the current eventtoshow
+				var listctr:int = 0;
+				for (listctr = 0;listctr < ModelLocator.getInstance().trackingList.length;listctr++) {
+					if ((ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).eventid == ModelLocator.getInstance().trackingEventToShow)
+						break;
+				}
+				//now go up again to find the next marked element
+				listctr--;
+				for (;listctr >= 0;listctr--) {
+					if ((ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).mark) {
+						ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).eventid;
+						(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
+						ModelLocator.getInstance().trackingList.refresh();//forces a redraw of the list
+						reDrawActionButtons();
+						break;
+					}
+				}
+			}
+			
+			private function downClicked(e:MouseEvent = null):void {
+				if (ModelLocator.getInstance().trackingEventToShow == ModelLocator.getInstance().lastMarkedItemEventId)
+					return;
+				//first find the location of the current eventtoshow
+				var listctr:int = 0;
+				for (listctr = 0;listctr < ModelLocator.getInstance().trackingList.length;listctr++) {
+					if ((ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).eventid == ModelLocator.getInstance().trackingEventToShow)
+						break;
+				}
+				//now go further down to find the next marked element
+				listctr++;
+				for (;listctr >= 0;listctr++) {
+					if ((ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).mark) {
+						ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).eventid;
+						(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
+						ModelLocator.getInstance().trackingList.refresh();//forces a redraw of the list
+						reDrawActionButtons();
+						break;
+					}
+				}
+			}
+
+			private function cancelClicked(e:MouseEvent = null):void {
+				ModelLocator.getInstance().searchActive = false;
+				ModelLocator.getInstance().firstMarkedItemEventId = 0;
+				ModelLocator.getInstance().lastMarkedItemEventId = 0;
+				ModelLocator.getInstance().trackingEventToShow = 
+					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null ? -1 :
+					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.eventid;
+				(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
+				ModelLocator.getInstance().trackingList.refresh();
+			}
+
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				reDrawActionButtons();
+	
+				if (!navigator) return;
+				if (!navigator.actionBar.actionContent) return;
+				if (navigator.actionBar.actionContent.indexOf(searchButton) != -1) {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_searchbutton');
+					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewSearchButton;
+					//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+					helpCallOut.open(searchButton,true)
+				} /*else
+					helptext0Removed();*/
+			}
+			
+			/*private function helptext0Removed(event:Event = null):void {
+				
+			}*/
+			
+			/**
+			 * helptexts related to up, down and cancel button 
+			 */
+			private function openHelpTexts():void {
+				if (navigator.actionBar.actionContent.indexOf(upButton) != -1) {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_upbutton');
+					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewUpButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(upButton,true)
+				} else
+				helptext1Removed();
+			}
+
+			private function helptext1Removed(event:Event = null):void  {
+				if (navigator.actionBar.actionContent.indexOf(downButton) != -1) {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_downbutton');
+					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewDownButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.open(downButton,true)
+				} else
+					helptext2Removed();
+			}
+			
+			private function helptext2Removed(event:Event = null):void  {
+				if (navigator.actionBar.actionContent.indexOf(cancelButton) != -1) {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_cancelbutton');
+					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewCancelButton;
+					//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.open(cancelButton,true)
+				} /*else
+					helptext2Removed();*/
+			}
 		]]>
 	</fx:Script>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/ic_up.png')" id="upButton" click="upClicked(event)"/>
+		<s:Button icon="@Embed(source='../assets/ic_down.png')" id="downButton" click="downClicked(event)"/>
+		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" />
+		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
+	</s:actionContent>
+
 	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
 			click="onListElementClicked(event)"

@@ -540,8 +540,15 @@ package myComponents
 			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible
 		}
 		
+		/**
+		 * if mealEvent.extendedInTrackingView true then returns true<br>
+		 * if mealEvent.eventid = event id of currently selectedmeal, then extendedInTrackingView is set to true and return true<br>
+		 * also whebn mark = true, then true is returned
+		 */
 		private function getMealExtendedValue(mealEvent:MealEvent):Boolean {
 			if (mealEvent.extendedInTrackingView)
+				return true;
+			if (mealEvent.mark)
 				return true;
 			var returnValue:Boolean = false;
 			

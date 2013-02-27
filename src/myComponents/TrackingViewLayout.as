@@ -69,8 +69,24 @@ package myComponents
 		}
 
 		private var _firstUpdateDisplayList:Boolean=true;
-		
-		
+
+		/**
+		 * if true, then firstindexinview will  recalculated
+		 */
+		public function get firstUpdateDisplayList():Boolean
+		{
+			return _firstUpdateDisplayList;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set firstUpdateDisplayList(value:Boolean):void
+		{
+			_firstUpdateDisplayList = value;
+		}
+
+				
 		/**
 		 * 
 		 */ 
@@ -175,7 +191,6 @@ package myComponents
 			var layoutTarget:GroupBase = target;
 			if (!(layoutTarget as DataGroup).dataProvider || (layoutTarget as DataGroup).dataProvider.length == 0)
 				return;
-			
 			var elementHeight:Number;
 			
 			//provide the initial values

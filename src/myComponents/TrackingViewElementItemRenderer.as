@@ -17,6 +17,8 @@
  */
 package myComponents
 {
+	import model.ModelLocator;
+	
 	import spark.components.IconItemRenderer;
 	import spark.components.LabelItemRenderer;
 
@@ -48,6 +50,20 @@ package myComponents
 			graphics.moveTo(0,unscaledHeight - 1);
 			graphics.lineTo(unscaledWidth,unscaledHeight - 1);
 			graphics.endFill();
+			
+			if ((data as TrackingViewElement).mark) {
+				graphics.beginFill(0xC0EDFF, 0.75);
+				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+				graphics.endFill();
+				if ((data as TrackingViewElement).eventid == ModelLocator.getInstance().trackingEventToShow) {
+					graphics.lineStyle(unscaledHeight/20, 0xFF0000, 0.5);
+					graphics.lineTo(0, unscaledHeight);
+					graphics.lineTo(unscaledWidth,unscaledHeight);
+					graphics.lineTo(unscaledWidth,0);
+					graphics.lineTo(0,0);
+					graphics.endFill();
+				}
+			}
 			
 			if (down) {
 				graphics.beginFill(0, 0.25);

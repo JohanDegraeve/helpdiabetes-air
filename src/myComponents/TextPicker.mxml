@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			/**
+			 * two labels will be shown this is the first label 
+			 */
+			private var _labelText1:String;
+			
+			public function get labelText1():String
+			{
+				return _labelText1;
+			}
+			
+			public function set labelText1(value:String):void
+			{
+				_labelText1 = value;
+			}
+			
+			/**
+			 * two labels will be shown this is the second label 
+			 */
+			private var _labelText2:String;
+			public function get labelText2():String
+			{
+				return _labelText2;
+			}
+			
+			public function set labelText2(value:String):void
+			{
+				_labelText2 = value;
+			}
+			
+			private function okClicked(): void
+			{
+				var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
+				dpe.newValue = pickerText.text;
+				dispatchEvent(dpe);
+				PopUpManager.removePopUp(this);
+			}
+			private function cancel(): void
+			{
+				var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_CANCEL);
+				dispatchEvent(dpe);
+				PopUpManager.removePopUp(this);
+			}
+
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer>
+		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="5" paddingRight="5" paddingTop="10">
+			<s:Label includeInLayout="{labelText1 != ''}" text="{labelText1}" textAlign="center" width="100%" styleName="textColorInPickerOnDarkBackground" />
+			<!--s:Label includeInLayout="{labelText2 != ''}" text="{labelText2}" textAlign="center" width="100%" styleName="textColorInPickerOnDarkBackground" />-->
+			<s:Line width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xcccccc" weight="3"/>
+				</s:stroke>
+			</s:Line>
+			<s:TextInput maxWidth="250" skinClass="spark.skins.mobile.TextInputSkin" id="pickerText" width="100%" editable="true"/>
+			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
+				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
+					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="okClicked()"/>
+					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','cancel')}" click="cancel()"/>
+				</s:VGroup>
+			</s:BorderContainer>
+		</s:VGroup>
+	</s:BorderContainer>
+</s:Group>

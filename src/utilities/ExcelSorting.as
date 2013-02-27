@@ -327,5 +327,18 @@ package utilities
 				returnvalue.push(input.charCodeAt(i));
 			return returnvalue;
 		}
+		
+		/**
+		 * returns true if stringB is within stringA 
+		 */
+		static public function stringAhasStringB(stringA:String, stringB:String):Boolean {
+			if (stringB.length > stringA.length)
+				return false;
+			for (var i:int = 0;i <= stringA.length - stringB.length;i++) {
+				if (compareStrings(stringA.substr(i,stringB.length),stringB) == 0)
+					return true;
+			}
+			return false;
+		}
 	}
 }
