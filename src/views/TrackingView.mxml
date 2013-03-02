@@ -64,6 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private static var lastClickOnTrackingView:Number;
 			private var textPicker:TextPicker;
 			private var helpCallOut:HelpCallOut;
+			private var timer:Timer;
 
 			private function onInitialize():void {
 				title = resourceManager.getString('trackingview','logbook');
@@ -74,40 +75,54 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function reDrawActionButtons(event:Event = null):void {
-				if (!navigator) return;
-				if (!navigator.actionBar.actionContent) return;
-				if (ModelLocator.getInstance().searchActive) {
-					if (navigator.actionBar.actionContent.indexOf(searchButton) != -1)
-						navigator.actionBar.actionGroup.removeElement(searchButton);
-					if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().lastMarkedItemEventId) {
-						upButton.alpha = 0.25;
-						downButton.alpha = 0.25
-					} else if (ModelLocator.getInstance().lastMarkedItemEventId == ModelLocator.getInstance().trackingEventToShow) {
-						downButton.alpha = 0.25;
-						upButton.alpha = 1;
-					} else if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().trackingEventToShow) {
-						upButton.alpha = 0.25;
-						downButton.alpha = 1;
-					} else  {
-						upButton.alpha = 1;
-						downButton.alpha = 1;
+				if (navigator) {
+					if (navigator.actionBar.actionContent) {
+						if (ModelLocator.getInstance().searchActive) {
+							if (navigator.actionBar.actionContent.indexOf(searchButton) != -1)
+								navigator.actionBar.actionGroup.removeElement(searchButton);
+							if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().lastMarkedItemEventId) {
+								upButton.alpha = 0.25;
+								downButton.alpha = 0.25
+							} else if (ModelLocator.getInstance().lastMarkedItemEventId == ModelLocator.getInstance().trackingEventToShow) {
+								downButton.alpha = 0.25;
+								upButton.alpha = 1;
+							} else if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().trackingEventToShow) {
+								upButton.alpha = 0.25;
+								downButton.alpha = 1;
+							} else  {
+								upButton.alpha = 1;
+								downButton.alpha = 1;
+							}
+							if (navigator.actionBar.actionContent.indexOf(upButton) == -1)  {
+								navigator.actionBar.actionGroup.addElement(upButton);
+								navigator.actionBar.actionGroup.addElement(downButton);
+								navigator.actionBar.actionGroup.addElement(cancelButton);
+							}
+						} else  {
+							if (navigator.actionBar.actionContent.indexOf(searchButton) == -1)  {
+								navigator.actionBar.actionGroup.addElement(searchButton);
+							}
+							if (navigator.actionBar.actionContent.indexOf(upButton) != -1)  {
+								navigator.actionBar.actionGroup.removeElement(upButton);
+								navigator.actionBar.actionGroup.removeElement(downButton);
+								navigator.actionBar.actionGroup.removeElement(cancelButton);
+							}
+						}
+						openHelpTexts();
+					} else {
+						timer = new Timer(100, 1);
+						timer.addEventListener(TimerEvent.TIMER,timerEnd);
+						timer.start();
 					}
-					if (navigator.actionBar.actionContent.indexOf(upButton) == -1)  {
-						navigator.actionBar.actionGroup.addElement(upButton);
-						navigator.actionBar.actionGroup.addElement(downButton);
-						navigator.actionBar.actionGroup.addElement(cancelButton);
-					}
-				} else  {
-					if (navigator.actionBar.actionContent.indexOf(searchButton) == -1)  {
-						navigator.actionBar.actionGroup.addElement(searchButton);
-					}
-					if (navigator.actionBar.actionContent.indexOf(upButton) != -1)  {
-						navigator.actionBar.actionGroup.removeElement(upButton);
-						navigator.actionBar.actionGroup.removeElement(downButton);
-						navigator.actionBar.actionGroup.removeElement(cancelButton);
-					}
+				} else {
+					timer = new Timer(100, 1);
+					timer.addEventListener(TimerEvent.TIMER,timerEnd);
+					timer.start();
 				}
-				openHelpTexts();
+			
+				function timerEnd():void {
+					reDrawActionButtons();
+				}
 			}
 			
 			public var tracker:AnalyticsTracker;
