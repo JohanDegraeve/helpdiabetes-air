@@ -205,9 +205,9 @@ package databaseclasses
 		public static const SettingsHelpTextTrackingViewUpButton:int=57;
 		public static const SettingsHelpTextTrackingViewDownButton:int=58;
 		public static const SettingsHelpTextTrackingViewCancelButton:int=59;
-		public static const SettingsHelpText60:int=60;
-		public static const SettingsHelpText61:int=61;
-		public static const SettingsHelpText62:int=62;
+		public static const SettingsHelpTextFoodCounterViewSearchText:int=60;
+		public static const SettingsHelpTextFoodCounterViewSearchButton:int=61;
+		public static const SettingsHelpTextFoodCounterViewCancelButton:int=62;
 		public static const SettingsHelpText63:int=63;
 		public static const SettingsHelpText64:int=64;
 		public static const SettingsHelpText65:int=65;
@@ -341,47 +341,47 @@ package databaseclasses
 			"true",
 			"true",
 			"true",//59
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
+			"true",//SettingsHelpTextFoodCounterViewSearchField
+			"true",//SettingsHelpTextFoodCounterViewSearchButton
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",
+			"true",//last helptext
 			"",//default access token
 			"",//default refresh token
 			"0",//lastsynctimestamp

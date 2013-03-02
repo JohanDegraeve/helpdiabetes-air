@@ -27,12 +27,32 @@ package databaseclasses
 		
 		private var _itemid:int;
 		
+		private var _shownInList:Boolean;
+
+		/**
+		 * first aim is to use in search mechanism in foodcounterview<br>
+		 * if false, then this item does not match the searchcriteria and will not be shown 
+		 */
+		public function get shownInList():Boolean
+		{
+			return _shownInList;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set shownInList(value:Boolean):void
+		{
+			_shownInList = value;
+		}
+		
 		/**
 		 * expects an array of units<br>
 		 * itemid is the id as known in the database<br>
 		 * there's no database storage when creating a FoodItem<br>
 		 */
 		public function FoodItem(foodItemDescription:String, units:ArrayCollection,itemid:int) {
+			_shownInList = true;
 			unitList = units;
 			this._itemDescription = foodItemDescription;
 			this._itemid = itemid;

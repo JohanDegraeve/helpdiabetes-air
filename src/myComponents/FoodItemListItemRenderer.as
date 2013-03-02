@@ -17,26 +17,31 @@
  */
 package myComponents
 {
-	import spark.components.LabelItemRenderer;
-	
-	public class ListItemRenderer extends LabelItemRenderer
+	import databaseclasses.FoodItem;
+
+	public class FoodItemListItemRenderer extends ListItemRenderer
 	{
-		public function ListItemRenderer()
+		public function FoodItemListItemRenderer()
 		{
 			super();
 		}
+
+		override public function set data(value:Object):void {
+			if (!(value as FoodItem).shownInList) {
+				visible = false;
+			}
+			super.data = value;
+		}
 		
-		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
-		{
-			//only draw a border line
-			graphics.lineStyle(1, 0, 0.75);
-			graphics.moveTo(0,unscaledHeight - 1);
-			graphics.lineTo(unscaledWidth,unscaledHeight - 1);
-			graphics.endFill();
-			if (down) {
-				graphics.beginFill(0, 0.25);
-				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
-				graphics.endFill();
+		override protected function measure():void  {
+			super.measure();
+			//trace("in fooditemlistitemrendere, fooditem = " + (data as FoodItem).itemDescription + ", showninlist = " + (data as FoodItem).shownInList + ", height = " + height);
+			if (!(data as FoodItem).shownInList) {
+				measuredHeight = 0;
+				height = 0;
+			} else {
+				measuredHeight = 45;
+				height = 45;	
 			}
 		}
 	}
