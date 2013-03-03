@@ -20,7 +20,14 @@ package myComponents
 	import databaseclasses.FoodItem;
 
 	public class FoodItemListItemRenderer extends ListItemRenderer
+		
 	{
+		/**
+		 * itemHeight of an element as measured by default. Will be assigned intial value, so that we can reassign the correct value<br>
+		 * see the code
+		 */
+		private static var defaultHeight:int=0;
+
 		public function FoodItemListItemRenderer()
 		{
 			super();
@@ -35,13 +42,16 @@ package myComponents
 		
 		override protected function measure():void  {
 			super.measure();
+			if (defaultHeight == 0)
+				defaultHeight = measuredHeight;
+			
 			//trace("in fooditemlistitemrendere, fooditem = " + (data as FoodItem).itemDescription + ", showninlist = " + (data as FoodItem).shownInList + ", height = " + height);
 			if (!(data as FoodItem).shownInList) {
 				measuredHeight = 0;
 				height = 0;
 			} else {
-				measuredHeight = 45;
-				height = 45;	
+				measuredHeight = defaultHeight;
+				height = defaultHeight;	
 			}
 		}
 	}
