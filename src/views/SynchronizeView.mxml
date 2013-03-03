@@ -94,14 +94,7 @@ initial setup of sync settings
 					resourceManager.getString('synchronizeview','synchronisationwillstart');
 					
 					buttonAuthenticateToGoogle.addEventListener(MouseEvent.CLICK,buttonClicked);
-					
-					buttonHelp.addEventListener(MouseEvent.CLICK,helpButtonClicked);
-
 				}
-			}
-			
-			private function helpButtonClicked(event:MouseEvent):void {
-				navigateToURL(new URLRequest(SynchronizeView2.helpUrl));
 			}
 			
 			private function buttonClicked(event:MouseEvent):void {
@@ -178,6 +171,6 @@ initial setup of sync settings
 		<s:Label id="topLabel1" width="100%" text="{topLabelText1}" />
 		<s:TextArea id="authorizationcodeTextArea" width="100%"  height = "{authorizationcodeTextAreaVisible ? 100:0}" text="@{authorizationCode_text}" click="authorizationcodeTextAreaClicked()" visible="{authorizationcodeTextAreaVisible}"/>
 		<s:Button id="buttonAuthenticateToGoogle" width="100%" label="{resourceManager.getString('synchronizeview','buttonauthenticatetogoogletext')}"  visible="{!authorizationcodeTextAreaVisible}"/>
-		<s:Button id="buttonHelp" width="100%" label="{resourceManager.getString('synchronizeview','help')}"  visible="{!authorizationcodeTextAreaVisible}"/>
+		<s:Button visible="true" width="100%" label="{resourceManager.getString('synchronizeview','help')}" click="{navigateToURL(new URLRequest(SynchronizeView2.helpUrl))}"/>
 	</s:Group>
 </s:View>
