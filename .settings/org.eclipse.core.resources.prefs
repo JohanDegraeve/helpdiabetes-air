@@ -1,4 +1,4 @@
-#Sun Jan 13 23:22:34 CET 2013
+#Sun Mar 03 22:16:09 CET 2013
 eclipse.preferences.version=1
 encoding//src/locale/en_US/general.properties=UTF-8
 encoding//src/locale/nl_NL/editbgeventview.properties=UTF-8
@@ -6,4 +6,5 @@ encoding//src/locale/nl_NL/editexerciseeventview.properties=UTF-8
 encoding//src/locale/nl_NL/editmedicineventview.properties=UTF-8
 encoding//src/locale/nl_NL/general.properties=UTF-8
 encoding//src/locale/nl_NL/settingsboluscalculationview.properties=UTF-8
+encoding//src/locale/nl_NL/synchronizeview.properties=UTF-8
 encoding/<project>=utf-8

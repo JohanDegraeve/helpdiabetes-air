@@ -504,6 +504,10 @@ package utilities
 		 * used for event dispatching<br>
 		 */
 		public static const WAITING_FOR_SYNC_TO_FINISH:String = "waiting_for_sync_to_finish";
+		/**
+		 * used for event dispatching<br>
+		 */
+		public static const NEW_EVENT_UPLOADED:String = "new_event_uploaded";
 		
 		private var _foodtable:XML = <foodtable/>;
 		
@@ -514,6 +518,16 @@ package utilities
 			
 		{
 			return _foodtable;
+		}
+		
+		private var _uploadFoodDatabaseStatus:String = "";
+
+		/**
+		 * text to use in downloadfoodtableview, for showing status 
+		 */
+		public function get uploadFoodDatabaseStatus():String
+		{
+			return _uploadFoodDatabaseStatus;
 		}
 		
 		private var _workSheetList:ArrayList;
@@ -2649,6 +2663,10 @@ package utilities
 					return;
 				} // else we continue
 				Settings.getInstance().setSetting(Settings.SettingsNextRowToAddInFoodTable,new Number(foodItemIdBeingTreated + 1).toString());
+				
+				//let anyone who is interested know that a new item is uploaded
+				_uploadFoodDatabaseStatus = foodItemIdBeingTreated + " {outof} " + ModelLocator.getInstance().foodItemList.length  + " {elementsuploaded} ";
+				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 			} else  {//first time we come here, we need to initialize foodItemIdBeingTreated
 				foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAddInFoodTable));
 			}
@@ -2765,6 +2783,9 @@ package utilities
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) == googleExcelFoodTableColumnNames.length)  {
 				googleExcelInsertFoodItems();
 			} else {
+				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingheaders');
+				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
+
 				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) + 1;//index starts at 0, but column number at 1
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
@@ -2856,6 +2877,9 @@ package utilities
 				}
 				
 			} else {
+				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingfoodtablespreadsheet');
+				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
+
 				if (traceNeeded)
 					trace("start method googleExcelCreateFoodTable");
 				
@@ -2986,6 +3010,9 @@ package utilities
 					googleExcelCreateFoodTableHeader(null);
 				}
 			} else {
+				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingfoodtableworksheet');
+				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
+
 				if (traceNeeded)
 					trace("start method googleExcelCreateWorkSheet");
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";

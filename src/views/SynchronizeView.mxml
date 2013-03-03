@@ -141,14 +141,18 @@ initial setup of sync settings
 				Synchronize.getInstance().startSynchronize(null,true);
 			}
 			
-			/**
-			 * just to set status of texts buttons, ... corresponding to status where sync is ongoing for the first time, ie most probably uploading foodtable 
-			 */
-			private function setViewInStatusSynchronizing():void {
+			private function setViewInStatusSynchronizing(event:Event = null):void {
 				buttonAuthenticateToGoogle.visible = false;
 				authorizationcodeTextArea.visible = false;
 				topLabelText1 = resourceManager.getString('synchronizeview','alreadyauthorized') + '\n' +
 					resourceManager.getString('synchronizeview','synchronisationwillstart');
+				if (event == null)
+					Synchronize.getInstance().addEventListener(Synchronize.NEW_EVENT_UPLOADED,setViewInStatusSynchronizing);
+				else  {
+					topLabelText1+= Synchronize.getInstance().uploadFoodDatabaseStatus.
+					replace("{outof}",resourceManager.getString('synchronizeview','outof')).
+						replace("{elementsuploaded}",resourceManager.getString('synchronizeview','elementsuploaded'));	
+				}
 			}
 			
 			private function onSyncFinishedEvent(event:Event):void {
