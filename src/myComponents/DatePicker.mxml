@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-copied from franto.com
--->										  
+Copyright (C) 2013  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
 <!--
 user wil enter a date
 client needs to set currentDate, which is a timestamp in ms. User can only change year, month, date, but hour, minutes, seconds remains. ms will be set to zero
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 creationComplete="group1_creationCompleteHandler(event)"
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
 		 >
 	<fx:Declarations>
@@ -16,10 +31,13 @@ client needs to set currentDate, which is a timestamp in ms. User can only chang
 	<fx:Metadata>
 		[ResourceBundle("general")]
 	</fx:Metadata>
-<fx:Script>
+	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
+			
+			import spark.components.calendarClasses.DateSelectorDisplayMode;
 			private var _currentDate: Date;
 			[Bindable]
 			public function get currentDate(): Date
@@ -29,58 +47,12 @@ client needs to set currentDate, which is a timestamp in ms. User can only chang
 			public function set currentDate(value: Date): void
 			{
 				_currentDate = value;
-				updateDateParts();
-			}
-			
-			[Bindable]
-			public var day: int;
-			[Bindable]
-			public var month: int;
-			[Bindable]
-			public var year: int;
-			private var hour:int;
-			private var minute:int;
-			private var second:int;
-			
-			
-			private function updateDateParts(): void
-			{
-				day = currentDate.date;
-				month = currentDate.month;
-				year = currentDate.fullYear;
-				hour = currentDate.hours;
-				minute = currentDate.minutes;
-				second = currentDate.seconds;
-			}
-			private function incrementDate(type: String): void
-			{
-				updateDate(type, 1);
-			}
-			private function decrementDate(type: String): void
-			{
-				updateDate(type, -1);
-			}
-			private function updateDate(type: String, value: int): void
-			{
-				switch(type)
-				{
-					case 'day':
-						day += value;
-						break;
-					case 'month':
-						month += value;
-						break;
-					case 'year':
-						year += value;
-						break;
-				}
-				currentDate = new Date(year, month, day,hour,minute,second);
 			}
 			
 			private function setDate(): void
 			{
 				var dpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
-				dpe.newValue = currentDate;
+				dpe.newValue = dt.selectedDate;
 				dispatchEvent(dpe);
 				PopUpManager.removePopUp(this);
 			}
@@ -91,35 +63,20 @@ client needs to set currentDate, which is a timestamp in ms. User can only chang
 				PopUpManager.removePopUp(this);
 			}
 			
-			 
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				dt.selectedDate = _currentDate;
+				//var temp:Object = Capabilities.language;
+				dt.setStyle("locale",Capabilities.language);
+			}
+			
 		]]>
 	</fx:Script>
 	<s:BorderContainer >
 		
 		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
-			<s:Label text="{dayformatter.format(currentDate)}" width="100%" styleName="textColorInPickerOnDarkBackground"/>
-			<s:Line width="100%">
-				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="3"/>
-				</s:stroke>
-			</s:Line>
-			<s:HGroup width="100%">
-				<s:VGroup gap="10" >
-					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('day')" width="100%"/>
-					<s:Label text="{day}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('day')" width="100%"/>
-				</s:VGroup>
-				<s:VGroup gap="10" >
-					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('month')" width="100%"/>
-					<s:Label text="{monthformatter.format(currentDate)}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('month')" width="100%"/>
-				</s:VGroup>
-				<s:VGroup gap="10" >
-					<s:Button label="+" minWidth="60" minHeight="60" click="incrementDate('year')" width="100%"/>
-					<s:Label text="{year}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="60" minHeight="60" click="decrementDate('year')" width="100%"/>
-				</s:VGroup>
-			</s:HGroup>
+			<s:DateSpinner id="dt" displayMode="{DateSelectorDisplayMode.DATE}"/> 		
 			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
 				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
 					<s:Button width="100%" height="50%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="setDate()"/>

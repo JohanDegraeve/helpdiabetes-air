@@ -99,17 +99,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, breakfastUntilTimeSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
-				breakfastTime = timeformatter.format(event.newValue as Date);
-				Settings.getInstance().setSetting(Settings.SettingBREAKFAST_UNTIL,(((event.newValue as Date).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString());
+				breakfastTime = timeformatter.format(convertFromUTC(new Date(event.newValue as Date)));
+				Settings.getInstance().setSetting(Settings.SettingBREAKFAST_UNTIL,(((convertFromUTC(new Date(event.newValue as Date))).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString());
 				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			private function breakfastUntilSettingClicked(e:MouseEvent = null):void {
 				dateOrTimePicker = new TimePicker();
-				dateOrTimePicker.useUTC=true;				
-				dateOrTimePicker.minTime = new Date(1);//1 ms after 0 hour, because breakfast can only start at 0, but off course time can never be set to 1 ms
-				dateOrTimePicker.maxTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL)));
-				(dateOrTimePicker as TimePicker).currentTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL)));
+				dateOrTimePicker.minTime = convertToUTC(new Date(1));//1 ms after 0 hour, because breakfast can only start at 0, but off course time can never be set to 1 ms
+				dateOrTimePicker.maxTime = convertToUTC(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))));
+				
+				(dateOrTimePicker as TimePicker).currentTime = convertToUTC(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))));
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, breakfastUntilTimeSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				PopUpManager.addPopUp(dateOrTimePicker, this, true);
@@ -120,17 +120,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, lunchfastUntilTimeSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
-				lunchTime = timeformatter.format(event.newValue as Date);
-				Settings.getInstance().setSetting(Settings.SettingLUNCH_UNTIL,(((event.newValue as Date).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString());
+				lunchTime = timeformatter.format(convertFromUTC(new Date(event.newValue as Date)));
+				Settings.getInstance().setSetting(Settings.SettingLUNCH_UNTIL,(((convertFromUTC(new Date(event.newValue as Date))).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString());
 				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			private function lunchUntilSettingClicked(e:MouseEvent = null):void {
 				dateOrTimePicker = new TimePicker();
-				dateOrTimePicker.useUTC=true;
-				dateOrTimePicker.maxTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL)));
-				dateOrTimePicker.minTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL)));
-				(dateOrTimePicker as TimePicker).currentTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL)));
+				dateOrTimePicker.maxTime = convertToUTC(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))));
+				dateOrTimePicker.minTime = convertToUTC(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))));
+				(dateOrTimePicker as TimePicker).currentTime = convertToUTC(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))));
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, lunchfastUntilTimeSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				PopUpManager.addPopUp(dateOrTimePicker, this, true);
@@ -141,23 +140,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, snackfastUntilTimeSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
-				snackTime = timeformatter.format(event.newValue as Date);
-				Settings.getInstance().setSetting(Settings.SettingSNACK_UNTIL,(((event.newValue as Date).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString());
+				snackTime = timeformatter.format(convertFromUTC(new Date(event.newValue as Date)));
+				Settings.getInstance().setSetting(Settings.SettingSNACK_UNTIL,(((convertFromUTC(new Date(event.newValue as Date))).hoursUTC * 3600000 + (event.newValue as Date).minutesUTC * 60000)as Number).toString());
 				Synchronize.getInstance().startSynchronize(tracker,true);
 			}
 			
 			private function snackUntilSettingClicked(e:MouseEvent = null):void {
 				dateOrTimePicker = new TimePicker();
-				dateOrTimePicker.useUTC=true;
-				dateOrTimePicker.maxTime = new Date(new Number(143999999));//1 ms before midnight
-				dateOrTimePicker.minTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL)));
-				(dateOrTimePicker as TimePicker).currentTime = new Date(new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL)));
+				dateOrTimePicker.maxTime = convertToUTC(new Date(new Number(143999999)));//1 ms before midnight
+				dateOrTimePicker.minTime = convertToUTC(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))));
+				(dateOrTimePicker as TimePicker).currentTime = convertToUTC(new Date(new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))));
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, snackfastUntilTimeSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				PopUpManager.addPopUp(dateOrTimePicker, this, true);
 				PopUpManager.centerPopUp(dateOrTimePicker);
 			}
 			
+			/**
+			 * 
+			 */
+			private function convertToUTC(dtDate:Date):Date{
+				dtDate.setTime(dtDate.getTime() + (dtDate.getTimezoneOffset() * 60000))
+				return dtDate;
+			}
+
+			/**
+			 * 
+			 */
+			private function convertFromUTC(dtDate:Date):Date{
+				dtDate.setTime(dtDate.getTime() - (dtDate.getTimezoneOffset() * 60000))
+				return dtDate;
+			}
+
 ]]>
 	</fx:Script>
 	<s:navigationContent>

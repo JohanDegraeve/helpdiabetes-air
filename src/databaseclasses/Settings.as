@@ -289,9 +289,9 @@ package databaseclasses
 			"0", //lunch
 			"0", //snack
 			"0", //supper
-			"37800000", // January 1, 1970, 10h30 Hr in ms, local time,
-			"55800000", // January 1, 1970, 15h30 Hr in ms, local time,
-			"61200000", // January 1, 1970, 17 Hr in ms, local time,
+			"37800000", // January 1, 1970, 10h30 Hr in ms, gmt time,
+			"55800000", // January 1, 1970, 15h30 Hr in ms, gmt time,
+			"61200000", // January 1, 1970, 17 Hr in ms, gmt time,
 			"0", //correction factor
 			"0", //the first blood glucose event id to be used
 			"999999", // a high value for maximum time difference last bloodglucose event and meal

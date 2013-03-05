@@ -1,26 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-copied from franto.com
--->										  
+Copyright (C) 2013  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
 <!--
 user wil enter a time
 client needs to set currentTime, which is a timestamp in ms. User can only change hour, minutes, seconds but year, month, date remains. ms will be set to zero
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 creationComplete="group1_creationCompleteHandler(event)"
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
 		 >
 	<fx:Declarations>
-		<s:DateTimeFormatter id="timeFormatter" dateStyle="none" dateTimePattern="hh:mm a" useUTC="{useUTC}"/>
-		<s:DateTimeFormatter id="timeFormatter2" dateStyle="none" dateTimePattern="hh" useUTC="{useUTC}"/>
 	</fx:Declarations>
 	<fx:Metadata>
 		[ResourceBundle("general")]
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
 			import myComponents.PickerEvent;
+			
+			import spark.components.calendarClasses.DateSelectorDisplayMode;
+
 			private var _currentTime: Date;
 			[Bindable]
 			public function get currentTime(): Date
@@ -30,26 +47,13 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			public function set currentTime(value: Date): void
 			{
 				_currentTime = value;
-				updateTimeParts();
-			}
-			
-			private var _useUTC:Boolean = false;
-
-			/**
-			 * A boolean flag to control whether the local or the UTC date and time values are used when the formatting a date. <br>
-			 * If useUTC is set to true then the UTC values are used. <br>
-			 * If the value is set to false, then the date time values of the operating system's current time zone is used
-			 */
-			public function get useUTC():Boolean
-			{
-				return _useUTC;
 			}
 			
 			/**
 			 * maximum time to which user can set the new time 
 			 */
 			private var _maxTime:Date = new Date(32531915068000);
-
+			
 			/**
 			 * maximum time to which user can set the new time 
 			 */
@@ -57,7 +61,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			{
 				return _maxTime;
 			}
-
+			
 			/**
 			 * maximum time to which user can set the new time 
 			 */
@@ -65,7 +69,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			{
 				_maxTime = value;
 			}
-
+			
 			/**
 			 * minimum time to which user can set the new time 
 			 */
@@ -86,116 +90,11 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			{
 				_minTime = value;
 			}
-
-			/**
-			 * @private
-			 */
-			public function set useUTC(value:Boolean):void
-			{
-				if (_useUTC == value)
-					return;
-				_useUTC = value;
-				timeFormatter.useUTC = value;
-				timeFormatter2.useUTC = value;
-			}
-
-			
-			[Bindable]
-			public var timeMode: String = 'AM';
-			private var _fullDayMode: Boolean;
-			[Bindable]
-			public function get fullDayMode(): Boolean
-			{
-				return _fullDayMode;
-			}
-			public function set fullDayMode(value: Boolean): void
-			{
-				if (_fullDayMode != value)
-				{
-					_fullDayMode = value;
-					if (_fullDayMode)
-					{
-						timeFormatter.dateTimePattern = 'HH:mm';
-						timeFormatter2.dateTimePattern = 'HH';
-					} else {
-						timeFormatter.dateTimePattern = 'hh:mm a';
-						timeFormatter2.dateTimePattern = 'hh';
-					}
-				}
-			}
-			
-			[Bindable]
-			public var hour: int;
-			[Bindable]
-			public var minute: int;
-			[Bindable]
-			public var second: int;
-			private var year:int;
-			private var month:int;
-			private var date:int;
-			
-			
-			private function changeMode(): void
-			{
-				if (timeMode == 'AM')
-				{
-					currentTime.setHours(currentTime.getHours() + 12);
-				} else {
-					currentTime.setHours(currentTime.getHours() - 12);
-				}
-				updateTimeParts();
-				
-				currentTime = new Date(year, month, date, hour, minute, second);
-				
-			}
-			private function updateTimeParts(): void
-			{
-				hour = currentTime.hours;
-				minute = currentTime.minutes;
-				second = currentTime.seconds;
-				year = currentTime.fullYear;
-				month = currentTime.month;
-				date = currentTime.date;
-				
-				if (hour >= 12)
-					timeMode = 'PM';
-				else {
-					timeMode = 'AM';
-				}
-			}
-			private function incrementTime(type: String): void
-			{
-				updateTime(type, 1);
-			}
-			private function decrementTime(type: String): void
-			{
-				updateTime(type, -1);
-			}
-			private function updateTime(type: String, value: int): void
-			{
-				switch(type)
-				{
-					case 'hour':
-						hour += value;
-						break;
-					case 'minute':
-						minute += value;
-						break;
-					case 'second':
-						second += value;
-						break;
-				}
-				var newTime:Date = new Date(year, month, date, hour, minute, second);
-				if ((newTime < maxTime) && (newTime > minTime)) {
-					currentTime = newTime;
-				} else
-					updateTimeParts();//this will force reset hour, minute and second to previous values
-			}
 			
 			private function setTime(): void
 			{
 				var tpe: PickerEvent = new PickerEvent(PickerEvent.PICKER_SET);
-				tpe.newValue = currentTime;
+				tpe.newValue = dt.selectedDate;
 				dispatchEvent(tpe);
 				PopUpManager.removePopUp(this);
 			}
@@ -205,32 +104,21 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 				dispatchEvent(tpe);
 				PopUpManager.removePopUp(this);
 			}
+
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				dt.setStyle("locale",Capabilities.language);
+				
+				dt.minDate = _minTime;
+				dt.maxDate = _maxTime;
+				dt.selectedDate = _currentTime;
+			}
 		]]>
 	</fx:Script>
 	<s:BorderContainer>
 		
 		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
-			<s:Label text="{timeFormatter.format(currentTime)}" width="100%" styleName="textColorInPickerOnDarkBackground"/>
-			<s:Line width="100%">
-				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="2"/>
-				</s:stroke>
-			</s:Line>
-			<s:HGroup width="100%">
-				<s:VGroup gap="10">
-					<s:Button label="+" minWidth="60" minHeight="60" click="incrementTime('hour')" width="100%"/>
-					<s:Label text="{timeFormatter2.format(currentTime)}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="60" minHeight="60" click="decrementTime('hour')" width="100%"/>
-				</s:VGroup>
-				<s:VGroup gap="10" >
-					<s:Button label="+" minWidth="60" minHeight="60" click="incrementTime('minute')" width="100%"/>
-					<s:Label text="{minute}" width="100%" textAlign="center" styleName="textColorInPickerOnDarkBackground"/>
-					<s:Button label="-" minWidth="60" minHeight="60" click="decrementTime('minute')" width="100%"/>
-				</s:VGroup>
-				<s:VGroup gap="10" visible="{!fullDayMode}" includeInLayout="{!fullDayMode}" verticalAlign="middle" height="100%">
-					<s:Button label="{timeMode}" click="changeMode()" width="100%"/>
-				</s:VGroup>
-			</s:HGroup>
+			<s:DateSpinner id="dt" displayMode="{DateSelectorDisplayMode.TIME}"/>
 			<s:BorderContainer backgroundColor="0xcccccc" width="100%">
 				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
 					<s:Button height="50%" width="100%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="setTime()"/>
