@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:TabbedViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 								  xmlns:s="library://ns.adobe.com/flex/spark"
 								  initialize="initApplication()" 
-								  creationComplete="onCreationComplete()"
 								  applicationDPI="160" 
 								  splashScreenImage="@Embed('assets/bg_withappname.png')"
 								  splashScreenScaleMode="zoom"
@@ -100,7 +99,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			public var modelLocator:ModelLocator = ModelLocator.getInstance();
 			
-			private function onCreationComplete():void {
+			private function addedToStageHandler(event:Event):void {
+				//tests with emulator show that minimum height of 455 is required
+				var deviceScreenWidth:int = Math.min(width,height);
+				if (deviceScreenWidth < 455) {
+					this.stage.setAspectRatio(StageAspectRatio.PORTRAIT);
+					this.stage.autoOrients = false;
+				}
+
 			}
 			
 			
@@ -108,9 +114,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * here's where the database is initialized and if completed the dataprovider for foodcounterview will be updated. 
 			 */
 			private function initApplication():void {
-				
+				this.addEventListener( Event.ADDED_TO_STAGE , addedToStageHandler );
 				tabbedNavigator.addEventListener(IndexChangeEvent.CHANGE, changeIcon);
-				
 			}
 			
 			protected function changeIcon(event:IndexChangeEvent):void {
