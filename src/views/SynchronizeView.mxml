@@ -87,6 +87,8 @@ initial setup of sync settings
 					//apparently oninitialize gets called
 					setViewInStatusSynchronizing();
 					Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
+					//but you never know that sync is not really running, so let's try to retart it
+					Synchronize.getInstance().startSynchronize(null,true);
 				} else {
 					authorizationcodeTextAreaVisible = false;
 					topLabelText1 = resourceManager.getString('synchronizeview','synchronizewithgoogledocs1');
