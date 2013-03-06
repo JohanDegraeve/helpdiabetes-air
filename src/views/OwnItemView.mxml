@@ -52,12 +52,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var errorWarning:HelpCallOut;
 			private var helpCallOut:HelpCallOut;
 			
+			[Bindable]private static var unitdescriptionText:String ="";
+			[Bindable]private static var standardamountText:String;
+			[Bindable]private static var fooditemdescriptionText:String;
+			[Bindable]private static var kilocaloriesText:String;
+			[Bindable]private static var gramoffcarbsText:String;
+			[Bindable]private static var gramofffatText:String;
+			[Bindable]private static var gramoffproteinText:String;
+			
 			/**
 			 * used as context value when pushing the view AddFoodItemView<br>
 			 * when addHandler is called, the value of the return object will be check
 			 */
 			public static const ADD_FOOD_ITEM:int = 1; 
 
+			private function initializeVariables():void {
+				unitdescriptionText = resourceManager.getString('general','gram_long');
+				standardamountText = "100";
+				fooditemdescriptionText = resourceManager.getString('ownitemview','youritem');
+				kilocaloriesText = "";
+				gramoffcarbsText = "";
+				gramofffatText = "";
+				gramoffproteinText = "";
+			}
+			
+			
 			private function onCreationComplete():void {
 				helpCallOut = new HelpCallOut();
 				helpCallOut.helpText = resourceManager.getString('ownitemview','help_text_ownitemview');
@@ -73,6 +92,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
 					if (navigator.poppedViewReturnedObject.object.context == ADD_FOOD_ITEM) {
+						initializeVariables();
 						navigator.popView();
 					}
 				}
@@ -82,6 +102,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				back_label = resourceManager.getString('general','back');
 				trackerId = resourceManager.getString('analytics','trackeraccount');
+				if (unitdescriptionText == "")
+					initializeVariables();
 			}
 			
 			private function errorMessageConfirmed(event:Event):void {
@@ -140,11 +162,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" text="100" contentBackgroundColor="0xDCDCDC" id="standardamount" editable="true" borderVisible="false" textAlign="left" restrict="0-9"/>
-			<s:TextInput width = "50%" text="{resourceManager.getString('general','gram_long')}"  contentBackgroundColor="0xDCDCDC" id="unitdescription" editable="true" borderVisible="false" textAlign="left" />
+			<s:TextInput width = "50%" text="@{standardamountText}" contentBackgroundColor="0xDCDCDC" id="standardamount" editable="true" borderVisible="false" textAlign="left" restrict="0-9"/>
+			<s:TextInput width = "50%" text="@{unitdescriptionText}"  contentBackgroundColor="0xDCDCDC" id="unitdescription" editable="true" borderVisible="false" textAlign="left" />
 		</s:Group>
 		<s:Group>
-			<s:TextInput text="{resourceManager.getString('ownitemview','youritem')}" contentBackgroundColor="0xDCDCDC" id="fooditemdescription" editable="true" borderVisible="false" textAlign="left" />
+			<s:TextInput text="@{fooditemdescriptionText}" contentBackgroundColor="0xDCDCDC" id="fooditemdescription" editable="true" borderVisible="false" textAlign="left" />
 		</s:Group>
 		<s:Group y="0" x="0" width="100%">
 			<s:Label  height="30" text="{resourceManager.getString('ownitemview','contains')}" verticalAlign="middle"/>
@@ -154,7 +176,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" contentBackgroundColor="0xDCDCDC" id="gramofcarbs" editable="true" borderVisible="false" textAlign="left" restrict="0-9.,"/>
+			<s:TextInput width = "50%" text="@{gramoffcarbsText}" contentBackgroundColor="0xDCDCDC" id="gramofcarbs" editable="true" borderVisible="false" textAlign="left" restrict="0-9.,"/>
 			<s:Label  height="30" width="50%" text="{resourceManager.getString('general','gram_of_carbs_short')}" verticalAlign="middle"/>
 		</s:Group>
 		<s:Group y="0" x="0" width="100%">
@@ -162,7 +184,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" contentBackgroundColor="0xDCDCDC" id="kilocalories" editable="true" borderVisible="false" textAlign="left" restrict="0-9"/>
+			<s:TextInput width = "50%" text="@{kilocaloriesText}" contentBackgroundColor="0xDCDCDC" id="kilocalories" editable="true" borderVisible="false" textAlign="left" restrict="0-9"/>
 			<s:Label  height="30" width="50%" text="{resourceManager.getString('general','kilocalories')}" verticalAlign="middle"/>
 		</s:Group>
 		<s:Group y="0" x="0" width="100%">
@@ -170,7 +192,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" contentBackgroundColor="0xDCDCDC" id="gramoffat" editable="true" borderVisible="false" textAlign="left" restrict="0-9.,"/>
+			<s:TextInput width = "50%" text="@{gramofffatText}" contentBackgroundColor="0xDCDCDC" id="gramoffat" editable="true" borderVisible="false" textAlign="left" restrict="0-9.,"/>
 			<s:Label  height="30" width="50%" text="{resourceManager.getString('general','gram_of_fat')}" verticalAlign="middle"/>
 		</s:Group>
 		<s:Group y="0" x="0" width="100%">
@@ -178,7 +200,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" contentBackgroundColor="0xDCDCDC" id="gramofprotein" editable="true" borderVisible="false" textAlign="left" restrict="0-9.,"/>
+			<s:TextInput width = "50%" text="@{gramoffproteinText}" contentBackgroundColor="0xDCDCDC" id="gramofprotein" editable="true" borderVisible="false" textAlign="left" restrict="0-9.,"/>
 			<s:Label  height="30" width="50%" text="{resourceManager.getString('general','gram_of_protein')}" verticalAlign="middle"/>
 		</s:Group>
 	</s:Group>
