@@ -255,7 +255,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
 				helpCallOut.open(searchButton,true);
 			}
-
+			
 			private function helptext2Removed(event:Event):void {
 				
 			}
@@ -333,7 +333,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 									ModelLocator.getInstance().foodItemList.refresh()
 									//searchtextchanged will be called after timer expiry so no need to call it here
 								}
-									
+							
 							timer = new Timer(200, 1);
 							timer.addEventListener(TimerEvent.TIMER,timerEnd);
 							timer.start();
@@ -367,18 +367,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function searchClicked(e:MouseEvent = null):void {
 				if (searchActive)
 					return;
+				if (!searchtext.text != "") {
+					return;
+				} 
 				
 				var foundFirstItem:Boolean = false;
-				if (searchtext.text != "") {
-					for (var fooditemctr:int = 0;fooditemctr < ModelLocator.getInstance().foodItemList.length;fooditemctr++) {
-						if (ExcelSorting.stringAhasStringB((ModelLocator.getInstance().foodItemList.getItemAt(fooditemctr) as FoodItem).itemDescription,searchtext.text)) {
-							if (!foundFirstItem)
-								setAllShownInList(false);
-							foundFirstItem = true;
-							(ModelLocator.getInstance().foodItemList.getItemAt(fooditemctr) as FoodItem).shownInList = true;
-						}
+				for (var fooditemctr:int = 0;fooditemctr < ModelLocator.getInstance().foodItemList.length;fooditemctr++) {
+					if (ExcelSorting.stringAhasStringB((ModelLocator.getInstance().foodItemList.getItemAt(fooditemctr) as FoodItem).itemDescription,searchtext.text)) {
+						if (!foundFirstItem)
+							setAllShownInList(false);
+						foundFirstItem = true;
+						(ModelLocator.getInstance().foodItemList.getItemAt(fooditemctr) as FoodItem).shownInList = true;
 					}
-				} 
+				}
 				if (foundFirstItem) {
 					ModelLocator.getInstance().foodItemList.refresh();//the trigger a redraw
 					searchActive = true;
@@ -387,6 +388,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						helpCallOut.helpText = resourceManager.getString('foodcounterview','help_text_cancelButton');
 						helpCallOut.settingId = Settings.SettingsHelpTextFoodCounterViewCancelButton;
 						helpCallOut.open(cancelButton,true)
+					}
+				} else  {
+					notificationPopUp = new Notification();
+					notificationPopUp.notificationText = resourceManager.getString('foodcounterview','noitemsfound');
+					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
+					PopUpManager.addPopUp(notificationPopUp, this, true);
+					PopUpManager.centerPopUp(notificationPopUp);
+				}
+				
+				function okClicked(event: PickerEvent):void {
+					if (notificationPopUp != null) {
+						PopUpManager.removePopUp(notificationPopUp);
+						if (notificationPopUp.hasEventListener(PickerEvent.PICKER_SET)) {
+							notificationPopUp.removeEventListener(PickerEvent.PICKER_SET, okClicked);
+						}
 					}
 				}
 			}
