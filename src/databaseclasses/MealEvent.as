@@ -39,6 +39,13 @@ package databaseclasses
 	 */ 
 	public class MealEvent extends TrackingViewElement implements IListElement
 	{
+		private var _comment:String;
+
+		public function get comment():String
+		{
+			return _comment;
+		}
+		
 		internal var _mealName:String;//made internal because meal.as failed to use mealName - no explanation
 		/**
 		 * the insulinratio used in this mealevent, if 0 then not used<br>
@@ -144,7 +151,7 @@ package databaseclasses
 		 * if databaseStorage = false then creationTimeStamp must be not null<br>
 		 * new mealEventId is created if databaseStorage = true.
 		 */
-		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,timeStamp:Number,dispatcher:EventDispatcher, mealEventId:Number, lastModifiedTimeStamp:Number, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null,mealThatHoldsThisMealEvent:Meal = null) {
+		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,previousBGlevel:Number,timeStamp:Number,dispatcher:EventDispatcher, mealEventId:Number, newcomment:String, lastModifiedTimeStamp:Number, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null,mealThatHoldsThisMealEvent:Meal = null) {
 			this._mealName = mealName;
 			if (isNaN(insulinRatio))
 				this._insulinRatio = 0;
@@ -157,6 +164,7 @@ package databaseclasses
 			this._totalKilocalories = 0;
 			this._correctionFactor = correctionFactor;
 			this._meal = mealThatHoldsThisMealEvent;
+			this._comment = newcomment;
 			
 			if (!isNaN(lastModifiedTimeStamp))
 				this._lastModifiedTimeStamp = lastModifiedTimeStamp;
@@ -189,6 +197,7 @@ package databaseclasses
 					correctionFactor,
 					previousBGlevel,
 					_timeStamp.valueOf(),
+					_comment,
 					localDispatcher);
 			}
 			
@@ -283,7 +292,7 @@ package databaseclasses
 		{
 			this._timeStamp = timeStamp;
 			_lastModifiedTimeStamp = (new Date()).valueOf();
-			updateMealEvent(mealName,insulinRatio,correctionFactor,previousBGlevel,lastModifiedTimeStamp,timeStamp);
+			updateMealEvent(mealName, _comment,insulinRatio,correctionFactor,previousBGlevel,lastModifiedTimeStamp,timeStamp);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -330,7 +339,17 @@ package databaseclasses
 		{
 			return _totalCarbs;
 		}
-
+		
+		public function set comment(value:String):void {
+			this._comment = value;
+			var newLastModifiedTimeStamp:Number = new Date().valueOf();
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			_lastModifiedTimeStamp = newLastModifiedTimeStamp;
+			
+			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,_previousBGlevel,_lastModifiedTimeStamp,_timeStamp, _comment, null);
+		}
+		
 		/**
 		 * the insulineratio, if null then there was no insuline ratio for the period in which the meal was created or modified
 		 */
@@ -347,7 +366,7 @@ package databaseclasses
 		 * if value == null or value == Number.NaN then insulinratio is set to 0
 		 * 
 		 */
-		public function set  insulinRatio(value:Number):void {
+		public function set insulinRatio(value:Number):void {
 			if (isNaN(_insulinRatio))
 				this._insulinRatio = 0;
 			else
@@ -357,7 +376,7 @@ package databaseclasses
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
 			_lastModifiedTimeStamp = newLastModifiedTimeStamp;
 			
-			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,_previousBGlevel,_lastModifiedTimeStamp,_timeStamp,null);
+			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,_previousBGlevel,_lastModifiedTimeStamp,_timeStamp,_comment,null);
 			recalculateInsulinAmount();
 		}
 
@@ -473,11 +492,12 @@ package databaseclasses
 		 * updates the mealevent, also in the database<br>
 		 * none of the values should be null 
 		 */
-		public function updateMealEvent(newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newPreviousBGLevel:int,newLastModifiedTimeStamp:Number,newCreationTimeStamp:Number) :void {
+		public function updateMealEvent(newMealName:String, newcomment:String, newInsulinRatio:Number,newCorrectionFactor:Number,newPreviousBGLevel:int,newLastModifiedTimeStamp:Number,newCreationTimeStamp:Number) :void {
 			_mealName = newMealName;
 			_insulinRatio = newInsulinRatio;
 			_correctionFactor = newCorrectionFactor;
 			_previousBGlevel = newPreviousBGLevel;
+			_comment = newcomment;
 
 				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
 					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
@@ -488,7 +508,7 @@ package databaseclasses
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
 			
-			Database.getInstance().updateMealEvent(this.eventid,newMealName,newInsulinRatio,newCorrectionFactor,newPreviousBGLevel,newLastModifiedTimeStamp,newCreationTimeStamp,null);
+			Database.getInstance().updateMealEvent(this.eventid,newMealName,newInsulinRatio,newCorrectionFactor,newPreviousBGLevel,newLastModifiedTimeStamp,newCreationTimeStamp,_comment,null);
 		}
 	}
 }

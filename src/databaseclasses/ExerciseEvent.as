@@ -37,16 +37,19 @@ package databaseclasses
 		private var _comment:String;
 
 		public function get comment():String
-
 		{
 			return _comment;
 		}
 		
-		public function ExerciseEvent(level:String,comment:String, exerciseeventid:Number,creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true)
+		private function set comment(value:String):void
+		{
+			_comment = value;
+		}
+		public function ExerciseEvent(level:String, newcomment:String, exerciseeventid:Number,creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true)
 		{
 			this._level = level;
 			this.eventid = exerciseeventid;
-			this._comment = comment;
+			this._comment = newcomment;
 			if (!isNaN(creationTimeStamp))
 				_timeStamp = creationTimeStamp;
 			else
@@ -58,7 +61,7 @@ package databaseclasses
 				_lastModifiedTimestamp = (new Date()).valueOf();
 			
 			if (storeInDatabase)
-				Database.getInstance().createNewExerciseEvent(level,comment,_timeStamp,_lastModifiedTimestamp,exerciseeventid,null);
+				Database.getInstance().createNewExerciseEvent(level,_comment,_timeStamp,_lastModifiedTimestamp,exerciseeventid,null);
 		}
 		
 		public function get timeStamp():Number
@@ -89,7 +92,7 @@ package databaseclasses
 		 */
 		public function updateExerciseEvent(newLevel:String,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number,newComment:String = null):void {
 			_level = newLevel;
-			_comment = (newComment == null ? "":newComment);
+			_comment = newComment;
 
 				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
 					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());

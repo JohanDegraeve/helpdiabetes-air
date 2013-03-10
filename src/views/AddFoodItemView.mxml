@@ -84,9 +84,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private var amount_textinput_text:String;
 			[Bindable]
 			private var meal_textarea_text:String;
-			private var _amount_textarea_text:String;
-			
-			
+			private var _amount_textarea_text:String;					
 			[Bindable]
 			private var meal_button_text:String;
 			[Bindable]
