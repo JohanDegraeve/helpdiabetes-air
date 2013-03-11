@@ -71,7 +71,32 @@ package myComponents
 		static private var offsetToPutTextInTheMiddle:int;
 		static private var iconHeight:int;
 		static private var iconWidth:int;
+		static private var notesIconWidthAndHeight:int = 17;
 		
+		private var _comment:String;
+		
+		public function get comment():String
+		{
+			return _comment;
+		}
+		
+		public function set comment(value:String):void
+		{
+			if (_comment == value)
+				return;
+			_comment = value;
+			if (comment == null)
+				return;
+			if (comment == "")
+				return;
+			if (!notesImage) {
+				notesImage = new Image();
+				notesImage.fillMode = BitmapFillMode.CLIP;
+				notesImage.source = notesIcon;
+				addChild(notesImage);
+			}
+		}
+
 		private var _mealExtended:Boolean = false;
 
 		/**
@@ -307,6 +332,7 @@ package myComponents
 			
 			mealExtended = getMealExtendedValue(value as MealEvent);
 			
+			comment = (value as MealEvent).comment;
 		}
 		
 		/**
@@ -344,6 +370,15 @@ package myComponents
 				addChild(insulinDetails);
 			}
 			
+			if (_comment != null)
+				if (_comment != "") {
+					if (!notesImage) {
+						notesImage = new Image();
+						notesImage.fillMode = BitmapFillMode.CLIP;
+						notesImage.source = notesIcon;
+						addChild(notesImage);
+					}
+				}
 		}
 		
 		// Override styleChanged() to proopgate style changes to compLabelDisplay.
@@ -386,18 +421,25 @@ package myComponents
 			//and then we'll extend carbamount if still possible
 			//NEED TO CHECK ONCE WITH DEBUGGER IF THIS IS ALWAYS EQUAL TO MINIMUM_CARB_AMOUNT_WIDTH - I THINK SO BECAUSE HERE carbAmountDisplay has no text yet
 			var carbAmountDisplayWidth:Number = Math.max(getElementPreferredWidth(carbAmountDisplay), MINIMUM_CARB_AMOUNT_WIDTH_LARGE_FONT);//that value is used later on also while creating field for selectedmealitems
-			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth  - iconWidth);
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - carbAmountDisplayWidth  - iconWidth - (notesImage ? notesIconWidthAndHeight:0));
 			carbAmountDisplay.text = carbAmount + " " + gramkh;
-			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(carbAmountDisplay));
+			carbAmountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT - iconWidth - (notesImage ? notesIconWidthAndHeight:0), getElementPreferredWidth(carbAmountDisplay));
+			labelDisplayWidth = Math.min(labelDisplayWidth,unscaledWidth - PADDING_LEFT - carbAmountDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT - iconWidth - (notesImage ? notesIconWidthAndHeight:0));
 			
-			setElementSize(labelDisplay,labelDisplayWidth + iconWidth,itemHeight);
+			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
 			
 			setElementSize(carbAmountDisplay,carbAmountDisplayWidth,itemHeight);
 			labelDisplay.truncateToFit();
 			carbAmountDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0 + iconWidth ,offsetToPutTextInTheMiddle);
-			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth,offsetToPutTextInTheMiddle);
+			setElementPosition(carbAmountDisplay,unscaledWidth - PADDING_RIGHT - carbAmountDisplayWidth - (notesImage ? notesIconWidthAndHeight:0),offsetToPutTextInTheMiddle);
+
+			if (notesImage)  {
+				setElementSize(notesImage,notesIconWidthAndHeight,notesIconWidthAndHeight);
+				setElementPosition(notesImage,unscaledWidth- notesIconWidthAndHeight,offsetToPutTextInTheMiddle);
+			}
+			
 			var currentY:Number = itemHeight - _upLiftForNextField;
 			
 		    if (insulinAmount != null && insulinDetails != null) {

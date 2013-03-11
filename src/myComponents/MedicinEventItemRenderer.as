@@ -45,6 +45,7 @@ package myComponents
 		static private var offsetToPutTextInTheMiddle:int;
 		static private var iconHeight:int;
 		static private var iconWidth:int;
+		static private var notesIconWidthAndHeight:int = 17;
 		
 		
 		/**
@@ -59,6 +60,31 @@ package myComponents
 		 * minimum gap between two elements, horizontal
 		 */
 		private static const GAP_HORIZONTAL_MINIMUM:int = 5;
+		
+		private var _comment:String;
+		
+		public function get comment():String
+		{
+			return _comment;
+		}
+		
+		public function set comment(value:String):void
+		{
+			if (_comment == value)
+				return;
+			_comment = value;
+			if (comment == null)
+				return;
+			if (comment == "")
+				return;
+			if (!notesImage) {
+				notesImage = new Image();
+				notesImage.fillMode = BitmapFillMode.CLIP;
+				notesImage.source = notesIcon;
+				addChild(notesImage);
+			}
+		}
+
 		
 		private var amountDisplay:StyleableTextField;
 		
@@ -108,6 +134,7 @@ package myComponents
 				+ " " + (value as MedicinEvent).medicinName;
 			
 			amount = (value as MedicinEvent).amount.toString();
+			comment = (value as MedicinEvent).comment;
 		}
 
 		override protected function createChildren():void {
@@ -130,6 +157,15 @@ package myComponents
 				amountDisplay.wordWrap = false;
 				addChild(amountDisplay);
 			}
+			if (_comment != null)
+				if (_comment != "") {
+					if (!notesImage) {
+						notesImage = new Image();
+						notesImage.fillMode = BitmapFillMode.CLIP;
+						notesImage.source = notesIcon;
+						addChild(notesImage);
+					}
+				}
 		}
 
 		override public function getHeight(item:TrackingViewElement = null):Number {
@@ -139,9 +175,11 @@ package myComponents
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
 			amountDisplay.text = amount + " " + resourceManager.getString('trackingview','internationalunit');
 			var amountDisplayWidth:Number = getElementPreferredWidth(amountDisplay);
-			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth - iconWidth);
+			var temp:Object = getElementPreferredWidth(labelDisplay);
+			var temp2:Object = unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth - iconWidth- (notesImage ? notesIconWidthAndHeight:0);
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth - iconWidth - (notesImage ? notesIconWidthAndHeight:0));
 			amountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(amountDisplay));
-			if (iconWidth + labelDisplayWidth + amountDisplayWidth + PADDING_RIGHT + GAP_HORIZONTAL_MINIMUM < unscaledWidth)
+			if (iconWidth + (notesImage ? notesIconWidthAndHeight:0) + labelDisplayWidth + amountDisplayWidth + PADDING_RIGHT + GAP_HORIZONTAL_MINIMUM < unscaledWidth)
 				labelDisplayWidth = unscaledWidth;//same reason as in exerciseventitemrenderer and bgeventitemrender but this works better
 			
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
@@ -151,8 +189,12 @@ package myComponents
 			amountDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);
-			setElementPosition(amountDisplay,unscaledWidth - PADDING_RIGHT - amountDisplayWidth,offsetToPutTextInTheMiddle);
+			setElementPosition(amountDisplay,unscaledWidth - PADDING_RIGHT - amountDisplayWidth - (notesImage ? notesIconWidthAndHeight:0),offsetToPutTextInTheMiddle);
 			setElementPosition(eventTypeImage,0,0);
+			if (notesImage)  {
+				setElementSize(notesImage,notesIconWidthAndHeight,notesIconWidthAndHeight);
+				setElementPosition(notesImage,unscaledWidth- notesIconWidthAndHeight,offsetToPutTextInTheMiddle);
+			}
 		}
 		
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void

@@ -48,7 +48,32 @@ package myComponents
 		static private var offsetToPutTextInTheMiddle:int;
 		static private var iconHeight:int;
 		static private var iconWidth:int;
+		static private var notesIconWidthAndHeight:int = 17;
 		
+		private var _comment:String;
+		
+		public function get comment():String
+		{
+			return _comment;
+		}
+		
+		public function set comment(value:String):void
+		{
+			if (_comment == value)
+				return;
+			_comment = value;
+			if (comment == null)
+				return;
+			if (comment == "")
+				return;
+			if (!notesImage) {
+				notesImage = new Image();
+				notesImage.fillMode = BitmapFillMode.CLIP;
+				notesImage.source = notesIcon;
+				addChild(notesImage);
+			}
+		}
+
 		//*****************//
 		// the display fields //
 		// labelDisplay will be used to shown the first field with timestamp , amount in glucoseLevel will be on the right
@@ -152,6 +177,7 @@ package myComponents
 			
 			glucoseLevel = (value as BloodGlucoseEvent).bloodGlucoseLevel.toString();
 			unit = (value as BloodGlucoseEvent).unit;
+			comment = (value as BloodGlucoseEvent).comment;
 		}
 		
 		override protected function createChildren():void {
@@ -179,6 +205,15 @@ package myComponents
 				var textLineMetricx:TextLineMetrics = this.measureText("9999");
 				MINIMUM_AMOUNT_WIDTH = textLineMetricx.width;
 			}
+			if (_comment != null)
+				if (_comment != "") {
+					if (!notesImage) {
+						notesImage = new Image();
+						notesImage.fillMode = BitmapFillMode.CLIP;
+						notesImage.source = notesIcon;
+						addChild(notesImage);
+					}
+				}
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {
@@ -187,7 +222,7 @@ package myComponents
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
 			var glucoseLevelDisplayWidth:Number = Math.max(getElementPreferredWidth(glucoseLevelDisplay), MINIMUM_AMOUNT_WIDTH);
-			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - glucoseLevelDisplayWidth - iconWidth);
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - glucoseLevelDisplayWidth - iconWidth- (notesImage ? notesIconWidthAndHeight:0));
 			glucoseLevelDisplay.text = glucoseLevel + " " + unit ;
 			glucoseLevelDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(glucoseLevelDisplay));
 			labelDisplayWidth = unscaledWidth;//setting back to maximum value, because it seems when there was a missing gap between labeldisplaywidt and glucosedisplaywidt, then click item doesn't work in trackingview
@@ -198,8 +233,12 @@ package myComponents
 			glucoseLevelDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);
-			setElementPosition(glucoseLevelDisplay,unscaledWidth - PADDING_RIGHT - glucoseLevelDisplayWidth,offsetToPutTextInTheMiddle);
+			setElementPosition(glucoseLevelDisplay,unscaledWidth - PADDING_RIGHT - glucoseLevelDisplayWidth- (notesImage ? notesIconWidthAndHeight:0),offsetToPutTextInTheMiddle);
 			setElementPosition(eventTypeImage,0,0);
+			if (notesImage)  {
+				setElementSize(notesImage,notesIconWidthAndHeight,notesIconWidthAndHeight);
+				setElementPosition(notesImage,unscaledWidth- notesIconWidthAndHeight,offsetToPutTextInTheMiddle);
+			}
 		}
 		
 		/**
