@@ -49,6 +49,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
+			import myComponents.TextPicker;
 			import myComponents.TimePicker;
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
@@ -79,7 +80,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var trackerId:String;
 
 			private var thisView:View;
-
+			private var textPicker:TextPicker;
+			private var comment:String;
+			
 			/**
 			 * if true then this view is created for a new mealevent 
 			 */
@@ -114,6 +117,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						dateText = dateformatter.format(_eventDateAndTime);
 						timeText = timeformatter.format(_eventDateAndTime);
 						medicinName = (data as MedicinEvent).medicinName;
+						comment = theMedicinEvent.comment;
 						amountText = (new Number((data as MedicinEvent).amount)).toString();
 						newMedicinEvent = false;
 						backButton.visible=true;
@@ -294,11 +298,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						new Number(amountText),
 						medicinName,
 						new Date().valueOf(),
-						"",
+						comment,//comment,
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theMedicinEvent);
 				} else {
-					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText),"",eventDateAndTime.valueOf(),new Date().valueOf());
+					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText),comment,eventDateAndTime.valueOf(),new Date().valueOf());
 				}
 				
 				var creationTimeStampAsDate:Date = new Date(theMedicinEvent.timeStamp);
@@ -376,6 +380,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 				}
 			}
+			private function editNote(e:MouseEvent = null):void {
+				textPicker = new TextPicker();
+				textPicker.labelText1 = resourceManager.getString('general','editnotetext');
+				textPicker.text = comment;
+				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
+				PopUpManager.addPopUp(textPicker, this, true);
+				PopUpManager.centerPopUp(textPicker);
+			}
+			
+			private function onTextSet(event: PickerEvent): void
+			{
+				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
+				comment = event.newValue as String;
+				if (newMedicinEvent) {
+				} else {
+					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText),comment,eventDateAndTime.valueOf(),new Date().valueOf());
+				}
+			}
 		]]>
 	</fx:Script>
 	<s:navigationContent>
@@ -383,6 +405,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</s:navigationContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>
+		<s:Button icon="@Embed(source='../assets/Notes_48x48.png')" id="NotesButton" click="editNote(event)"/>
 		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked(event)"/>
 	</s:actionContent>
 

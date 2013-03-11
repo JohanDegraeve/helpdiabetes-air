@@ -47,6 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
+			import myComponents.TextPicker;
 			import myComponents.TimePicker;
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
@@ -75,6 +76,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var thisView:View;
 			
 			private var helpCallOut:HelpCallOut;
+			private var textPicker:TextPicker;
+			private var comment:String;
 			
 			private var theExerciseEvent:ExerciseEvent;
 			/**
@@ -105,7 +108,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						eventDateAndTime = new Date(theExerciseEvent.timeStamp);
 						dateText = dateformatter.format(_eventDateAndTime);
 						timeText = timeformatter.format(_eventDateAndTime);
-						exerciseName = theExerciseEvent.level
+						exerciseName = theExerciseEvent.level;
+						comment = theExerciseEvent.comment;
 						newExerciseEvent = false;
 						backButton.visible=true;
 						TrashButton.visible = true;
@@ -241,12 +245,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (newExerciseEvent) {
 					theExerciseEvent = new ExerciseEvent(
 						exerciseName,
-						null,
+						comment,
 						new Date().valueOf(),
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theExerciseEvent);
 				} else {
-					theExerciseEvent.updateExerciseEvent(exerciseName,eventDateAndTime.valueOf(),new Date().valueOf(),null);
+					theExerciseEvent.updateExerciseEvent(exerciseName,eventDateAndTime.valueOf(),new Date().valueOf(),comment);
 				}
 				
 
@@ -325,6 +329,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 				}
 			}
+			private function editNote(e:MouseEvent = null):void {
+				textPicker = new TextPicker();
+				textPicker.labelText1 = resourceManager.getString('general','editnotetext');
+				textPicker.text = comment;
+				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
+				PopUpManager.addPopUp(textPicker, this, true);
+				PopUpManager.centerPopUp(textPicker);
+			}
+			
+			private function onTextSet(event: PickerEvent): void
+			{
+				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
+				comment = event.newValue as String;
+				if (newExerciseEvent) {
+				} else {
+					theExerciseEvent.updateExerciseEvent(exerciseName,eventDateAndTime.valueOf(),new Date().valueOf(),comment);
+				}
+			}
 		]]>
 	</fx:Script>
 	<s:navigationContent>
@@ -332,6 +354,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</s:navigationContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>
+		<s:Button icon="@Embed(source='../assets/Notes_48x48.png')" id="NotesButton" click="editNote(event)"/>
 		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked(event)"/>
 	</s:actionContent>
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">

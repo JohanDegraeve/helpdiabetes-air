@@ -33,10 +33,14 @@ package myComponents
 
 	public class MedicinEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		private var image:Image;
+		private var eventTypeImage:Image;
 		[Embed(source = "assets/ic_tab_medicine_selected_35x35.png")]
-		public static var icon:Class;
+		public static var eventTypeIcon:Class;
 		
+		private var notesImage:Image;
+		[Embed(source = "assets/Notes_16x16.png")]
+		public static var notesIcon:Class;
+
 		static private var itemHeight:int;
 		static private var offsetToPutTextInTheMiddle:int;
 		static private var iconHeight:int;
@@ -109,13 +113,13 @@ package myComponents
 		override protected function createChildren():void {
 			super.createChildren();
 			
-			if (!image) {
-				image = new Image();
+			if (!eventTypeImage) {
+				eventTypeImage = new Image();
 				//image.smooth = true;
 				//image.scaleMode = BitmapScaleMode.ZOOM;
-				image.fillMode = BitmapFillMode.CLIP;
-				image.source = icon;
-				addChild(image);
+				eventTypeImage.fillMode = BitmapFillMode.CLIP;
+				eventTypeImage.source = eventTypeIcon;
+				addChild(eventTypeImage);
 			}
 			
 			if (!amountDisplay) {
@@ -142,13 +146,13 @@ package myComponents
 			
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
 			setElementSize(amountDisplay,amountDisplayWidth,itemHeight);
-			setElementSize(image,iconWidth,iconHeight);
+			setElementSize(eventTypeImage,iconWidth,iconHeight);
 			labelDisplay.truncateToFit();
 			amountDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);
 			setElementPosition(amountDisplay,unscaledWidth - PADDING_RIGHT - amountDisplayWidth,offsetToPutTextInTheMiddle);
-			setElementPosition(image,0,0);
+			setElementPosition(eventTypeImage,0,0);
 		}
 		
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void

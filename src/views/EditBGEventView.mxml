@@ -347,7 +347,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			private function editNote(e:MouseEvent = null):void {
 				textPicker = new TextPicker();
-				textPicker.labelText1 = resourceManager.getString('editbgeventview','editnotetext');
+				textPicker.labelText1 = resourceManager.getString('general','editnotetext');
 				textPicker.text = comment;
 				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
 				PopUpManager.addPopUp(textPicker, this, true);

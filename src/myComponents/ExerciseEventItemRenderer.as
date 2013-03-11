@@ -30,30 +30,59 @@ package myComponents
 	
 	import spark.components.Image;
 	import spark.components.supportClasses.StyleableTextField;
-
+	
 	public class ExerciseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
-		private var image:Image;
+		private var eventTypeImage:Image;
 		[Embed(source = "assets/ic_tab_exercise_selected_35x35.png")]
-		public static var icon:Class;
-
+		public static var eventTypeIcon:Class;
+		
+		private var notesImage:Image;
+		[Embed(source = "assets/Notes_16x16.png")]
+		public static var notesIcon:Class;
+		
 		static private var itemHeight:int;
 		static private var offsetToPutTextInTheMiddle:int;
 		static private var iconHeight:int;
 		static private var iconWidth:int;
+		static private var notesIconWidthAndHeight:int = 17;
 		
 		private var exerciseLevelDisplay:StyleableTextField;
 		
+		private var _comment:String;
+
+		public function get comment():String
+		{
+			return _comment;
+		}
+
+		public function set comment(value:String):void
+		{
+			if (_comment == value)
+				return;
+			_comment = value;
+			if (comment == null)
+				return;
+			if (comment == "")
+				return;
+			if (!notesImage) {
+				notesImage = new Image();
+				notesImage.fillMode = BitmapFillMode.CLIP;
+				notesImage.source = notesIcon;
+				addChild(notesImage);
+			}
+		}
+
+		
 		private var _exerciseLevel:String;
-
+		
 		public function get exerciseLevel():String
-
+			
 		{
 			return _exerciseLevel;
 		}
-
+		
 		public function set exerciseLevel(value:String):void
-
 		{
 			if (_exerciseLevel == value)
 				return;
@@ -63,7 +92,7 @@ package myComponents
 				invalidateSize();
 			}
 		}
-
+		
 		/**
 		 * padding left 
 		 */
@@ -76,7 +105,7 @@ package myComponents
 		 * minimum gap between two elements, horizontal
 		 */
 		private static const GAP_HORIZONTAL_MINIMUM:int = 5;
-
+		
 		public function ExerciseEventItemRenderer()
 		{
 			super();
@@ -98,21 +127,22 @@ package myComponents
 				(date.hours.toString().length == 1 ? "0":"") + 	date.hours 
 				+ ":"  
 				+ (date.minutes.toString().length == 1 ? "0":"") + date.minutes; 
-				//+ " " + resourceManager.getString('editexerciseeventview','exercise');
+			//+ " " + resourceManager.getString('editexerciseeventview','exercise');
 			
 			exerciseLevel = (value as ExerciseEvent).level;
+			comment = (value as ExerciseEvent).comment;
 		}
 		
 		override protected function createChildren():void {
 			super.createChildren();
 			
-			if (!image) {
-				image = new Image();
+			if (!eventTypeImage) {
+				eventTypeImage = new Image();
 				//image.smooth = true;
 				//image.scaleMode = BitmapScaleMode.ZOOM;
-				image.fillMode = BitmapFillMode.CLIP;
-				image.source = icon;
-				addChild(image);
+				eventTypeImage.fillMode = BitmapFillMode.CLIP;
+				eventTypeImage.source = eventTypeIcon;
+				addChild(eventTypeImage);
 			}
 			
 			if (!exerciseLevelDisplay) {
@@ -123,6 +153,16 @@ package myComponents
 				exerciseLevelDisplay.wordWrap = false;
 				addChild(exerciseLevelDisplay);
 			}
+			
+			if (_comment != null)
+				if (_comment != "") {
+					if (!notesImage) {
+						notesImage = new Image();
+						notesImage.fillMode = BitmapFillMode.CLIP;
+						notesImage.source = notesIcon;
+						addChild(notesImage);
+					}
+				}
 		}
 		
 		override public function getHeight(item:TrackingViewElement = null):Number {
@@ -132,25 +172,25 @@ package myComponents
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
 			var labelDisplayWidth:Number = getElementPreferredWidth(labelDisplay);
 			exerciseLevelDisplay.text = exerciseLevel ;
-			var exerciseLevelDisplayWidth:Number  = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT - iconWidth, getElementPreferredWidth(exerciseLevelDisplay));
+			var exerciseLevelDisplayWidth:Number  = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT - iconWidth - (notesImage ? notesIconWidthAndHeight:0), getElementPreferredWidth(exerciseLevelDisplay));
 			labelDisplayWidth = unscaledWidth;//setting back to maximum value, because it seems when there was a missing gap between labeldisplaywidt and glucosedisplaywidt, then click item doesn't work in trackingview
-
+			
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
 			setElementSize(exerciseLevelDisplay,exerciseLevelDisplayWidth,itemHeight);
-			setElementSize(image,iconWidth,iconHeight);
+			setElementSize(eventTypeImage,iconWidth,iconHeight);
 			exerciseLevelDisplay.truncateToFit();
 			
 			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);
-			setElementPosition(exerciseLevelDisplay,unscaledWidth - PADDING_RIGHT - exerciseLevelDisplayWidth,offsetToPutTextInTheMiddle);
-			setElementPosition(image,0,0);
+			setElementPosition(exerciseLevelDisplay,unscaledWidth - PADDING_RIGHT - exerciseLevelDisplayWidth - (notesImage ? notesIconWidthAndHeight:0),offsetToPutTextInTheMiddle);
+			setElementPosition(eventTypeImage,0,0);
 			
-			/*
-			setElementSize(labelDisplay,unscaledWidth - PADDING_LEFT - PADDING_RIGHT,ModelLocator.StyleableTextFieldPreferredHeight);
-			labelDisplay.truncateToFit();
+			if (notesImage)  {
+				setElementSize(notesImage,notesIconWidthAndHeight,notesIconWidthAndHeight);
+				setElementPosition(notesImage,unscaledWidth- notesIconWidthAndHeight,offsetToPutTextInTheMiddle);
+			}
 			
-			setElementPosition(labelDisplay,0 + PADDING_LEFT,ModelLocator.offSetSoThatTextIsInTheMiddle);*/
 		}
-
+		
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
 			super.drawBackground(unscaledWidth,unscaledHeight);//to make the clicked items visible

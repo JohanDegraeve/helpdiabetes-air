@@ -58,10 +58,14 @@ package myComponents
 	public class MealEventItemRenderer extends TrackingViewElementItemRenderer
 	{
 		
-		private var image:Image;
+		private var eventTypeImage:Image;
 		[Embed(source = "assets/ic_tab_meal_selected_35x35.png")]
-		public static var icon:Class;
+		public static var eventTypeIcon:Class;
 		
+		private var notesImage:Image;
+		[Embed(source = "assets/Notes_16x16.png")]
+		public static var notesIcon:Class;
+
 		static private var itemHeight:int;
 		static private var selectedMealHeight:int;
 		static private var offsetToPutTextInTheMiddle:int;
@@ -311,13 +315,13 @@ package myComponents
 		override protected function createChildren():void {
 			super.createChildren();
 			
-			if (!image) {
-				image = new Image();
+			if (!eventTypeImage) {
+				eventTypeImage = new Image();
 				//image.smooth = true;
 				//image.scaleMode = BitmapScaleMode.ZOOM;
-				image.fillMode = BitmapFillMode.CLIP;
-				image.source = icon;
-				addChild(image);
+				eventTypeImage.fillMode = BitmapFillMode.CLIP;
+				eventTypeImage.source = eventTypeIcon;
+				addChild(eventTypeImage);
 			}
 			
 			if (!carbAmountDisplay) {
@@ -405,8 +409,8 @@ package myComponents
 				setElementSize(insulinDetails,0,0);
 			}
 			
-			setElementSize(image,iconWidth,iconHeight);
-			setElementPosition(image,0,0);
+			setElementSize(eventTypeImage,iconWidth,iconHeight);
+			setElementPosition(eventTypeImage,0,0);
 
 			if (mealExtended)  {
 				if (selectedMealsDescriptionStrings == null) {

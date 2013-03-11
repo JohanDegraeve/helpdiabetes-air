@@ -53,6 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.Notification;
 			import myComponents.PickerEvent;
 			import myComponents.SelectedFoodItemRenderer;
+			import myComponents.TextPicker;
 			
 			import spark.events.IndexChangeEvent;
 			import spark.formatters.DateTimeFormatter;
@@ -78,6 +79,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var fatAmount_text:String;
 			
 			private var mealEvent:MealEvent;
+			private var textPicker:TextPicker;
+			private var comment:String;
 			
 			[Bindable]
 			private var selectedFoodItems:ArrayCollection;
@@ -152,6 +155,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					proteinAmount_text = Math.round(mealEvent.totalProtein) + " " + resourceManager.getString('general','gram_of_protein');
 					fatAmount_text = Math.round(mealEvent.totalFat) + " " + resourceManager.getString('general','gram_of_fat');
 					kilocalorieAmount_text = Math.round(mealEvent.totalKilocalories) + " " + resourceManager.getString('general','kilocalories');
+					comment = mealEvent.comment;
 					
 					if (mealEvent.insulinRatio != 0) {
 						insulinAmount_text =  ((Math.round(mealEvent.calculatedInsulinAmount * 10))/10).toString() + 
@@ -250,34 +254,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
 				}
 			}
+			private function editNote(e:MouseEvent = null):void {
+				textPicker = new TextPicker();
+				textPicker.labelText1 = resourceManager.getString('general','editnotetext');
+				textPicker.text = comment;
+				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
+				PopUpManager.addPopUp(textPicker, this, true);
+				PopUpManager.centerPopUp(textPicker);
+			}
+			
+			private function onTextSet(event: PickerEvent): void
+			{
+				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
+				comment = event.newValue as String;
+				mealEvent.comment =  comment
+			}
 			
 		]]>
 	</fx:Script>
 	<s:navigationContent>
 		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/Notes_48x48.png')" id="NotesButton" click="editNote(event)"/>
+	</s:actionContent>
 
-	<s:Scroller width="100%" height="100%">
-		<s:Group width="100%" clipAndEnableScrolling="true" >
+		<s:Group width="100%" >
 			<s:layout >
 				<s:VerticalLayout gap="0">
 				</s:VerticalLayout>
 			</s:layout>
 			<s:Group id="dateTimeAndMealNameGroup" click="dateTimeAndMealNameClicked(event)">
-				<s:Label id="dateTimeAndMealName" left="5" top="15"  width="100%" text="{dateTimeAndMealName_text}"   height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('trackingeventHeight')}"/>
+				<s:Label id="dateTimeAndMealName" paddingLeft="10" paddingBottom="12" paddingTop="12" width="100%" text="{dateTimeAndMealName_text}"/>
 			</s:Group>
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0x000000" weight="1"/>
 				</s:stroke>
 			</s:Line>
+			<s:Group>
+				<s:layout >
+					<s:VerticalLayout paddingLeft="10" paddingBottom="5"
+									  gap="4" paddingTop="5">
+					</s:VerticalLayout>
+				</s:layout>
+				<s:Label id="carbAmount" width="100%" text="{carbAmount_text}" />
+				<s:Label visible="{mealEvent.totalProtein != -1}"  id="proteinAmount" width="100%" text="{proteinAmount_text}" />
+				<s:Label visible="{mealEvent.totalFat != -1}"  id="fatAmount" width="100%" text="{fatAmount_text}"/>
+				<s:Label visible="{mealEvent.totalKilocalories != -1}"  id="kilocalorieAmount" width="100%" text="{kilocalorieAmount_text}" height="{mealEvent.totalKilocalories != -1 ? styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight') : 0}"/>
+				<s:Label includeIn="insulinAmount" id="insulinAmount" width="100%" text="{insulinAmount_text}" />
+			</s:Group>
 			
-			<s:TextArea id="carbAmount" width="100%" paddingTop="0" paddingBottom="0" text="{carbAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight')}"/>
-			<s:TextArea visible="{mealEvent.totalProtein != -1}" id="proteinAmount" width="100%" paddingTop="0" paddingBottom="0" text="{proteinAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{mealEvent.totalProtein != -1 ? styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight') : 0}"/>
-			<s:TextArea visible="{mealEvent.totalFat != -1}" id="fatAmount" width="100%" paddingTop="0" paddingBottom="0" text="{fatAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{mealEvent.totalFat != -1 ? styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight') : 0}"/>
-			<s:TextArea visible="{mealEvent.totalKilocalories != -1}" id="kilocalorieAmount" width="100%" paddingTop="0" paddingBottom="0"  text="{kilocalorieAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{mealEvent.totalKilocalories != -1 ? styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight') : 0}"/>
-			
-			<s:TextArea includeIn="insulinAmount"  id="insulinAmount" width="100%" paddingTop="0" paddingBottom="0"  text="{insulinAmount_text}"  editable="false" borderVisible="false" contentBackgroundAlpha="0" fontSize="{styleManager.getStyleDeclaration('.fontSizeForSubElements').getStyle('fontSize')}" height="{styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight')}"/>
 			<s:Line width="100%">
 				<s:stroke>
 					<s:SolidColorStroke color="0x000000" weight="1"/>
@@ -287,5 +314,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:List id="fooditemlist" width="100%"  height="100%" useVirtualLayout="false" dataProvider="{selectedFoodItems}" contentBackgroundAlpha="0" 
 					labelFunction="displaySelectedItem" itemRendererFunction="itemRendererFunction" />
 		</s:Group>
-	</s:Scroller>
 </s:View>
