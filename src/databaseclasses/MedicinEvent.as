@@ -29,7 +29,7 @@ package databaseclasses
 
 		public function get comment():String
 		{
-			return _comment;
+			return (_comment == null ? "":_comment);
 		}
 		
 		private function set comment(value:String):void

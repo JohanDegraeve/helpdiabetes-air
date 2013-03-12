@@ -73,6 +73,8 @@ package utilities
 		private static var googleSelectUrl:String = "https://www.googleapis.com/fusiontables/v1/query";
 		private static var googleDriveFilesUrl:String = "https://www.googleapis.com/drive/v2/files";
 		private static var googleTokenRefreshUrl:String = "https://accounts.google.com/o/oauth2/token";
+		private static var googleInsertColumnInTableUrl:String = "https://www.googleapis.com/fusiontables/v1/tables/{tableId}/columns";
+		
 		/**
 		 * replace {key} by the spreadsheet key<br>
 		 * replace {worksheetid} by the worksheetid
@@ -215,6 +217,7 @@ package utilities
 		private static var ColumnName_unitfat:String = "unitfat";
 		private static var ColumnName_chosenamount:String = "chosenamount";
 		private static var ColumnName_mealeventid:String = "mealeventid";
+		private static var ColumnName_comment:String = "comment";
 		
 		/**
 		 * tablename, tableid and list of columns with columnname and type <br>
@@ -230,6 +233,7 @@ package utilities
 					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
 					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
 					[ColumnName_deleted,"STRING"],//was the event deleted or not
+					[ColumnName_comment,"STRING"],//the comment
 					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"MedicinEvents"//description
@@ -243,6 +247,7 @@ package utilities
 					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
 					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
 					[ColumnName_deleted,"STRING"],//was the event deleted or not
+					[ColumnName_comment,"STRING"],//the comment
 					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"BloodglucoseEvents"//description
@@ -255,6 +260,7 @@ package utilities
 					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
 					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
 					[ColumnName_deleted,"STRING"],//was the event deleted or not
+					[ColumnName_comment,"STRING"],//the comment
 					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"ExerciseEvents"//description
@@ -270,6 +276,7 @@ package utilities
 					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
 					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
 					[ColumnName_deleted,"STRING"],//was the event deleted or not
+					[ColumnName_comment,"STRING"],//the comment
 					[ColumnName_addedtoormodifiedintabletimestamp,"NUMBER"]//the timestamp that the row was added to the table
 				],
 				"MealEvents"//description
@@ -837,6 +844,43 @@ package utilities
 			}
 		}
 		
+		/**
+		 * adds missing column to a table<br>
+		 * functionToRecall will be called when finished 
+		 */
+		private function addColumnToExistingTable(functionToReCall:Function,tableId:String,columnName:String,columnType:String):void {
+			if (traceNeeded)
+				trace("start method addColumnToExistingTable for tableid = " + tableId + "columnName = " + columnName);
+			
+			var jsonObject:Object = new Object();
+			jsonObject.name = columnName;
+			jsonObject.type = columnType;
+			
+			createAndLoadURLRequest(googleInsertColumnInTableUrl.replace("{tableId}",tableId),URLRequestMethod.POST,null,JSON.stringify(jsonObject),functionToReCall,true,"application/json");
+		}
+		
+		/**
+		 * checks of all columns that should be there are available remotely<br>
+		 * at first column that is not there, will call addcolumntoexistingtable, with functiontorecall as callback function, and in that case stops searching for other columns and returns false<br>
+		 * columnsInRemoteTable is an array<br>
+		 * columnsThatShouldBeThere is an array of array, with first element in each array being the column name, second element the column type
+		 * returns true if all columns are there
+		 */
+		private function checkMissingColumn(tableId:String,columnsInRemoteTable:Array,columnsThatShouldBeThere:Array,functionToReCall:Function):Boolean {
+			var remotectr:int;
+			for (var localctr:int = 0;localctr < columnsThatShouldBeThere.length;localctr++) {
+				for (remotectr = 0;remotectr < columnsInRemoteTable.length;remotectr++) {
+					if (columnsInRemoteTable[remotectr] == columnsThatShouldBeThere[localctr][0])
+						break;
+				}
+				if (remotectr == columnsInRemoteTable.length) {
+					addColumnToExistingTable(functionToReCall,tableId,columnsThatShouldBeThere[localctr][0],columnsThatShouldBeThere[localctr][1]);
+					return false;
+				}
+			}
+			return true;
+		}
+		
 		private function getTheMedicinEvents(event:Event = null):void {
 			var positionId:int;
 			var eventAsJSONObject:Object;
@@ -852,26 +896,31 @@ package utilities
 				
 				if (eventHasError(event,getTheMedicinEvents))
 					return;
+
 				else {
-					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
-					
-					var elementAlreadyThere:Boolean;
-					if (eventAsJSONObject.rows) {
-						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
-							elementAlreadyThere = false;
-							for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
-								if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
-									elementAlreadyThere = true;
-									break;
+					if (eventAsJSONObject.kind != "fusiontables#column")  {//if it would have been fusiontables#column, it would mean we come here after having added a missing column
+						positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
+						
+						if (!(checkMissingColumn(tableNamesAndColumnNames[0][1],eventAsJSONObject.columns,tableNamesAndColumnNames[0][2],getTheMedicinEvents)))
+							return;
+						var elementAlreadyThere:Boolean;
+						if (eventAsJSONObject.rows) {
+							for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
+								elementAlreadyThere = false;
+								for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
+									if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
+										elementAlreadyThere = true;
+										break;
+									}
+								}
+								if (!elementAlreadyThere) {
+									remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
+									remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
 								}
 							}
-							if (!elementAlreadyThere) {
-								remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
-								remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
-							}
 						}
+						nextPageToken = eventAsJSONObject.nextPageToken;
 					}
-					nextPageToken = eventAsJSONObject.nextPageToken;
 				}
 			} 
 			
@@ -949,7 +998,7 @@ package utilities
 									(trackingList.getItemAt(l) as MedicinEvent).updateMedicinEvent(
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][1][0])],
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
-										"",//comment
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]));
 								}
@@ -966,7 +1015,7 @@ package utilities
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][1][0])],
 								remoteElements.getItemAt(m)[positionId],
-								"",//comment
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]),
 								true));
@@ -1729,7 +1778,7 @@ package utilities
 						if (!elementFoundWithSameId) {
 							previousTypeOfEventAlreadyUsed = true;
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[0][1] + " ";
-							sqlStatement += "(id,medicinname,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp) VALUES (\'" +
+							sqlStatement += "(id,medicinname,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as MedicinEvent).eventid.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).medicinName + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).amount.toString() + "\',\'" +
@@ -1742,7 +1791,8 @@ package utilities
 									(new Date()).valueOf().toString() 
 									:
 									(localElements.getItemAt(i) as MedicinEvent).lastModifiedTimestamp.toString())
-								+ "\')";
+								+ "\',\'" +
+								(localElements.getItemAt(i) as MedicinEvent).comment + "\')" ;
 							localElements.removeItemAt(i);
 							i--;
 						}
@@ -1861,6 +1911,7 @@ package utilities
 										"medicinname = \'" + (localElements.getItemAt(k) as MedicinEvent).medicinName + "\'," +
 										"value = \'" + (localElements.getItemAt(k) as MedicinEvent).amount.toString() + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as MedicinEvent).timeStamp.toString() + "\'," +
+										"comment = \'" + (localElements.getItemAt(k) as MedicinEvent).comment + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as MedicinEvent).lastModifiedTimestamp.toString() + "\'," +
 										"addedtoormodifiedintabletimestamp = \'" +
 										((new Date()).valueOf() - (localElements.getItemAt(k) as MedicinEvent).lastModifiedTimestamp > 10000 

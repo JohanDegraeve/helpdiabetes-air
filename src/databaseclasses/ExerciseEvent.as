@@ -38,13 +38,14 @@ package databaseclasses
 
 		public function get comment():String
 		{
-			return _comment;
+			return (_comment == null ? "":_comment);
 		}
 		
 		private function set comment(value:String):void
 		{
 			_comment = value;
 		}
+		
 		public function ExerciseEvent(level:String, newcomment:String, exerciseeventid:Number,creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true)
 		{
 			this._level = level;

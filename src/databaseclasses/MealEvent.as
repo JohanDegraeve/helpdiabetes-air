@@ -43,7 +43,7 @@ package databaseclasses
 
 		public function get comment():String
 		{
-			return _comment;
+			return (_comment == null ? "":_comment);
 		}
 		
 		internal var _mealName:String;//made internal because meal.as failed to use mealName - no explanation
