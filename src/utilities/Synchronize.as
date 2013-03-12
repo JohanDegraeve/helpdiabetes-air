@@ -1044,25 +1044,30 @@ package utilities
 				if (eventHasError(event,getTheBloodGlucoseEvents))
 					return;
 				else {
-					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
-					
-					var elementAlreadyThere:Boolean;
-					if (eventAsJSONObject.rows) {
-						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
-							elementAlreadyThere = false;
-							for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
-								if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
-									elementAlreadyThere = true;
-									break;
+					if (eventAsJSONObject.kind != "fusiontables#column")  {
+						positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
+						
+						if (!(checkMissingColumn(tableNamesAndColumnNames[1][1],eventAsJSONObject.columns,tableNamesAndColumnNames[1][2],getTheBloodGlucoseEvents)))
+							return;
+
+						var elementAlreadyThere:Boolean;
+						if (eventAsJSONObject.rows) {
+							for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
+								elementAlreadyThere = false;
+								for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
+									if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
+										elementAlreadyThere = true;
+										break;
+									}
+								}
+								if (!elementAlreadyThere) {
+									remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
+									remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
 								}
 							}
-							if (!elementAlreadyThere) {
-								remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
-								remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
-							}
 						}
+						nextPageToken = eventAsJSONObject.nextPageToken;
 					}
-					nextPageToken = eventAsJSONObject.nextPageToken;
 				}
 			} 
 			
@@ -1143,7 +1148,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unit)],
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_value)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
-										"",//comment
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]));
 								}
 								break;
@@ -1160,7 +1165,7 @@ package utilities
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_value)],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unit)],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)],
-								"",//comment
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
@@ -1188,25 +1193,30 @@ package utilities
 				if (eventHasError(event,getTheExerciseEvents))
 					return;
 				else {
-					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
-					
-					var elementAlreadyThere:Boolean;
-					if (eventAsJSONObject.rows) {
-						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
-							elementAlreadyThere = false;
-							for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
-								if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
-									elementAlreadyThere = true;
-									break;
+					if (eventAsJSONObject.kind != "fusiontables#column")  {
+						positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
+						
+						if (!(checkMissingColumn(tableNamesAndColumnNames[2][1],eventAsJSONObject.columns,tableNamesAndColumnNames[2][2],getTheExerciseEvents)))
+							return;
+
+						var elementAlreadyThere:Boolean;
+						if (eventAsJSONObject.rows) {
+							for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
+								elementAlreadyThere = false;
+								for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
+									if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
+										elementAlreadyThere = true;
+										break;
+									}
+								}
+								if (!elementAlreadyThere) {
+									remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
+									remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
 								}
 							}
-							if (!elementAlreadyThere) {
-								remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
-								remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
-							}
 						}
+						nextPageToken = eventAsJSONObject.nextPageToken;
 					}
-					nextPageToken = eventAsJSONObject.nextPageToken;
 				}
 			} 
 			
@@ -1286,7 +1296,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_level)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
-										"");
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)]);
 								}
 								break;
 							}
@@ -1300,7 +1310,7 @@ package utilities
 							
 							(new ExerciseEvent(
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_level)],
-								"",
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								remoteElements.getItemAt(m)[positionId],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
@@ -1330,25 +1340,30 @@ package utilities
 				if (eventHasError(event,getTheMealEvents))
 					return;
 				else {
-					positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
-					
-					var elementAlreadyThere:Boolean;
-					if (eventAsJSONObject.rows) {
-						for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
-							elementAlreadyThere = false;
-							for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
-								if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
-									elementAlreadyThere = true;
-									break;
+					if (eventAsJSONObject.kind != "fusiontables#column")  {
+						positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
+						
+						if (!(checkMissingColumn(tableNamesAndColumnNames[3][1],eventAsJSONObject.columns,tableNamesAndColumnNames[3][2],getTheMealEvents)))
+							return;
+
+						var elementAlreadyThere:Boolean;
+						if (eventAsJSONObject.rows) {
+							for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
+								elementAlreadyThere = false;
+								for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
+									if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
+										elementAlreadyThere = true;
+										break;
+									}
+								}
+								if (!elementAlreadyThere) {
+									remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
+									remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
 								}
 							}
-							if (!elementAlreadyThere) {
-								remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
-								remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
-							}
 						}
+						nextPageToken = eventAsJSONObject.nextPageToken;
 					}
-					nextPageToken = eventAsJSONObject.nextPageToken;
 				}
 			} 
 			
@@ -1446,7 +1461,7 @@ package utilities
 								} else {
 									(trackingList.getItemAt(l) as MealEvent).updateMealEvent(
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_mealname)],
-										"",//comment
+										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_insulinratio)],
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_correctionfactor)],
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_previousbglevel)],
@@ -1471,7 +1486,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								null,
 								remoteElements.getItemAt(m)[positionId],
-								"",//comment
+								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
 						}
@@ -1800,7 +1815,7 @@ package utilities
 						if (!elementFoundWithSameId) {
 							previousTypeOfEventAlreadyUsed = true;
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[1][1] + " ";
-							sqlStatement += "(id,unit,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp) VALUES (\'" +
+							sqlStatement += "(id,unit,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).eventid.toString() + "\',\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).unit + "\',\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).bloodGlucoseLevel + "\',\'" +
@@ -1813,7 +1828,8 @@ package utilities
 									(new Date()).valueOf().toString() 
 									:
 									(localElements.getItemAt(i) as BloodGlucoseEvent).lastModifiedTimestamp.toString())
-								+ "\')";
+								+ "\',\'" +
+								(localElements.getItemAt(i) as BloodGlucoseEvent).comment + "\')" ;
 							localElements.removeItemAt(i);
 							i--;
 						}
@@ -1821,7 +1837,7 @@ package utilities
 						if (!elementFoundWithSameId) {
 							previousTypeOfEventAlreadyUsed = true;
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[2][1] + " ";
-							sqlStatement += "(id,level,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp) VALUES (\'" +
+							sqlStatement += "(id,level,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as ExerciseEvent).eventid.toString() + "\',\'" +
 								(localElements.getItemAt(i) as ExerciseEvent).level + "\',\'" +
 								(localElements.getItemAt(i) as ExerciseEvent).timeStamp.toString() + "\',\'" +
@@ -1833,7 +1849,8 @@ package utilities
 									(new Date()).valueOf().toString() 
 									:
 									(localElements.getItemAt(i) as ExerciseEvent).lastModifiedTimestamp.toString())
-								+ "\')";
+								+ "\',\'" +
+								(localElements.getItemAt(i) as ExerciseEvent).comment + "\')" ;
 							localElements.removeItemAt(i);
 							i--;
 						}
@@ -1841,7 +1858,7 @@ package utilities
 						if (!elementFoundWithSameId) {
 							previousTypeOfEventAlreadyUsed = true;
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[3][1] + " ";
-							sqlStatement += "(id,mealname,insulinratio,correctionfactor,previousbglevel,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp) VALUES (\'" +
+							sqlStatement += "(id,mealname,insulinratio,correctionfactor,previousbglevel,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as MealEvent).eventid.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).mealName + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).insulinRatio.toString() + "\',\'" +
@@ -1856,7 +1873,8 @@ package utilities
 									(new Date()).valueOf().toString() 
 									:
 									(localElements.getItemAt(i) as MealEvent).lastModifiedTimeStamp.toString())
-								+ "\')";
+								+ "\',\'" +
+								(localElements.getItemAt(i) as MealEvent).comment + "\')" ;
 							localElements.removeItemAt(i);
 							i--;
 						}
@@ -1939,6 +1957,7 @@ package utilities
 										"unit = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).unit + "\'," +
 										"value = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).bloodGlucoseLevel + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).timeStamp.toString() + "\'," +
+										"comment = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).comment + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).lastModifiedTimestamp.toString() + "\'," +
 										"addedtoormodifiedintabletimestamp = \'" +
 										((new Date()).valueOf() - (localElements.getItemAt(k) as BloodGlucoseEvent).lastModifiedTimestamp > 10000 
@@ -1966,6 +1985,7 @@ package utilities
 										"level = \'" + (localElements.getItemAt(k) as ExerciseEvent).level + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as ExerciseEvent).timeStamp.toString() + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as ExerciseEvent).lastModifiedTimestamp.toString() + "\'," +
+										"comment = \'" + (localElements.getItemAt(k) as ExerciseEvent).comment + "\'," +
 										"addedtoormodifiedintabletimestamp = \'" +
 										((new Date()).valueOf() - (localElements.getItemAt(k) as ExerciseEvent).lastModifiedTimestamp > 10000 
 											? 
@@ -1994,6 +2014,7 @@ package utilities
 										"correctionfactor = \'" + (localElements.getItemAt(k) as MealEvent).correctionFactor.toString() + "\'," +
 										"previousbglevel = \'" + (localElements.getItemAt(k) as MealEvent).previousBGlevel + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as MealEvent).timeStamp.toString() + "\'," +
+										"comment = \'" + (localElements.getItemAt(k) as MealEvent).comment + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as MealEvent).lastModifiedTimeStamp.toString() + "\'," +
 										"addedtoormodifiedintabletimestamp = \'" +
 										((new Date()).valueOf() - (localElements.getItemAt(k) as MealEvent).lastModifiedTimeStamp > 10000 
