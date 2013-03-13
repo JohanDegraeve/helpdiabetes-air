@@ -983,8 +983,6 @@ package utilities
 						break;
 				}
 				//we've got to start updating
-				if (traceNeeded)
-					trace("there are " + remoteElements.length + " remote elements to store or update locally");
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the medicinevent in the trackinglist that has the same id
 					var l:int=0;
@@ -994,6 +992,8 @@ package utilities
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][5][0])] as String) == "true") {
 									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
+									if (traceNeeded)
+										trace("local element deleted");
 								} else {
 									(trackingList.getItemAt(l) as MedicinEvent).updateMedicinEvent(
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][1][0])],
@@ -1001,6 +1001,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]));
+									trace("local element updated");
 								}
 								break;
 							}
@@ -1019,6 +1020,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]),
 								true));
+							trace("local element deleted");
 						}
 					}
 				}
@@ -1132,8 +1134,6 @@ package utilities
 						break;
 				}
 				//we've got to start updating
-				if (traceNeeded)
-					trace("there are " + remoteElements.length + " remote elements to store or update locally");
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the medicinevent in the trackinglist that has the same id
 					var l:int=0;
@@ -1142,6 +1142,7 @@ package utilities
 							if ((trackingList.getItemAt(l) as BloodGlucoseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
+									trace("local element deleted");
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).updateBloodGlucoseEvent(
@@ -1150,6 +1151,7 @@ package utilities
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]));
+									trace("local element updated");
 								}
 								break;
 							}
@@ -1169,6 +1171,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
+							trace("local element created");
 						}
 					}
 				}
@@ -1280,8 +1283,6 @@ package utilities
 						break;
 				}
 				//we've got to start updating
-				if (traceNeeded)
-					trace("there are " + remoteElements.length + " remote elements to store or update locally");
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the medicinevent in the trackinglist that has the same id
 					var l:int=0;
@@ -1291,12 +1292,14 @@ package utilities
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 									(trackingList.getItemAt(l) as ExerciseEvent).deleteEvent();
+									trace("local element deleted");
 								} else {
 									(trackingList.getItemAt(l) as ExerciseEvent).updateExerciseEvent(
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_level)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)]);
+									trace("local element updated");
 								}
 								break;
 							}
@@ -1315,6 +1318,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
+							trace("local element created");
 						}
 					}
 				}
@@ -1446,8 +1450,6 @@ package utilities
 					syncFinished(false);
 				}
 				//we've got to start updating
-				if (traceNeeded)
-					trace("there are " + remoteElements.length + " remote elements to store or update locally");
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the medicinevent in the trackinglist that has the same id
 					var l:int=0;
@@ -1467,6 +1469,8 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_previousbglevel)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]));
+									trace("local element updated");
+
 								}
 								break;
 							}
@@ -1489,6 +1493,7 @@ package utilities
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
+							trace("local element created");
 						}
 					}
 				}
@@ -1598,8 +1603,6 @@ package utilities
 					}
 				}
 				//we've got to start updating
-				if (traceNeeded)
-					trace("there are " + remoteElements.length + " remote elements to store or update locally");
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the selectedfooditem in the trackinglist that has the same id
 					var l:int=0;
@@ -1626,6 +1629,7 @@ package utilities
 												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitfat)]),
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)],
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_chosenamount)]);
+										trace("local element updated");
 									}
 									break;
 									//l =  trackingList.length;
