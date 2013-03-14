@@ -401,9 +401,13 @@ package utilities
 		 */
 		private var remoteElementIds:ArrayList;
 		/**
-		 * will have id's off elements that need to be delete remotely 
+		 * will have rowid's off elements that need to be deleted remotely 
 		 */
-		private var remoteElementIdsToBeDeleted:ArrayList;
+		private var remoteElementRowIdsToBeDeleted:ArrayList;
+		/**
+		 * will have eventid's off elements that need to be deleted remotely 
+		 */
+		private var remoteElementEventIdsToBeDeleted:ArrayList;
 		
 		/**
 		 * temporary variable used in getrowids
@@ -1002,9 +1006,9 @@ package utilities
 							if ((trackingList.getItemAt(l) as MedicinEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][5][0])] as String) == "true") {
-									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
 									if (traceNeeded)
-										if (traceNeeded) trace("local element deleted");
+										if (traceNeeded) trace("local element deleted, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
+									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as MedicinEvent).updateMedicinEvent(
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][1][0])],
@@ -1012,7 +1016,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]));
-									if (traceNeeded) trace("local element updated");
+									if (traceNeeded) trace("local element updated, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
 								}
 								break;
 							}
@@ -1031,7 +1035,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]),
 								true));
-							if (traceNeeded) trace("local element deleted");
+							if (traceNeeded) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
 				}
@@ -1153,7 +1157,8 @@ package utilities
 							if ((trackingList.getItemAt(l) as BloodGlucoseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
-									if (traceNeeded) trace("local element deleted");
+									if (traceNeeded)
+										if (traceNeeded) trace("local element deleted, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).updateBloodGlucoseEvent(
@@ -1162,7 +1167,7 @@ package utilities
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]));
-									if (traceNeeded) trace("local element updated");
+									if (traceNeeded) trace("local element updated, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
 								}
 								break;
 							}
@@ -1182,7 +1187,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
-							if (traceNeeded) trace("local element created");
+							if (traceNeeded) trace("local element created, id = " + remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)]);
 						}
 					}
 				}
@@ -1302,15 +1307,16 @@ package utilities
 							if ((trackingList.getItemAt(l) as ExerciseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
+									if (traceNeeded)
+										if (traceNeeded) trace("local element deleted, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
 									(trackingList.getItemAt(l) as ExerciseEvent).deleteEvent();
-									if (traceNeeded) trace("local element deleted");
 								} else {
 									(trackingList.getItemAt(l) as ExerciseEvent).updateExerciseEvent(
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_level)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)]);
-									if (traceNeeded) trace("local element updated");
+									if (traceNeeded) trace("local element updated, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
 								}
 								break;
 							}
@@ -1329,7 +1335,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
-							if (traceNeeded) trace("local element created");
+							if (traceNeeded) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
 				}
@@ -1368,6 +1374,11 @@ package utilities
 								for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
 									if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
 										elementAlreadyThere = true;
+										if (remoteElementEventIdsToBeDeleted == null) {
+											remoteElementEventIdsToBeDeleted = new ArrayList();
+										}
+										//now remoteelementidstobedeleted is array of tableid, eventid pair, eventid still needs to be changed to rowid
+										remoteElementEventIdsToBeDeleted.addItem(new Array(tableNamesAndColumnNames[3][1],(remoteElements.getItemAt(rowctr2) as Array)[positionId]));
 										break;
 									}
 								}
@@ -1480,8 +1491,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_previousbglevel)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]));
-									if (traceNeeded) trace("local element updated");
-
+									if (traceNeeded) trace("local element updated, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
 								}
 								break;
 							}
@@ -1504,7 +1514,7 @@ package utilities
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
-							if (traceNeeded) trace("local element created");
+							if (traceNeeded) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
 				}
@@ -1640,7 +1650,7 @@ package utilities
 												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitfat)]),
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)],
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_chosenamount)]);
-										if (traceNeeded) trace("local element updated");
+										if (traceNeeded) trace("local element updated, id = " + theSelectedFoodItem.eventid);
 									}
 									break;
 									//l =  trackingList.length;
@@ -1683,25 +1693,61 @@ package utilities
 						}
 					}
 				}
-				getRowIds(null);
+				getRowIdsOfRemoteElementsToBeDeleted(null);
 			}
 		}
 		
+		private function getRowIdsOfRemoteElementsToBeDeleted(event:Event = null):void {
+			if (traceNeeded)
+				trace ("in method getRowIdsOfRemoteElementsToBeDeleted");
+			if (event != null) {
+				removeEventListeners();
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				
+				if (eventHasError(event,getRowIdsOfRemoteElementsToBeDeleted))
+					return;
+				
+				if ((eventAsJSONObject.rows as Array).length > 1) {
+					//there seem to be duplicate events on remote site, let's delete one of them
+					if (remoteElementRowIdsToBeDeleted == null)
+						remoteElementRowIdsToBeDeleted = new ArrayList();
+					for (var cntr:int = 1;cntr < (eventAsJSONObject.rows as Array).length;cntr++) {
+						remoteElementRowIdsToBeDeleted.addItem(new Array(tableId,eventAsJSONObject.rows[cntr][0]));
+					}
+				}
+			} 
+			
+			if (remoteElementEventIdsToBeDeleted != null)  {
+				if (remoteElementEventIdsToBeDeleted.length > 0) {
+					var sqlStatement:String;
+					tableId = (remoteElementEventIdsToBeDeleted.getItemAt(0) as Array)[0];
+					sqlStatement = "SELECT ROWID FROM " + tableId + " WHERE id = \'" + (remoteElementEventIdsToBeDeleted.getItemAt(0) as Array)[1] + "\'";
+					var urlVariables:URLVariables = new URLVariables();
+					urlVariables.sql = sqlStatement;
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,urlVariables,null,getRowIdsOfRemoteElementsToBeDeleted,true,null);
+					remoteElementEventIdsToBeDeleted.removeItemAt(0);
+				} else
+					getRowIdsOfLocalElements();
+			} else 
+				getRowIdsOfLocalElements();
+		}
+		
+		
 		/**
 		 * deletes remote events that are in remoteElementIdsToBeDeleted, the calls synclocalevents 
+		 * I think actually there's never going to be any more event, this was added before getrowidsofremotelementstobedeleted, which will delete all double events
 		 */
-		private function deleteRemoteEvents(event:Event= null):void {
+		private function deleteRemoteEvents(event:Event = null):void {
 			if (traceNeeded)
 				trace ("in method deleteremoteevents");
-			//DELETE FROM <table_id>{ WHERE ROWID = <row_id>}
-			if (remoteElementIdsToBeDeleted != null) {
-				if (remoteElementIdsToBeDeleted.length > 0) {
+			if (remoteElementRowIdsToBeDeleted != null) {
+				if (remoteElementRowIdsToBeDeleted.length > 0) {
 					var sqlStatement:String ;
-					sqlStatement = "DELETE FROM  " + (remoteElementIdsToBeDeleted.getItemAt(0) as Array)[0] + " WHERE ROWID = \'" + (remoteElementIdsToBeDeleted.getItemAt(0) as Array)[1]  + "\'";
+					sqlStatement = "DELETE FROM  " + (remoteElementRowIdsToBeDeleted.getItemAt(0) as Array)[0] + " WHERE ROWID = \'" + (remoteElementRowIdsToBeDeleted.getItemAt(0) as Array)[1]  + "\'";
 					var urlVariables:URLVariables = new URLVariables();
 					urlVariables.sql = sqlStatement;
 					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,urlVariables,null,deleteRemoteEvents,true,null);
-					remoteElementIdsToBeDeleted.removeItemAt(0);
+					remoteElementRowIdsToBeDeleted.removeItemAt(0);
 				} else
 					syncLocalEvents();
 			} else 
@@ -1711,7 +1757,7 @@ package utilities
 		/**
 		 * we need to get the rowids for all localevents that have a remote copy, we need to do that to be able to update 
 		 */
-		private function getRowIds(event:Event):void {
+		private function getRowIdsOfLocalElements(event:Event = null):void {
 			if (traceNeeded)
 				trace ("in method getrowids");
 			//ModelLocator.getInstance().logString += "in method getrowids" + "\n";
@@ -1719,16 +1765,16 @@ package utilities
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				
-				if (eventHasError(event,getRowIds))
+				if (eventHasError(event,getRowIdsOfLocalElements))
 					return;
 				
 				remoteElementIds.getItemAt(indexOfRetrievedRowId)[1] =  new Number(eventAsJSONObject.rows[0][0]);
 				if ((eventAsJSONObject.rows as Array).length > 1) {
 					//there seem to be duplicate events on remote site, let's delete one of them
-					if (remoteElementIdsToBeDeleted == null)
-						remoteElementIdsToBeDeleted = new ArrayList();
+					if (remoteElementRowIdsToBeDeleted == null)
+						remoteElementRowIdsToBeDeleted = new ArrayList();
 					for (var cntr:int = 1;cntr < (eventAsJSONObject.rows as Array).length;cntr++) {
-						remoteElementIdsToBeDeleted.addItem(new Array(tableId,eventAsJSONObject.rows[cntr][0]));
+						remoteElementRowIdsToBeDeleted.addItem(new Array(tableId,eventAsJSONObject.rows[cntr][0]));
 					}
 				}
 			} 
@@ -1807,7 +1853,7 @@ package utilities
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.sql = sqlStatement;
 				
-				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getRowIds,true,null);
+				createAndLoadURLRequest(googleSelectUrl,null,urlVariables,null,getRowIdsOfLocalElements,true,null);
 			}
 		}
 		
