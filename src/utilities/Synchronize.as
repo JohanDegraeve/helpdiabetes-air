@@ -50,6 +50,7 @@ package utilities
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
+	import mx.events.Request;
 	import mx.resources.ResourceManager;
 	import mx.utils.Base64Encoder;
 	
@@ -399,6 +400,16 @@ package utilities
 		 * in case of syncing settings, it is used differently
 		 */
 		private var remoteElementIds:ArrayList;
+		/**
+		 * will have id's off elements that need to be delete remotely 
+		 */
+		private var remoteElementIdsToBeDeleted:ArrayList;
+		
+		/**
+		 * temporary variable used in getrowids
+		 */
+		private  var tableId:String;
+
 		
 		/**
 		 * the access_token to use the google api 
@@ -1677,6 +1688,27 @@ package utilities
 		}
 		
 		/**
+		 * deletes remote events that are in remoteElementIdsToBeDeleted, the calls synclocalevents 
+		 */
+		private function deleteRemoteEvents(event:Event= null):void {
+			if (traceNeeded)
+				trace ("in method deleteremoteevents");
+			//DELETE FROM <table_id>{ WHERE ROWID = <row_id>}
+			if (remoteElementIdsToBeDeleted != null) {
+				if (remoteElementIdsToBeDeleted.length > 0) {
+					var sqlStatement:String ;
+					sqlStatement = "DELETE FROM  " + (remoteElementIdsToBeDeleted.getItemAt(0) as Array)[0] + " WHERE ROWID = \'" + (remoteElementIdsToBeDeleted.getItemAt(0) as Array)[1]  + "\'";
+					var urlVariables:URLVariables = new URLVariables();
+					urlVariables.sql = sqlStatement;
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,urlVariables,null,deleteRemoteEvents,true,null);
+					remoteElementIdsToBeDeleted.removeItemAt(0);
+				} else
+					syncLocalEvents();
+			} else 
+				syncLocalEvents();
+		}
+		
+		/**
 		 * we need to get the rowids for all localevents that have a remote copy, we need to do that to be able to update 
 		 */
 		private function getRowIds(event:Event):void {
@@ -1691,6 +1723,14 @@ package utilities
 					return;
 				
 				remoteElementIds.getItemAt(indexOfRetrievedRowId)[1] =  new Number(eventAsJSONObject.rows[0][0]);
+				if ((eventAsJSONObject.rows as Array).length > 1) {
+					//there seem to be duplicate events on remote site, let's delete one of them
+					if (remoteElementIdsToBeDeleted == null)
+						remoteElementIdsToBeDeleted = new ArrayList();
+					for (var cntr:int = 1;cntr < (eventAsJSONObject.rows as Array).length;cntr++) {
+						remoteElementIdsToBeDeleted.addItem(new Array(tableId,eventAsJSONObject.rows[cntr][0]));
+					}
+				}
 			} 
 			
 			var sqlStatement:String = "";
@@ -1700,7 +1740,8 @@ package utilities
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
 							if (!remoteElementIds.getItemAt(j)[1]) {
-								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[0][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
+								tableId = tableNamesAndColumnNames[0][1] ;
+								sqlStatement = "SELECT ROWID FROM " + tableId + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
 								i = localElements.length;
 								indexOfRetrievedRowId = j;
 							}
@@ -1711,7 +1752,8 @@ package utilities
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
 							if (!remoteElementIds.getItemAt(j)[1]) {
-								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[1][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
+								tableId = tableNamesAndColumnNames[1][1] ;
+								sqlStatement = "SELECT ROWID FROM " + tableId + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
 								i = localElements.length;
 								indexOfRetrievedRowId = j;
 							}
@@ -1722,7 +1764,8 @@ package utilities
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
 							if (!remoteElementIds.getItemAt(j)[1]) {
-								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[2][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
+								tableId = tableNamesAndColumnNames[2][1] ;
+								sqlStatement = "SELECT ROWID FROM " + tableId + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
 								i = localElements.length;
 								indexOfRetrievedRowId = j;
 							}
@@ -1733,7 +1776,8 @@ package utilities
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as TrackingViewElement).eventid == remoteElementIds.getItemAt(j)[0]) {
 							if (!remoteElementIds.getItemAt(j)[1]) {
-								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[3][1] + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
+								tableId = tableNamesAndColumnNames[3][1] ;
+								sqlStatement = "SELECT ROWID FROM " + tableId + " WHERE id = \'" + (localElements.getItemAt(i) as TrackingViewElement).eventid + "\'";
 								i = localElements.length;
 								indexOfRetrievedRowId = j;
 							}
@@ -1744,7 +1788,8 @@ package utilities
 					for (j = 0;j < remoteElementIds.length; j++) {
 						if ((localElements.getItemAt(i) as SelectedFoodItem).eventid == remoteElementIds.getItemAt(j)[0]) {
 							if (!remoteElementIds.getItemAt(j)[1]) {
-								sqlStatement = "SELECT ROWID FROM " + tableNamesAndColumnNames[4][1] + " WHERE id = \'" + (localElements.getItemAt(i) as SelectedFoodItem).eventid + "\'";
+								tableId = tableNamesAndColumnNames[4][1] ;
+								sqlStatement = "SELECT ROWID FROM " + tableId + " WHERE id = \'" + (localElements.getItemAt(i) as SelectedFoodItem).eventid + "\'";
 								i = localElements.length;
 								indexOfRetrievedRowId = j;
 							}
@@ -1757,7 +1802,7 @@ package utilities
 			}
 			
 			if (sqlStatement.length == 0) {
-				syncLocalEvents(null);
+				deleteRemoteEvents();
 			} else {
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.sql = sqlStatement;
