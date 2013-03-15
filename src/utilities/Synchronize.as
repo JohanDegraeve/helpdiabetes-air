@@ -3505,7 +3505,8 @@ package utilities
 			if (success) {
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
 				lastSyncTimeStamp = currentSyncTimeStamp;
-			}
+			} else
+				currentSyncTimeStamp = currentSyncTimeStamp - (secondsBetweenTwoSync * 1000 + 1);
 			
 			if (localElementsUpdated) {
 				localElementsUpdated = false;
