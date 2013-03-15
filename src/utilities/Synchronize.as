@@ -2751,7 +2751,7 @@ package utilities
 				trace("start method googleExcelInsertLogBookEvents");
 			this.dispatchEvent(new Event(INSERTING_NEW_EVENTS));
 			var dateFormatter:DateTimeFormatter =  new DateTimeFormatter();
-			dateFormatter.dateTimePattern = ResourceManager.getInstance().getString('roview','datepattern');
+			dateFormatter.dateTimePattern = ResourceManager.getInstance().getString('uploadtrackingview','datepattern');
 			dateFormatter.useUTC = false;
 			dateFormatter.setStyle("locale",Capabilities.language.substr(0,2));
 			var timeFormatter:DateTimeFormatter = new DateTimeFormatter();
