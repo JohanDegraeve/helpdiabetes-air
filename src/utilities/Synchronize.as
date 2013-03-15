@@ -51,6 +51,7 @@ package utilities
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
 	import mx.events.Request;
+	import mx.formatters.DateFormatter;
 	import mx.resources.ResourceManager;
 	import mx.utils.Base64Encoder;
 	
@@ -649,6 +650,20 @@ package utilities
 		 */
 		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean,onlySyncTheSettings:Boolean = false):void {
 			tracker = callingTracker;
+
+			//to make sure there's at least one complete resync per day
+			if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteSync))) {
+				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,
+					( (
+						(new Date()).valueOf() 
+						- 
+						new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000
+					).toString()
+					)
+				);
+				Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteSync,(new Date()).date.toString());
+			}
+			
 			if (
 				(!(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true"))
 				&&
@@ -668,6 +683,8 @@ package utilities
 				trackingList = ModelLocator.getInstance().trackingList;
 				currentSyncTimeStamp = new Date().valueOf();
 				lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
+				if (traceNeeded)
+					trace("lastsynctimestamp = " + new DateFormatter().format(new Date(lastSyncTimeStamp)));
 				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 				rerunNecessary = false;
 				syncRunning = true;

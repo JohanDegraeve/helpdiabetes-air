@@ -278,6 +278,10 @@ package databaseclasses
 		 * 0 = first one , 1 = second, ... if > size of array of column names, then all column names are created 
 		 */
 		public static const SettingsNextColumnToAddInLogBook:int=108;
+		/**
+		 * day of the month (ie 1..31), where last complete sync was done. -1 means not yet done. 
+		 **/
+		 public static const SettingsDayOfLastCompleteSync:int=109;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -389,7 +393,8 @@ package databaseclasses
 			"false",//creator of foodtable on google excel
 			"0",//SettingsNextRowToAdd
 			"false",//all fooditmes uploaded or not
-			"0"
+			"0",
+			"-1"//SettingsDayOfLastCompleteSync
 		];
 		
 		/** array with lastmodifiedtimestamp<br> 
