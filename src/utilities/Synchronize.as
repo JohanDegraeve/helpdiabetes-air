@@ -925,6 +925,11 @@ package utilities
 								for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
 									if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
 										elementAlreadyThere = true;
+										if (remoteElementEventIdsToBeDeleted == null) {
+											remoteElementEventIdsToBeDeleted = new ArrayList();
+										}
+										//now remoteelementidstobedeleted is array of tableid, eventid pair, eventid still needs to be changed to rowid
+										remoteElementEventIdsToBeDeleted.addItem(new Array(tableNamesAndColumnNames[0][1],(remoteElements.getItemAt(rowctr2) as Array)[positionId]));
 										break;
 									}
 								}
@@ -1074,6 +1079,11 @@ package utilities
 								for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
 									if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
 										elementAlreadyThere = true;
+										if (remoteElementEventIdsToBeDeleted == null) {
+											remoteElementEventIdsToBeDeleted = new ArrayList();
+										}
+										//now remoteelementidstobedeleted is array of tableid, eventid pair, eventid still needs to be changed to rowid
+										remoteElementEventIdsToBeDeleted.addItem(new Array(tableNamesAndColumnNames[1][1],(remoteElements.getItemAt(rowctr2) as Array)[positionId]));
 										break;
 									}
 								}
@@ -1225,6 +1235,11 @@ package utilities
 								for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
 									if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
 										elementAlreadyThere = true;
+										if (remoteElementEventIdsToBeDeleted == null) {
+											remoteElementEventIdsToBeDeleted = new ArrayList();
+										}
+										//now remoteelementidstobedeleted is array of tableid, eventid pair, eventid still needs to be changed to rowid
+										remoteElementEventIdsToBeDeleted.addItem(new Array(tableNamesAndColumnNames[2][1],(remoteElements.getItemAt(rowctr2) as Array)[positionId]));
 										break;
 									}
 								}
@@ -1547,6 +1562,11 @@ package utilities
 							for (var rowctr2:int = 0;rowctr2 < remoteElements.length;rowctr2++) {
 								if ((remoteElements.getItemAt(rowctr2) as Array)[positionId] == eventAsJSONObject.rows[rowctr][positionId]) {
 									elementAlreadyThere = true;
+									if (remoteElementEventIdsToBeDeleted == null) {
+										remoteElementEventIdsToBeDeleted = new ArrayList();
+									}
+									//now remoteelementidstobedeleted is array of tableid, eventid pair, eventid still needs to be changed to rowid
+									remoteElementEventIdsToBeDeleted.addItem(new Array(tableNamesAndColumnNames[4][1],(remoteElements.getItemAt(rowctr2) as Array)[positionId]));
 									break;
 								}
 							}
