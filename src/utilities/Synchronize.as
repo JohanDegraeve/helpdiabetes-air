@@ -371,6 +371,7 @@ package utilities
 		private static const foodValueNames_Index_mealinsulinratio:int = 9;
 		private static const foodValueNames_Index_mealcalculatedinsulin:int = 10;
 		private static const foodValueNames_Index_mealselecteditems:int = 11;
+		private static const foodValueNames_Index_comment:int = 12;
 		
 		/**
 		 * name of the spreadsheet used when uploading the foodtable 
@@ -633,6 +634,7 @@ package utilities
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio] = ResourceManager.getInstance().getString('uploadtrackingview','mealinsulinratio');
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin] = ResourceManager.getInstance().getString('uploadtrackingview','mealcalculatedinsulin');
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems] = ResourceManager.getInstance().getString('uploadtrackingview','mealselecteditems');
+			googleExcelLogBookColumnNames[foodValueNames_Index_comment] = ResourceManager.getInstance().getString('uploadtrackingview','comment');
 		}
 		
 		public static function getInstance():Synchronize {
@@ -2808,6 +2810,7 @@ package utilities
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealtype],(trackElement as MealEvent).mealName);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount],(Math.round((trackElement as MealEvent).totalCarbs)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio],(trackElement as MealEvent).insulinRatio.toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MealEvent).comment);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin],((Math.round((trackElement as MealEvent).calculatedInsulinAmount*10))/10).toString());
 						var selectedItems:ArrayCollection = (trackElement as MealEvent).selectedFoodItems;
 						var selectedItemsString:String = "";
@@ -2819,12 +2822,15 @@ package utilities
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems],selectedItemsString);
 					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is BloodGlucoseEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamebloodglucose'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as BloodGlucoseEvent).comment);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue],new Number((trackElement as BloodGlucoseEvent).bloodGlucoseLevel).toString());
 					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is ExerciseEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnameexercise'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as ExerciseEvent).comment);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel],(trackElement as ExerciseEvent).level);
 					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is MedicinEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamemedicin'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MedicinEvent).comment);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicintype],(trackElement as MedicinEvent).medicinName);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue],new Number((trackElement as MedicinEvent).amount).toString());
 					} else {
@@ -2986,13 +2992,12 @@ package utilities
 					return;
 				}
 			} 
-			
-			if (traceNeeded)
-				trace("start method googleExcelCreateHeader");
-			
+						
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) == googleExcelFoodTableColumnNames.length)  {
 				googleExcelInsertFoodItems();
 			} else {
+				if (traceNeeded)
+					trace("start method googleExcelCreateHeader");
 				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingheaders');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 
@@ -3259,6 +3264,8 @@ package utilities
 		}
 		
 		private function googleExcelFindLogBookWorkSheet(event:Event = null):void {
+			var weNeedToAddColumns:Boolean = false;//if worksheet already exists, then we will check of all columns are there, if not we'll have to add column "comment", because that's the one that was add later on,
+			var workSheetEditUrl:String;
 			if (syncRunning) {
 				findlogbookworksheetWaiting=true;
 				return;
@@ -3272,28 +3279,31 @@ package utilities
 				for each (var ns : Namespace in namespaces) {
 					if (ns.prefix == "") {
 						xmlns = ns;
-						break;
+					}
+					if (ns.prefix == prefix_gs)
+					{
+						_namespace_gs = ns;
 					}
 				}
 				helpDiabetesLogBookWorkSheetId = "";
+				var indexOfLogbookEntry:int;
 				var entryXMLList:XMLList = new XMLList(workSheetListAsXML..xmlns::entry);
 				for (var listCounter:int = 0 ; listCounter < entryXMLList.length();listCounter++) {
 					if (entryXMLList[listCounter]..xmlns::title == "logbook") {
 						helpDiabetesLogBookWorkSheetId = entryXMLList[listCounter]..xmlns::id;
 						var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesLogBookWorkSheetId.split("/");
 						helpDiabetesLogBookWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
-						
+						if (entryXMLList[listCounter].._namespace_gs::colCount < googleExcelLogBookColumnNames.length)  {
+							weNeedToAddColumns = true;
+							//to do that we need the editurl
+							workSheetEditUrl = getEditURl(new XMLList(entryXMLList[listCounter]..xmlns::link));
+							entryXMLList[listCounter].._namespace_gs::colCount =  googleExcelLogBookColumnNames.length;
+							indexOfLogbookEntry = listCounter;
+						}
 					}
 					if (entryXMLList[listCounter]..xmlns::title == "Sheet 1") {
 						if (entryXMLList.length() > 1) {
-							var linkListForThisentryXMLList:XMLList = new XMLList(entryXMLList[listCounter]..xmlns::link);
-							for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
-								if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
-									if (linkListForThisentryXMLList[linkListCounter].attribute("rel") == "edit")  {
-										googleExcelDeleteWorkSheetUrl = linkListForThisentryXMLList[linkListCounter].attribute("href"); 
-									}
-								}
-							}
+							googleExcelDeleteWorkSheetUrl = getEditURl(new XMLList(entryXMLList[listCounter]..xmlns::link));
 						}
 					}
 				}
@@ -3307,7 +3317,14 @@ package utilities
 						googleExcelCreateLogBookWorkSheet(null);
 						return;
 					}
-					else googleExcelCreateLogBookHeader(null);
+					else {
+						if (!weNeedToAddColumns)
+							googleExcelCreateLogBookHeader(null);
+						else {
+							
+							googleExcelAddColumnToLogBookWorksheet(null,workSheetEditUrl,entryXMLList[indexOfLogbookEntry].toString());
+						}
+					}
 				} else {
 					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInLogBook,"0");
 					Settings.getInstance().setSetting(Settings.SettingLastUploadedEventTimeStamp,"0");
@@ -3329,6 +3346,28 @@ package utilities
 			}
 		}
 		
+		/**
+		 * will extend an existing logbookworksheet so that it has enough columns, in case columns are added to an existing logbook<br>
+		 */
+		private function googleExcelAddColumnToLogBookWorksheet(event:Event = null, editUrl:String = null,xml:String = null):void  {
+			if (event != null)  {
+				removeEventListeners();
+				googleExcelCreateLogBookHeader(null);//will actuall add the missing columnheaders
+			} else {
+				if (traceNeeded)
+					trace("start method googleExcelAddColumnToLogBookWorksheet");
+				
+				createAndLoadURLRequest(
+					editUrl,
+					URLRequestMethod.PUT,
+					null,
+					xml,
+					googleExcelAddColumnToLogBookWorksheet,
+					true,
+					"application/atom+xml");
+			}
+		}
+				
 		private function googleExcelFindFoodTableWorkSheet(event:Event = null):void {
 			if (event != null)  {
 				removeEventListeners();
@@ -3352,18 +3391,10 @@ package utilities
 						helpDiabetesFoodTableWorkSheetId = entryXMLList[listCounter]..xmlns::id;
 						var helpdiabetesWorkSheetIdSplitted:Array = helpDiabetesFoodTableWorkSheetId.split("/");
 						helpDiabetesFoodTableWorkSheetId = helpdiabetesWorkSheetIdSplitted[helpdiabetesWorkSheetIdSplitted.length - 1];
-						
 					}
 					if (entryXMLList[listCounter]..xmlns::title == "Sheet 1") {
 						if (entryXMLList.length() > 1) {
-							var linkListForThisentryXMLList:XMLList = new XMLList(entryXMLList[listCounter]..xmlns::link);
-							for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
-								if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
-									if (linkListForThisentryXMLList[linkListCounter].attribute("rel") == "edit")  {
-										googleExcelDeleteWorkSheetUrl = linkListForThisentryXMLList[linkListCounter].attribute("href"); 
-									}
-								}
-							}
+							googleExcelDeleteWorkSheetUrl = getEditURl(new XMLList(entryXMLList[listCounter]..xmlns::link));
 						}
 					}
 				}
@@ -3972,6 +4003,16 @@ package utilities
 			return ExcelSorting.compareStrings((a as XML).description.text(),(b as XML).description.text());
 		}
 		
+		private function getEditURl(linkListForThisentryXMLList:XMLList):String {
+			for (var linkListCounter:int = 0; linkListCounter < linkListForThisentryXMLList.length();linkListCounter++)  {
+				if (linkListForThisentryXMLList[linkListCounter].attribute("rel"))  {
+					if (linkListForThisentryXMLList[linkListCounter].attribute("rel") == "edit")  {
+						return linkListForThisentryXMLList[linkListCounter].attribute("href"); 
+					}
+				}
+			}
+			return "";
+		}
 	}
 }
 
