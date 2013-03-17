@@ -25,7 +25,6 @@ package databaseclasses
 
 	public class BloodGlucoseEvent extends TrackingViewElement implements IListElement
 	{
-		private var _timeStamp:Number;
 		private var _bloodGlucoseLevel:Number;
 		private var _comment:String;
 
@@ -101,16 +100,6 @@ package databaseclasses
 			_bloodGlucoseLevel = value;
 		}
 
-		public function get timeStamp():Number
-		{
-			return _timeStamp;
-		}
-
-		public function set timeStamp(value:Number):void
-		{
-			_timeStamp = value;
-		}
-				
 		/**
 		 * will update the exerciseevent in the database with the new values for level and comment and amount<br>
 		 * if newComment = null then an empty string will be used<br>

@@ -103,11 +103,6 @@ package databaseclasses
 
 		
 		/**
-		 * value will be creationtimestamp, must be named _timeStamp because the class implements IListElement
-		 */
-		private var _timeStamp:Number;
-		
-		/**
 		 * the calculated amount, in fact a redundant value because it can be derived from other values here<br>
 		 * null if no calculation is possible eg because no insulinratio defined
 		 */
@@ -279,16 +274,7 @@ package databaseclasses
 		 * as MealEvent implements Itimestamp, it shoud have a timestamp<br>
 		 * the value will be assigned at creation, 
 		 */
-		public function get timeStamp():Number
-		{
-			return _timeStamp;
-		}
-		
-		/**
-		 * as MealEvent implements Itimestamp, it shoud have a timestamp<br>
-		 * the value will be assigned at creation, 
-		 */
-		public function set timeStamp(timeStamp:Number):void
+		override public function set timeStamp(timeStamp:Number):void
 		{
 			this._timeStamp = timeStamp;
 			_lastModifiedTimeStamp = (new Date()).valueOf();

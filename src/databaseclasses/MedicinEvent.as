@@ -37,8 +37,6 @@ package databaseclasses
 			_comment = value;
 		}
 
-		private var _timeStamp:Number;
-		
 		private var _medicinName:String;
 		
 		public function get medicinName():String
@@ -90,16 +88,6 @@ package databaseclasses
 			
 			if (storeInDatabase)
 				Database.getInstance().createNewMedicinEvent(amount, medicin, _timeStamp,_lastModifiedTimestamp,medicineventid, _comment, null);
-		}
-		
-		public function get timeStamp():Number
-		{
-			return _timeStamp;
-		}
-		
-		public function set timeStamp(value:Number):void
-		{
-			_timeStamp = value;
 		}
 		
 		public function listElementRendererFunction():ClassFactory

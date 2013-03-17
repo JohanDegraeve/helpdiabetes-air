@@ -23,7 +23,20 @@ package myComponents
 	 * also the eventid is defined here 
 	 */
 	public class TrackingViewElement
+		
 	{
+		protected var _timeStamp:Number;
+
+		public function get timeStamp():Number
+		{
+			return _timeStamp;
+		}
+		
+		public function set timeStamp(value:Number):void
+		{
+			_timeStamp = value;
+		}
+		
 		public function TrackingViewElement()
 		{
 		}

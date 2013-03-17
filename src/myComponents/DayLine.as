@@ -26,8 +26,6 @@ package myComponents
 	 */
 	public class DayLine extends TrackingViewElement implements IListElement 
 	{
-		private var _timeStamp:Number;
-		
 		/**
 		 * creates a dayline with timeStamp, time will be set to 00:00 in the morning 0 seconds 0 milliseconds 
 		 */
@@ -35,10 +33,6 @@ package myComponents
 		{
 			this.timeStamp = timeStamp;
 			eventid = (new Date()).valueOf();
-		}
-		
-		public function get timeStamp():Number {
-			return _timeStamp
 		}
 		
 		public function listElementRendererFunction ():ClassFactory {
@@ -50,7 +44,7 @@ package myComponents
 		 * sets thh timeStamp, time will be set to 00:00 in the morning 0 seconds 0 milliseconds , with 00:00 being local time<br>
 		 * For instance if here in Belgium it is GMT+2, if timeStamp represents for example 5th of January 2011 at 10 o'clock, then timeStamp will be set to 4th of January at 22:00, which is the UTC time corresponding to 00:00 here in Belgium on 5th of January
 		 */
-		public function set timeStamp(value:Number):void
+		override public function set timeStamp(value:Number):void
 		{
 			var newDate:Date = new Date(value);
 			newDate.setHours(0,0,0,0);

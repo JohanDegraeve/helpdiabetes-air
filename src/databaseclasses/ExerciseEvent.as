@@ -25,8 +25,6 @@ package databaseclasses
 	
 	public class ExerciseEvent extends TrackingViewElement implements IListElement
 	{
-		private var _timeStamp:Number;
-
 		private var _level:String;
 
 		public function get level():String
@@ -63,16 +61,6 @@ package databaseclasses
 			
 			if (storeInDatabase)
 				Database.getInstance().createNewExerciseEvent(level,_comment,_timeStamp,_lastModifiedTimestamp,exerciseeventid,null);
-		}
-		
-		public function get timeStamp():Number
-		{
-			return _timeStamp;
-		}
-		
-		public function set timeStamp(newTimeStamp:Number):void
-		{
-			 _timeStamp = newTimeStamp;
 		}
 		
 		private var _lastModifiedTimestamp:Number;
