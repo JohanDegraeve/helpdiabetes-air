@@ -42,6 +42,7 @@ package databaseclasses
 	
 	import myComponents.DayLine;
 	import myComponents.DayLineWithTotalAmount;
+	import myComponents.TimeLine;
 	
 	import views.FoodCounterView;
 	
@@ -2178,6 +2179,7 @@ package databaseclasses
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseEventsRetrievalFailed);
 				
 				var tempObject:Object = localSqlStatement.getResult().data;
+				var creationTimeStampAtMidNight:Number ;
 				
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
@@ -2187,7 +2189,7 @@ package databaseclasses
 							var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.exerciseeventid as Number,o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newExerciseEvent);
 							var creationTimeStampAsDate:Date = new Date(newExerciseEvent.timeStamp);
-							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
+							creationTimeStampAtMidNight = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
 							if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
 								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 								if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
@@ -2203,9 +2205,14 @@ package databaseclasses
 				
 				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
 				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
-				//Now add list of daylines
-				for (var counter:Number = youngest;counter - 1 < oldest;counter = counter + 86400000)
+				
+				//Now add list of daylines and red timelines
+				for (var counter:Number = youngest;counter - 1 < oldest;counter = counter + 86400000) {
 					ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(counter));
+					//ModelLocator.getInstance().trackingList.addItem(new TimeLine(counter + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))));
+//					ModelLocator.getInstance().trackingList.addItem(new TimeLine(counter + new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))));
+					//ModelLocator.getInstance().trackingList.addItem(new TimeLine(counter + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))));
+				}
 				
 				ModelLocator.getInstance().trackingList.refresh();
 				

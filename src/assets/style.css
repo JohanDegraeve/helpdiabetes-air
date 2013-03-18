@@ -68,9 +68,9 @@ s|TabbedViewNavigator #tabBar
 	colortop:#000000;/* gradient will be applied from bottom to top, this is the top color*/
 }
 
-.listAlternatingColors {/* a tabbar in a viewnavigator has tabs, this tab has a backgroundcolor when selected, this will be the colors used for a gradient box from bottom to top */
-	color1:#D0DDEF;/* gradient will be applied from bottom to top, this is the bottom color*/
-	color2:#EEF3F9;/* gradient will be applied from bottom to top, this is the top color*/
+.listAlternatingColors {/*used in menu items*/
+	color1:#D0DDEF;
+	color2:#EEF3F9;
 }
 
 s|ActionBar

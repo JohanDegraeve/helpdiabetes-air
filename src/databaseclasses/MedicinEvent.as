@@ -40,7 +40,6 @@ package databaseclasses
 		private var _medicinName:String;
 		
 		public function get medicinName():String
-
 		{
 			return _medicinName;
 		}
@@ -48,7 +47,6 @@ package databaseclasses
 		private var _amount:Number;
 		
 		public function get amount():Number
-
 		{
 			return _amount;
 		}

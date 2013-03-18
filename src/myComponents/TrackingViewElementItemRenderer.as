@@ -17,6 +17,8 @@
  */
 package myComponents
 {
+	import databaseclasses.Settings;
+	
 	import model.ModelLocator;
 	
 	import spark.components.IconItemRenderer;
@@ -63,6 +65,21 @@ package myComponents
 					graphics.lineTo(0,0);
 					graphics.endFill();
 				}
+			} else {
+				var creationTimeStampAsDate:Date = new Date((data as TrackingViewElement).timeStamp);
+				var temp:Date = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0));
+				var creationTimeStampAsNumber:Number = creationTimeStampAsDate.valueOf() - temp.valueOf();
+				if (creationTimeStampAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL)))
+					graphics.beginFill(0xF0D1DE,0);
+				else if (creationTimeStampAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL)))
+					graphics.beginFill(0xF0D1DE,0.5);
+				/*else if (creationTimeStampAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL)))
+					graphics.beginFill(styleManager.getStyleDeclaration(".listAlternatingColors").getStyle("color1"),0.5);*/
+				else  
+					graphics.beginFill(0xF0D1DE,0);
+				
+				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+				graphics.endFill();
 			}
 			
 			if (down) {

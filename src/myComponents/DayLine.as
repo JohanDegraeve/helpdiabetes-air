@@ -38,7 +38,6 @@ package myComponents
 		public function listElementRendererFunction ():ClassFactory {
 			return new ClassFactory(DayLineItemRenderer);
 		}
-
 		
 		/**
 		 * sets thh timeStamp, time will be set to 00:00 in the morning 0 seconds 0 milliseconds , with 00:00 being local time<br>
@@ -50,6 +49,5 @@ package myComponents
 			newDate.setHours(0,0,0,0);
 			_timeStamp = newDate.valueOf();
 		}
-		
 	}
 }
