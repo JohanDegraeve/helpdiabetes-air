@@ -192,7 +192,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				PopUpManager.addPopUp(textPicker, this, true);
 				PopUpManager.centerPopUp(textPicker);
 				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('trackingview','help_text_enterfoodtext');
+				helpCallOut.helpText = resourceManager.getString('trackingview','help_text_entersearchtext');
 				helpCallOut.settingId = Settings.SettingsHelpTextTrackingView1;
 				//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
 				helpCallOut.open(textPicker,true)
@@ -202,7 +202,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				var cntr:int = 0;
 				var selitemctr:int = 0;
-				var mealEvent:MealEvent;
 				ModelLocator.getInstance().searchActive = false;
 				ModelLocator.getInstance().firstMarkedItemEventId = 0;
 				ModelLocator.getInstance().lastMarkedItemEventId = 0;
@@ -222,73 +221,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					return;//there seem to be only space
 				
 				//start with the first substring
-				for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
-					if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MealEvent) {
-						mealEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent;
-						for (selitemctr = 0;selitemctr < mealEvent.selectedFoodItems.length;selitemctr++) {
-							if (ExcelSorting.stringAhasStringB((mealEvent.selectedFoodItems.getItemAt(selitemctr) as SelectedFoodItem).itemDescription,splittedText[0] as String)) {
-								mealEvent.mark = true;
-								elementsFound = true;
-								if (ModelLocator.getInstance().firstMarkedItemEventId == 0)
-									ModelLocator.getInstance().firstMarkedItemEventId = mealEvent.eventid;
-								ModelLocator.getInstance().lastMarkedItemEventId = mealEvent.eventid;
-								break;
-							}
-						}
-					}
-				}
 				
-				//now check for all marked items, if they also matchi the following substrings
-				splittedTextCntr = 1;
-				for (;splittedTextCntr < splittedText.length;splittedTextCntr++) {
-					//start with the first substring
-					for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
-						if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MealEvent) {
-							if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent).mark) {
-								mealEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent;
-								var mealEventHasTheTextInOneOfTheElements:Boolean = false;
-								for (selitemctr = 0;selitemctr < mealEvent.selectedFoodItems.length;selitemctr++) {
-									if ((ExcelSorting.stringAhasStringB((mealEvent.selectedFoodItems.getItemAt(selitemctr) as SelectedFoodItem).itemDescription,splittedText[splittedTextCntr] as String))) {
-										mealEventHasTheTextInOneOfTheElements = true;
-										break;
-									}
-								}
-								if (!mealEventHasTheTextInOneOfTheElements) {
-									mealEvent.mark = false;
-									if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().lastMarkedItemEventId) {
-										//as first and last are equal, it means there was originally only one marked item
-										//but that wasn't found with a second or third word, so we need to remove everything, 
-										cancelClicked();
-										return;
-									}
-									var cntr2:int;
-									if (ModelLocator.getInstance().firstMarkedItemEventId == mealEvent.eventid) {
-										//we need to find a new firstmarkeditem
-										for (cntr2 = cntr + 1;cntr2 < ModelLocator.getInstance().copyOfTrackingList.length;cntr2++) {
-											if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) is MealEvent) {
-												if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) as MealEvent).mark) {
-													ModelLocator.getInstance().firstMarkedItemEventId = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) as MealEvent).eventid;
-													break;
-												}
-											}
-										}
-									} 
-									if (ModelLocator.getInstance().lastMarkedItemEventId == mealEvent.eventid) {
-										//we need to find a new lastmarkeditem
-										for (cntr2 = cntr - 1;cntr2 >= 0;cntr2--) {
-											if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) is MealEvent) {
-												if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) as MealEvent).mark) {
-													ModelLocator.getInstance().lastMarkedItemEventId = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr2) as MealEvent).eventid;
-													break;
-												}
-											}
-										}
-									}  
-								}
-							}
+				for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
+					var allTextInOneString:String = "";
+					if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MealEvent) {
+						var mealEvent:MealEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent;
+						for (selitemctr = 0;selitemctr < mealEvent.selectedFoodItems.length;selitemctr++) {
+							allTextInOneString += " " + (mealEvent.selectedFoodItems.getItemAt(selitemctr) as SelectedFoodItem).itemDescription;
 						}
+						allTextInOneString += " " + mealEvent.comment;
+					} else if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is ExerciseEvent) {
+						var exerciseEvent:ExerciseEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as ExerciseEvent;
+						allTextInOneString += " " + exerciseEvent.level;
+						allTextInOneString += " " + exerciseEvent.comment;
+					} else if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is BloodGlucoseEvent) {
+						allTextInOneString += " " + (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as BloodGlucoseEvent).comment;
+					} else if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MedicinEvent) {
+						var medicinEvent:MedicinEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MedicinEvent;
+						allTextInOneString += " " + medicinEvent.medicinName;
+						allTextInOneString += " " + medicinEvent.comment;
+					} 
+					splittedTextCntr = 0;
+					while (splittedTextCntr < splittedText.length)
+						if (ExcelSorting.stringAhasStringB(allTextInOneString,splittedText[splittedTextCntr] as String))
+							splittedTextCntr++;
+						else
+							break;
+					if (splittedTextCntr == splittedText.length) {
+						(ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).mark = true;
+						ModelLocator.getInstance().lastMarkedItemEventId = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).eventid;
+						if (ModelLocator.getInstance().firstMarkedItemEventId == 0)
+							ModelLocator.getInstance().firstMarkedItemEventId = ModelLocator.getInstance().lastMarkedItemEventId;
+						elementsFound = true;
 					}
 				}
+
 				(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
 				ModelLocator.getInstance().trackingList.refresh();//forces a redraw
 
