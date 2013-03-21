@@ -42,7 +42,6 @@ package databaseclasses
 	
 	import myComponents.DayLine;
 	import myComponents.DayLineWithTotalAmount;
-	import myComponents.TimeLine;
 	
 	import views.FoodCounterView;
 	

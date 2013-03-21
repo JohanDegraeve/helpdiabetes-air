@@ -70,16 +70,15 @@ package myComponents
 				var temp:Date = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0));
 				var creationTimeStampAsNumber:Number = creationTimeStampAsDate.valueOf() - temp.valueOf();
 				if (creationTimeStampAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL)))
-					graphics.beginFill(0xF0D1DE,0);
-				else if (creationTimeStampAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL)))
+					;
+				else if (creationTimeStampAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))) {
 					graphics.beginFill(0xF0D1DE,0.5);
-				/*else if (creationTimeStampAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL)))
-					graphics.beginFill(styleManager.getStyleDeclaration(".listAlternatingColors").getStyle("color1"),0.5);*/
+					graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
+					graphics.endFill();
+				}
 				else  
-					graphics.beginFill(0xF0D1DE,0);
+					;
 				
-				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
-				graphics.endFill();
 			}
 			
 			if (down) {
