@@ -113,7 +113,6 @@ view to show ModelLocator.getInstance().meals in a list
 					trace("exception thrown in SelectedMealView.onSelectedMeall Changed - not important");
 					;
 				}
-
 				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
 			}
 			

@@ -553,11 +553,13 @@ package model
 										mealTimeStamp = new Date((_meals.getItemAt(k) as Meal).timeStamp);			
 										mealTimeStampAtMidNight = (new Date(mealTimeStamp.fullYear,mealTimeStamp.month,mealTimeStamp.date)).valueOf();
 										if (mealTimeStampAtMidNight == mealEventTimeStampAtMidNight) {
-											if ((_meals.getItemAt(k) as Meal).mealName.toUpperCase() == 
-												(_trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
-												mealFound = true;
-												_meals.setItemAt(new Meal(null,(_trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
-												k = _meals.length;
+											if ((_meals.getItemAt(k) as Meal).mealEvent == null) {//see fix in r347
+												if ((_meals.getItemAt(k) as Meal).mealName.toUpperCase() == 
+													(_trackingList.getItemAt(j) as MealEvent).mealName.toUpperCase()) {
+													mealFound = true;
+													_meals.setItemAt(new Meal(null,(_trackingList.getItemAt(j) as MealEvent),Number.NaN),k);
+													k = _meals.length;
+												}
 											}
 										}
 									}
