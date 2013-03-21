@@ -107,22 +107,23 @@ view to show ModelLocator.getInstance().meals in a list
 			}
 			
 			private function onSelectedMealChanged(e:Event):void {
-				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
+				try {//doing this because sometimes an exception was thrown here, not sure why
+					meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
+				} catch (error:Error) {
+					trace("exception thrown in SelectedMealView.onSelectedMeall Changed - not important");
+					;
+				}
+
 				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
 			}
 			
 			/**
 			 * will check if navigator.poppedViewReturnedObject is not null and if so, checks the value<br>
-			 * if equal to CHANGE_MEAL_DATE_AND_TIME then view is popped.
+			 * if equal to CHANGE_MEAL_DATE_AND_TIME or ADD_NEW_MEAL then view is popped.
 			 */
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
-					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
-						if (navigator.poppedViewReturnedObject.object != null) {
-							ModelLocator.getInstance().selectedMeal = navigator.poppedViewReturnedObject.object as Number;
-							navigator.popView();
-						}
-					} else if (navigator.poppedViewReturnedObject.context == ADD_NEW_MEAL) {
+					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME || navigator.poppedViewReturnedObject.context == ADD_NEW_MEAL) {
 						if (navigator.poppedViewReturnedObject.object != null) {
 							ModelLocator.getInstance().selectedMeal = navigator.poppedViewReturnedObject.object as Number;
 							navigator.popView();

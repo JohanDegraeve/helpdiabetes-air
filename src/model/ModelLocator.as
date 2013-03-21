@@ -432,6 +432,7 @@ package model
 		 */
 		public function refreshMeals(updateSelectedMeal:Boolean = true):void {
 			meals = new ArrayCollection();
+			trace("in refreshmeals");
 			
 			/**
 			 * that's the actual time, in milliseconds since 1970, utc
