@@ -36,10 +36,12 @@ package myComponents
 	
 	public class TrackingViewLayout extends BasicLayout {
 		
-		private var _lastIndexInView:int;
-		private var _firstIndexInView:int;
+		private var _lastIndexInView:Number = Number.NaN;
+		private var _firstIndexInView:Number = Number.NaN;
 		static private var _yToIndex:Vector.<int>; 
 		static private var _indexToY:Vector.<int>; 
+		
+		private var listSize:Number = Number.NaN;
 
 		/**
 		 * indexToY returns the y coordinate of object with specified index
@@ -52,7 +54,7 @@ package myComponents
 			return _indexToY[index];
 		}
 
-		private var _currentFirstIndexInView:int;
+		private var _currentFirstIndexInView:int = 0;
 
 		public function get currentFirstIndexInView():int
 
@@ -60,7 +62,7 @@ package myComponents
 			return _currentFirstIndexInView;
 		}
 
-		private var _currentLastIndexInView:int;
+		private var _currentLastIndexInView:int = 0;
 
 		public function get currentLastIndexInView():int
 
@@ -102,9 +104,22 @@ package myComponents
 				return;
 			var count:int = dataProvider.length;
 			
-			var elementHeight:Number;
+			if (!isNaN(listSize))  {
+				if (listSize != dataProvider.length)
+					resetAllGlobalVariables();
+			} else
+				resetAllGlobalVariables();
+			listSize = dataProvider.length;
 			_yToIndex = new Vector.<int>();
 			_indexToY = new Vector.<int>();
+
+			
+			if (listSize == 1) {
+				var temp2:int = 0;
+				temp2++;
+			}
+			
+			var elementHeight:Number;
 			var d:Object ;
 			//loop though all the elements elements
 			for (var i:int = 0; i < count; i++) {
@@ -137,7 +152,6 @@ package myComponents
 		}
 		
 		override protected function scrollPositionChanged():void {
-			
 			var g:GroupBase = target;
 			if (!g)
 				return;     
@@ -226,10 +240,10 @@ package myComponents
 				}
 			}
 			
-			if (!_firstIndexInView) // if _firstindexinview still not existing then initialize to zero.
+			if (isNaN(_firstIndexInView)) // if _firstindexinview still not existing then initialize to zero.
 				_firstIndexInView = 0;
 			
-			if (!_lastIndexInView) //this will force to set lastindexinview correctly (and also first)
+			if (isNaN(_lastIndexInView)) //this will force to set lastindexinview correctly (and also first)
 				scrollPositionChanged();
 			
 			_currentFirstIndexInView = (_firstIndexInView < 0 ? 0 : _firstIndexInView) ;
@@ -272,6 +286,16 @@ package myComponents
 			_firstIndexInView = firstIndex;
 			_lastIndexInView = lastIndex;
 			
+		}
+		
+		private function resetAllGlobalVariables():void {
+			_lastIndexInView = Number.NaN;
+			_firstIndexInView = Number.NaN;
+			_yToIndex = new Vector.<int>();
+			_indexToY = new Vector.<int>();
+			_currentFirstIndexInView = 0;
+			_currentLastIndexInView = 0;
+			_firstUpdateDisplayList = true;
 		}
 		
 	}

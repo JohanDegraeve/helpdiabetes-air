@@ -33,6 +33,7 @@ package model
 	import mx.resources.ResourceManager;
 	
 	import myComponents.DayLine;
+	import myComponents.SimpleTextEvent;
 	import myComponents.TrackingViewElement;
 	
 	import spark.collections.Sort;
@@ -242,8 +243,9 @@ package model
 		/**
 		 * copyOfTrackingList is the arraycollection used as list in the trackingview<br>
 		 * trackingList is the list that will be maintained, copy is simply set equal to trackinglist, but when doing lots of changes
-		 * then copy can be set to null temporarily, do the changes on trackinglist, and then reassign copy to trackinglist<br><br>
+		 * then copy can be set to another array (..) temporarily, do the changes on trackinglist, and then reassign copy to trackinglist<br><br>
 		 * the arraycollection used as list in trackingview<br>
+		 * This temporary "another array" can show that sync is busy<br>
 		 * It is declared here because it will be used in other classes as well, eg during intialization of the application it will already be created and initialized<br>
 		 * The _trackingList contains all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents and also DayLine objects are stored here. Sorted by timestamp.<br>
 		 * any item in the _trackingList must be of a class extended from TrackingViewElement
@@ -259,6 +261,12 @@ package model
 		{
 			_copyOfTrackingList = value;
 		}
+		
+		/**
+		 * an array collection that has a message saying that sync is busy<br>
+		 * copyoftrackinglist can be assigned to this list temporarily. 
+		 */
+		public var infoTrackingList:ArrayCollection;
 
 		
 		/**
@@ -339,6 +347,8 @@ package model
 			// at initialization, there's no dayline existing in the tracking, so initialize to something very big
 			_youngestDayLineStoredInTrackingList = 5000000000000;
 			
+			infoTrackingList = new ArrayCollection();
+			infoTrackingList.addItem(new SimpleTextEvent(ResourceManager.getInstance().getString("general","storingnewevents")));
 		}
 		
 		/** 

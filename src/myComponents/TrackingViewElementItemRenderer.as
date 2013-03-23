@@ -76,9 +76,6 @@ package myComponents
 					graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 					graphics.endFill();
 				}
-				else  
-					;
-				
 			}
 			
 			if (down) {

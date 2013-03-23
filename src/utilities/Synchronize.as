@@ -3548,7 +3548,7 @@ package utilities
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
 			if (traceNeeded)
-				trace("in sycFinished with success = " + success);
+				trace("in syncFinished with success = " + success);
 			
 			if (success) {
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
@@ -3993,9 +3993,9 @@ package utilities
 		private function copyTrackingListIfNotDoneYet():void {
 			if (!trackingListAlreadyModified) {
 				trackingListAlreadyModified = true;
-				ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-			}
-			
+				ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
+				ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().infoTrackingList;
+			}			
 		}
 		
 		public static function compareFoodItemDescriptions(a:Object,b:Object):int {
