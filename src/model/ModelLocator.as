@@ -334,7 +334,10 @@ package model
 					ResourceManager.getInstance().getString("general","NorwegianTableInEnglish")),
 				new Array("fr",
 					ResourceManager.getInstance().getString("general","french"),
-					ResourceManager.getInstance().getString("general","FrenchAxelle"))
+					ResourceManager.getInstance().getString("general","FrenchAxelle")),
+				new Array("ro",
+					ResourceManager.getInstance().getString("general","romanian"),
+					ResourceManager.getInstance().getString("general","RomanianOnedenDotCom"))
 			);
             
 			trackingList = new ArrayCollection();

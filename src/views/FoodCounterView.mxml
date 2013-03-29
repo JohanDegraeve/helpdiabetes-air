@@ -141,7 +141,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					elementPicker.elements = new ArrayCollection([
 						resourceManager.getString('general','english'),
 						resourceManager.getString('general','dutch'),
-						resourceManager.getString('general','french')]);
+						resourceManager.getString('general','french'),
+						resourceManager.getString('general','romanian')]);
 					elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, onReturn);
 					elementPicker.addEventListener(Event.REMOVED_FROM_STAGE,onReturn);
 					elementPicker.labelText1 = resourceManager.getString('general','choose_language');
@@ -170,16 +171,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					//if event is not a unitchaged event, it means this application doesn't start first the first itme, so a database already existed and user didn't have to pick a preferred language
 					if (event is UnitChangedEvent)  {
 						if ((event as UnitChangedEvent).index == 0) {
-							resourceManager.localeChain = ["en_US","nl_NL","fr_FR"];
-							localeChainAsString = "en_US,nl_NL,fr_FR";
+							resourceManager.localeChain = ["en_US","nl_NL","fr_FR","ro_RO"];
+							localeChainAsString = "en_US,nl_NL,fr_FR,ro_RO";
 						}
 						if ((event as UnitChangedEvent).index == 1) {
-							resourceManager.localeChain = ["nl_NL","en_US","fr_FR"];
-							localeChainAsString = "nl_NL,en_US,fr_FR";
+							resourceManager.localeChain = ["nl_NL","en_US","fr_FR","ro_RO"];
+							localeChainAsString = "nl_NL,en_US,fr_FR,ro_RO";
 						}
 						if ((event as UnitChangedEvent).index == 2) {
-							resourceManager.localeChain = ["fr_FR","en_US","nl_NL"];
-							localeChainAsString = "fr_FR,en_US,nl_NL";
+							resourceManager.localeChain = ["fr_FR","en_US","nl_NL","ro_RO"];
+							localeChainAsString = "fr_FR,en_US,nl_NL,ro_RO";
+						}
+						if ((event as UnitChangedEvent).index == 3) {
+							resourceManager.localeChain = ["ro_RO","en_US","fr_FR","nl_NL"];
+							localeChainAsString = "ro_RO,en_US,fr_FR,nl_NL";
 						}
 					}
 					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
