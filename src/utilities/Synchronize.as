@@ -372,6 +372,9 @@ package utilities
 		private static const foodValueNames_Index_mealcalculatedinsulin:int = 10;
 		private static const foodValueNames_Index_mealselecteditems:int = 11;
 		private static const foodValueNames_Index_comment:int = 12;
+		private static const foodValueNames_Index_mealkcalamount:int = 13;
+		private static const foodValueNames_Index_mealproteinamount:int = 14;
+		private static const foodValueNames_Index_mealfatamount:int = 15;
 		
 		/**
 		 * name of the spreadsheet used when uploading the foodtable 
@@ -450,7 +453,7 @@ package utilities
 		
 		private var amountofSpaces:int;
 		
-		private static var traceNeeded:Boolean = true;
+		private static var traceNeeded:Boolean = false;
 		
 		private var localElementsUpdated:Boolean;
 		
@@ -635,6 +638,9 @@ package utilities
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin] = ResourceManager.getInstance().getString('uploadtrackingview','mealcalculatedinsulin');
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems] = ResourceManager.getInstance().getString('uploadtrackingview','mealselecteditems');
 			googleExcelLogBookColumnNames[foodValueNames_Index_comment] = ResourceManager.getInstance().getString('uploadtrackingview','comment');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealkcalamount');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealproteinamount');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealfatamount');
 		}
 		
 		public static function getInstance():Synchronize {
@@ -2811,6 +2817,9 @@ package utilities
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount],(Math.round((trackElement as MealEvent).totalCarbs)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio],(trackElement as MealEvent).insulinRatio.toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MealEvent).comment);
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount],(Math.round((trackElement as MealEvent).totalKilocalories)).toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount],(Math.round((trackElement as MealEvent).totalProtein)).toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount],(Math.round((trackElement as MealEvent).totalFat)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin],((Math.round((trackElement as MealEvent).calculatedInsulinAmount*10))/10).toString());
 						var selectedItems:ArrayCollection = (trackElement as MealEvent).selectedFoodItems;
 						var selectedItemsString:String = "";
