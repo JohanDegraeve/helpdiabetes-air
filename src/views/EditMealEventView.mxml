@@ -58,6 +58,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.formatters.DateTimeFormatter;
 			
 			import utilities.MyGATracker;
+			import utilities.Synchronize;
 			
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
@@ -208,11 +209,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
 						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
 						ModelLocator.getInstance().trackingList = new ArrayCollection();
-						
 						localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
 						localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-						
 						Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
+						
+						Synchronize.getInstance().startSynchronize(tracker,true);//not always necessary, because even if user click back button in changemealdateandtimeveiw, without change the time, then we'll pass here
 					} 
 				}
 				

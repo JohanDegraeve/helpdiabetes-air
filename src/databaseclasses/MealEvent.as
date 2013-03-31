@@ -277,6 +277,10 @@ package databaseclasses
 		override public function set timeStamp(timeStamp:Number):void
 		{
 			this._timeStamp = timeStamp;
+			
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			
 			_lastModifiedTimeStamp = (new Date()).valueOf();
 			updateMealEvent(mealName, _comment,insulinRatio,correctionFactor,previousBGlevel,lastModifiedTimeStamp,timeStamp);
 		}
