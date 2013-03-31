@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		initialize="onInitialize()"
-		creationComplete="onCreationComplete()"
 		add="addHandler()"
 		>
 	<fx:Declarations>
@@ -32,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:State name="noInsulinAmount"/>
 		<s:State name="insulinAmount"/>
 	</s:states> 
-		
+	
 	<fx:Script>
 		<![CDATA[
 			import com.google.analytics.AnalyticsTracker;
@@ -59,10 +58,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.formatters.DateTimeFormatter;
 			
 			import utilities.MyGATracker;
-
+			
 			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
-
+			
 			[Bindable]
 			private var dateTimeAndMealName_text:String;
 			
@@ -86,37 +85,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var selectedFoodItems:ArrayCollection;
 			[Bindable]
 			private var back_label:String;
-
+			
 			private static var dateFormatter:DateTimeFormatter ;
 			private static var timeFormatter:DateTimeFormatter ;
-
+			
 			private var helpCallOut:HelpCallOut;
 			
-			private var itemsAreEditable:Boolean;
-
 			/**
 			 * used as context value when pushing the view ChangeMealDateAndTimeView<br>
 			 * when addHandler is called, the value of the return object will be check, if equal to CHANGE_MEAL_DATE_AND_TIME then view is popped
 			 */
 			private static const CHANGE_MEAL_DATE_AND_TIME:int = 1;
-		
+			
 			override public function set data(value:Object):void {
 				super.data = value;
 				mealEvent = value as MealEvent;
 				selectedFoodItems = mealEvent.selectedFoodItems;
-			}
-			
-			private function onCreationComplete():void {
-				if (itemsAreEditable) {
-					if (fooditemlist.hasEventListener(Event.CHANGE)) {
-						helpCallOut = new HelpCallOut();
-						helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
-						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
-						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-						helpCallOut.verticalPosition = "before";
-						helpCallOut.open(fooditemlist,true);
-					}
-				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
@@ -128,15 +112,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				helpCallOut.verticalPosition = "after";
 				helpCallOut.open(dateTimeAndMealNameGroup,true);
 			}
-
+			
 			private function helptext2Removed(event:Event):void {
 				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
 			}
 			
-
+			
 			private function onInitialize():void {
 				trackerId = resourceManager.getString('analytics','trackeraccount');
-
+				
 				if (TrackingView.popToFirstViewNecessary())
 					navigator.popToFirstView();
 				else {
@@ -165,22 +149,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							+ " " + mealEvent.insulinRatio;
 					} else insulinAmount_text = null;
 					
-					for (var mealCounter:int = ModelLocator.getInstance().meals.length - 1;mealCounter >=0 ; mealCounter--) {
+					/*for (var mealCounter:int = ModelLocator.getInstance().meals.length - 1;mealCounter >=0 ; mealCounter--) {
 						if (ModelLocator.getInstance().meals.getItemAt(mealCounter) is Meal) {
 							if ((ModelLocator.getInstance().meals.getItemAt(mealCounter) as Meal).mealEvent == mealEvent) {
 								ModelLocator.getInstance().selectedMeal = mealCounter;						
 								fooditemlist.addEventListener(Event.CHANGE,onClick);
 								mealCounter = -1;
-								itemsAreEditable = true;
 							}
 						}
-					}
-
-					if (!itemsAreEditable) {
-						fooditemlist.addEventListener(Event.CHANGE,onClickButNotEditable);
-						itemsAreEditable = false;
-					}
-
+					}*/
+					
+					fooditemlist.addEventListener(Event.CHANGE,onClick);
+					
 					if (mealEvent.insulinRatio != 0)
 						currentState="insulinAmount";
 					
@@ -195,15 +175,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				return  new ClassFactory(SelectedFoodItemRenderer);
 			}
 			
-			private function onClickButNotEditable(event:spark.events.IndexChangeEvent):void {
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editmealeventview','youcannoteditthismealevent');
-				helpCallOut.settingId = 0;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,okClicked);
-				helpCallOut.verticalPosition = "before";
-				helpCallOut.open(fooditemlist,true);
-			}
-			
 			private function okClicked(event: Event):void {
 			}
 			
@@ -212,7 +183,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					tracker = new MyGATracker( this, trackerId, "AS3", false );
 				}
 				tracker.trackPageview( "EditMealEventView-selectedItemClicked" );
-
+				
 				data = mealEvent;
 				var dataToPass:Object = new Object();
 				dataToPass.selectedFoodItem = mealEvent.selectedFoodItems.getItemAt(event.newIndex);
@@ -220,12 +191,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function dateTimeAndMealNameClicked(event:Event):void  {
-				if (itemsAreEditable)   {//meal date and time can only be changed if meal != null, that means future, current ans previous meal, but older meals can not have a date change
-					navigator.pushView(ChangeMealDateAndTimeView,{
-						meal:mealEvent.meal
-					},CHANGE_MEAL_DATE_AND_TIME);
-				} else
-					onClickButNotEditable(null);
+				var mealToPush:Meal = mealEvent.meal;
+				if (mealToPush == null) {
+					mealToPush = new Meal(null,mealEvent,mealEvent.timeStamp);
+				}
+				navigator.pushView(ChangeMealDateAndTimeView,{
+					meal:mealToPush
+				},CHANGE_MEAL_DATE_AND_TIME);
 			}
 			
 			private function addHandler():void {
@@ -278,40 +250,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/Notes_48x48.png')" id="NotesButton" click="editNote(event)"/>
 	</s:actionContent>
-
-		<s:Group width="100%" >
+	
+	<s:Group width="100%" >
+		<s:layout >
+			<s:VerticalLayout gap="0">
+			</s:VerticalLayout>
+		</s:layout>
+		<s:Group id="dateTimeAndMealNameGroup" click="dateTimeAndMealNameClicked(event)">
+			<s:Label id="dateTimeAndMealName" paddingLeft="10" paddingBottom="12" paddingTop="12" width="100%" text="{dateTimeAndMealName_text}"/>
+		</s:Group>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0x000000" weight="1"/>
+			</s:stroke>
+		</s:Line>
+		<s:Group>
 			<s:layout >
-				<s:VerticalLayout gap="0">
+				<s:VerticalLayout paddingLeft="10" paddingBottom="5"
+								  gap="4" paddingTop="5">
 				</s:VerticalLayout>
 			</s:layout>
-			<s:Group id="dateTimeAndMealNameGroup" click="dateTimeAndMealNameClicked(event)">
-				<s:Label id="dateTimeAndMealName" paddingLeft="10" paddingBottom="12" paddingTop="12" width="100%" text="{dateTimeAndMealName_text}"/>
-			</s:Group>
-			<s:Line width="100%">
-				<s:stroke>
-					<s:SolidColorStroke color="0x000000" weight="1"/>
-				</s:stroke>
-			</s:Line>
-			<s:Group>
-				<s:layout >
-					<s:VerticalLayout paddingLeft="10" paddingBottom="5"
-									  gap="4" paddingTop="5">
-					</s:VerticalLayout>
-				</s:layout>
-				<s:Label id="carbAmount" width="100%" text="{carbAmount_text}" />
-				<s:Label visible="{mealEvent.totalProtein != -1}"  id="proteinAmount" width="100%" text="{proteinAmount_text}" />
-				<s:Label visible="{mealEvent.totalFat != -1}"  id="fatAmount" width="100%" text="{fatAmount_text}"/>
-				<s:Label visible="{mealEvent.totalKilocalories != -1}"  id="kilocalorieAmount" width="100%" text="{kilocalorieAmount_text}" height="{mealEvent.totalKilocalories != -1 ? styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight') : 0}"/>
-				<s:Label includeIn="insulinAmount" id="insulinAmount" width="100%" text="{insulinAmount_text}" />
-			</s:Group>
-			
-			<s:Line width="100%">
-				<s:stroke>
-					<s:SolidColorStroke color="0x000000" weight="1"/>
-				</s:stroke>
-			</s:Line>
-			
-			<s:List id="fooditemlist" width="100%"  height="100%" useVirtualLayout="false" dataProvider="{selectedFoodItems}" contentBackgroundAlpha="0" 
-					labelFunction="displaySelectedItem" itemRendererFunction="itemRendererFunction" />
+			<s:Label id="carbAmount" width="100%" text="{carbAmount_text}" />
+			<s:Label visible="{mealEvent.totalProtein != -1}"  id="proteinAmount" width="100%" text="{proteinAmount_text}" />
+			<s:Label visible="{mealEvent.totalFat != -1}"  id="fatAmount" width="100%" text="{fatAmount_text}"/>
+			<s:Label visible="{mealEvent.totalKilocalories != -1}"  id="kilocalorieAmount" width="100%" text="{kilocalorieAmount_text}" height="{mealEvent.totalKilocalories != -1 ? styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight') : 0}"/>
+			<s:Label includeIn="insulinAmount" id="insulinAmount" width="100%" text="{insulinAmount_text}" />
 		</s:Group>
+		
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0x000000" weight="1"/>
+			</s:stroke>
+		</s:Line>
+		
+		<s:List id="fooditemlist" width="100%"  height="100%" useVirtualLayout="false" dataProvider="{selectedFoodItems}" contentBackgroundAlpha="0" 
+				labelFunction="displaySelectedItem" itemRendererFunction="itemRendererFunction" />
+	</s:Group>
 </s:View>

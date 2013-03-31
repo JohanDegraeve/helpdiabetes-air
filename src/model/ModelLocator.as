@@ -422,7 +422,6 @@ package model
 		public function set selectedMeal(value:int):void
 
 		{
-
 			if (_selectedMeal == -1) {
 				_selectedMeal = value;
 				this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_INITIALIZED));

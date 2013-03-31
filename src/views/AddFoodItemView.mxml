@@ -445,8 +445,15 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					amount_textinput_text ="0";
 				
 				if (data.selectedFoodItem) {
-					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent
-						.updateSelectedFoodItemChosenAmount(data.selectedFoodItem,new Number(amount_textinput_text));
+					var mealEventId:Number = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
+					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().copyOfTrackingList.length;trackingCntr++) {
+						if (((ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
+							(ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr) as MealEvent)
+							.updateSelectedFoodItemChosenAmount(data.selectedFoodItem,new Number(amount_textinput_text));
+							break;
+						}
+					}
+					
 				} else {
 					//- get the selected meal (which may or may not already include a mealevent
 					//- create a selectedfooditem and add it
