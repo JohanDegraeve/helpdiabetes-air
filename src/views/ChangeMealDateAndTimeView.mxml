@@ -63,10 +63,14 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			
 			[Bindable]
 			private var mealname_textarea_text:String;
-			[Bindable]
+			/*[Bindable]
 			private var date_button_text:String;
 			[Bindable]
-			private var time_button_text:String;
+			private var time_button_text:String;*/
+			
+			[Bindable]
+			private var buttonDateAndTime:Number;
+			
 			[Bindable]
 			private var ok_button_text:String;
 			private var previousTimeStamp:Number;
@@ -105,8 +109,9 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			private function onCreationComplete():void {
 				back_label = resourceManager.getString('general','back');
 				mealname_textarea_text = (data.meal as Meal).mealName ;
-				date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
-				time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
+				//date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
+				buttonDateAndTime = (data.meal as Meal).timeStamp;
+				//time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
 				previousTimeStamp = (data.meal as Meal).timeStamp ;
 				selectedMealIndex = ModelLocator.getInstance().meals.getItemIndex(data.meal as Meal);
 
@@ -146,9 +151,10 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			{
 				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_SET, onTimeSet);
 				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
-				(data.meal as Meal).timeStamp = (event.newValue as Date).valueOf();
-				time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
-				date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
+				//(data.meal as Meal).timeStamp = (event.newValue as Date).valueOf();
+				buttonDateAndTime = (event.newValue as Date).valueOf();
+				//time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
+				//date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
 				ModelLocator.getInstance().meals.refresh();
 				selectedMealIndex = ModelLocator.getInstance().meals.getItemIndex(data.meal as Meal);
 			}
@@ -161,6 +167,9 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 					tracker = new MyGATracker( this, trackerId, "AS3", false );
 				tracker.trackPageview( "ChangeMealDateAndTimeView-OkClicked" );
 
+				if ((data.meal as Meal).timeStamp != buttonDateAndTime)
+					(data.meal as Meal).timeStamp = buttonDateAndTime;
+				
 				mealChosen = true;
 				navigator.popView();
 			}
@@ -207,10 +216,10 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 		<s:Label   id="meal_name"  height="100%" maxHeight="45" textAlign="center" verticalAlign="middle" width="100%" text="{mealname_textarea_text}" />
 		
 		<!-- the date -->
-		<s:Button id="date_button" width="100%"  label="{date_button_text}" click="dateClicked()" />
+		<s:Button id="date_button" width="100%"  label="{dateformatter.format(buttonDateAndTime)}" click="dateClicked()" />
 		
 		<!-- the time -->
-		<s:Button id="time_button" width="100%" label="{time_button_text}" click="timeClicked()" />
+		<s:Button id="time_button" width="100%" label="{timeformatter.format(buttonDateAndTime)}" click="timeClicked()" />
 		
 	</s:Group>
 	
