@@ -32,8 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
 			import databaseclasses.FoodItem;
 			import databaseclasses.Settings;
 			import databaseclasses.Unit;
@@ -47,8 +45,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import utilities.MyGATracker;
 			[Bindable]
 			private var back_label:String;
-			public var tracker:AnalyticsTracker;
-			private var trackerId:String;
 			private var errorWarning:HelpCallOut;
 			private var helpCallOut:HelpCallOut;
 			
@@ -99,9 +95,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 
 			protected function view1_initializeHandler(event:FlexEvent):void
+
 			{
+
 				back_label = resourceManager.getString('general','back');
-				trackerId = resourceManager.getString('analytics','trackeraccount');
 				if (unitdescriptionText == "")
 					initializeVariables();
 			}
@@ -119,10 +116,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
-				if (tracker == null) {
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				}
-				tracker.trackPageview( "OwnItemView-GreenButtonClicked" );
+				MyGATracker.getInstance().trackPageview( "OwnItemView-GreenButtonClicked" );
 				
 				if (fooditemdescription.text == "") {showErrorMessage(resourceManager.getString('synchronizeview','fooditemdescriptioncannotbeempty'),fooditemdescription);return;}
 				if (gramofcarbs.text == "") {showErrorMessage(resourceManager.getString('synchronizeview','carbvaluemustbenumeric'),gramofcarbs);return;}

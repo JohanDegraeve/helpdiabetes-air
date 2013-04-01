@@ -31,8 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
 			import databaseclasses.Meal;
 			import databaseclasses.MealEvent;
 			import databaseclasses.Settings;
@@ -75,7 +73,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private var firstTime:Boolean = true;
 			
-			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
 
 			private function onInitialize():void {
@@ -152,10 +149,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function onAmountSet(event: PickerEvent): void
 				{
-					if (tracker == null) {
-						tracker = new MyGATracker( thisView, trackerId, "AS3", false );
-					}
-					tracker.trackPageview( "SettingsBolusCalculationView-carbRatioChanged" );
+					MyGATracker.getInstance().trackPageview( "SettingsBolusCalculationView-carbRatioChanged" );
 
 					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
@@ -231,7 +225,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					
 					button.label = newAmount.toString();
 					if (!firstTime) {
-						Synchronize.getInstance().startSynchronize(tracker,true);
+						Synchronize.getInstance().startSynchronize(true,false);
 					} else {
 						checkOtherSettings(newAmount,
 							(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp < ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp ? 
@@ -254,7 +248,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					
 					button.label = (newAmount).toString();
 					if (!firstTime) {
-						Synchronize.getInstance().startSynchronize(tracker,true);
+						Synchronize.getInstance().startSynchronize(true,false);
 					} else {
 						checkOtherSettings(newAmount, (ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp + 1);
 					}
@@ -325,7 +319,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				{
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 				
 				function onYesYesClicked(event: PickerEvent): void {
@@ -338,7 +332,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						newValue,
 						0,
 						86400000);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 
 				function onNoNoClicked(event: PickerEvent): void {
@@ -351,7 +345,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						newValue,
 						0,
 						86400000);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			

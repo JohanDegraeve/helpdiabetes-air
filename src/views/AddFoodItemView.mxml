@@ -45,8 +45,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
 			import databaseclasses.*;
 			import databaseclasses.FoodItem;
 			import databaseclasses.Unit;
@@ -127,7 +125,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			
 			private var aSelectUnit:elementFromListPicker;
 			
-			public var tracker:AnalyticsTracker;
 			private var trackerId:String;
 			
 			/**
@@ -369,10 +366,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 * if track then google analyticstracking to do
 			 */ 
 			private function popUpUnitList(track:Boolean=true,e:MouseEvent = null):void {
-				if (!tracker)
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
 				if (track)
-					tracker.trackPageview( "AddFoodItemView-unitSelectionButtonClicked" );
+					MyGATracker.getInstance().trackPageview( "AddFoodItemView-unitSelectionButtonClicked" );
 				
 				var unitList:ArrayCollection = new ArrayCollection();
 				unitList.addItem((retrievedFoodItem.getUnit(0) as Unit).unitDescription);
@@ -433,9 +428,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 * will add a selectedFoodItem to the selected meal, called when addButton is clicked
 			 */ 
 			private function addButtonClicked(e:MouseEvent = null):void {
-				if (!tracker)
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				tracker.trackPageview( "AddFoodItemView-AddButtonClicked" );
+				MyGATracker.getInstance().trackPageview( "AddFoodItemView-AddButtonClicked" );
 				
 				navigator.popView();
 				searchText = "";
@@ -502,16 +495,14 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
 							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 					}
-				Synchronize.getInstance().startSynchronize(tracker,true);
+				Synchronize.getInstance().startSynchronize(true,false);
 			}
 			
 			/**
 			 * called when mealbutton clicked
 			 */
 			private function mealButtonClicked(e:MouseEvent = null):void {
-				if (!tracker)
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				tracker.trackPageview( "AddFoodItemView-MealButtonClicked" );
+				MyGATracker.getInstance().trackPageview( "AddFoodItemView-MealButtonClicked" );
 				
 				data = new Object();
 				data.retrievedFoodItem = retrievedFoodItem;
@@ -568,9 +559,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			}
 			
 			private function deleteEvent(e:MouseEvent = null):void {//should only be called in case the trash button is available, meaning a selectedfooditem is being deleted from an existing meal
-				if (!tracker)
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				tracker.trackPageview( "AddFoodItemView-deleteButtonClicked" );
+				MyGATracker.getInstance().trackPageview( "AddFoodItemView-deleteButtonClicked" );
 				
 				var localdispatcher:EventDispatcher;
 				var length:int 

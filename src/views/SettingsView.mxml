@@ -26,8 +26,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
 			
@@ -51,8 +49,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var elementPicker:elementFromListPicker;
 			private var alertPopUp:AlertPopUp;
 			
-			public var tracker:AnalyticsTracker;
-			private var trackerId:String;
 			private var textToShow:String ;
 			private var debugging:Boolean = false;
 			
@@ -82,8 +78,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function init():void {
-				trackerId = resourceManager.getString('analytics','trackeraccount');
-				
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
 				title =  ResourceManager.getInstance().getString("settingsview","titlesettings");
@@ -107,10 +101,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				PopUpManager.centerPopUp(elementPicker);
 				
 				function selectedUnitChanged(event:UnitChangedEvent):void {
-					if (tracker == null) {
-						tracker = new MyGATracker( elementPicker, trackerId, "AS3", false );
-					}
-					tracker.trackPageview( "SetingsView-bloodglucoseUnitChanged" );
+					MyGATracker.getInstance().trackPageview( "SetingsView-bloodglucoseUnitChanged" );
 					
 					elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
 					PopUpManager.removePopUp(elementPicker);
@@ -119,7 +110,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					else if (event.index == 1)
 						Settings.getInstance().setSetting(Settings.SettingsBLOODGLUCOSE_UNIT,"mmoll");
 					settingsList.selectedIndex = -1;
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
@@ -159,10 +150,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						PopUpManager.centerPopUp(elementPicker);
 						break;
 					case 7:
-						if (tracker == null) {
-							tracker = new MyGATracker( this, trackerId, "AS3", false );
-						}
-						tracker.trackPageview( "SetingsView-resetHelpText" );
+						MyGATracker.getInstance().trackPageview( "SetingsView-resetHelpText" );
 						for (var i:int = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;i <= Settings.SettingsHelpText100;i++) {
 							Settings.getInstance().setSetting(i,"true");
 						}
@@ -183,10 +171,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							navigator.pushView(SynchronizeView2);
 						break;
 					case 9:
-						if (tracker == null) {
-							tracker = new MyGATracker( this, trackerId, "AS3", false );
-						}
-						tracker.trackPageview( "SetingsView-infoAndHelpShown" );
+						MyGATracker.getInstance().trackPageview( "SetingsView-infoAndHelpShown" );
 						
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
@@ -210,10 +195,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function languageSelected(event: Event = null): void
 				{
-					if (tracker == null) {
-						tracker = new MyGATracker( elementPicker, trackerId, "AS3", false );
-					}
-					tracker.trackPageview( "SetingsView-languageSelected" );
+					MyGATracker.getInstance().trackPageview( "SetingsView-languageSelected" );
 					
 					if (elementPicker != null) {
 						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {

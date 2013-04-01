@@ -25,16 +25,55 @@ package utilities
 	
 	import flash.display.DisplayObject;
 	
-	public class MyGATracker extends GATracker
+	import mx.resources.ResourceManager;
+	
+	public class MyGATracker
 	{
-		public function MyGATracker(display:DisplayObject, account:String, mode:String="AS3", visualDebug:Boolean=false, config:Configuration=null, debug:DebugConfiguration=null)
+		private static var trackerId:String;
+		
+		private static var gaTracker:GATracker;
+		
+		private static var instance:MyGATracker;
+		
+		public function MyGATracker()
 		{
-			super(display, account, mode, visualDebug, config, debug);
+			trackerId = ResourceManager.getInstance().getString('analytics','trackeraccount');
+			if (instance != null) {
+				throw new Error("MyGATracker class can only be accessed through MyGATracker.getInstance()");	
+			}
+			instance = this;
 		}
 		
-		override public function  trackPageview(pageURL:String=""):void {
-			if ((new Date()).valueOf() - 7*24*60*60*1000 > new Number(Settings.getInstance().getSetting(Settings.SettingsFirstStartUp))) 
-				super.trackPageview(pageURL);
+		/**
+		 * any display , can be null but then there should already have been a call to getinstance with a non-null display
+		 */
+		public static function getInstance(display:DisplayObject = null):MyGATracker {
+			if (instance == null) 
+					instance = new MyGATracker();
+
+			if (gaTracker == null && display != null) {
+				try {
+					gaTracker = new GATracker(display, trackerId, "AS3", false, null, null);
+					trace("gatracker successfuly created");
+				} catch (error:Error) {
+					//creation of gatracker failed, hopefully better luck next time
+				}
+			}
+			
+			return instance;
+		}
+		
+		/**
+		 * returns true if track launched 
+		 */
+		public function  trackPageview(pageURL:String=""):Boolean {
+			if (gaTracker != null) {
+				if ((new Date()).valueOf() - 7*24*60*60*1000 > new Number(Settings.getInstance().getSetting(Settings.SettingsFirstStartUp))) {
+					gaTracker.trackPageview(pageURL);
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

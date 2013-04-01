@@ -163,9 +163,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			 * refresh the meals list, and pop two views so that we return back to addfooditemview
 			 */
 			private function okClicked():void {
-				if (!tracker)
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				tracker.trackPageview( "ChangeMealDateAndTimeView-OkClicked" );
+				MyGATracker.getInstance().trackPageview( "ChangeMealDateAndTimeView-OkClicked" );
 
 				if ((data.meal as Meal).timeStamp != buttonDateAndTime)
 					(data.meal as Meal).timeStamp = buttonDateAndTime;

@@ -31,8 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
 			import databaseclasses.MedicinEvent;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
@@ -75,9 +73,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var amountText:String = "0";
 			[Bindable]
 			private var back_label:String;
-
-			public var tracker:AnalyticsTracker;
-			private var trackerId:String;
 
 			private var thisView:View;
 			private var textPicker:TextPicker;
@@ -194,8 +189,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 
 			private function onInitialize():void {
-				trackerId = resourceManager.getString('analytics','trackeraccount');
-
 				//setting initial values, will be overwritten in oncreationcomplete if data is an medicinevent
 				eventDateAndTime = new Date();
 				dateText = dateformatter.format(_eventDateAndTime);
@@ -288,10 +281,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
-				if (tracker == null) {
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				}
-				tracker.trackPageview( "EditMedicinEventView-OkClicked" );
+				MyGATracker.getInstance().trackPageview( "EditMedicinEventView-OkClicked" );
 
 				if (newMedicinEvent) {
 					theMedicinEvent = new MedicinEvent(
@@ -336,7 +326,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().trackingEventToShow = theMedicinEvent.eventid;
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
-				Synchronize.getInstance().startSynchronize(tracker,true);
+				Synchronize.getInstance().startSynchronize(true,false);
 			}
 			
 			private function deleteEvent(e:MouseEvent = null):void {
@@ -350,15 +340,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function onYesClicked(event: PickerEvent): void
 				{
-					if (tracker == null) {
-						tracker = new MyGATracker( thisView, trackerId, "AS3", false );
-					}
-					tracker.trackPageview( "EditMedicinEventView-deleteClicked" );
+					MyGATracker.getInstance().trackPageview( "EditMedicinEventView-deleteClicked" );
 
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					Synchronize.getInstance().addObjectToBeDeleted(theMedicinEvent);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 
 					theMedicinEvent.deleteEvent();
 					//we need to make sure the previous tracking event is visible so we store the itemindex

@@ -30,8 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
 			import databaseclasses.ExerciseEvent;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
@@ -70,9 +68,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			private var back_label:String;
 
-			public var tracker:AnalyticsTracker;
-			private var trackerId:String;
-			
 			private var thisView:View;
 			
 			private var helpCallOut:HelpCallOut;
@@ -169,7 +164,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
-				trackerId = resourceManager.getString('analytics','trackeraccount');
 
 				//setting initial values, will be overwritten in oncreationcomplete if data is an medicinevent
 				eventDateAndTime = new Date();
@@ -237,10 +231,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function okClicked(e:MouseEvent = null):void {
-				if (tracker == null) {
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				}
-				tracker.trackPageview( "EditExerciseEventView-OkClicked" );
+				MyGATracker.getInstance().trackPageview( "EditExerciseEventView-OkClicked" );
 
 				if (newExerciseEvent) {
 					theExerciseEvent = new ExerciseEvent(
@@ -285,7 +276,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().trackingEventToShow = theExerciseEvent.eventid;
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
-				Synchronize.getInstance().startSynchronize(tracker,true);
+				Synchronize.getInstance().startSynchronize(true,false);
 			}
 			private function deleteEvent(e:MouseEvent = null):void {
 				confirmationPicker = new RequestConfirmation();
@@ -298,15 +289,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				function onYesClicked(event: PickerEvent): void
 				{
-					if (tracker == null) {
-						tracker = new MyGATracker( thisView, trackerId, "AS3", false );
-					}
-					tracker.trackPageview( "EditExerciseEventView-deleteClicked" );
+					MyGATracker.getInstance().trackPageview( "EditExerciseEventView-deleteClicked" );
 
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					Synchronize.getInstance().addObjectToBeDeleted(theExerciseEvent);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 
 					theExerciseEvent.deleteEvent();
 

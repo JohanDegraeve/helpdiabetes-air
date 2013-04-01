@@ -28,8 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
 			import databaseclasses.Settings;
 			
 			import mx.events.FlexEvent;
@@ -50,8 +48,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			private var back_label:String;
 
-			public var tracker:AnalyticsTracker;
-			private var trackerId:String;
 			private var helpCallOut:HelpCallOut;
 
 			private function onBackKeyPressed(event:Event):void {
@@ -64,7 +60,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function view1_initializeHandler(event:FlexEvent):void
 			{
-				trackerId = resourceManager.getString('analytics','trackeraccount');
 				back_label = resourceManager.getString('general','back');
 				exerciseText1 = Settings.getInstance().getSetting(Settings.SettingsExerciseType1);
 				exerciseText2 = Settings.getInstance().getSetting(Settings.SettingsExerciseType2);
@@ -77,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (exerciseText1 != Settings.getInstance().getSetting(Settings.SettingsExerciseType1)) {
 					Settings.getInstance().setSetting(Settings.SettingsExerciseType1,exerciseText1);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
@@ -85,7 +80,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (exerciseText2 != Settings.getInstance().getSetting(Settings.SettingsExerciseType2)) {
 					Settings.getInstance().setSetting(Settings.SettingsExerciseType2,exerciseText2);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
@@ -93,7 +88,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (exerciseText3 != Settings.getInstance().getSetting(Settings.SettingsExerciseType3)) {
 					Settings.getInstance().setSetting(Settings.SettingsExerciseType3,exerciseText3);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
@@ -101,7 +96,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (exerciseText4 != Settings.getInstance().getSetting(Settings.SettingsExerciseType4)) {
 					Settings.getInstance().setSetting(Settings.SettingsExerciseType4,exerciseText4);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
@@ -109,16 +104,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (exerciseText5 != Settings.getInstance().getSetting(Settings.SettingsExerciseType5)) {
 					Settings.getInstance().setSetting(Settings.SettingsExerciseType5,exerciseText5);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
 			{
-				if (tracker == null) {
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				}
-				tracker.trackPageview( "SettingsExerciseView-viewOpened" );
+				MyGATracker.getInstance().trackPageview( "SettingsExerciseView-viewOpened" );
 
 				helpCallOut = new HelpCallOut();
 				helpCallOut.helpText = resourceManager.getString('settingsexerciseview','help_text_changeExerciseTypes');

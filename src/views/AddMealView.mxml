@@ -156,9 +156,7 @@ view to add a new meal
 			}
 
 			private function okClicked():void {
-				if (!tracker)
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				tracker.trackPageview( "AddMealView-newMealCreated" );
+				MyGATracker.getInstance().trackPageview( "AddMealView-newMealCreated" );
 
 				var newMeal:Meal = new Meal(mealname_textarea_text,null,currentDateAndTime.valueOf());
 				newMealIndex = ModelLocator.getInstance().addMeal(newMeal);

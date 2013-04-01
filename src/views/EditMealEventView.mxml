@@ -34,8 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
 			import databaseclasses.Database;
 			import databaseclasses.DatabaseEvent;
 			import databaseclasses.Meal;
@@ -59,9 +57,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
-			
-			public var tracker:AnalyticsTracker;
-			private var trackerId:String;
 			
 			[Bindable]
 			private var dateTimeAndMealName_text:String;
@@ -120,7 +115,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			
 			private function onInitialize():void {
-				trackerId = resourceManager.getString('analytics','trackeraccount');
+				trace("editmealeventview oninitialize");
 				
 				if (TrackingView.popToFirstViewNecessary())
 					navigator.popToFirstView();
@@ -180,10 +175,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onClick(event:IndexChangeEvent):void {
-				if (tracker == null) {
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				}
-				tracker.trackPageview( "EditMealEventView-selectedItemClicked" );
+				MyGATracker.getInstance().trackPageview( "EditMealEventView-selectedItemClicked" );
 				
 				data = mealEvent;
 				var dataToPass:Object = new Object();
@@ -213,7 +205,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
 						Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
 						
-						Synchronize.getInstance().startSynchronize(tracker,true);//not always necessary, because even if user click back button in changemealdateandtimeveiw, without change the time, then we'll pass here
+						Synchronize.getInstance().startSynchronize(true,false);//not always necessary, because even if user click back button in changemealdateandtimeveiw, without change the time, then we'll pass here
 					} 
 				}
 				

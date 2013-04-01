@@ -36,9 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			import com.google.analytics.GATracker;
-			
 			import databaseclasses.Database;
 			import databaseclasses.DatabaseEvent;
 			import databaseclasses.FoodItem;
@@ -81,8 +78,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var thisView:View;
 			private var firstStartUp:Boolean = false;
 			
-			public var tracker:AnalyticsTracker;
-			private var trackerId:String;
 			private var helpCallOut:HelpCallOut;
 			
 			[Bindable]
@@ -101,16 +96,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function init():void {
 				/* add event listener for clicking item */
 				fooditemlist.addEventListener(Event.CHANGE,selectFoodItem);
-				trackerId = resourceManager.getString('analytics','trackeraccount');
 			}
 			
 			private function onCreationComplete():void {
+				MyGATracker.getInstance(this);//just to make sure mygatracker is initialized with a displayobject
+
 				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,initiateRetrievalOfFoodItemList);
 				
 				thisView = this;
 				
 				if (!ModelLocator.getInstance().firstStartUp)  {
-					Synchronize.getInstance().startSynchronize(tracker,false);
+					Synchronize.getInstance().startSynchronize(false,false);
 					ensureIndexIsVisible();
 					showSearchTextBoxHelpText();
 					return;
@@ -219,7 +215,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							resourceManager.getString('settingsview','infoabouttext');
 						licensePopUp.show(thisView,textToShow);
 					} else {
-						Synchronize.getInstance().startSynchronize(tracker,false);
+						Synchronize.getInstance().startSynchronize(false,false);
 						showSearchTextBoxHelpText();
 					}
 					
@@ -296,10 +292,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function selectFoodItem(event:IndexChangeEvent):void {
-				if (tracker == null) {
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				}
-				tracker.trackPageview( "FoodCounterView-itemSelected" );
+				MyGATracker.getInstance().trackPageview( "FoodCounterView-itemSelected" );
 				
 				data = new Object();
 				data.searchtext = searchtext.text;//we pass the searchtext to addfooditemview. Addfooditemview will return the searchtext or an empty string when popped

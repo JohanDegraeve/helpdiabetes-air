@@ -17,9 +17,6 @@
  */
 package utilities
 {
-	import com.google.analytics.AnalyticsTracker;
-	import com.google.analytics.GATracker;
-	
 	import databaseclasses.BloodGlucoseEvent;
 	import databaseclasses.Database;
 	import databaseclasses.DatabaseEvent;
@@ -430,7 +427,6 @@ package utilities
 		 */
 		private var trackingList:ArrayCollection;
 		
-		private var tracker:AnalyticsTracker;
 		private var alReadyGATracked:Boolean;
 		
 		private static var instance:Synchronize = new Synchronize();
@@ -453,7 +449,7 @@ package utilities
 		
 		private var amountofSpaces:int;
 		
-		private static var traceNeeded:Boolean = true;
+		private static var traceNeeded:Boolean = false;
 		
 		private var localElementsUpdated:Boolean;
 		
@@ -553,6 +549,7 @@ package utilities
 		 * text to use in downloadfoodtableview, for showing status 
 		 */
 		public function get uploadFoodDatabaseStatus():String
+
 		{
 			return _uploadFoodDatabaseStatus;
 		}
@@ -653,11 +650,9 @@ package utilities
 		 * set rerunnecessary to false<br>
 		 * <br>
 		 * If  (syncRunning is true and currentSyncTimeStamp < 30 seconds ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything.<br>
-		 * if tracker is null, then no tracking will be done next time <br>
 		 * onlySyncTheSettings =  if true synchronize will jump immediately to syncing the settings, assuming all tables are already there. Should only be true if it's sure that tables are existing on google docs account
 		 */
-		public function startSynchronize(callingTracker:AnalyticsTracker,immediateRunNecessary:Boolean,onlySyncTheSettings:Boolean = false):void {
-			tracker = callingTracker;
+		public function startSynchronize(immediateRunNecessary:Boolean,onlySyncTheSettings:Boolean):void {
 
 			//to make sure there's at least one complete resync per day
 			if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteSync))) {
@@ -772,9 +767,8 @@ package utilities
 					//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
 					syncFinished(false);
 				} else {
-					if (tracker != null && !alReadyGATracked) {
-						tracker.trackPageview( "Synchronize-SyncStarted" );
-						alReadyGATracked = true;
+					if (!alReadyGATracked) {
+						alReadyGATracked = MyGATracker.getInstance().trackPageview( "Synchronize-SyncStarted");
 					}
 					
 					//first get all the tables
@@ -1448,7 +1442,6 @@ package utilities
 								localElements.addItem(trackingList.getItemAt(i));
 					}
 				}
-				//ModelLocator.getInstance().logString += "here i am, localElements.length = " + localElements.length + "\n";
 				//time to start comparing
 				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
 				try {
@@ -2865,7 +2858,9 @@ package utilities
 			}
 			if (trackinglistcntr == ModelLocator.getInstance().trackingList.length) {
 				this.dispatchEvent(new Event(EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS));
-				startSynchronize(null,true,true);
+				MyGATracker.getInstance().trackPageview( "LogBookUploaded" );
+
+				startSynchronize(true,true);
 			}
 		}
 		
@@ -3965,6 +3960,8 @@ package utilities
 			} else {
 				if (traceNeeded)
 					trace("start method googleExcelDownloadFoodTableSpreadSheet");
+
+				MyGATracker.getInstance().trackPageview( "DownLoadFoodTable" );
 				
 				callingDispatcher =  dispatcher;
 				

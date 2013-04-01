@@ -29,8 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
 			import databaseclasses.Settings;
 			
 			import mx.events.FlexEvent;
@@ -51,8 +49,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			private var back_label:String;
 
-			public var tracker:AnalyticsTracker;
-			private var trackerId:String;
 			private var helpCallOut:HelpCallOut;
 
 			private function onBackKeyPressed(event:Event):void {
@@ -66,7 +62,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			protected function view1_initializeHandler(event:FlexEvent):void
 
 			{
-				trackerId = resourceManager.getString('analytics','trackeraccount');
 				back_label = resourceManager.getString('general','back');
 				medicinText1 = Settings.getInstance().getSetting(Settings.SettingsInsulinType1);
 				medicinText2 = Settings.getInstance().getSetting(Settings.SettingsInsulinType2);
@@ -79,7 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (medicinText1 != Settings.getInstance().getSetting(Settings.SettingsInsulinType1)) {
 					Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
@@ -88,7 +83,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (medicinText2 != Settings.getInstance().getSetting(Settings.SettingsInsulinType2)) {
 					Settings.getInstance().setSetting(Settings.SettingsInsulinType2,medicinText2);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
@@ -96,7 +91,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (medicinText3 != Settings.getInstance().getSetting(Settings.SettingsInsulinType3)) {
 					Settings.getInstance().setSetting(Settings.SettingsInsulinType3,medicinText3);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
@@ -104,7 +99,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (medicinText4 != Settings.getInstance().getSetting(Settings.SettingsInsulinType4)) {
 					Settings.getInstance().setSetting(Settings.SettingsInsulinType4,medicinText4);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
@@ -112,16 +107,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (medicinText5 != Settings.getInstance().getSetting(Settings.SettingsInsulinType5)) {
 					Settings.getInstance().setSetting(Settings.SettingsInsulinType5,medicinText5);
-					Synchronize.getInstance().startSynchronize(tracker,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
 			{
-				if (tracker == null) {
-					tracker = new MyGATracker( this, trackerId, "AS3", false );
-				}
-				tracker.trackPageview( "SettingsMedicinView-viewOpened" );
+				MyGATracker.getInstance().trackPageview( "SettingsMedicinView-viewOpened" );
 				
 				helpCallOut = new HelpCallOut();
 				helpCallOut.helpText = resourceManager.getString('settingsmedicinview','help_text_changeMedicinTypes');
