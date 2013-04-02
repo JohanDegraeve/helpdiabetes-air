@@ -231,7 +231,20 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					details_button_text = createDetailsButtonText(0,(data.selectedFoodItem).chosenAmount);
 					amount_textinput_text = (data.selectedFoodItem).chosenAmount.toString();;
 					selectedUnit = 0;
-					TrashButton.visible = true;
+					
+					//find back the mealevent to which this selectedfooditem belongs
+					//then check if it belongs to a meal and if no don't show the trashbutton
+					for (var cntr:int = ModelLocator.getInstance().copyOfTrackingList.length - 1 ;cntr >= 0;cntr--) {
+						if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MealEvent) {
+							if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent).eventid == (data.selectedFoodItem as SelectedFoodItem).mealEventId) {
+								if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent).meal == null)
+									TrashButton.visible = false;
+								else 
+									TrashButton.visible = true;
+								break;
+							}
+						}
+					}
 				} else if (data.ownFoodItem) {
 					//addfooditemview created via ownitemview
 					defaultMealTimeSTamp = true;

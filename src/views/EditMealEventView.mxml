@@ -145,21 +145,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							+ " " + mealEvent.insulinRatio;
 					} else insulinAmount_text = null;
 					
-					/*for (var mealCounter:int = ModelLocator.getInstance().meals.length - 1;mealCounter >=0 ; mealCounter--) {
-						if (ModelLocator.getInstance().meals.getItemAt(mealCounter) is Meal) {
-							if ((ModelLocator.getInstance().meals.getItemAt(mealCounter) as Meal).mealEvent == mealEvent) {
-								ModelLocator.getInstance().selectedMeal = mealCounter;						
-								fooditemlist.addEventListener(Event.CHANGE,onClick);
-								mealCounter = -1;
-							}
-						}
-					}*/
-					
 					fooditemlist.addEventListener(Event.CHANGE,onClick);
 					
 					if (mealEvent.insulinRatio != 0)
 						currentState="insulinAmount";
-					
 				}
 			}
 			
