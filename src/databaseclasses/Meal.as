@@ -217,7 +217,7 @@ package databaseclasses
 			}
 
 			Synchronize.getInstance().addObjectToBeDeleted(selectedFoodItem);
-			Synchronize.getInstance().startSynchronize(null,true);
+			Synchronize.getInstance().startSynchronize(true,false);
 			_mealEvent.removeSelectedFoodItem(selectedFoodItem);
 			
 			if (_mealEvent.selectedFoodItems.length == 0) {
@@ -239,7 +239,7 @@ package databaseclasses
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventDeletionFromDBFailed);
 				if (de != null) {
 					Synchronize.getInstance().addObjectToBeDeleted(_mealEvent);
-					Synchronize.getInstance().startSynchronize(null,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 					//_mealEvent = null;
 				} else {
 				}

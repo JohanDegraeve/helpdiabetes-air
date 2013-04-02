@@ -94,7 +94,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						break;
 					case 2:
 						Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,"0");
-						Synchronize.getInstance().startSynchronize(null,true);
+						Synchronize.getInstance().startSynchronize(false,false);
 						
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);

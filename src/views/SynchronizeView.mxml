@@ -88,7 +88,7 @@ initial setup of sync settings
 					setViewInStatusSynchronizing();
 					Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
 					//but you never know that sync is not really running, so let's try to retart it
-					Synchronize.getInstance().startSynchronize(null,true);
+					Synchronize.getInstance().startSynchronize(true,false);
 				} else {
 					authorizationcodeTextAreaVisible = false;
 					topLabelText1 = resourceManager.getString('synchronizeview','synchronizewithgoogledocs1');
@@ -140,7 +140,7 @@ initial setup of sync settings
 				Settings.getInstance().setSetting(Settings.SettingsAccessToken,temp.access_token);
 				Settings.getInstance().setSetting(Settings.SettingsRefreshToken,temp.refresh_token);
 				Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
-				Synchronize.getInstance().startSynchronize(null,true);
+				Synchronize.getInstance().startSynchronize(true,false);
 			}
 			
 			private function setViewInStatusSynchronizing(event:Event = null):void {

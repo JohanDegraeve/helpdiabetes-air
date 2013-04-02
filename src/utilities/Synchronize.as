@@ -449,7 +449,7 @@ package utilities
 		
 		private var amountofSpaces:int;
 		
-		private static var traceNeeded:Boolean = false;
+		private static var traceNeeded:Boolean = true;
 		
 		private var localElementsUpdated:Boolean;
 		
@@ -755,7 +755,6 @@ package utilities
 				trackingListAlreadyModified = false;
 				if (traceNeeded)
 					trace("start method synchronize");
-				//ModelLocator.getInstance().logString += "start method synchronize"+ "\n";;
 				
 				//we could be arriving here after a retempt, example, first time failed due to invalid credentials, token refresh occurs, with success, we come back to here
 				//first thing to do is to removeeventlisteners
