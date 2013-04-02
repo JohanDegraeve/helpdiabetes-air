@@ -40,7 +40,6 @@ package databaseclasses
 	import mx.resources.ResourceBundle;
 	import mx.resources.ResourceManager;
 	
-	import myComponents.DayLine;
 	import myComponents.DayLineWithTotalAmount;
 	
 	import views.FoodCounterView;
@@ -2205,12 +2204,9 @@ package databaseclasses
 				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
 				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
 				
-				//Now add list of daylines and red timelines
+				//Now add list of daylines 
 				for (var counter:Number = youngest;counter - 1 < oldest;counter = counter + 86400000) {
 					ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(counter));
-					//ModelLocator.getInstance().trackingList.addItem(new TimeLine(counter + new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))));
-//					ModelLocator.getInstance().trackingList.addItem(new TimeLine(counter + new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))));
-					//ModelLocator.getInstance().trackingList.addItem(new TimeLine(counter + new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))));
 				}
 				
 				ModelLocator.getInstance().trackingList.refresh();

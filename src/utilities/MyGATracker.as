@@ -45,15 +45,16 @@ package utilities
 		}
 		
 		/**
-		 * any display , can be null but then there should already have been a call to getinstance with a non-null display
+		 * any display , can be null but then there should already have been a call to getinstance with a non-null display<br>
+		 * should be a displayobject, but because I had cases here where a 'global object' was passed, i changed the type to object
 		 */
-		public static function getInstance(display:DisplayObject = null):MyGATracker {
+		public static function getInstance(display:Object = null):MyGATracker {
 			if (instance == null) 
 					instance = new MyGATracker();
 
-			if (gaTracker == null && display != null) {
+			if (gaTracker == null && display != null && display is DisplayObject) {
 				try {
-					gaTracker = new GATracker(display, trackerId, "AS3", false, null, null);
+					gaTracker = new GATracker(display as DisplayObject, trackerId, "AS3", false, null, null);
 					trace("gatracker successfuly created");
 				} catch (error:Error) {
 					//creation of gatracker failed, hopefully better luck next time
