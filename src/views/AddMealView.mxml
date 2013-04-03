@@ -193,6 +193,10 @@ view to add a new meal
 	<s:navigationContent>
 		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked()"/>
+	</s:actionContent>
+
 	<s:Group y="0" x="0" width="100%" height = "100%" >
 		<s:layout>
 			<s:VerticalLayout>
@@ -207,9 +211,6 @@ view to add a new meal
 		
 		<!-- the time -->
 		<s:Button id="time_button" width="100%" label="{time_button_text}" click="timeClicked()" />
-		
-		<!-- Ok button -->
-		<s:Button id="ok_button" width="100%" label="{ok_button_text}" click="okClicked()" />
 		
 	</s:Group>
 
