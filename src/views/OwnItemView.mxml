@@ -129,10 +129,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						new Array(
 						new Unit(unitdescription.text,
 							     new Number(standardamount.text),
-								 new Number(kilocalories.text),
-								 new Number(gramofprotein.text.replace(",",".")),
+								 kilocalories.text == "" ? -1 : new Number(kilocalories.text),
+								 gramofprotein.text == "" ? -1 : new Number(gramofprotein.text.replace(",",".")),
 								 new Number(gramofcarbs.text.replace(",",".")),
-								 new Number(gramoffat.text.replace(",","."))))),
+								 gramoffat.text == "" ? -1 : new Number(gramoffat.text.replace(",","."))))),
 					    0);
 				navigator.pushView(AddFoodItemView,data,{
 					context:ADD_FOOD_ITEM
