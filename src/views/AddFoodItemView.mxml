@@ -596,10 +596,19 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					
 					localdispatcher = new EventDispatcher();
-					length = (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.selectedFoodItems.length;
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
-					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).deleteSelectedFoodItem(data.selectedFoodItem,localdispatcher);
+
+					var mealEventId:Number = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
+					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().copyOfTrackingList.length;trackingCntr++) {
+						if (((ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
+							(ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr) as MealEvent)
+							.meal
+							.deleteSelectedFoodItem(data.selectedFoodItem,localdispatcher);
+							length = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr) as MealEvent).selectedFoodItems.length;
+							break;
+						}
+					}
 					navigator.popView();
 				}
 				

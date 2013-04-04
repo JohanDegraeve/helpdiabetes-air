@@ -49,6 +49,7 @@ package databaseclasses
 		private var _mealName:String;//normally it will be dinner, lunch, ...
 		private var _mealEvent:MealEvent;
 		private var _timeStamp:Number;//needed because it implements IListElement
+		private var thisMeal:Meal;
 		
 		/**
 		 * A meal can be created either with mealName - in which case MealEvent should be null - or with a MealEvent - in which case mealName should be null<br>
@@ -76,6 +77,7 @@ package databaseclasses
 				_mealName = _mealEvent._mealName;
 				newMealEvent.meal = this;
 			}
+			thisMeal = this;
 		}
 		
 		public function get mealName():String
@@ -154,7 +156,7 @@ package databaseclasses
 					}*/
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-					_mealEvent = new MealEvent(mealName,insulinRatio,new Number(Settings.getInstance().getSetting(Settings.SettingCORRECTION_FACTOR)), previousBGlevel,_timeStamp,localdispatcher,new Date().valueOf(), "",new Date().valueOf(),true,null,this as Meal);
+					_mealEvent = new MealEvent(mealName,insulinRatio,new Number(Settings.getInstance().getSetting(Settings.SettingCORRECTION_FACTOR)), previousBGlevel,_timeStamp,localdispatcher,new Date().valueOf(), "",new Date().valueOf(),true,null,thisMeal);
 				} else
 					mealEventCreated(null);
 			}
