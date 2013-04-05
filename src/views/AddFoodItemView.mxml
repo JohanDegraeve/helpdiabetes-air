@@ -602,10 +602,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					var mealEventId:Number = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
 					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().copyOfTrackingList.length;trackingCntr++) {
 						if (((ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
+							length = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr) as MealEvent).selectedFoodItems.length;
 							(ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr) as MealEvent)
 							.meal
 							.deleteSelectedFoodItem(data.selectedFoodItem,localdispatcher);
-							length = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr) as MealEvent).selectedFoodItems.length;
 							break;
 						}
 					}
