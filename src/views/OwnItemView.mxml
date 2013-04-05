@@ -87,9 +87,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			private function addHandler():void {
 				if (navigator.poppedViewReturnedObject != null) {
-					if (navigator.poppedViewReturnedObject.object.context == ADD_FOOD_ITEM) {
-						initializeVariables();
-						navigator.popView();
+					if (navigator.poppedViewReturnedObject.object != null) {
+						if (navigator.poppedViewReturnedObject.object.context == ADD_FOOD_ITEM) {
+							initializeVariables();
+							navigator.popView();
+						}
 					}
 				}
 			}

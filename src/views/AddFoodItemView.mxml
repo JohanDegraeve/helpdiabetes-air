@@ -49,7 +49,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			import databaseclasses.FoodItem;
 			import databaseclasses.Unit;
 			import databaseclasses.UnitChangedEvent;
-			
+						
 			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
@@ -126,6 +126,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			private var aSelectUnit:elementFromListPicker;
 			
 			private var trackerId:String;
+			
+			private var backLabelClicked:Boolean = false;
 			
 			/**
 			 * tells us if the mealtimeStamp used here is still having the default mealtime or no,<br>
@@ -555,6 +557,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (navigator.context != null) {
 					if (navigator.context.context != null)
 						if (navigator.context.context == OwnItemView.ADD_FOOD_ITEM)
+							if (backLabelClicked)
+								return null;
 							return navigator.context;//used in case addfooditemview created via ownitemview, then navigator.context will be not null and will be equal to ADD_FOOD_ITEM
 				}
 				var returnObject:Object = new Object();
@@ -642,7 +646,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 	</fx:Script>
 	
 	<s:navigationContent>
-		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
+		<s:Button   label="{back_label}" id="backButton" click="backLabelClicked = true;navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>
