@@ -137,8 +137,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					elementPicker.elements = new ArrayCollection([
 						resourceManager.getString('general','english'),
 						resourceManager.getString('general','dutch'),
-						resourceManager.getString('general','french'),
-						resourceManager.getString('general','romanian')]);
+						resourceManager.getString('general','french')]);
 					elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, onReturn);
 					elementPicker.addEventListener(Event.REMOVED_FROM_STAGE,onReturn);
 					elementPicker.labelText1 = resourceManager.getString('general','choose_language');
