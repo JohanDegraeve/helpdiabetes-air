@@ -408,9 +408,15 @@ package myComponents
 			_height = 0;
 
 			description_textarea.truncateToFit();
-			description_textarea.setLayoutBoundsSize(containerWidth - textGap * 2 ,itemHeight);
+			var preferredHeight:Number = description_textarea.getPreferredBoundsHeight();
+			if (preferredHeight > itemHeight)
+				preferredHeight = itemHeight * 1.5;
+			else
+				preferredHeight = itemHeight;
+			description_textarea.setLayoutBoundsSize(containerWidth - textGap * 2 ,preferredHeight);
+			description_textarea.truncateToFit();
 			description_textarea.setLayoutBoundsPosition(textGap,offsetToPutTextInTheMiddle);
-			_height = itemHeight;
+			_height = preferredHeight + textGap;
 			
 			var preferredButtonHeight:int = details_button.getPreferredBoundsHeight();
 			details_button.setLayoutBoundsSize(containerWidth - textGap * 2,preferredButtonHeight);
@@ -494,8 +500,8 @@ package myComponents
 				description_textarea = new StyleableTextField();
 				description_textarea.styleName = this;
 				description_textarea.editable = false;
-				description_textarea.multiline = false;
-				description_textarea.wordWrap = false;
+				description_textarea.multiline = true;
+				description_textarea.wordWrap = true;
 				description_textarea.text = description_textarea_text;
 				addElement(description_textarea);
 			}
