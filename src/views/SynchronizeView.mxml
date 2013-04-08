@@ -39,9 +39,14 @@ initial setup of sync settings
 			import flash.net.navigateToURL;
 			
 			import mx.events.BrowserChangeEvent;
+			import mx.events.DragEvent;
+			import mx.events.FlexEvent;
 			import mx.managers.BrowserManager;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
+			
+			import myComponents.HelpCallOut;
+			import myComponents.PickerEvent;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
@@ -49,13 +54,13 @@ initial setup of sync settings
 			
 			private var _authorizationCode:String;
 			
+			private var errorWarning:HelpCallOut;
+			
 			private static var googleAuthUrl:String = "https://accounts.google.com/o/oauth2/token";
 			
 			[Bindable]
 			private var back_label:String;
 			
-			[Bindable]
-			private var authorizationcodeTextAreaVisible:Boolean;
 			[Bindable]
 			private var topLabelText1:String;			
 			
@@ -68,11 +73,13 @@ initial setup of sync settings
 			private function set authorizationCode_text(value:String):void
 			{
 				_authorizationCode = value;
-				if (value == "") return;
+				if ((value == "") || (value == resourceManager.getString('synchronizeview','copyauthorizationcode')) )
+					return;
 				
-				buttonAuthenticateToGoogle.label = resourceManager.getString('synchronizeview','startsynchronizing') ;
-				buttonAuthenticateToGoogle.visible = true;
-				buttonAuthenticateToGoogle.addEventListener(MouseEvent.CLICK,getAccessTokenAndRefreshToken);
+				
+				buttonStoreAuthorizationCode.label = resourceManager.getString('synchronizeview','startsynchronizing') ;
+				buttonStoreAuthorizationCode.visible = true;
+				buttonStoreAuthorizationCode.addEventListener(MouseEvent.CLICK,getAccessTokenAndRefreshToken);				
 			}
 			
 			
@@ -81,6 +88,8 @@ initial setup of sync settings
 			private function onInitialize():void {
 				back_label = resourceManager.getString('general','back');
 				title = resourceManager.getString('synchronizeview','titlesettingssync');
+				authorizationCode_text = resourceManager.getString('synchronizeview','copyauthorizationcode');
+				authorizationcodeTextArea.addEventListener(FocusEvent.FOCUS_IN, authorizationcodeTextAreaClicked);
 
 				if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) != "") {
 					//access token is not empty but still we got here, this is because user started syncing, then went to other tab, and back to this tab,
@@ -90,7 +99,6 @@ initial setup of sync settings
 					//but you never know that sync is not really running, so let's try to retart it
 					Synchronize.getInstance().startSynchronize(true,false);
 				} else {
-					authorizationcodeTextAreaVisible = false;
 					topLabelText1 = resourceManager.getString('synchronizeview','synchronizewithgoogledocs1');
 					
 					resourceManager.getString('synchronizeview','synchronisationwillstart');
@@ -101,13 +109,11 @@ initial setup of sync settings
 			
 			private function buttonClicked(event:MouseEvent):void {
 				navigateToURL(new URLRequest("https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/fusiontables.readonly https://www.googleapis.com/auth/fusiontables https://spreadsheets.google.com/feeds https://docs.google.com/feeds&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&client_id=" + resourceManager.getString('client_secret','client_id') + "&hl=nl&from_login=1&as=6d24e440f72448b2&pli=1"));
-				authorizationcodeTextAreaVisible = true;
-				topLabelText1 = resourceManager.getString('synchronizeview','copyauthorizationcode');
-				buttonAuthenticateToGoogle.removeEventListener(MouseEvent.CLICK,buttonClicked);
 			}
 			
-			private function authorizationcodeTextAreaClicked():void {
+			private function authorizationcodeTextAreaClicked(event:Event):void {
 				authorizationCode_text = "";
+				authorizationcodeTextArea.removeEventListener(FocusEvent.FOCUS_IN, authorizationcodeTextAreaClicked);
 			}
 			
 			private function getAccessTokenAndRefreshToken(event:MouseEvent):void {
@@ -123,12 +129,36 @@ initial setup of sync settings
 				loader.addEventListener(Event.COMPLETE,getAccessTokenAndRefreshTokenResult);
 				loader.addEventListener(IOErrorEvent.IO_ERROR,getAccessTokenAndRefreshTokenFault);
 				loader.load(request);
+				buttonHelp.label = resourceManager.getString('synchronizeview','help');
 			}
 			
 			private function getAccessTokenAndRefreshTokenFault(event:IOErrorEvent):void {
 				//refreshtoken failed
 				loader.removeEventListener(ResultEvent.RESULT,getAccessTokenAndRefreshTokenResult);
 				loader.removeEventListener(FaultEvent.FAULT,getAccessTokenAndRefreshTokenFault);
+				
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				if (eventAsJSONObject.error)
+					if (eventAsJSONObject.error == "invalid_grant") {
+						showErrorMessage(resourceManager.getString('synchronizeview','authenticationerror'),authorizationcodeTextArea);						
+					}
+
+			}
+			
+			private function showErrorMessage(errorText:String, owner:DisplayObjectContainer):void {
+				errorWarning = new HelpCallOut();
+				errorWarning.settingId = 0;
+				errorWarning.addEventListener(PickerEvent.PICKER_SET,errorMessageConfirmed);
+				errorWarning.helpText = errorText;
+				errorWarning.open(owner,true);
+			}
+			
+			private function errorMessageConfirmed(event:Event):void {
+				errorWarning.removeEventListener(PickerEvent.PICKER_SET,errorMessageConfirmed);
+				authorizationCode_text = resourceManager.getString('synchronizeview','copyauthorizationcode');
+				authorizationcodeTextArea.addEventListener(FocusEvent.FOCUS_IN, authorizationcodeTextAreaClicked);
+				buttonHelp.label = resourceManager.getString('synchronizeview','step1help');
+				buttonStoreAuthorizationCode.visible = false;
 			}
 			
 			private function getAccessTokenAndRefreshTokenResult(event:Event):void {
@@ -175,8 +205,9 @@ initial setup of sync settings
 			</s:VerticalLayout>
 		</s:layout>
 		<s:Label id="topLabel1" width="100%" text="{topLabelText1}" />
-		<s:TextArea id="authorizationcodeTextArea" width="100%"  height = "{authorizationcodeTextAreaVisible ? 100:0}" text="@{authorizationCode_text}" click="authorizationcodeTextAreaClicked()" visible="{authorizationcodeTextAreaVisible}"/>
-		<s:Button id="buttonAuthenticateToGoogle" width="100%" label="{resourceManager.getString('synchronizeview','buttonauthenticatetogoogletext')}"  visible="{!authorizationcodeTextAreaVisible}"/>
-		<s:Button visible="true" width="100%" label="{resourceManager.getString('synchronizeview','help')}" click="{navigateToURL(new URLRequest(SynchronizeView2.helpUrl))}"/>
+		<s:Button id="buttonHelp" width="100%" label="{resourceManager.getString('synchronizeview','step1help')}" click="{navigateToURL(new URLRequest(SynchronizeView2.helpUrl))}"/>
+		<s:Button id="buttonAuthenticateToGoogle" width="100%" label="{resourceManager.getString('synchronizeview','buttonauthenticatetogoogletext')}"/>
+		<s:TextArea id="authorizationcodeTextArea" width="100%"  height = "65" text="@{authorizationCode_text}"/>
+		<s:Button id="buttonStoreAuthorizationCode" width="100%" visible="false"/>
 	</s:Group>
 </s:View>
