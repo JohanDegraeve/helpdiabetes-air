@@ -7,7 +7,6 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import flashx.textLayout.conversion.TextConverter;
 			
 			import mx.managers.PopUpManager;
 			/**
@@ -66,7 +65,7 @@
 				dispatchEvent(dpe);
 				PopUpManager.removePopUp(this);
 			}
-
+			
 		]]>
 	</fx:Script>
 	<s:BorderContainer>
@@ -79,7 +78,7 @@
 				</s:stroke>
 			</s:Line>
 			<s:BorderContainer cornerRadius="0" borderWeight="10" borderColor="0xFFFFFF">
-				<s:RichEditableText  text = "@{_text}" minWidth="250" maxWidth="{parent.width - 60}" id="pickerText" editable="true" backgroundColor="0xFFFFFF"/>
+				<s:RichEditableText text = "@{_text}" minWidth="250" maxWidth="{parent.width - 60}" id="pickerText" editable="true" backgroundColor="0xFFFFFF"/>
 			</s:BorderContainer>
 			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
 				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">

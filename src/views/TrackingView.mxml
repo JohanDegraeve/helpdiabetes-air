@@ -168,15 +168,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function searchClicked(e:MouseEvent = null):void {
 				textPicker = new TextPicker();
+				textPicker.needsSoftKeyboard = true;
 				textPicker.labelText1 = resourceManager.getString('trackingview','searchforfood');;
 				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
-				//textPicker.addEventListener(PickerEvent.PICKER_CANCEL, onTextCancel);
 				PopUpManager.addPopUp(textPicker, this, true);
 				PopUpManager.centerPopUp(textPicker);
 				helpCallOut = new HelpCallOut();
 				helpCallOut.helpText = resourceManager.getString('trackingview','help_text_entersearchtext');
 				helpCallOut.settingId = Settings.SettingsHelpTextTrackingView1;
-				//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
 				helpCallOut.open(textPicker,true)
 			}
 			
