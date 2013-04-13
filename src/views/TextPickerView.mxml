@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2013  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		creationComplete="onCreationComplete()"
+		xmlns:s="library://ns.adobe.com/flex/spark" title="">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import databaseclasses.Settings;
+			
+			import myComponents.HelpCallOut;
+			[Bindable]
+			private var topText:String = "";
+			[Bindable]
+			private var back_label:String;
+			private var helpTextSettingId:int;
+			private var helpCallOut:HelpCallOut;
+
+			/**
+			 * expected in data : <br>
+			 * .title 
+			 * .topText (explanatory text on top of the view) 
+			 * .helpTextSettingId
+			 * .text (the text that can be created or modified)
+			 */
+			private function onCreationComplete():void {
+				if (data.topText)
+					topText = data.topText as String;
+				if (data.title)
+					title = data.title as String;
+				if (data.helpTextSettingId)
+					helpTextSettingId = data.helpTextSettingId as int;
+				if (data.text)
+					createdText.text = data.text as String;
+				
+				back_label = resourceManager.getString('general','back');
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('trackingview','help_text_entersearchtext');
+				helpCallOut.settingId = Settings.SettingsHelpTextTrackingView1;
+				helpCallOut.open(createdText,true);
+			}
+			
+			override public function createReturnObject():Object {
+				if (topText != "")
+					return createdText.text;
+				else
+					return null;
+			}
+
+			
+		]]>
+	</fx:Script>
+	<s:navigationContent>
+		<s:Button   label="{back_label}" id="backButton" click="topText='';navigator.popView()" height="48"/>
+	</s:navigationContent>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="navigator.popView()"/>
+	</s:actionContent>
+	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
+		<s:layout>
+			<s:VerticalLayout >
+			</s:VerticalLayout>
+		</s:layout>
+		<s:Label y="0" x="0" width="100%" text="@{topText}" height="100%" maxHeight="48"  textAlign="left" verticalAlign="top"/>
+		<s:TextInput id="createdText" height="65"/>
+	</s:Group>
+			 
+	
+</s:View>

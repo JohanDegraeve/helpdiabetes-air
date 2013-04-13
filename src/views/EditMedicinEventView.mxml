@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
 		initialize="onInitialize()"
+		add="addHandler()"
 		creationComplete="onCreationComplete()" actionBarVisible="true"
 		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
@@ -47,7 +48,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
-			import myComponents.TextPicker;
 			import myComponents.TimePicker;
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
@@ -74,8 +74,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			private var back_label:String;
 
-			private var thisView:View;
-			private var textPicker:TextPicker;
 			private var comment:String;
 			
 			/**
@@ -197,7 +195,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				back_label = resourceManager.getString('general','back');
 				newMedicinEvent = true;
 				TrashButton.visible = false;
-				thisView=this;
 			}
 
 			private function insulinTypeGroupClicked(e:MouseEvent = null):void {
@@ -367,19 +364,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 				}
 			}
+			
 			private function editNote(e:MouseEvent = null):void {
-				textPicker = new TextPicker();
-				textPicker.labelText1 = resourceManager.getString('general','editnotetext');
-				textPicker.text = comment;
-				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
-				PopUpManager.addPopUp(textPicker, this, true);
-				PopUpManager.centerPopUp(textPicker);
+				data = new Object();
+				data.title = "";
+				data.text = comment;
+				data.topText = resourceManager.getString('general','editnotetext');
+				navigator.pushView(TextPickerView,data);				
+				
 			}
 			
-			private function onTextSet(event: PickerEvent): void
+			private function addHandler():void {
+				if (!navigator.poppedViewReturnedObject) return; 
+				if (!navigator.poppedViewReturnedObject.object) return;
+				
+				onTextSet(navigator.poppedViewReturnedObject.object as String);
+			}
+			
+			private function onTextSet(textSet:String): void
 			{
-				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
-				comment = event.newValue as String;
+				comment = textSet;
 				if (newMedicinEvent) {
 				} else {
 					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText),comment,eventDateAndTime.valueOf(),new Date().valueOf());

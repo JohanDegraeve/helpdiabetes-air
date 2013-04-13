@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
 		backKeyPressed="onBackKeyPressed(event)"  
 		creationComplete="onCreationComplete()"
+		add="addHandler()"
 		actionBarVisible="true"
 		initialize="onInitialize()">
 	<fx:Declarations>
@@ -38,7 +39,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import model.ModelLocator;
 			
 			import mx.managers.PopUpManager;
-			import mx.resources.ResourceManager;
 			
 			import myComponents.AmountPicker;
 			import myComponents.DatePicker;
@@ -46,7 +46,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
-			import myComponents.TextPicker;
 			import myComponents.TimePicker;
 			import myComponents.TrackingViewElement;
 			
@@ -72,7 +71,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private var unit:String;
-			private var textPicker:TextPicker;
 			
 			private var amountPicker:AmountPicker;
 			[Bindable]
@@ -93,8 +91,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			[Bindable]
 			private var meteringTexttext:String;
-
-			private var thisView:View;
 			
 			private var helpCallOut:HelpCallOut;
 
@@ -220,7 +216,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				newBloodGlucoseEvent = true;
 				back_label = resourceManager.getString('general','back');
 				TrashButton.visible = false;
-				thisView=this;
 			}
 			
 			private function onTimeOrDateCancel(event: PickerEvent): void
@@ -333,18 +328,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 
 			private function editNote(e:MouseEvent = null):void {
-				textPicker = new TextPicker();
-				textPicker.labelText1 = resourceManager.getString('general','editnotetext');
-				textPicker.text = comment;
-				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
-				PopUpManager.addPopUp(textPicker, this, true);
-				PopUpManager.centerPopUp(textPicker);
+				data = new Object();
+				data.title = "";
+				data.text = comment;
+				data.topText = resourceManager.getString('general','editnotetext');
+				navigator.pushView(TextPickerView,data);				
+
 			}
 			
-			private function onTextSet(event: PickerEvent): void
+			private function addHandler():void {
+				if (!navigator.poppedViewReturnedObject) return; 
+				if (!navigator.poppedViewReturnedObject.object) return;
+				
+				onTextSet(navigator.poppedViewReturnedObject.object as String);
+			}
+			
+			private function onTextSet(textSet:String): void
 			{
-				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
-				comment = event.newValue as String;
+				comment = textSet;
 				if (newBloodGlucoseEvent) {
 				} else {
 					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText), eventDateAndTime.valueOf(), comment,new Date().valueOf());

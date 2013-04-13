@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		xmlns:mx="library://ns.adobe.com/flex/mx"
 		xmlns:myComponents="myComponents.*" 
 		creationComplete="creationCompleteHandler(event)"
+		add="addHandler()"
 		initialize="onInitialize()"
 		>
 	<fx:Declarations>
@@ -31,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
+			
 			import databaseclasses.BloodGlucoseEvent;
 			import databaseclasses.ExerciseEvent;
 			import databaseclasses.Meal;
@@ -38,37 +41,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import databaseclasses.MedicinEvent;
 			import databaseclasses.SelectedFoodItem;
 			import databaseclasses.Settings;
-			import databaseclasses.UnitChangedEvent;
 			
 			import model.ModelLocator;
-			
-			import mx.collections.ArrayCollection;
-			import mx.core.UIComponent;
-			import mx.events.FlexEvent;
-			import mx.managers.PopUpManager;
 			
 			import myComponents.HelpCallOut;
 			import myComponents.IListElement;
 			import myComponents.PickerEvent;
-			import myComponents.TextPicker;
 			import myComponents.TrackingViewElement;
-			import myComponents.elementFromListPicker;
-			
-			import spark.skins.mobile.ListSkin;
 			
 			import utilities.ExcelSorting;
 			import utilities.MyGATracker;
 			
 			private static var lastClickOnTrackingView:Number;
-			private var textPicker:TextPicker;
 			private var helpCallOut:HelpCallOut;
 			private var timer:Timer;
 
+			private function addHandler():void {
+				if (!navigator.poppedViewReturnedObject) return; 
+				if (!navigator.poppedViewReturnedObject.object) return;
+				
+				onTextSet(navigator.poppedViewReturnedObject.object as String);
+			}
+			
 			private function onInitialize():void {
 				title = resourceManager.getString('trackingview','logbook');
 				
 				lastClickOnTrackingView = (new Date()).valueOf();
-				ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
+				//ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
 			}
 			
 			private function reDrawActionButtons(event:Event = null):void {
@@ -167,19 +166,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function searchClicked(e:MouseEvent = null):void {
-				textPicker = new TextPicker();
-				textPicker.needsSoftKeyboard = true;
-				textPicker.labelText1 = resourceManager.getString('trackingview','searchforfood');;
-				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
-				PopUpManager.addPopUp(textPicker, this, true);
-				PopUpManager.centerPopUp(textPicker);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('trackingview','help_text_entersearchtext');
-				helpCallOut.settingId = Settings.SettingsHelpTextTrackingView1;
-				helpCallOut.open(textPicker,true)
+				data = new Object();
+				data.title = "";
+				data.topText = resourceManager.getString('trackingview','searchforfood');
+				data.helpTextSettingId = Settings.SettingsHelpTextTrackingView1;
+				navigator.pushView(TextPickerView,data);				
 			}
 			
-			private function onTextSet(event: PickerEvent): void
+			private function onTextSet(textSet:String): void
 			{
 				var cntr:int = 0;
 				var selitemctr:int = 0;
@@ -187,11 +181,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().firstMarkedItemEventId = 0;
 				ModelLocator.getInstance().lastMarkedItemEventId = 0;
 				
-				if ((event.newValue as String) == "")
+				if (textSet == "")
 					return;
-				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
 				var elementsFound:Boolean = false;
-				var splittedText:Array = (event.newValue as String).split(" ");
+				var splittedText:Array = textSet.split(" ");
 				//search the first text, as long as it's not an empty space
 				var splittedTextCntr:int = 0;
 				for (;splittedTextCntr < splittedText.length;splittedTextCntr++) {
@@ -246,12 +239,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 			}
 			
-			/*private function onTextCancel(event: PickerEvent): void
-			{
-				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
-				textPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTextCancel);
-			}*/
-						
 			private function upClicked(e:MouseEvent = null):void {
 				if (ModelLocator.getInstance().trackingEventToShow == ModelLocator.getInstance().firstMarkedItemEventId)
 					return;
@@ -310,9 +297,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			protected function creationCompleteHandler(event:FlexEvent):void
 
 			{
-
 				reDrawActionButtons();
-	
 				if (!navigator) return;
 				if (!navigator.actionBar.actionContent) return;
 				if (navigator.actionBar.actionContent.indexOf(searchButton) != -1) {

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		initialize="onInitialize()"
+		creationComplete="onCreationComplete()"
 		add="addHandler()"
 		>
 	<fx:Declarations>
@@ -34,6 +35,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.formatters.DateTimeFormatter;
+			
 			import databaseclasses.Database;
 			import databaseclasses.DatabaseEvent;
 			import databaseclasses.Meal;
@@ -43,17 +49,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import model.ModelLocator;
 			
-			import mx.collections.ArrayCollection;
-			import mx.managers.PopUpManager;
-			
 			import myComponents.HelpCallOut;
-			import myComponents.Notification;
 			import myComponents.PickerEvent;
 			import myComponents.SelectedFoodItemRenderer;
-			import myComponents.TextPicker;
-			
-			import spark.events.IndexChangeEvent;
-			import spark.formatters.DateTimeFormatter;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
@@ -74,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var fatAmount_text:String;
 			
 			private var mealEvent:MealEvent;
-			private var textPicker:TextPicker;
+
 			private var comment:String;
 			
 			[Bindable]
@@ -113,7 +111,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
 			}
 			
-			
+			private function onCreationComplete():void {
+				if (mealEvent.meal != null) {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.verticalPosition = "before";
+					helpCallOut.open(fooditemlist,true);
+				}
+			}
+
 			private function onInitialize():void {
 				trace("editmealeventview oninitialize");
 				
@@ -160,10 +168,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				return  new ClassFactory(SelectedFoodItemRenderer);
 			}
 			
-			private function okClicked(event: Event):void {
-			}
-			
 			private function onClick(event:IndexChangeEvent):void {
+				if (mealEvent.meal == null)
+					return;//meal can't be changed anymore
+
 				MyGATracker.getInstance().trackPageview( "EditMealEventView-selectedItemClicked" );
 				
 				data = mealEvent;
@@ -173,6 +181,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function dateTimeAndMealNameClicked(event:Event):void  {
+				if (mealEvent.meal == null)
+					return;//meal can't be changed anymore
 				var mealToPush:Meal = mealEvent.meal;
 				if (mealToPush == null) {
 					mealToPush = new Meal(null,mealEvent,mealEvent.timeStamp);
@@ -186,16 +196,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				var localdispatcher:EventDispatcher ;
 				
 				if (navigator.poppedViewReturnedObject != null) {
-					localdispatcher = new EventDispatcher();
-					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
-						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-						ModelLocator.getInstance().trackingList = new ArrayCollection();
-						localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
-						localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-						Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
-						
-						Synchronize.getInstance().startSynchronize(true,false);//not always necessary, because even if user click back button in changemealdateandtimeveiw, without change the time, then we'll pass here
-					} 
+					if (navigator.poppedViewReturnedObject.object) {
+						if (navigator.poppedViewReturnedObject.object is String) {
+							onTextSet(navigator.poppedViewReturnedObject.object as String);
+						}
+					}
+					else {
+						localdispatcher = new EventDispatcher();
+						if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
+							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+							ModelLocator.getInstance().trackingList = new ArrayCollection();
+							localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
+							localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
+							Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
+							
+							Synchronize.getInstance().startSynchronize(true,false);//not always necessary, because even if user click back button in changemealdateandtimeveiw, without change the time, then we'll pass here
+						} 
+					}
 				}
 				
 				function getAllEventsAndFillUpMealsFinished(event:Event):void
@@ -208,19 +225,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
 				}
 			}
+
 			private function editNote(e:MouseEvent = null):void {
-				textPicker = new TextPicker();
-				textPicker.labelText1 = resourceManager.getString('general','editnotetext');
-				textPicker.text = comment;
-				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
-				PopUpManager.addPopUp(textPicker, this, true);
-				PopUpManager.centerPopUp(textPicker);
+				data = new Object();
+				data.title = "";
+				data.text = comment;
+				data.topText = resourceManager.getString('general','editnotetext');
+				navigator.pushView(TextPickerView,data);				
 			}
 			
-			private function onTextSet(event: PickerEvent): void
+			private function onTextSet(textSet:String): void
 			{
-				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
-				comment = event.newValue as String;
+				comment = textSet;
 				mealEvent.comment =  comment
 			}
 			

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" title=""
 		initialize="onInitialize()"
+		add="addHandler()"
 		creationComplete="onCreationComplete()" actionBarVisible="true"
 		backKeyPressed="onBackKeyPressed(event)">
 	<fx:Declarations>
@@ -30,28 +31,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.core.UIComponent;
+			import mx.managers.PopUpManager;
+			
+			import spark.components.TabbedViewNavigator;
+			import spark.components.ViewNavigator;
+			
 			import databaseclasses.ExerciseEvent;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
 			
 			import model.ModelLocator;
 			
-			import mx.collections.ArrayCollection;
-			import mx.core.UIComponent;
-			import mx.managers.PopUpManager;
-			
 			import myComponents.DatePicker;
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
-			import myComponents.TextPicker;
 			import myComponents.TimePicker;
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
-			
-			import spark.components.TabbedViewNavigator;
-			import spark.components.ViewNavigator;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
@@ -68,10 +68,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			private var back_label:String;
 
-			private var thisView:View;
-			
 			private var helpCallOut:HelpCallOut;
-			private var textPicker:TextPicker;
+
 			private var comment:String;
 			
 			private var theExerciseEvent:ExerciseEvent;
@@ -173,7 +171,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				newExerciseEvent = true;
 				back_label = resourceManager.getString('general','back');
 				TrashButton.visible = false;
-				thisView=this;
 			}
 			
 			private function exerciseGroupClicked(e:MouseEvent = null):void {
@@ -318,18 +315,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 			}
 			private function editNote(e:MouseEvent = null):void {
-				textPicker = new TextPicker();
-				textPicker.labelText1 = resourceManager.getString('general','editnotetext');
-				textPicker.text = comment;
-				textPicker.addEventListener(PickerEvent.PICKER_SET, onTextSet);
-				PopUpManager.addPopUp(textPicker, this, true);
-				PopUpManager.centerPopUp(textPicker);
+				data = new Object();
+				data.title = "";
+				data.text = comment;
+				data.topText = resourceManager.getString('general','editnotetext');
+				navigator.pushView(TextPickerView,data);				
+				
 			}
 			
-			private function onTextSet(event: PickerEvent): void
+			private function addHandler():void {
+				if (!navigator.poppedViewReturnedObject) return; 
+				if (!navigator.poppedViewReturnedObject.object) return;
+				
+				onTextSet(navigator.poppedViewReturnedObject.object as String);
+			}
+			
+			private function onTextSet(textSet:String): void
 			{
-				textPicker.removeEventListener(PickerEvent.PICKER_SET, onTextSet);
-				comment = event.newValue as String;
+				comment = textSet;
 				if (newExerciseEvent) {
 				} else {
 					theExerciseEvent.updateExerciseEvent(exerciseName,eventDateAndTime.valueOf(),new Date().valueOf(),comment);
