@@ -106,7 +106,6 @@ package model
 					(trackingList.getItemAt(trackingcntr) as TrackingViewElement).mark = false;
 				}
 			}
-			this.dispatchEvent(new Event(ModelLocator.SEARCHACTIVE_CHANGED));
 		}
 
 
@@ -181,10 +180,6 @@ package model
 		 * used for event dispatching, when selectedMeal initialized, meaning changed from value -1 to value > 0<br>
 		 */
 		public static const SELECTEDMEAL_INITIALIZED:String="selected_meal_initialized";
-		/**
-		 * used for event dispatching, when searchactive changes, <br>
-		 */
-		public static const SEARCHACTIVE_CHANGED:String="searchactive_changed";
 		
 		/**
 		 * no comment 

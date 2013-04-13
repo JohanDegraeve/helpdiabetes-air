@@ -33,13 +33,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var back_label:String;
 			private var helpTextSettingId:int;
 			private var helpCallOut:HelpCallOut;
+			private var helpText:String = "";
+			private var dataToPassBack:Object;
 
 			/**
 			 * expected in data : <br>
 			 * .title 
 			 * .topText (explanatory text on top of the view) 
 			 * .helpTextSettingId
+			 * .helpText (if null or empty, no helptext will be shown)
 			 * .text (the text that can be created or modified)
+			 * .dataToPassBack = data that needs to be passed back..
 			 */
 			private function onCreationComplete():void {
 				if (data.topText)
@@ -48,24 +52,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					title = data.title as String;
 				if (data.helpTextSettingId)
 					helpTextSettingId = data.helpTextSettingId as int;
+				else helpTextSettingId = 0;
+				if (data.helpText)
+					helpText = data.helpText as String;
 				if (data.text)
 					createdText.text = data.text as String;
+				else createdText.text = "";
+				if (data.dataToPassBack)
+					dataToPassBack = data.dataToPassBack;
 				
 				back_label = resourceManager.getString('general','back');
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('trackingview','help_text_entersearchtext');
-				helpCallOut.settingId = Settings.SettingsHelpTextTrackingView1;
-				helpCallOut.open(createdText,true);
+				if (helpText != "") {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = helpText;
+					helpCallOut.settingId = helpTextSettingId;
+					helpCallOut.open(createdText,true);
+				}
 			}
 			
 			override public function createReturnObject():Object {
-				if (topText != "")
-					return createdText.text;
-				else
-					return null;
+				var dataToReturn:Object = new Object;
+				dataToReturn.dataToPassBack = dataToPassBack;
+				
+				if (createdText.text != "")
+					 dataToReturn.text = createdText.text;
+				
+				return dataToReturn;
 			}
-
-			
 		]]>
 	</fx:Script>
 	<s:navigationContent>

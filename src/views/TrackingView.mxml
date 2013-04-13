@@ -67,7 +67,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				title = resourceManager.getString('trackingview','logbook');
 				
 				lastClickOnTrackingView = (new Date()).valueOf();
-				//ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
 			}
 			
 			private function reDrawActionButtons(event:Event = null):void {
@@ -170,6 +169,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				data.title = "";
 				data.topText = resourceManager.getString('trackingview','searchforfood');
 				data.helpTextSettingId = Settings.SettingsHelpTextTrackingView1;
+				data.helpText = resourceManager.getString('trackingview','help_text_entersearchtext');
 				navigator.pushView(TextPickerView,data);				
 			}
 			

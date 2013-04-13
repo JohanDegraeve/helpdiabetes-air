@@ -33,12 +33,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import mx.managers.PopUpManager;
+			
+			import spark.components.TabbedViewNavigator;
+			import spark.components.ViewNavigator;
+			
 			import databaseclasses.BloodGlucoseEvent;
 			import databaseclasses.Settings;
 			
 			import model.ModelLocator;
-			
-			import mx.managers.PopUpManager;
 			
 			import myComponents.AmountPicker;
 			import myComponents.DatePicker;
@@ -48,9 +51,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.RequestConfirmation;
 			import myComponents.TimePicker;
 			import myComponents.TrackingViewElement;
-			
-			import spark.components.TabbedViewNavigator;
-			import spark.components.ViewNavigator;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
@@ -328,19 +328,56 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 
 			private function editNote(e:MouseEvent = null):void {
-				data = new Object();
-				data.title = "";
-				data.text = comment;
-				data.topText = resourceManager.getString('general','editnotetext');
-				navigator.pushView(TextPickerView,data);				
-
+				var dataToPass:Object = new Object();
+				dataToPass.title = "";
+				dataToPass.text = comment;
+				dataToPass.topText = resourceManager.getString('general','editnotetext');
+				
+				var passbackObject:Object = new Object();
+				if (newBloodGlucoseEvent) {
+					passbackObject.meteringResultText = meteringResultText;
+					passbackObject.unit = unit;
+					passbackObject.timeText = timeText;						
+					passbackObject.dateText = dateText;						
+				} else {
+					//updating the bg event, this means even if the user would hit the back button afterwards, the bgevent will be updated
+					//this is in case user updates eg result or timing, then hits comment button, when coming back, we need to have the new values
+					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText), eventDateAndTime.valueOf(), comment,new Date().valueOf());
+					passbackObject = theBloodGlucoseEvent;
+				}
+				dataToPass.dataToPassBack = passbackObject;
+				navigator.pushView(TextPickerView,dataToPass);				
 			}
 			
 			private function addHandler():void {
 				if (!navigator.poppedViewReturnedObject) return; 
 				if (!navigator.poppedViewReturnedObject.object) return;
 				
-				onTextSet(navigator.poppedViewReturnedObject.object as String);
+				var temp:Object = navigator.poppedViewReturnedObject.object;
+				if (navigator.poppedViewReturnedObject.object.dataToPassBack) {
+					if (navigator.poppedViewReturnedObject.object.dataToPassBack is BloodGlucoseEvent) {
+						theBloodGlucoseEvent = navigator.poppedViewReturnedObject.object.dataToPassBack as BloodGlucoseEvent;
+						meteringResultText = (new  Number(theBloodGlucoseEvent.bloodGlucoseLevel)).toString();
+						unit = theBloodGlucoseEvent.unit;
+						eventDateAndTime = new Date(theBloodGlucoseEvent.timeStamp);
+						dateText = dateformatter.format(_eventDateAndTime);
+						timeText = timeformatter.format(_eventDateAndTime);
+						newBloodGlucoseEvent = false;
+					} else
+					{
+						meteringResultText = navigator.poppedViewReturnedObject.object.dataToPassBack.meteringResultText as String;
+						unit = navigator.poppedViewReturnedObject.object.dataToPassBack.unit as String;
+						timeText = navigator.poppedViewReturnedObject.object.dataToPassBack.timeText as String;
+						dateText = navigator.poppedViewReturnedObject.object.dataToPassBack.dateText as String;
+					}
+					
+					//if there's a datatopassback then there should also be a text
+					//anyway let's check
+					if (navigator.poppedViewReturnedObject.object.text)
+						onTextSet(navigator.poppedViewReturnedObject.object.text as String);
+					else
+						onTextSet("");
+				}
 			}
 			
 			private function onTextSet(textSet:String): void

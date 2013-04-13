@@ -227,11 +227,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 
 			private function editNote(e:MouseEvent = null):void {
-				data = new Object();
-				data.title = "";
-				data.text = comment;
-				data.topText = resourceManager.getString('general','editnotetext');
-				navigator.pushView(TextPickerView,data);				
+				var noteData:Object;
+				noteData = new Object();
+				noteData.title = "";
+				noteData.text = comment;
+				noteData.topText = resourceManager.getString('general','editnotetext');
+				navigator.pushView(TextPickerView,noteData);				
 			}
 			
 			private function onTextSet(textSet:String): void

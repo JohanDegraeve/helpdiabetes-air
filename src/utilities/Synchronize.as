@@ -449,7 +449,7 @@ package utilities
 		
 		private var amountofSpaces:int;
 		
-		private static var traceNeeded:Boolean = false;
+		private static var traceNeeded:Boolean = true;
 		
 		private var localElementsUpdated:Boolean;
 		
