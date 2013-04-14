@@ -408,12 +408,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						eventDateAndTime = navigator.poppedViewReturnedObject.object.dataToPassBack.eventDateAndTime as Date;
 					}
 					
-					//if there's a datatopassback then there should also be a text
-					//anyway let's check
-					if (navigator.poppedViewReturnedObject.object.text)
+					if (navigator.poppedViewReturnedObject.object.text != null)
 						onTextSet(navigator.poppedViewReturnedObject.object.text as String);
-					else
-						onTextSet("");
 				}
 			}
 			

@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import databaseclasses.Settings;
+			import mx.utils.StringUtil;
 			
 			import myComponents.HelpCallOut;
 			[Bindable]
@@ -70,19 +70,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 			}
 			
+			/**
+			 * createdText.text = null if user pressed back button, ie didn't change the text 
+			 */
 			override public function createReturnObject():Object {
 				var dataToReturn:Object = new Object;
 				dataToReturn.dataToPassBack = dataToPassBack;
 				
-				if (createdText.text != "")
-					 dataToReturn.text = createdText.text;
+				if (createdText.text != "NaN")
+					 dataToReturn.text = StringUtil.trim(createdText.text);
+				else
+					dataToReturn.text = null;
 				
 				return dataToReturn;
 			}
 		]]>
 	</fx:Script>
 	<s:navigationContent>
-		<s:Button   label="{back_label}" id="backButton" click="topText='';navigator.popView()" height="48"/>
+		<s:Button   label="{back_label}" id="backButton" click="createdText.text='NaN';navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="navigator.popView()"/>

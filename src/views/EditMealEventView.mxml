@@ -197,9 +197,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				if (navigator.poppedViewReturnedObject != null) {
 					if (navigator.poppedViewReturnedObject.object) {
-						if (navigator.poppedViewReturnedObject.object is String) {
-							onTextSet(navigator.poppedViewReturnedObject.object as String);
-						}
+							if (navigator.poppedViewReturnedObject.object.text != null) {
+								onTextSet(navigator.poppedViewReturnedObject.object.text as String);
+							}
 					}
 					else {
 						localdispatcher = new EventDispatcher();
@@ -238,7 +238,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function onTextSet(textSet:String): void
 			{
 				comment = textSet;
-				mealEvent.comment =  comment
+				mealEvent.comment =  comment;
 			}
 			
 		]]>

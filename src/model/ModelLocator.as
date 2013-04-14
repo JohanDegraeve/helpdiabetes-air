@@ -21,7 +21,6 @@
  */
 package model
 {
-	import databaseclasses.FoodItem;
 	import databaseclasses.Meal;
 	import databaseclasses.MealEvent;
 	import databaseclasses.Settings;
@@ -38,8 +37,6 @@ package model
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
-	import spark.components.List;
-	import spark.components.View;
 	
 	/**
 	 * has some data fields used throughout the application<br>
@@ -80,7 +77,10 @@ package model
 		public var firstMarkedItemEventId:Number;
 		
 		private  var _searchActive:Boolean = false;
-
+		/**
+		 * used for event dispatching, when searchactive changes
+		 */public static const SEARCHACTIVE_CHANGED:String="searchactive_changed";
+		
 		[Bindable]
 		/**
 		 * used in tracking view, true means a search has been made, some elements in the tracking list are marked 
@@ -106,6 +106,7 @@ package model
 					(trackingList.getItemAt(trackingcntr) as TrackingViewElement).mark = false;
 				}
 			}
+			this.dispatchEvent(new Event(ModelLocator.SEARCHACTIVE_CHANGED));
 		}
 
 

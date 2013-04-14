@@ -52,7 +52,6 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
-			import mx.resources.Locale;
 			
 			import myComponents.DatePicker;
 			import myComponents.HelpCallOut;
@@ -63,10 +62,6 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			
 			[Bindable]
 			private var mealname_textarea_text:String;
-			/*[Bindable]
-			private var date_button_text:String;
-			[Bindable]
-			private var time_button_text:String;*/
 			
 			[Bindable]
 			private var buttonDateAndTime:Number;

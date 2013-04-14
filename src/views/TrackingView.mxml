@@ -60,13 +60,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (!navigator.poppedViewReturnedObject) return; 
 				if (!navigator.poppedViewReturnedObject.object) return;
 				
-				onTextSet(navigator.poppedViewReturnedObject.object as String);
+				if (navigator.poppedViewReturnedObject.object.text != null)
+					onTextSet(navigator.poppedViewReturnedObject.object.text as String);
 			}
 			
 			private function onInitialize():void {
 				title = resourceManager.getString('trackingview','logbook');
 				
 				lastClickOnTrackingView = (new Date()).valueOf();
+				ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
 			}
 			
 			private function reDrawActionButtons(event:Event = null):void {
