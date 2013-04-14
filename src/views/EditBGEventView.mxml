@@ -337,8 +337,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (newBloodGlucoseEvent) {
 					passbackObject.meteringResultText = meteringResultText;
 					passbackObject.unit = unit;
-					passbackObject.timeText = timeText;						
-					passbackObject.dateText = dateText;						
+					passbackObject.eventDateAndTime = eventDateAndTime;						
 				} else {
 					//updating the bg event, this means even if the user would hit the back button afterwards, the bgevent will be updated
 					//this is in case user updates eg result or timing, then hits comment button, when coming back, we need to have the new values
@@ -353,7 +352,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (!navigator.poppedViewReturnedObject) return; 
 				if (!navigator.poppedViewReturnedObject.object) return;
 				
-				var temp:Object = navigator.poppedViewReturnedObject.object;
 				if (navigator.poppedViewReturnedObject.object.dataToPassBack) {
 					if (navigator.poppedViewReturnedObject.object.dataToPassBack is BloodGlucoseEvent) {
 						theBloodGlucoseEvent = navigator.poppedViewReturnedObject.object.dataToPassBack as BloodGlucoseEvent;
@@ -367,8 +365,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					{
 						meteringResultText = navigator.poppedViewReturnedObject.object.dataToPassBack.meteringResultText as String;
 						unit = navigator.poppedViewReturnedObject.object.dataToPassBack.unit as String;
-						timeText = navigator.poppedViewReturnedObject.object.dataToPassBack.timeText as String;
-						dateText = navigator.poppedViewReturnedObject.object.dataToPassBack.dateText as String;
+						eventDateAndTime = navigator.poppedViewReturnedObject.object.dataToPassBack.eventDateAndTime as Date;
 					}
 					
 					//if there's a datatopassback then there should also be a text

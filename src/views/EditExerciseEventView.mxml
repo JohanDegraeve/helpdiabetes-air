@@ -38,6 +38,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.components.TabbedViewNavigator;
 			import spark.components.ViewNavigator;
 			
+			import databaseclasses.BloodGlucoseEvent;
 			import databaseclasses.ExerciseEvent;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
@@ -315,19 +316,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 			}
 			private function editNote(e:MouseEvent = null):void {
-				data = new Object();
-				data.title = "";
-				data.text = comment;
-				data.topText = resourceManager.getString('general','editnotetext');
-				navigator.pushView(TextPickerView,data);				
+				var dataToPass:Object = new Object();
+				dataToPass.title = "";
+				dataToPass.text = comment;
+				dataToPass.topText = resourceManager.getString('general','editnotetext');
 				
+				var passbackObject:Object = new Object();
+				if (newExerciseEvent) {
+					passbackObject.exerciseName = exerciseName;
+					passbackObject.eventDateAndTime = eventDateAndTime;						
+				} else {
+					//updating the bg event, this means even if the user would hit the back button afterwards, the bgevent will be updated
+					//this is in case user updates eg result or timing, then hits comment button, when coming back, we need to have the new values
+					theExerciseEvent.updateExerciseEvent(exerciseName, eventDateAndTime.valueOf(),new Date().valueOf(),comment);
+					passbackObject = theExerciseEvent;
+				}
+				dataToPass.dataToPassBack = passbackObject;
+				navigator.pushView(TextPickerView,dataToPass);				
 			}
 			
 			private function addHandler():void {
 				if (!navigator.poppedViewReturnedObject) return; 
 				if (!navigator.poppedViewReturnedObject.object) return;
 				
-				onTextSet(navigator.poppedViewReturnedObject.object as String);
+				if (navigator.poppedViewReturnedObject.object.dataToPassBack) {
+					if (navigator.poppedViewReturnedObject.object.dataToPassBack is ExerciseEvent) {
+						theExerciseEvent = navigator.poppedViewReturnedObject.object.dataToPassBack as ExerciseEvent;
+						exerciseName = theExerciseEvent.level;
+						eventDateAndTime = new Date(theExerciseEvent.timeStamp);
+						dateText = dateformatter.format(_eventDateAndTime);
+						timeText = timeformatter.format(_eventDateAndTime);
+						newExerciseEvent = false;
+					} else
+					{
+						exerciseName = navigator.poppedViewReturnedObject.object.dataToPassBack.exerciseName as String;
+						eventDateAndTime = navigator.poppedViewReturnedObject.object.dataToPassBack.eventDateAndTime as Date;
+					}
+					
+					//if there's a datatopassback then there should also be a text
+					//anyway let's check
+					if (navigator.poppedViewReturnedObject.object.text)
+						onTextSet(navigator.poppedViewReturnedObject.object.text as String);
+					else
+						onTextSet("");
+				}
 			}
 			
 			private function onTextSet(textSet:String): void
