@@ -21,17 +21,28 @@ package myComponents
 	import databaseclasses.MealEvent;
 	import databaseclasses.SelectedFoodItem;
 	
+	import flash.display.GradientType;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Matrix;
+	import flash.system.Capabilities;
+	import flash.text.AntiAliasType;
+	import flash.text.TextLineMetrics;
 	
 	import model.ModelLocator;
 	
 	import mx.collections.ArrayCollection;
+	import mx.collections.ArrayList;
 	import mx.graphics.BitmapFillMode;
 	
+	import spark.components.Application;
+	import spark.components.IconItemRenderer;
 	import spark.components.Image;
+	import spark.components.Label;
+	import spark.components.LabelItemRenderer;
 	import spark.components.supportClasses.StyleableTextField;
 	
+	import views.TemplatesView;
 	
 	/**
 	 * an itemrenderer for a mealevent<br>

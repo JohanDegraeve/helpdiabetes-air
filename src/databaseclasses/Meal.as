@@ -17,21 +17,20 @@
  */
 package databaseclasses
 {
-	import flash.events.EventDispatcher;
-	
-	import mx.core.ClassFactory;
-	import mx.core.mx_internal;
-	
 	import databaseclasses.MealEvent;
+	
+	import flash.events.EventDispatcher;
 	
 	import flashx.textLayout.tlf_internal;
 	
 	import model.ModelLocator;
 	
+	import mx.core.ClassFactory;
+	import mx.core.mx_internal;
+	
 	import myComponents.IListElement;
 	import myComponents.MealItemRenderer;
 	
-	import utilities.FromtimeAndValueArrayCollection;
 	import utilities.Synchronize;
 	
 	/**
@@ -105,13 +104,14 @@ package databaseclasses
 		/**
 		 * adds a selected food item, if there's no mealevent yet then it will be created here<br>
 		 * It is here also that the insulinratio to be used is defined,  this will be redefined each time a selectedfooditem is added<br>
+		 * Also the previous blood glucose event is checked, if any. If the time difference is less than Settings.<br>
 		 */
 		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem):void {
 			var now:Date = new Date();
 			var previousBGlevel:Number = Number.NaN;
 			var insulinRatio:Number;
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			
+						
 			var nowAsNumber:Number = (now.hours * 3600 + now.minutes * 60 + now.seconds)*1000;
 			if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
 				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST));
@@ -124,21 +124,42 @@ package databaseclasses
 			}
 			now = new Date();
 			
-			if (_mealEvent == null) {
-				//it's the first selectedfooditem, and if no timestamp was supplied then set _timestamp to current time
-				//correction 2012-12-09, this was a residu from a previous version where timestamp was a parameter  in addSelectedFoodItem
-				//but now timeStamp points to meal.timeStamp, which is never nan.
-				/*if (isNaN(timeStamp)) {
-				if (((new Date()).valueOf() - _timeStamp) > 0) {
-				_timeStamp = (new Date()).valueOf();
-				}
-				}*/
-				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
-				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-				var correctionFactorList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
-				_mealEvent = new MealEvent(mealName,insulinRatio, correctionFactorList.getValue(Number.NaN,"",new Date(_timeStamp)),_timeStamp,localdispatcher,new Date().valueOf(), "",new Date().valueOf(),true,null,thisMeal);
-			} else
-				mealEventCreated(null);
+			//let's find the last blood glucose event
+			localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
+			localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingLAST_BLOODGLUCOSE_EVENT_ID)) > 0) {
+				Database.getInstance().getPreviousGlucoseEvent(localdispatcher);
+			} else 
+				previousBloodGlucoseEventRetrieved(null);
+			
+			function previousBloodGlucoseEventRetrieved(de:DatabaseEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
+				
+				var previousBGEvent:BloodGlucoseEvent = null;
+				if (de != null) {
+					if (de.data != null) {
+						previousBGEvent = (de.data as BloodGlucoseEvent);
+						if (now.date.valueOf() - previousBGEvent.timeStamp < new Number(Settings.getInstance().getSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL))) {
+							previousBGlevel = previousBGEvent.bloodGlucoseLevel;
+						}
+					}
+				} 
+				if (_mealEvent == null) {
+					//it's the first selectedfooditem, and if no timestamp was supplied then set _timestamp to current time
+					//correction 2012-12-09, this was a residu from a previous version where timestamp was a parameter  in addSelectedFoodItem
+					//but now timeStamp points to meal.timeStamp, which is never nan.
+					/*if (isNaN(timeStamp)) {
+						if (((new Date()).valueOf() - _timeStamp) > 0) {
+							_timeStamp = (new Date()).valueOf();
+						}
+					}*/
+					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
+					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
+					_mealEvent = new MealEvent(mealName,insulinRatio,new Number(Settings.getInstance().getSetting(Settings.SettingCORRECTION_FACTOR)), previousBGlevel,_timeStamp,localdispatcher,new Date().valueOf(), "",new Date().valueOf(),true,null,thisMeal);
+				} else
+					mealEventCreated(null);
+			}
 			
 			function mealEventCreated(de:DatabaseEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
@@ -162,6 +183,13 @@ package databaseclasses
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
 				trace("Error while creating mealeevent. Meal.as 0002");
 			}
+			
+			function previousBloodGlucoseEventRetrievalFailed(de:DatabaseEvent):void {
+				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,previousBloodGlucoseEventRetrieved);
+				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,previousBloodGlucoseEventRetrievalFailed);
+				trace("Error while getting bloodglucoseevent. Meal.as 0001");
+			}
+			
 		}
 		
 		/**
@@ -189,7 +217,7 @@ package databaseclasses
 				trace ("error in deletedSelectedFoodItem, the specified selectedfooditem does not belong to the  mealevent in this meal");
 				return;
 			}
-			
+
 			Synchronize.getInstance().addObjectToBeDeleted(selectedFoodItem);
 			Synchronize.getInstance().startSynchronize(true,false);
 			_mealEvent.removeSelectedFoodItem(selectedFoodItem);

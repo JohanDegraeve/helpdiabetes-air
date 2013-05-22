@@ -31,20 +31,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.managers.PopUpManager;
-			
-			import spark.components.View;
-			
 			import databaseclasses.Meal;
 			import databaseclasses.MealEvent;
 			import databaseclasses.Settings;
 			
+			import flashx.textLayout.formats.Float;
+			
 			import model.ModelLocator;
+			
+			import mx.managers.PopUpManager;
 			
 			import myComponents.AmountPicker;
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
+			
+			import spark.events.ViewNavigatorEvent;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;

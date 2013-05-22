@@ -36,26 +36,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
-			import mx.managers.PopUpManager;
-			
-			import spark.components.View;
-			import spark.events.IndexChangeEvent;
-			import spark.events.PopUpEvent;
-			
 			import databaseclasses.Database;
 			import databaseclasses.DatabaseEvent;
 			import databaseclasses.FoodItem;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
 			
+			import flash.utils.getTimer;
+			
 			import model.ModelLocator;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			import mx.resources.ResourceBundle;
 			
 			import myComponents.AlertPopUp;
 			import myComponents.HelpCallOut;
 			import myComponents.Notification;
 			import myComponents.PickerEvent;
 			import myComponents.elementFromListPicker;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.PopUpEvent;
+			import spark.events.ViewNavigatorEvent;
+			import spark.skins.spark.DefaultItemRenderer;
 			
 			import utilities.ExcelSorting;
 			import utilities.MyGATracker;

@@ -21,6 +21,7 @@ package databaseclasses
 	
 	import flash.data.SQLConnection;
 	import flash.data.SQLMode;
+	import flash.data.SQLResult;
 	import flash.data.SQLStatement;
 	import flash.errors.SQLError;
 	import flash.events.Event;
@@ -30,14 +31,19 @@ package databaseclasses
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
+	import flash.net.Responder;
+	import flash.xml.XMLDocument;
 	
 	import model.ModelLocator;
 	
 	import mx.collections.ArrayCollection;
+	import mx.resources.ResourceBundle;
 	import mx.resources.ResourceManager;
 	
 	import myComponents.DayLineWithTotalAmount;
-		
+	
+	import views.FoodCounterView;
+	
 	
 	
 	/**
@@ -95,7 +101,7 @@ package databaseclasses
 			"insulinratio INTEGER," +
 			"correctionfactor INTEGER," +
 			"creationtimestamp TIMESTAMP NOT NULL," +
-			"previousBGlevel INTEGER)";	//previousBGlevel is not used anymore	
+			"previousBGlevel INTEGER)";		
 		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER PRIMARY KEY , " +
 			"mealevents_mealeventid INTEGER NOT NULL, " +
 			"itemdescription TEXT NOT NULL, " +
@@ -177,7 +183,7 @@ package databaseclasses
 			":protein," +
 			":carbs," +
 			":fat, :lastmodifiedtimestamp)";
-		private const UPDATE_MEAL_EVENT:String = "UPDATE mealevents set comment_2 = :comment_2, mealname = :mealname, insulinratio = :insulinratio, creationtimestamp = :creationtimestamp, lastmodifiedtimestamp = :lastmodifiedtimestamp,correctionfactor = :correctionfactor WHERE mealeventid = :id";
+		private const UPDATE_MEAL_EVENT:String = "UPDATE mealevents set comment_2 = :comment_2, mealname = :mealname, insulinratio = :insulinratio, previousBGlevel = :previousBGlevel, creationtimestamp = :creationtimestamp, lastmodifiedtimestamp = :lastmodifiedtimestamp,correctionfactor = :correctionfactor WHERE mealeventid = :id";
 		private const UPDATE_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set mealevents_mealeventid = :mealevents_mealeventid,itemdescription = :itemdescription, standardamount = :standardamount,unitdescription = :unitdescription,kcal = :kcal,protein = :protein,carbs = :carbs,fat = :fat,chosenamount = :chosenamount,lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE selectedfooditemid = :selectedfooditemid";
 		private const UPDATE_MEDICINEVENT:String="UPDATE medicinevents set comment_2 = :comment_2, amount = :amount, medicinname = :medicinname, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE medicineventid = :id";
 		private const UPDATE_EXERCISEEVENT:String="UPDATE exerciseevents set comment_2 = :comment_2, level = :level, comment_2 = :comment_2, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE exerciseeventid = :id";
@@ -186,7 +192,7 @@ package databaseclasses
 		/**
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
 		 */ 
-		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp, insulinratio, correctionfactor, creationtimestamp, comment_2 ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp,:insulinratio,:correctionfactor,:creationtimestamp,:comment_2)";
+		private const INSERT_MEALEVENT:String = "INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp, insulinratio, correctionfactor, previousBGlevel, creationtimestamp, comment_2 ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp,:insulinratio,:correctionfactor,:previousBGlevel,:creationtimestamp,:comment_2)";
 		
 		private const INSERT_SELECTED_FOOD_ITEM:String = "INSERT INTO selectedfooditems (selectedfooditemid, mealevents_mealeventid,itemdescription ,unitdescription,standardamount,kcal,protein,carbs, fat, chosenamount,lastmodifiedtimestamp ) VALUES (:selectedfooditemid,:mealevents_mealeventid,:itemdescription ,:unitdescription,:standardamount,:kcal,:protein,:carbs,:fat,:chosenamount, :lastmodifiedtimestamp)";
 		
@@ -407,7 +413,7 @@ package databaseclasses
 					for each (var o:Object in result) {
 						if  ((o.id as int) != Settings.SettingsFirstStartUp || !databaseWasCopiedFromSampleFile) {
 							//retrievalresult[Settings.SettingsFirstStartUp] will remain null so it will get the value from the class later on
-							retrievalResult[(o.id as int) + 100] = (o.value as String);
+							retrievalResult[(o.id as int)] = (o.value as String);
 							Settings.getInstance().setSettingWithoutDatabaseUpdate((o.id as int),(o.value as String), o.lastmodifiedtimestamp);
 						}
 					}
@@ -426,14 +432,14 @@ package databaseclasses
 						sqlStatement.addEventListener(SQLEvent.RESULT,settingAdded);
 						sqlStatement.addEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
 						sqlStatement.text = 
-							(id - 100 != Settings.SettingsFirstStartUp || !databaseWasCopiedFromSampleFile)
+							(id != Settings.SettingsFirstStartUp || !databaseWasCopiedFromSampleFile)
 							?
 							INSERT_SETTING
 							:
 							UPDATE_SETTING;
-						sqlStatement.parameters[":id"] = id - 100;
-						sqlStatement.parameters[":value"] = Settings.getInstance().getSetting(id - 100);
-						sqlStatement.parameters[":lastmodifiedtimestamp"] = Settings.getInstance().getSettingLastModifiedTimeStamp(id - 100);
+						sqlStatement.parameters[":id"] = id;
+						sqlStatement.parameters[":value"] = Settings.getInstance().getSetting(id);
+						sqlStatement.parameters[":lastmodifiedtimestamp"] = Settings.getInstance().getSettingLastModifiedTimeStamp(id);
 						sqlStatement.execute();
 					} else {
 						addMissingSetting(id + 1);
@@ -445,7 +451,7 @@ package databaseclasses
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingAdded);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
 				
-				addMissingSetting((sqlStatement.parameters[":id"] as int) + 1 + 100);
+				addMissingSetting((sqlStatement.parameters[":id"] as int)+1);
 			}
 			
 			function addingSettingFailed (se:SQLErrorEvent):void {
@@ -1594,7 +1600,7 @@ package databaseclasses
 		 * newLastModifiedTimeStamp = <br>
 		 * dispatcher = a DatabaseEvent will be dispatched when finished
 		 */
-		internal function updateMealEvent(mealEventId:Number, newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newLastModifiedTimeStamp:Number,newCreationTimeStamp:Number, comment:String, dispatcher:EventDispatcher):void {
+		internal function updateMealEvent(mealEventId:Number, newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newPreviousBGLevel:int,newLastModifiedTimeStamp:Number,newCreationTimeStamp:Number, comment:String, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -1610,6 +1616,7 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_MEAL_EVENT;
 				localSqlStatement.parameters[":id"] = mealEventId;
 				localSqlStatement.parameters[":insulinratio"] = newInsulinRatio;
+				localSqlStatement.parameters[":previousBGlevel"] = newPreviousBGLevel;
 				localSqlStatement.parameters[":correctionfactor"] = newCorrectionFactor;
 				localSqlStatement.parameters[":mealname"] = newMealName;
 				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;
@@ -1711,7 +1718,7 @@ package databaseclasses
 				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = UPDATE_SETTING;
-				localSqlStatement.parameters[":id"] = id - 100;
+				localSqlStatement.parameters[":id"] = id;
 				localSqlStatement.parameters[":value"] = value;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (isNaN(lastModifiedTimeStamp) ? (new Date()).valueOf() : lastModifiedTimeStamp);
 				localSqlStatement.addEventListener(SQLEvent.RESULT, settingUpdated);
@@ -1760,6 +1767,7 @@ package databaseclasses
 			lastmodifiedtimestamp:Number,
 			insulinRatio:Number,
 			correctionFactor:Number,
+			previousBGlevel:int,
 			creationtimestamp:Number,
 			comment:String,
 			dispatcher:EventDispatcher):void {
@@ -1781,6 +1789,7 @@ package databaseclasses
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = lastmodifiedtimestamp;
 				localSqlStatement.parameters[":insulinratio"] = insulinRatio;
 				localSqlStatement.parameters[":correctionfactor"] = correctionFactor;
+				localSqlStatement.parameters[":previousBGlevel"] = previousBGlevel;
 				localSqlStatement.parameters[":creationtimestamp"] = creationtimestamp;
 				localSqlStatement.parameters[":comment_2"] = comment;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, mealEventCreated);
@@ -1999,13 +2008,12 @@ package databaseclasses
 			function onOpenResult(e:SQLError):void {
 				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
 				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
-
-				localSqlStatement.addEventListener(SQLEvent.RESULT,bloodGlucoseEventsRetrieved);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,bloodGlucoseRetrievalFailed);
+				
+				localSqlStatement.addEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
 				localSqlStatement.sqlConnection = aConn;
-				localSqlStatement.text = GET_ALLBLOODGLUCOSEEVENTS;
+				localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
 				localSqlStatement.execute();
-
 			}
 			
 			function selectedFoodItemsRetrieved(result:SQLEvent):void {
@@ -2060,6 +2068,7 @@ package databaseclasses
 							var newMealEvent:MealEvent = new MealEvent(o.mealname as String,
 								o.insulinratio as Number,
 								o.correctionfactor as Number,
+								o.prevousBGlevel as Number,
 								o.creationtimestamp as Number,
 								null,
 								o.mealeventid as Number,
@@ -2083,11 +2092,13 @@ package databaseclasses
 						}
 					}
 				}
-				localSqlStatement.addEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
+				
+				localSqlStatement.addEventListener(SQLEvent.RESULT,bloodGlucoseEventsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,bloodGlucoseRetrievalFailed);
 				localSqlStatement.sqlConnection = aConn;
-				localSqlStatement.text = GET_ALLMEDICINEVENTS;
+				localSqlStatement.text = GET_ALLBLOODGLUCOSEEVENTS;
 				localSqlStatement.execute();
+				
 			}
 			
 			function bloodGlucoseEventsRetrieved(result:SQLEvent):void {
@@ -2121,14 +2132,11 @@ package databaseclasses
 						}
 					}
 				}
-				
-				
-				localSqlStatement.addEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
+				localSqlStatement.addEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
 				localSqlStatement.sqlConnection = aConn;
-				localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
+				localSqlStatement.text = GET_ALLMEDICINEVENTS;
 				localSqlStatement.execute();
-
 			}
 			
 			function medicinEventsRetrieved(result:SQLEvent):void {
@@ -2268,6 +2276,17 @@ package databaseclasses
 					globalDispatcher =  null;
 				}
 			}
+		}
+		
+		
+		
+		/**
+		 * 
+		 */
+		internal function getPreviousGlucoseEvent(dispatcher:EventDispatcher):void {
+			var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
+			event.data = null;
+			dispatcher.dispatchEvent(event);
 		}
 		
 		internal function updateSelectedFoodItem(selectedFoodItemId:Number, newMealEventId:Number,newDescription:String,newChosenAmount:Number, newUnit:Unit, newLastModifiedTimeStamp:Number, dispatcher:EventDispatcher):void {

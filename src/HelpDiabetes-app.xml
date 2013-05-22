@@ -189,8 +189,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
                 <string>UIStatusBarStyleBlackOpaque</string>
             ]]>
         </InfoAdditions>
-        <Entitlements>
-        </Entitlements>
 	</iPhone>
 
 

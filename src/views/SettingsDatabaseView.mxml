@@ -12,12 +12,10 @@
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import databaseclasses.Settings;
+			
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
-			
-			import spark.components.View;
-			
-			import databaseclasses.Settings;
 			
 			import myComponents.AmountPicker;
 			import myComponents.HelpCallOut;

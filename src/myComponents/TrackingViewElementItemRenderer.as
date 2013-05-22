@@ -21,6 +21,7 @@ package myComponents
 	
 	import model.ModelLocator;
 	
+	import spark.components.IconItemRenderer;
 	import spark.components.LabelItemRenderer;
 
 	/**

@@ -19,8 +19,6 @@ package databaseclasses
 {
 	import mx.core.ClassFactory;
 	
-	import model.ModelLocator;
-	
 	import myComponents.BloodGlucoseEventItemRenderer;
 	import myComponents.IListElement;
 	import myComponents.TrackingViewElement;
@@ -47,7 +45,7 @@ package databaseclasses
 			return _unit;
 		}
 
-		private function set unit(value:String):void
+		public function set unit(value:String):void
 		{
 			_unit = value;
 		}
@@ -89,7 +87,6 @@ package databaseclasses
 
 			if (storeInDatabase)
 				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,_lastModifiedTimestamp,unit,bloodglucoseEventId,_comment,null);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		
@@ -108,7 +105,7 @@ package databaseclasses
 		 * if newComment = null then an empty string will be used<br>
 		 */
 		public function updateBloodGlucoseEvent(newUnit:String,newBloodGlucoseLevel:Number,newCreationTimeStamp:Number,newcomment:String,  newLastModifiedTimeStamp:Number):void {
-			_unit = newUnit;
+			unit = newUnit;
 			_bloodGlucoseLevel = newBloodGlucoseLevel;
 			_comment = newcomment;
 
@@ -119,8 +116,7 @@ package databaseclasses
 			if (!isNaN(newCreationTimeStamp)) {
 				timeStamp = newCreationTimeStamp;
 			}
-			Database.getInstance().updateBloodGlucoseEvent(this.eventid,_unit,_bloodGlucoseLevel, timeStamp,_lastModifiedTimestamp,_comment);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			Database.getInstance().updateBloodGlucoseEvent(this.eventid,unit,_bloodGlucoseLevel, timeStamp,_lastModifiedTimestamp,_comment);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -134,7 +130,6 @@ package databaseclasses
 		 */
 		public function deleteEvent():void {
 			Database.getInstance().deleteBloodGlucoseEvent(this.eventid);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		public function toString():String {
@@ -143,7 +138,7 @@ package databaseclasses
 			returnValue = "timeStamp = " + timeStamp+ "\n";
 			returnValue += "ladmodifiedtimestamp = " + _lastModifiedTimestamp+ "\n";
 			returnValue += "bloodglucoselevel = " + _bloodGlucoseLevel.toString() + "\n";
-			returnValue += "unit = " + _unit + "\n";
+			returnValue += "unit = " + unit+ "\n";
 			returnValue += "comment = " + _comment + "\n";
 			 
 			return returnValue;

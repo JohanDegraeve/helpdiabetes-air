@@ -472,6 +472,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						&&
 						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null
 					) {
+						trace("defaultmealtimestamp = " + defaultMealTimeSTamp);
 						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp = (new Date()).valueOf();
 					}
 					

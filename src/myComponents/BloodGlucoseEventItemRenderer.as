@@ -18,12 +18,20 @@
 package myComponents
 {
 	import databaseclasses.BloodGlucoseEvent;
+	import databaseclasses.Settings;
+	
+	import flash.display.GradientType;
+	import flash.geom.Matrix;
 	import flash.text.TextLineMetrics;
 	
+	import model.ModelLocator;
+	
 	import mx.graphics.BitmapFillMode;
+	import mx.graphics.BitmapScaleMode;
 	
 	import spark.components.Image;
 	import spark.components.supportClasses.StyleableTextField;
+	import spark.primitives.BitmapImage;
 
 	public class BloodGlucoseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
