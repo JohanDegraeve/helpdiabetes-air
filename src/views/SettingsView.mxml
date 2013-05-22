@@ -26,22 +26,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import databaseclasses.Settings;
-			import databaseclasses.UnitChangedEvent;
-			
-			import model.ModelLocator;
-			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
 			
-			import myComponents.AlertPopUp;
-			import myComponents.PickerEvent;
-			import myComponents.elementFromListPicker;
-			
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
+			
+			import databaseclasses.Settings;
+			import databaseclasses.UnitChangedEvent;
+			
+			import myComponents.AlertPopUp;
+			import myComponents.elementFromListPicker;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
@@ -55,7 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[ResourceBundle("settingsview")]
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
-				ResourceManager.getInstance().getString("settingsview","bolus_calculation"),
+				ResourceManager.getInstance().getString("settingsview","bolussettings"),
 				ResourceManager.getInstance().getString("settingsview","meal_times"),
 				ResourceManager.getInstance().getString("settingsview","bloodglucoseunit"),
 				ResourceManager.getInstance().getString("settingsview","medicin"),
@@ -120,7 +117,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function selectedElementChanged(event:IndexChangeEvent):void {
 				switch (event.newIndex) {
 					case 0:
-						navigator.pushView(SettingsBolusCalculationView);
+						navigator.pushView(SettingsAllBolusSettings);
 						break;
 					case 1:
 						navigator.pushView(SettingsMealTimesView);

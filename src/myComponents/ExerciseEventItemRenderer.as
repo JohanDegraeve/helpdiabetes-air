@@ -18,13 +18,6 @@
 package myComponents
 {
 	import databaseclasses.ExerciseEvent;
-	import databaseclasses.Settings;
-	
-	import flash.display.GradientType;
-	import flash.geom.Matrix;
-	import flash.text.TextLineMetrics;
-	
-	import model.ModelLocator;
 	
 	import mx.graphics.BitmapFillMode;
 	

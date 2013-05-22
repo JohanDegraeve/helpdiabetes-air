@@ -37,8 +37,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.managers.PopUpManager;
 			
 			import myComponents.AlertPopUp;
-			import spark.components.TabbedViewNavigator;
-			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
 			
 			import utilities.Synchronize;

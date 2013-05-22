@@ -28,14 +28,10 @@ package utilities
 	import databaseclasses.Settings;
 	import databaseclasses.Unit;
 	
-	import flash.data.SQLStatement;
-	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.filesystem.File;
-	import flash.filesystem.FileMode;
-	import flash.filesystem.FileStream;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestHeader;
@@ -47,17 +43,14 @@ package utilities
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
-	import mx.events.Request;
 	import mx.formatters.DateFormatter;
 	import mx.resources.ResourceManager;
-	import mx.utils.Base64Encoder;
 	
 	import myComponents.IListElement;
 	import myComponents.TrackingViewElement;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
-	import spark.components.Application;
 	import spark.formatters.DateTimeFormatter;
 	
 	/**
@@ -206,7 +199,7 @@ package utilities
 		private static var ColumnName_mealname:String = "mealname";
 		private static var ColumnName_insulinratio:String = "insulinratio";
 		private static var ColumnName_correctionfactor:String = "correctionfactor";
-		private static var ColumnName_previousbglevel:String = "previousbglevel";
+		private static var ColumnName_previousbglevel:String = "previousbglevel";//not used anymore
 		private static var ColumnName_description:String = "description";
 		private static var ColumnName_unitdescription:String = "unitdescription";
 		private static var ColumnName_unitstandardamount:String = "unitstandardamount";
@@ -271,7 +264,7 @@ package utilities
 					[ColumnName_mealname,"STRING"],
 					[ColumnName_insulinratio,"NUMBER"],
 					[ColumnName_correctionfactor,"NUMBER"],
-					[ColumnName_previousbglevel,"NUMBER"],
+					[ColumnName_previousbglevel,"NUMBER"],//not used anymore
 					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
 					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
 					[ColumnName_deleted,"STRING"],//was the event deleted or not
@@ -449,7 +442,7 @@ package utilities
 		
 		private var amountofSpaces:int;
 		
-		private static var traceNeeded:Boolean = false;
+		private static var traceNeeded:Boolean = true;
 		
 		private var localElementsUpdated:Boolean;
 		
@@ -1520,7 +1513,6 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_insulinratio)],
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_correctionfactor)],
-										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_previousbglevel)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]));
 									if (traceNeeded) trace("local element updated, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
@@ -1539,7 +1531,6 @@ package utilities
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_mealname)],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_insulinratio)],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_correctionfactor)],
-								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_previousbglevel)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								null,
 								remoteElements.getItemAt(m)[positionId],
@@ -1990,12 +1981,11 @@ package utilities
 						if (!elementFoundWithSameId) {
 							previousTypeOfEventAlreadyUsed = true;
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[3][1] + " ";
-							sqlStatement += "(id,mealname,insulinratio,correctionfactor,previousbglevel,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
+							sqlStatement += "(id,mealname,insulinratio,correctionfactor,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as MealEvent).eventid.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).mealName + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).insulinRatio.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).correctionFactor.toString() + "\',\'" +
-								(localElements.getItemAt(i) as MealEvent).previousBGlevel + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).timeStamp.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).lastModifiedTimeStamp.toString() + "\'," +
 								"\'false\'" +
@@ -2144,7 +2134,6 @@ package utilities
 										"mealname = \'" + (localElements.getItemAt(k) as MealEvent).mealName + "\'," +
 										"insulinratio = \'" + (localElements.getItemAt(k) as MealEvent).insulinRatio.toString() + "\'," +
 										"correctionfactor = \'" + (localElements.getItemAt(k) as MealEvent).correctionFactor.toString() + "\'," +
-										"previousbglevel = \'" + (localElements.getItemAt(k) as MealEvent).previousBGlevel + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as MealEvent).timeStamp.toString() + "\'," +
 										"comment = \'" + (localElements.getItemAt(k) as MealEvent).comment + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as MealEvent).lastModifiedTimeStamp.toString() + "\'," +
@@ -2430,7 +2419,6 @@ package utilities
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				var message:String = eventAsJSONObject.error.message as String;
 				if (message == googleError_Invalid_Credentials) {
-					//if (!secondAttempt) {
 						secondAttempt = true;
 						//get a new access_token
 						var request:URLRequest = new URLRequest(googleTokenRefreshUrl);
@@ -2447,11 +2435,6 @@ package utilities
 						loader.load(request);
 						if (traceNeeded)
 							trace("loader : request = " + request.data); 
-					//} else {
-						//Settings.getInstance().setSetting(Settings.SettingsAccessToken,  "");
-						//Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
-						//syncFinished(false);
-					//}
 				} else {
 					syncFinished(false);
 				}
@@ -2684,7 +2667,6 @@ package utilities
 						"mealname = \'" + (objectToBeDeleted as MealEvent).mealName + "\'," +
 						"insulinratio = \'" + (objectToBeDeleted as MealEvent).insulinRatio + "\'," +
 						"correctionfactor = \'" + (objectToBeDeleted as MealEvent).correctionFactor + "\'," +
-						"previousbglevel = \'" + (objectToBeDeleted as MealEvent).previousBGlevel + "\'," +
 						"creationtimestamp = \'" + (objectToBeDeleted as MealEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
 						"addedtoormodifiedintabletimestamp = \'" +

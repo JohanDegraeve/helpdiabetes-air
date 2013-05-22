@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2013  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		creationComplete="view1_creationCompleteHandler(event)"
+		add="addHandler()"
+		xmlns:s="library://ns.adobe.com/flex/spark">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Metadata>
+		[ResourceBundle("fromtimeandvaluelistview")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.components.View;
+			import spark.events.IndexChangeEvent;
+			
+			import databaseclasses.Settings;
+			
+			import myComponents.FromtimeAndValueItemRenderer;
+			import myComponents.PickerEvent;
+			import myComponents.RequestConfirmation;
+			
+			import utilities.FromtimeAndValue;
+			import utilities.FromtimeAndValueArrayCollection;
+			
+			[Bindable]
+			private var back_label:String;
+			
+			private var _listOfElements:FromtimeAndValueArrayCollection;
+			
+			private var deleteClicked:Boolean;
+			private var editClicked:Boolean;
+			private var addClicked:Boolean;
+			private var confirmationPicker:RequestConfirmation;
+			private var thisView:View;
+			
+			[Bindable]
+			/**
+			 * list of elements, should be list of FromtimeAndValue objects
+			 */
+			public function get listOfElements():FromtimeAndValueArrayCollection
+			{
+				return _listOfElements;
+			}
+			
+			/**
+			 * @private
+			 */
+			public function set listOfElements(value:FromtimeAndValueArrayCollection):void
+			{
+				_listOfElements = value;
+			}
+			
+			
+			[Bindable]
+			/**
+			 * topText shown on top of the view.
+			 */private var topText:String;
+			
+			private const CONTEXT_EDIT_LIST_ELEMENT:String = "context_edit_list_element";
+			
+			protected function view1_creationCompleteHandler(event:FlexEvent):void
+			{
+				thisView = this;
+				back_label = resourceManager.getString('general','back');
+				if (data.title)
+					title = data.title;
+				if (!listOfElements)
+					//if listOfElements is not null, then it means listOfElements has already been assigned in addhandler, so no need to check again on the data.setting value
+					//this would only reset the list to the initial value, as it still exists in the settings
+					if (data.setting) {
+						//expecting the settings string that contains the list to be edit
+						listOfElements =  FromtimeAndValueArrayCollection.createList(data.setting);
+						listOfElements.setArrayChangedToFalse();
+					}
+				if (data.topText)
+					topText = data.topText;
+				list.addEventListener(FromtimeAndValueItemRenderer.DELETE_CLICKED,deleteTheSelectedItem);
+				list.addEventListener(FromtimeAndValueItemRenderer.EDIT_CLICKED,editTheSelectedItem);
+				list.addEventListener(FromtimeAndValueItemRenderer.ADD_CLICKED,addANewItem);
+			}
+			
+			private function deleteTheSelectedItem(event:Event):void {
+				deleteClicked = true;
+			}
+			
+			private function addANewItem(event:Event):void  {
+				addClicked = true;
+			}
+			
+			private function editTheSelectedItem(event:Event):void {
+				editClicked = true;
+			}
+			
+			protected function list_changeHandler(event:IndexChangeEvent):void
+			{
+				var dataToSend:Object;
+				if (deleteClicked) {
+					listOfElements.removeItemAt(event.newIndex);
+					deleteClicked = false;
+				} else if (editClicked) {
+					dataToSend = new Object;
+					dataToSend.title = resourceManager.getString('settingsallbolussettingsview','correction_factor_settings');
+					dataToSend.selectedIndex = event.newIndex;
+					dataToSend.listOfElements = listOfElements;
+					dataToSend.topText = resourceManager.getString('fromtimeandvalueelementview','editcorrectionfactor');
+					navigator.pushView(FromtimeAndValueElementView,dataToSend,CONTEXT_EDIT_LIST_ELEMENT);
+					editClicked = false;
+				} else if (addClicked)  {
+					dataToSend = new Object;
+					dataToSend.title = resourceManager.getString('settingsallbolussettingsview','correction_factor_settings');
+					var clickedItem:FromtimeAndValue = listOfElements.getItemAt(event.newIndex) as FromtimeAndValue;
+					listOfElements.addItem(new FromtimeAndValue(clickedItem.from + 60,clickedItem.value,clickedItem.unit,true,true));
+					dataToSend.selectedIndex = event.newIndex + 1;//tricky here, if everything goes right, the new element should be at event.newIndex +1
+					dataToSend.listOfElements = listOfElements;
+					dataToSend.topText = resourceManager.getString('fromtimeandvalueelementview','editcorrectionfactor');
+					navigator.pushView(FromtimeAndValueElementView,dataToSend,CONTEXT_EDIT_LIST_ELEMENT);
+					addClicked = false;
+				}
+			}
+			
+			private function addHandler():void {
+				if (navigator.poppedViewReturnedObject != null) {
+					if (navigator.poppedViewReturnedObject.context != null) {
+						if (navigator.poppedViewReturnedObject.context == CONTEXT_EDIT_LIST_ELEMENT) {
+							if (navigator.poppedViewReturnedObject.object != null) {
+								listOfElements = navigator.poppedViewReturnedObject.object as FromtimeAndValueArrayCollection;				
+							}
+						}
+					}
+				}
+			}
+			
+			private function okClicked(e:MouseEvent = null):void {
+				if (listOfElements.arrayChanged) {
+					Settings.getInstance().setSetting(Settings.SettingsCorrectionFactor,listOfElements.createCorrectionFactorAsString());
+				}
+				navigator.popView();
+			}
+			
+			protected function back_clickHandler(event:MouseEvent):void
+			{
+				if (listOfElements.arrayChanged) {
+					confirmationPicker = new RequestConfirmation();
+					confirmationPicker.labelText1 = resourceManager.getString('fromtimeandvalueelementview','savechanges');
+					
+					confirmationPicker.addEventListener(PickerEvent.PICKER_SET, onYesClicked);
+					confirmationPicker.addEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+					PopUpManager.addPopUp(confirmationPicker, thisView, true);
+					PopUpManager.centerPopUp(confirmationPicker);
+				} else 
+					navigator.popView();
+				
+				function onYesClicked(event:PickerEvent): void
+				{
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+					okClicked();
+				}
+				
+				function onNoClicked(event:PickerEvent): void
+				{
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
+					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
+					navigator.popView();
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<s:navigationContent>
+		<s:Button label="{back_label}" click="back_clickHandler(event)" height="48"/>
+	</s:navigationContent>
+	<s:actionContent>
+		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked(event)"/>
+	</s:actionContent>
+	<s:Group y="0" x="0" width="100%" height = "100%" left="5" right="5" top="0" bottom="0">
+		<s:layout>
+			<s:VerticalLayout>
+			</s:VerticalLayout>
+		</s:layout>
+		<s:Label y="0" x="0" width="100%" height="75" text="@{topText}" textAlign="center" verticalAlign="middle"/>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
+		<s:List id="list" width="100%" height="100%" itemRenderer="myComponents.FromtimeAndValueItemRenderer"
+				dataProvider="{listOfElements}" 
+				change="list_changeHandler(event)"
+				scrollSnappingMode="leadingEdge">
+		</s:List>
+	</s:Group>
+	
+</s:View>

@@ -8,7 +8,7 @@
 	</fx:Declarations>
 	<fx:Metadata>
 		[ResourceBundle("general")]
-		[ResourceBundle("settingsdatabaseview")]
+		[ResourceBundle("settingstargetbglevelview")]
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
@@ -23,9 +23,6 @@
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
-			import utilities.MyGATracker;
-			import utilities.Synchronize;
-			
 			private var amountPicker:AmountPicker;
 			
 			private var thisView:View;
@@ -33,32 +30,20 @@
 			[Bindable]
 			private var back_label:String;
 			
-			private var trackerId:String;
 			private var helpCallOut:HelpCallOut;
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
 			{
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('settingsdatabaseview','help_text_changeDatabaseStorage');
-				helpCallOut.settingId = Settings.SettingsHelpTextDatabaseViewChangeStorage;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(trackingsizeButton,true);
 			}
-			
-			private function helptext1Removed(event:Event):void  {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-			}
-			
 			
 			private function onInit():void {
 				back_label = resourceManager.getString('general','back');
-				trackerId = resourceManager.getString('analytics','trackeraccount');
 				thisView = this;
 			}
 			
-			private function trackingSizeClicked(event:Event):void  {
+			private function targetBGLevelClicked(event:Event):void  {
 				amountPicker = new AmountPicker();
-				amountPicker.amount = Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE);
+				amountPicker.amount = Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL);
 				amountPicker.maxNonDecimalDigits = 3;
 				amountPicker.decimalDigits = 0;
 				//amountPicker.labelText1 = resourceManager.getString('editmedicineventview','amount_of_units');
@@ -76,17 +61,10 @@
 				
 				function onAmountSet(event: PickerEvent): void
 				{
-					MyGATracker.getInstance().trackPageview( "SettingsDatabaseView-trackingSizeChanged" );
-					
 					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-					trackingsizeButton.label = (event.newValue as Number).toString();
-					if (new Number(trackingsizeButton.label) > new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE))) {
-						Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,((new Date()).valueOf() - new Number(trackingsizeButton.label) * 24 * 3600 * 1000).toString());
-						Settings.getInstance().setSetting(Settings.SettingsMAXTRACKINGSIZE,trackingsizeButton.label );
-						Synchronize.getInstance().startSynchronize(true,false);
-					} else
-						Settings.getInstance().setSetting(Settings.SettingsMAXTRACKINGSIZE,trackingsizeButton.label );
+					targetBGLevelButton.label = (event.newValue as Number).toString();
+					Settings.getInstance().setSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL,targetBGLevelButton.label );
 				}
 			}
 		]]>
@@ -99,13 +77,13 @@
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:Group id="trackingsize" y="0" x="0" width="100%" height = "100%"  click="trackingSizeClicked(event)">
+		<s:Group id="bglevel" y="0" x="0" width="100%" height = "100%"  click="targetBGLevelClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  width="60%" text="{resourceManager.getString('settingsdatabaseview','trackingviewsize') }" />
-			<s:Button id="trackingsizeButton" width="40%" label="{Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)}"  />
+			<s:Label  width="60%" text="{resourceManager.getString('settingstargetbglevelview','targetbglevel') }" />
+			<s:Button id="targetBGLevelButton" width="40%" label="{Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)}"  />
 		</s:Group>
 	</s:Group>
 </s:View>

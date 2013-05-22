@@ -22,7 +22,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 creationComplete="group1_creationCompleteHandler(event)"
-		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
+		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*" xmlns:myComponents="myComponents.*"
 		 >
 	<fx:Declarations>
 	</fx:Declarations>
@@ -34,10 +34,12 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
+			import spark.components.calendarClasses.DateSelectorDisplayMode;
+			
 			import myComponents.PickerEvent;
 			
-			import spark.components.calendarClasses.DateSelectorDisplayMode;
-
+			import utilities.DateTimeUtilities;
+			
 			private var _currentTime: Date;
 			[Bindable]
 			public function get currentTime(): Date
@@ -52,7 +54,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			/**
 			 * maximum time to which user can set the new time 
 			 */
-			private var _maxTime:Date = new Date(32531915068000);
+			private var _maxTime:Date = DateTimeUtilities.convertToUTC(new Date(32531915068000));
 			
 			/**
 			 * maximum time to which user can set the new time 
@@ -73,7 +75,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			/**
 			 * minimum time to which user can set the new time 
 			 */
-			private var _minTime:Date = new Date(0);
+			private var _minTime:Date = DateTimeUtilities.convertToUTC(new Date(0));
 			
 			/**
 			 * minimum time to which user can set the new time 
@@ -104,7 +106,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 				dispatchEvent(tpe);
 				PopUpManager.removePopUp(this);
 			}
-
+			
 			protected function group1_creationCompleteHandler(event:FlexEvent):void
 			{
 				dt.setStyle("locale",Capabilities.language);
@@ -118,7 +120,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 	<s:BorderContainer>
 		
 		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
-			<s:DateSpinner id="dt" displayMode="{DateSelectorDisplayMode.TIME}"/>
+			<s:DateSpinner id="dt" displayMode="{DateSelectorDisplayMode.TIME}" skinClass="spark.skins.mobile.DateSpinnerSkin"/>
 			<s:BorderContainer backgroundColor="0xcccccc" width="100%">
 				<s:VGroup width="100%" verticalAlign="middle" paddingTop="0" paddingBottom="0" paddingLeft="0" paddingRight="0">
 					<s:Button height="50%" width="100%" minHeight="60" label="{resourceManager.getStringArray('general','ok')}" click="setTime()"/>

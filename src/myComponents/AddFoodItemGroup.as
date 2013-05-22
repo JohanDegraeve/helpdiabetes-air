@@ -17,27 +17,14 @@
  */
 package myComponents
 {
-	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.text.StyleSheet;
-	
-	import model.ModelLocator;
-	
-	import mx.events.FlexEvent;
-	import mx.events.ValidationResultEvent;
-	import mx.validators.NumberValidator;
-	import mx.validators.ValidationResult;
-	
+		
 	import skins.ButtonWithLabelOnTwoLinesSkin;
 	
 	import spark.components.Button;
-	import spark.components.DataGroup;
 	import spark.components.Group;
-	import spark.components.Label;
-	import spark.components.supportClasses.GroupBase;
 	import spark.components.supportClasses.StyleableTextField;
-	import spark.globalization.StringTools;
-	import spark.skins.mobile.supportClasses.MobileSkin;
 	
 	public class AddFoodItemGroup extends Group
 	{

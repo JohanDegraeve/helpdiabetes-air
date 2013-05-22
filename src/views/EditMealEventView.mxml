@@ -36,8 +36,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
 			
 			import spark.events.IndexChangeEvent;
+			import spark.events.PopUpEvent;
 			import spark.formatters.DateTimeFormatter;
 			
 			import databaseclasses.Database;
@@ -49,6 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import model.ModelLocator;
 			
+			import myComponents.AlertPopUp;
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.SelectedFoodItemRenderer;
@@ -72,7 +75,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var fatAmount_text:String;
 			
 			private var mealEvent:MealEvent;
-
+			
 			private var comment:String;
 			
 			[Bindable]
@@ -84,6 +87,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private static var timeFormatter:DateTimeFormatter ;
 			
 			private var helpCallOut:HelpCallOut;
+			private var alertPopUp:AlertPopUp;
 			
 			/**
 			 * used as context value when pushing the view ChangeMealDateAndTimeView<br>
@@ -121,7 +125,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					helpCallOut.open(fooditemlist,true);
 				}
 			}
-
+			
 			private function onInitialize():void {
 				trace("editmealeventview oninitialize");
 				
@@ -171,7 +175,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function onClick(event:IndexChangeEvent):void {
 				if (mealEvent.meal == null)
 					return;//meal can't be changed anymore
-
+				
 				MyGATracker.getInstance().trackPageview( "EditMealEventView-selectedItemClicked" );
 				
 				data = mealEvent;
@@ -195,24 +199,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function addHandler():void {
 				var localdispatcher:EventDispatcher ;
 				
+				
 				if (navigator.poppedViewReturnedObject != null) {
 					if (navigator.poppedViewReturnedObject.object) {
-							if (navigator.poppedViewReturnedObject.object.text != null) {
-								onTextSet(navigator.poppedViewReturnedObject.object.text as String);
+						var temp:Object = navigator.poppedViewReturnedObject.object ;
+						if (!(navigator.poppedViewReturnedObject.object is Number)) {
+							if (navigator.poppedViewReturnedObject.object.text) {
+								if (navigator.poppedViewReturnedObject.object.text != null) {
+									onTextSet(navigator.poppedViewReturnedObject.object.text as String);
+								}
 							}
+						}
 					}
-					else {
+					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
 						localdispatcher = new EventDispatcher();
-						if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
-							ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-							ModelLocator.getInstance().trackingList = new ArrayCollection();
-							localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
-							localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-							Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
-							
-							Synchronize.getInstance().startSynchronize(true,false);//not always necessary, because even if user click back button in changemealdateandtimeveiw, without change the time, then we'll pass here
-						} 
-					}
+						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
+						ModelLocator.getInstance().trackingList = new ArrayCollection();
+						localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
+						localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
+						Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
+						
+						Synchronize.getInstance().startSynchronize(true,false);//not always necessary, because even if user click back button in changemealdateandtimeveiw, without change the time, then we'll pass here
+					} 
 				}
 				
 				function getAllEventsAndFillUpMealsFinished(event:Event):void
@@ -225,7 +233,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
 				}
 			}
-
+			
 			private function editNote(e:MouseEvent = null):void {
 				var noteData:Object;
 				noteData = new Object();
@@ -239,6 +247,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				comment = textSet;
 				mealEvent.comment =  comment;
+			}
+						
+			protected function carbAmountGroupClicked(event:MouseEvent):void
+			{
+				alertPopUp = new AlertPopUp();
+				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+				alertPopUp.show(this,mealEvent.recalculateInsulinAmount()
+					.replace("{carb_amount}",resourceManager.getString('editmealeventview','carb_amount'))
+					.replace("{calculated_insulinamount}",resourceManager.getString('editmealeventview','calculated_insulinamount'))
+					.replace("{insulin_ratio}",resourceManager.getString('editmealeventview','insulin_ratio'))
+					.replace("{previous_bg_level}",resourceManager.getString('editmealeventview','previous_bg_level'))
+					.replace("{correction_factor}",resourceManager.getString('editmealeventview','correction_factor'))
+					.replace("{correction}",resourceManager.getString('editmealeventview','correction'))
+					.replace("{targetbglevel}",resourceManager.getString('editmealeventview','targetbglevel'))
+				);
+
+				function okClicked(event: PopUpEvent):void {
+					if (alertPopUp != null) {
+						PopUpManager.removePopUp(alertPopUp);
+						if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+							alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+						}
+					}
+				}
 			}
 			
 		]]>
@@ -263,7 +295,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:SolidColorStroke color="0x000000" weight="1"/>
 			</s:stroke>
 		</s:Line>
-		<s:Group>
+		<s:Group click="carbAmountGroupClicked(event)">
 			<s:layout >
 				<s:VerticalLayout paddingLeft="10" paddingBottom="5"
 								  gap="4" paddingTop="5">

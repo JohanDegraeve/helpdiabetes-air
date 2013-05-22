@@ -32,8 +32,6 @@ you can also define maximum amount of digits after decimal point, maximum amount
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import mx.core.IFlexDisplayObject;
-			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
 			[Bindable] private var hundreds:String;
@@ -41,6 +39,36 @@ you can also define maximum amount of digits after decimal point, maximum amount
 			[Bindable] private var units:String;
 			[Bindable] private var tenths:String;
 			[Bindable] private var hundredths:String;
+			
+			private var _minimumAmount :Number= 0;
+
+			/**
+			 * minimum amount, default value 0<br>
+			 */public function get minimumAmount():Number
+			{
+				return _minimumAmount;
+			}
+
+			public function set minimumAmount(value:Number):void
+			{
+				_minimumAmount = value;
+			}
+
+			private var _maximumAmount:Number =  Math.pow(10,maxNonDecimalDigits);
+
+			/**
+			 * maximum amount, default value 10 to the power of maxNonDecimalDigits<br>
+			 * if maxNonDecimalDigits gets new value, and if maximumAmount > 10 to the power of this new value, then maximumamount is again set to 10 to the power of this new value
+			 */public function get maximumAmount():Number
+			{
+				return _maximumAmount;
+			}
+
+			public function set maximumAmount(value:Number):void
+			{
+				_maximumAmount = value;
+			}
+
 			
 			private var _maxNonDecimalDigits:int = 3;
 
@@ -65,7 +93,10 @@ you can also define maximum amount of digits after decimal point, maximum amount
 					throw new Error("maxNonDecimalDigits must be <= 3");
 				if (!(parseFloat(_amount) < Math.pow(10,value)))
 					throw new Error("maxNonDecimalDigits and amount do not match up, amount is too big");
+				
 				_maxNonDecimalDigits = value;
+				if (_maximumAmount > Math.pow(10,maxNonDecimalDigits))
+					_maximumAmount =  Math.pow(10,maxNonDecimalDigits);
 			}
 
 			private var _decimalDigits:int = 1;
@@ -99,7 +130,11 @@ you can also define maximum amount of digits after decimal point, maximum amount
 				return (_amount == "" ? "0":_amount);
 			}
 			
-			public function set amount(value:String): void
+			/**
+			 * if amount > maximumAmount then amount will be set to maximumAmount<br>
+			 * if amount < minimumAmount then amount will be set to minimumAmount
+			 * 
+			 */public function set amount(value:String): void
 			{
 				var floatValue:Number = parseFloat(value);
 				if (!(floatValue < Math.pow(10,maxNonDecimalDigits)))
@@ -219,7 +254,12 @@ you can also define maximum amount of digits after decimal point, maximum amount
 				if (type == "hundredths") {
 					hundredths = incrementValue(hundredths);
 				}
-				_amount = ((Math.round((new Number(hundreds)*100 + new Number(tens)*10 + new Number(units) + new Number(tenths) /10 + new Number(hundredths)/100)*(Math.pow(10,decimalDigits))))/(Math.pow(10,decimalDigits))).toString();			
+				var newAmount:Number = ((Math.round((new Number(hundreds)*100 + new Number(tens)*10 + new Number(units) + new Number(tenths) /10 + new Number(hundredths)/100)*(Math.pow(10,decimalDigits))))/(Math.pow(10,decimalDigits)));
+				if (newAmount < minimumAmount || newAmount > maximumAmount) {
+					decrementAmount(type);
+				} else {
+					_amount = newAmount.toString(); 			
+				}
 			}
 			
 			private function decrementAmount(type:String):void {
@@ -238,7 +278,12 @@ you can also define maximum amount of digits after decimal point, maximum amount
 				if (type == "hundredths") {
 					hundredths = decrementValue(hundredths);
 				}
-				_amount = ((Math.round((new Number(hundreds)*100 + new Number(tens)*10 + new Number(units) + new Number(tenths) /10 + new Number(hundredths)/100)*(Math.pow(10,decimalDigits))))/(Math.pow(10,decimalDigits))).toString();			
+				var newAmount:Number = ((Math.round((new Number(hundreds)*100 + new Number(tens)*10 + new Number(units) + new Number(tenths) /10 + new Number(hundredths)/100)*(Math.pow(10,decimalDigits))))/(Math.pow(10,decimalDigits)));
+				if (newAmount < minimumAmount || newAmount > maximumAmount) {
+					incrementAmount(type);
+				} else {
+					_amount = newAmount.toString(); 			
+				}
 			}
 			
 			private function incrementValue(oldValue:String):String {
@@ -255,7 +300,7 @@ you can also define maximum amount of digits after decimal point, maximum amount
 					case 8: return "9";
 					case 9: return "0";
 				}
-				return "hi";
+				return "hi";//this is because compiler requires a return value
 			}
 
 			private function decrementValue(oldValue:String):String {
@@ -272,7 +317,7 @@ you can also define maximum amount of digits after decimal point, maximum amount
 					case 8: return "7";
 					case 9: return "8";
 				}
-				return "hi";
+				return "hi";//this is because compiler requires a return value
 			}
 ]]>
 	</fx:Script>

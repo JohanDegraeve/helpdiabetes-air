@@ -18,14 +18,6 @@
 package myComponents
 {
 	import databaseclasses.MedicinEvent;
-	import databaseclasses.Settings;
-	
-	import flash.display.GradientType;
-	import flash.geom.Matrix;
-	import flash.text.TextLineMetrics;
-	
-	import model.ModelLocator;
-	
 	import mx.graphics.BitmapFillMode;
 	
 	import spark.components.Image;

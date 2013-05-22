@@ -21,8 +21,9 @@ package databaseclasses
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
-	import mx.core.UIComponent;
 	import mx.resources.ResourceManager;
+	
+	import model.ModelLocator;
 	
 	/**
 	 * Each time a new settings is defined, an additional constant should be defined, with default value and the array must be extended.<br>
@@ -30,6 +31,9 @@ package databaseclasses
 	 * It's a singleton, at first creation, all settings will be intialized with default values.<br>
 	 * Each time a new value is stored, the value will be written to the database. <br>
 	 * All settings can be set and get , as string representation.<br>
+	 * 
+	 * Change made 16/04/2013, because i want to add more settings that can be synced, I added possiblity to create settings with id -100 to -1, these settings willb e synced <br>
+	 * When adding a setting that needs to be synced, always go one lower.
 	 */
 	public class Settings
 		
@@ -38,6 +42,11 @@ package databaseclasses
 		[ResourceBundle("editexerciseeventview")]
 		
 		/** EXTEND LIST OF CONSTANTS IN CASE NEW SETTING NEEDS TO BE DEFINED  */
+		
+		/**
+		 * 
+		 */
+		public static const SettingsCorrectionFactor:int = -1;
 		/**
 		 * the meal id where the last fooditem was stored
 		 */ 
@@ -83,9 +92,9 @@ package databaseclasses
 		 */
 		public static const SettingSNACK_UNTIL:int = 10;
 		/**
-		 * correction factor to be used when calculating insulindose
+		 * 
 		 */
-		public static const SettingCORRECTION_FACTOR:int=11
+		public static const SettingNotUsedAnyMore:int=11
 		/**
 		 * id of last bloodglucose event
 		 */
@@ -260,7 +269,7 @@ package databaseclasses
 		 * 0 = first one , 1 = second, ... if > size of array of column names, then all column names are created 
 		 */
 		public static const SettingsNextColumnToAddInFoodTable:int=104;
-				/**
+		/**
 		 * A user may have installed this app on several devices. Only one device will upload the foodtable to google docs.<br>
 		 * This setting indicates if the foodtable has been or is being created by this instance. 
 		 */
@@ -281,11 +290,113 @@ package databaseclasses
 		/**
 		 * day of the month (ie 1..31), where last complete sync was done. -1 means not yet done. 
 		 **/
-		 public static const SettingsDayOfLastCompleteSync:int=109;
+		public static const SettingsDayOfLastCompleteSync:int=109;
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
-			"none",// initially there will be no meal too which the last  fooditem has been added
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",
+			"",//correctiefactor initialized in constructor
+			// mmol/l-00:00>1.5  betekent correctiefactor 1.5 van 00:00 tot 23:59, eerste veld is de eenheid
+			// mg/dl-00:00>1.5-08:00>2.3-20:00>1.5 betekent 1.5 tussen 00:00 en 08:00 en 2.3 tussen 8 en 20 en vanaf 20 1.5
+			"none",// index 100 , corresponds to setting with value 0, initially there will be no meal too which the last  fooditem has been added
 			new Date(0).valueOf().toString(), //midnight January 1, 1970, universal time,
 			"1", //the first meal id to be used
 			"1", //first selected item id to be used
@@ -296,11 +407,13 @@ package databaseclasses
 			"37800000", // January 1, 1970, 10h30 Hr in ms, gmt time,
 			"55800000", // January 1, 1970, 15h30 Hr in ms, gmt time,
 			"61200000", // January 1, 1970, 17 Hr in ms, gmt time,
-			"0", //correction factor
+			"0", //correction factor - not used anymore, this is now in SettingsCorrectionFactor
 			"0", //the first blood glucose event id to be used
-			"999999", // a high value for maximum time difference last bloodglucose event and meal
+			"999999", // a low value for maximum time difference last bloodglucose event and meal
+			//originally the default value was 999999, but that was wrong
+			//so in get Settings, if value is 999999, 0 will be returned
 			"mgperdl", //unit for bloodglucose metering, this value must be known in locale/general.properties
-			"120",
+			"120",//targetbloodglucoselevel
 			"carbs",//possible values are "carbs", "protein", "fat", "kilocalories"
 			"insulin type 1 defined in constructor",
 			"insulin type 2 defined in constructor",
@@ -413,17 +526,18 @@ package databaseclasses
 			//then the settings array will be reset during database opening.
 			//There's already a database if it's not the first startup
 			// in other words, if this is the first startup, then these are the values
-			settings[SettingsInsulinType1] = ResourceManager.getInstance().getString('editmedicineventview','insulintype1');
-			settings[SettingsInsulinType2] = ResourceManager.getInstance().getString('editmedicineventview','insulintype2');
-			settings[SettingsInsulinType3] = ResourceManager.getInstance().getString('editmedicineventview','insulintype3');
-			settings[SettingsInsulinType4] = ResourceManager.getInstance().getString('editmedicineventview','insulintype4');
-			settings[SettingsInsulinType5] = ResourceManager.getInstance().getString('editmedicineventview','insulintype5');
-			settings[SettingsExerciseType1] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype1');
-			settings[SettingsExerciseType2] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype2');
-			settings[SettingsExerciseType3] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype3');
-			settings[SettingsExerciseType4] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype4');
-			settings[SettingsExerciseType5] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype5');
-			settings[SettingsFirstStartUp] = (new Date()).valueOf().toString();
+			settings[100 + SettingsInsulinType1] = ResourceManager.getInstance().getString('editmedicineventview','insulintype1');
+			settings[100 + SettingsInsulinType2] = ResourceManager.getInstance().getString('editmedicineventview','insulintype2');
+			settings[100 + SettingsInsulinType3] = ResourceManager.getInstance().getString('editmedicineventview','insulintype3');
+			settings[100 + SettingsInsulinType4] = ResourceManager.getInstance().getString('editmedicineventview','insulintype4');
+			settings[100 + SettingsInsulinType5] = ResourceManager.getInstance().getString('editmedicineventview','insulintype5');
+			settings[100 + SettingsExerciseType1] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype1');
+			settings[100 + SettingsExerciseType2] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype2');
+			settings[100 + SettingsExerciseType3] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype3');
+			settings[100 + SettingsExerciseType4] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype4');
+			settings[100 + SettingsExerciseType5] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype5');
+			settings[100 + SettingsFirstStartUp] = (new Date()).valueOf().toString();
+			settings[100 + SettingsCorrectionFactor] = ResourceManager.getInstance().getString('general','mgperdl') ; 
 			
 			settingsLastModifiedTimeStamp = new Array(settings.length);
 			for (var i:int = 0;i < settingsLastModifiedTimeStamp.length;i++)
@@ -441,23 +555,29 @@ package databaseclasses
 		 * get the setting specified by the Setting id
 		 */
 		public function getSetting(settingId:int):String {
-			//trace("setting retrieved = " + settingId);
-			return settings[settingId];
+			if (settingId == SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL) {
+				if (settings[100 + settingId] == "999999")
+					return "0";
+			}
+			return settings[100 + settingId];
 		}
 		
 		/**
 		 * get the lastmodifiedtimestamp for the setting specified by the Setting id
 		 */
 		public function getSettingLastModifiedTimeStamp(settingId:int):Number {
-			return settingsLastModifiedTimeStamp[settingId];
+			return settingsLastModifiedTimeStamp[100 + settingId];
 		}
 		
 		/**
 		 * Set the setting specified by the setting id, database will also be updated asynchronously<br>
-		 * If the settingid is the maxtrackingsize, then also lastsynctimestamp will be reset to current date - maxtrackingsize<br>
+		 * <br>
+		 * if SettingsCorrectionFactor is changed, then this function will update the correction factor for all mealevents in thre trackinglist
+		 * <br>
 		 * if lastModifiedTimeStamp == null then current date and time are used
 		 */
 		public function setSetting(settingId:int, newValue:String,lastModifiedTimeStamp:Number = Number.NaN):void {
+			settingId += 100;//100 extra settings added in front of first
 			var dispatcher:EventDispatcher = new EventDispatcher();
 			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailure);
 			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,settingInsertionSuccess);
@@ -468,7 +588,7 @@ package databaseclasses
 			if (isNaN(lastModifiedTimeStamp))
 				lastModifiedTimeStamp = (new Date()).valueOf();
 			settingsLastModifiedTimeStamp[settingId] = lastModifiedTimeStamp; 
-				
+			
 			settings[settingId] = newValue;
 			
 			Database.getInstance().updateSetting(settingId, newValue, lastModifiedTimeStamp, dispatcher);
@@ -483,6 +603,10 @@ package databaseclasses
 			function settingInsertionSuccess(se:Event):void {
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,settingInsertionFailure);
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,settingInsertionSuccess);
+				
+				//update all mealevents
+				//	 NOG AANPASSEN, ENKEL IN DIEN SETTING IS CORRECTIONFACTORSETTING
+				ModelLocator.getInstance().resetCorrectionFactorsInMeals(new Date());
 			}
 		}
 		
@@ -497,8 +621,8 @@ package databaseclasses
 			if (isNaN(lastModifiedTimeStamp))
 				lastModifiedTimeStamp = (new Date()).valueOf();
 			
-			settings[settingId] = newValue;
-			settingsLastModifiedTimeStamp[settingId] = lastModifiedTimeStamp;
+			settings[settingId + 100] = newValue;
+			settingsLastModifiedTimeStamp[settingId + 100] = lastModifiedTimeStamp;
 		}
 		
 		private function getAmountOfSettings():int {

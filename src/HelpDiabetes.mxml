@@ -35,19 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Script>
 		<![CDATA[
 			
-			import databaseclasses.*;
-			import databaseclasses.FoodItem;
 			
 			import model.ModelLocator;
 			
 			import mx.collections.ArrayCollection;
-			import mx.core.UIComponent;
-			import mx.events.IndexChangedEvent;
-			import mx.managers.PopUpManager;
-			
-			import myComponents.Notification;
-			import myComponents.PickerEvent;
-			import myComponents.elementFromListPicker;
 			
 			import spark.events.IndexChangeEvent;
 			

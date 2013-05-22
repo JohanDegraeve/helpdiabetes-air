@@ -17,22 +17,16 @@
  */
 package myComponents
 {	
-	import databaseclasses.Meal;
-	import databaseclasses.MealEvent;
-	
-	import flash.events.Event;
 	import flash.geom.Rectangle;
 	
 	import model.ModelLocator;
 	
 	import mx.collections.IList;
-	import mx.core.ClassFactory;
 	import mx.core.ILayoutElement;
 	
 	import spark.components.DataGroup;
 	import spark.components.supportClasses.GroupBase;
 	import spark.layouts.BasicLayout;
-	import spark.layouts.VerticalLayout;
 	
 	public class TrackingViewLayout extends BasicLayout {
 		
