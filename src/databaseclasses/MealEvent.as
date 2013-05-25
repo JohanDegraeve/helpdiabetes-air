@@ -21,7 +21,6 @@ package databaseclasses
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
-	import mx.messaging.channels.StreamingAMFChannel;
 	
 	import model.ModelLocator;
 	

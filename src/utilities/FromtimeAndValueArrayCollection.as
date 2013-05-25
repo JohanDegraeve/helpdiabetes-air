@@ -269,13 +269,14 @@ package utilities
 		  }
 		 
 		 /**
+		 * the first part is something like 0:0, which is not needed here
 		  * mmol/l-00:00>1.5  betekent correctiefactor 1.5 van 00:00 tot 23:59, eerste veld is de eenheid
 		  * mg/dl-00:00>1.5-08:00>2.3-20:00>1.5 betekent 1.5 tussen 00:00 en 08:00 en 2.3 tussen 8 en 20 en vanaf 20 1.5
 		  */public static function createList(correctionFactorListAsString:String):FromtimeAndValueArrayCollection {
 			  var splittedByDash:Array = correctionFactorListAsString.split("-");
-			  var unit:String = splittedByDash[0];
+			  var unit:String = splittedByDash[1];
 			  var returnValue:FromtimeAndValueArrayCollection = new FromtimeAndValueArrayCollection(null,unit);
-			  for (var ctr:int = 1;ctr < splittedByDash.length;ctr++) {
+			  for (var ctr:int = 2;ctr < splittedByDash.length;ctr++) {
 				  returnValue.addItem( 
 					  new FromtimeAndValue(
 						  splittedByDash[ctr].split(">")[0],
@@ -298,7 +299,9 @@ package utilities
 			 return super.addItemAt(newObject,index);
 		 }
 		 
-		 public function createCorrectionFactorAsString():String {
+		 /**
+		 * creates the correctionfactor list in a string as it's stored in the settings, but with the preceding 0:0
+		  */public function createCorrectionFactorAsString():String {
 			 var returnValue:String = unit;
 			 for (var cntr:int = 0;cntr < length;cntr++) {
 				 returnValue += "-";

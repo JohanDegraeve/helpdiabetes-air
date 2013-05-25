@@ -153,7 +153,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function okClicked(e:MouseEvent = null):void {
 				if (listOfElements.arrayChanged) {
-					Settings.getInstance().setSetting(Settings.SettingsCorrectionFactor,listOfElements.createCorrectionFactorAsString());
+					Settings.getInstance().setSetting(Settings.SettingsCorrectionFactor,"0:0-" + listOfElements.createCorrectionFactorAsString());
 				}
 				navigator.popView();
 			}

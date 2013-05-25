@@ -394,6 +394,11 @@ package databaseclasses
 			"",
 			"",
 			"",//correctiefactor initialized in constructor
+			//values are splitted by -
+			//first values,before the first - is only used for medicin and food curves, not for correction factors
+			//it is something like for example 1:10, meaning curve valid for amounts between 1 and 10
+			//for coreciton factor, we set something like 0:0 as first value
+			//
 			// mmol/l-00:00>1.5  betekent correctiefactor 1.5 van 00:00 tot 23:59, eerste veld is de eenheid
 			// mg/dl-00:00>1.5-08:00>2.3-20:00>1.5 betekent 1.5 tussen 00:00 en 08:00 en 2.3 tussen 8 en 20 en vanaf 20 1.5
 			"none",// index 100 , corresponds to setting with value 0, initially there will be no meal too which the last  fooditem has been added
@@ -537,7 +542,7 @@ package databaseclasses
 			settings[100 + SettingsExerciseType4] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype4');
 			settings[100 + SettingsExerciseType5] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype5');
 			settings[100 + SettingsFirstStartUp] = (new Date()).valueOf().toString();
-			settings[100 + SettingsCorrectionFactor] = ResourceManager.getInstance().getString('general','mgperdl') ; 
+			settings[100 + SettingsCorrectionFactor] = "0:0-" /* first values not used in cf */ + ResourceManager.getInstance().getString('general','mgperdl') ; 
 			
 			settingsLastModifiedTimeStamp = new Array(settings.length);
 			for (var i:int = 0;i < settingsLastModifiedTimeStamp.length;i++)
