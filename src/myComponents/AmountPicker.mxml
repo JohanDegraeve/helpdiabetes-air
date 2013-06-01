@@ -67,6 +67,8 @@ you can also define maximum amount of digits after decimal point, maximum amount
 			public function set maximumAmount(value:Number):void
 			{
 				_maximumAmount = value;
+				if (_maximumAmount > Math.pow(10,maxNonDecimalDigits))
+					_maximumAmount =  Math.pow(10,maxNonDecimalDigits);
 			}
 
 			

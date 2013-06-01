@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2013  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+
+-->
+<!--
+for example medicins will have a number of (4 in total) fromtimeandvalue lists
+Each such list is valid for a certain amount, eg list 1 for 0 to 3 units of insulin, list 2 for 4 to 8 units of insulin, ...list 4 for more than 20 units
+This view is to edit the overview, ie the units for which the list is valid, and a button to navigate to FromtimeAndVallueListView where an individual list can be edited 
+-->
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		creationComplete="view1_creationCompleteHandler(event)"
+		xmlns:s="library://ns.adobe.com/flex/spark" title="FromtimeAndValueOverviewView">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Metadata>
+		[ResourceBundle("fromtimeandvalueoverviewview")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.messaging.channels.AMFChannel;
+			import mx.resources.ResourceManager;
+			
+			import spark.components.View;
+			
+			import databaseclasses.Settings;
+			
+			import myComponents.AmountPicker;
+			import myComponents.PickerEvent;
+			
+			import utilities.FromtimeAndValue;
+			
+			[Bindable]
+			private var back_label:String;
+			private var thisView:View;
+			[Bindable]
+			/**
+			 * topText shown on top of the view.
+			 */private var topText:String;
+			
+
+			[Bindable]
+			private var x_value:String;
+			[Bindable]
+			private var y_value:String;
+			[Bindable]
+			private var z_value:String;
+			[Bindable]
+			private var active:Boolean = false;
+			
+			[Bindable]
+			private var listenabled:String;
+			[Bindable]
+			private var notActive:String;
+			[Bindable]
+			private var to:String;
+			[Bindable]
+			private var higherthan:String;
+			
+			private var amountPicker:AmountPicker;
+
+			protected function view1_creationCompleteHandler(event:FlexEvent):void
+			{
+				thisView = this;
+				
+				back_label = resourceManager.getString('general','back');
+				listenabled = resourceManager.getString('fromtimeandvalueoverviewview','enabled');
+				notActive = resourceManager.getString('fromtimeandvalueoverviewview','not_enabled');
+				to = resourceManager.getString('fromtimeandvalueoverviewview','to');
+				higherthan = resourceManager.getString('fromtimeandvalueoverviewview','higherthan');
+				
+				if (data.title)
+					title = data.title;
+				if (data.topText)
+					topText = data.topText;
+				//expecting 4 setting id's named settingid1, settingid2, settingid3 and settingid4
+				if (!data.settingid1)
+					throw new Error("expecting data.settingid1");
+				if (!data.settingid2)
+					throw new Error("expecting data.settingid2");
+				if (!data.settingid3)
+					throw new Error("expecting data.settingid3");
+				if (!data.settingid4)
+					throw new Error("expecting data.settingid4");
+				if (!data.settingidActive)
+					throw new Error("expecting data.settingidActive");
+				
+				active = Settings.getInstance().getSetting(new Number (data.settingidActive)) == "true" ? true:false;
+				x_value = ((Settings.getInstance().getSetting(new Number(data.settingid1)) as String).split("-")[0] as String).split(":")[1];
+				y_value = ((Settings.getInstance().getSetting(new Number(data.settingid2)) as String).split("-")[0] as String).split(":")[1];
+				z_value = ((Settings.getInstance().getSetting(new Number(data.settingid3)) as String).split("-")[0] as String).split(":")[1];
+			}
+			
+			protected function back_clickHandler(event:MouseEvent):void
+			{
+					navigator.popView();
+			}
+			
+			private function rangeButton_clickHandler(buttonClickEvent:MouseEvent):void
+			{
+				//variables used in de helperFunction
+				var settingIdToUpdate:Number;//if the setting is not the first one then there's actually two to update, the preceding one and the one indicated by settingidtoupdate
+				var startOfRange:String;//for settingidtoupdate
+				var endOfRange:String;//for settingidtoupdate
+				var secondPartOfSetting:String;
+
+				amountPicker = new AmountPicker();
+				amountPicker.amount = (buttonClickEvent.target as Button).label;
+				if ((buttonClickEvent.target as Button) == xRangeButton) {
+					amountPicker.minimumAmount = 0;
+					amountPicker.maximumAmount = new Number(y_value);
+				} else if ((buttonClickEvent.target as Button) == yRangeButton) {
+					amountPicker.minimumAmount = new Number(x_value);
+					amountPicker.maximumAmount = new Number(z_value);
+				} else if ((buttonClickEvent.target as Button) == zRangeButton) {
+					amountPicker.minimumAmount = new Number(y_value);
+					amountPicker.maximumAmount = 9999999;
+				} 
+				amountPicker.decimalDigits = 0;
+
+				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
+				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
+				amountPicker.labelText1 = resourceManager.getString('fromtimeandvalueoverviewview','amount');
+				PopUpManager.addPopUp(amountPicker, this, true);
+				PopUpManager.centerPopUp(amountPicker);
+				
+				function onAmountCancel(event: PickerEvent): void
+				{
+					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
+					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
+				}
+				
+				function onAmountSet(event: PickerEvent): void
+				{
+					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
+					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
+
+					(buttonClickEvent.target as Button).label = (event.newValue as Number).toString();
+
+					if ((buttonClickEvent.target as Button) == xRangeButton) {
+						settingIdToUpdate = new Number(data.settingid1);
+
+						startOfRange = "0";
+						helperFunction(event);
+					} else if ((buttonClickEvent.target as Button) == yRangeButton) {
+						settingIdToUpdate = new Number(data.settingid2);
+						startOfRange = Settings.getInstance().getSetting(settingIdToUpdate - 1).split("-",2)[0].split(":")[1];
+						helperFunction(event);
+					} else if ((buttonClickEvent.target as Button) == zRangeButton) {
+						settingIdToUpdate = new Number(data.settingid3);
+						startOfRange = Settings.getInstance().getSetting(settingIdToUpdate - 1).split("-",2)[0].split(":")[1];
+						helperFunction(event);
+					} 
+				}
+				
+				function helperFunction(event:PickerEvent):void {
+					endOfRange = (event.newValue as Number).toString();
+					secondPartOfSetting = Settings.getInstance().getSetting(settingIdToUpdate).split("-",2)[1];
+					if(secondPartOfSetting == null || secondPartOfSetting == "")
+						secondPartOfSetting = "";
+					else 
+						secondPartOfSetting = "-" + secondPartOfSetting;
+					Settings.getInstance().setSetting(settingIdToUpdate,startOfRange + ":" + endOfRange + secondPartOfSetting);
+					
+					startOfRange = endOfRange;
+					endOfRange = Settings.getInstance().getSetting(settingIdToUpdate + 1).split("-",2)[0].split(":")[1];
+					secondPartOfSetting = Settings.getInstance().getSetting(settingIdToUpdate + 1).split("-",2)[1];
+					if(secondPartOfSetting == null || secondPartOfSetting == "")
+						secondPartOfSetting = "";
+					else 
+						secondPartOfSetting = "-" + secondPartOfSetting;
+					Settings.getInstance().setSetting(settingIdToUpdate + 1,startOfRange + ":" + endOfRange + secondPartOfSetting);
+				}
+			}
+			
+			private function graphButton_clickHandler(buttonClickEvent:MouseEvent):void
+			{
+				var dataToSend:Object = new Object();
+				dataToSend.title = "let's put something else here";
+				dataToSend.topText = "and here we need to put some toptext";
+				if ((buttonClickEvent.target as Button) == zerotoxGraphButton) {
+					dataToSend.settingid = data.settingid1;
+				} else if ((buttonClickEvent.target as Button) == xToyRangeButton) {
+					dataToSend.settingid = data.settingid2;
+				} else if ((buttonClickEvent.target as Button) == yTozRangeButton) {
+					dataToSend.settingid = data.settingid3;
+				} else if ((buttonClickEvent.target as Button) == zTo9999RangeButton) {
+					dataToSend.settingid = data.settingid4;
+				} 
+
+				navigator.pushView(FromtimeAndValueListView,dataToSend);
+			}
+			
+			protected function onoroffCheckBox_clickHandler(event:MouseEvent):void
+			{
+				Settings.getInstance().setSetting(new Number(data.settingidActive),onoroffCheckBox.selected ? "true":"false");
+			}
+			
+		]]>
+	</fx:Script>
+	<s:navigationContent>
+		<s:Button label="{back_label}" click="back_clickHandler(event)" height="48"/>
+	</s:navigationContent>
+	<s:Group y="0" x="0" width="100%" height = "100%" left="5" right="5" top="0" bottom="0">
+		<s:layout>
+			<s:VerticalLayout>
+			</s:VerticalLayout>
+		</s:layout>
+		<s:Label y="0" x="0" width="100%" height="40" text="@{topText}" textAlign="center" verticalAlign="middle"/>
+		<s:Line width="100%" height="1">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:CheckBox id="onoroffCheckBox" height="47" width="100%" label="{active ? listenabled:notActive}" selected="@{active}" click="onoroffCheckBox_clickHandler(event)"/>
+		</s:Group>
+		<s:Line width="100%" height="1">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:Label  height="48"  width="100" text="{'0 ' + to + ' '}" verticalAlign="middle"/>
+			<s:Button id="xRangeButton" height="47" width="70" label="@{x_value}" click="rangeButton_clickHandler(event)"/>
+			<s:Button id="zerotoxGraphButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
+		</s:Group>
+		<s:Line width="100%" height="1">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:Label  height="48"  width="100" text="{x_value + ' ' + to + ' '}" verticalAlign="middle"/>
+			<s:Button id="yRangeButton" height="47" width="70" label="@{y_value}" click="rangeButton_clickHandler(event)"/>
+			<s:Button id="xToyRangeButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
+		</s:Group>
+		<s:Line width="100%" height="1">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
+		<s:Group  y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:Label  height="48"  width="100" text="{y_value + ' ' + to + ' '}" verticalAlign="middle"/>
+			<s:Button id="zRangeButton" height="47" width="70" label="@{z_value}" click="rangeButton_clickHandler(event)"/>
+			<s:Button id="yTozRangeButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
+		</s:Group>
+		<s:Line width="100%" height="1">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:Label  height="48"  width="200" text="{higherthan + ' ' + z_value}" verticalAlign="middle"/>
+			<s:Button id="zTo9999RangeButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
+		</s:Group>
+	</s:Group>
+</s:View>

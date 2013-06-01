@@ -41,10 +41,61 @@ package databaseclasses
 		[ResourceBundle("editmedicineventview")]
 		[ResourceBundle("editexerciseeventview")]
 		
-		/** EXTEND LIST OF CONSTANTS IN CASE NEW SETTING NEEDS TO BE DEFINED  */
+		/** default values for active insulin on board, per range **/
+		public static const Medicin1_range1_AOBChart_FactoryValue:String= "0:15-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin1_range2_AOBChart_FactoryValue:String= "15:25-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin1_range3_AOBChart_FactoryValue:String= "25:35-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin1_range4_AOBChart_FactoryValue:String= "35:9999-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin2_range1_AOBChart_FactoryValue:String= "0:15-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin2_range2_AOBChart_FactoryValue:String= "15:25-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin2_range3_AOBChart_FactoryValue:String= "25:35-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin2_range4_AOBChart_FactoryValue:String= "35:9999-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin3_range1_AOBChart_FactoryValue:String= "0:15-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin3_range2_AOBChart_FactoryValue:String= "15:25-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin3_range3_AOBChart_FactoryValue:String= "25:35-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin3_range4_AOBChart_FactoryValue:String= "35:9999-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin4_range1_AOBChart_FactoryValue:String= "0:15-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin4_range2_AOBChart_FactoryValue:String= "15:25-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin4_range3_AOBChart_FactoryValue:String= "25:35-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin4_range4_AOBChart_FactoryValue:String= "35:9999-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin5_range1_AOBChart_FactoryValue:String= "0:15-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin5_range2_AOBChart_FactoryValue:String= "15:25-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin5_range3_AOBChart_FactoryValue:String= "25:35-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin5_range4_AOBChart_FactoryValue:String= "35:9999-%-00:00>100-01:00>60-02:00>50";
+
 		
+		/** EXTEND LIST OF CONSTANTS IN CASE NEW SETTING NEEDS TO BE DEFINED  */
+	
+		/** is medicin aob calculation active or not ? **/
+		public static const SettingsMedicin1_AOBActive:int = -26;
+		public static const SettingsMedicin2_AOBActive:int = -25;
+		public static const SettingsMedicin3_AOBActive:int = -24;
+		public static const SettingsMedicin4_AOBActive:int = -23;
+		public static const SettingsMedicin5_AOBActive:int = -22;
+
+		/** charts for medicin active insulin on board, per range **/
+		public static const SettingsMedicin1_range1_AOBChart:int = -21;
+		public static const SettingsMedicin1_range2_AOBChart:int = -20;
+		public static const SettingsMedicin1_range3_AOBChart:int = -19;
+		public static const SettingsMedicin1_range4_AOBChart:int = -18;
+		public static const SettingsMedicin2_range1_AOBChart:int = -17;
+		public static const SettingsMedicin2_range2_AOBChart:int = -16;
+		public static const SettingsMedicin2_range3_AOBChart:int = -15;
+		public static const SettingsMedicin2_range4_AOBChart:int = -14;
+		public static const SettingsMedicin3_range1_AOBChart:int = -13;
+		public static const SettingsMedicin3_range2_AOBChart:int = -12;
+		public static const SettingsMedicin3_range3_AOBChart:int = -11;
+		public static const SettingsMedicin3_range4_AOBChart:int = -10;
+		public static const SettingsMedicin4_range1_AOBChart:int = -9;
+		public static const SettingsMedicin4_range2_AOBChart:int = -8;
+		public static const SettingsMedicin4_range3_AOBChart:int = -7;
+		public static const SettingsMedicin4_range4_AOBChart:int = -6;
+		public static const SettingsMedicin5_range1_AOBChart:int = -5;
+		public static const SettingsMedicin5_range2_AOBChart:int = -4;
+		public static const SettingsMedicin5_range3_AOBChart:int = -3;
+		public static const SettingsMedicin5_range4_AOBChart:int = -2;
 		/**
-		 * 
+		 * correction factor string
 		 */
 		public static const SettingsCorrectionFactor:int = -1;
 		/**
@@ -368,36 +419,38 @@ package databaseclasses
 			"",
 			"",
 			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
+			"false",//medicin 1 aob active or not
+			"false",//medicin 2 aob active or not
+			"false",//medicin 3 aob active or not
+			"false",//medicin 4 aob active or not
+			"false",//medicin 5 aob active or not
+			Medicin1_range1_AOBChart_FactoryValue,//		public static const SettingsMedicin1_range1_AOBChart:int = -21;
+			Medicin1_range2_AOBChart_FactoryValue,//		public static const SettingsMedicin1_range2_AOBChart:int = -20;
+			Medicin1_range3_AOBChart_FactoryValue,//		public static const SettingsMedicin1_range3_AOBChart:int = -19;
+			Medicin1_range4_AOBChart_FactoryValue,//		public static const SettingsMedicin1_range4_AOBChart:int = -18;
+			Medicin2_range1_AOBChart_FactoryValue,//		public static const SettingsMedicin2_range1_AOBChart:int = -17;
+			Medicin2_range2_AOBChart_FactoryValue,//		public static const SettingsMedicin2_range2_AOBChart:int = -16;
+			Medicin2_range3_AOBChart_FactoryValue,//		public static const SettingsMedicin2_range3_AOBChart:int = -15;
+			Medicin2_range4_AOBChart_FactoryValue,//		public static const SettingsMedicin2_range4_AOBChart:int = -14;
+			Medicin3_range1_AOBChart_FactoryValue,//		public static const SettingsMedicin3_range1_AOBChart:int = -13;
+			Medicin3_range2_AOBChart_FactoryValue,//		public static const SettingsMedicin3_range2_AOBChart:int = -12;
+			Medicin3_range3_AOBChart_FactoryValue,//		public static const SettingsMedicin3_range3_AOBChart:int = -11;
+			Medicin3_range4_AOBChart_FactoryValue,//		public static const SettingsMedicin3_range4_AOBChart:int = -10;
+			Medicin4_range1_AOBChart_FactoryValue,//		public static const SettingsMedicin4_range1_AOBChart:int = -9;
+			Medicin4_range2_AOBChart_FactoryValue,//		public static const SettingsMedicin4_range2_AOBChart:int = -8;
+			Medicin4_range3_AOBChart_FactoryValue,//		public static const SettingsMedicin4_range3_AOBChart:int = -7;
+			Medicin4_range4_AOBChart_FactoryValue,//		public static const SettingsMedicin4_range4_AOBChart:int = -6;
+			Medicin5_range1_AOBChart_FactoryValue,//		public static const SettingsMedicin5_range1_AOBChart:int = -5;
+			Medicin5_range2_AOBChart_FactoryValue,//		public static const SettingsMedicin5_range2_AOBChart:int = -4;
+			Medicin5_range3_AOBChart_FactoryValue,//		public static const SettingsMedicin5_range3_AOBChart:int = -3;
+			Medicin5_range4_AOBChart_FactoryValue,//		public static const SettingsMedicin5_range4_AOBChart:int = -2;
 			"",//correctiefactor initialized in constructor
 			//values are splitted by -
 			//first values,before the first - is only used for medicin and food curves, not for correction factors
 			//it is something like for example 1:10, meaning curve valid for amounts between 1 and 10
 			//for coreciton factor, we set something like 0:0 as first value
+			//the first value in the first range should always be 0, the second value in the last range should be 9999, actually first
+			//actually first value of one setting should be equal to second value of previous setting
 			//
 			// mmol/l-00:00>1.5  betekent correctiefactor 1.5 van 00:00 tot 23:59, eerste veld is de eenheid
 			// mg/dl-00:00>1.5-08:00>2.3-20:00>1.5 betekent 1.5 tussen 00:00 en 08:00 en 2.3 tussen 8 en 20 en vanaf 20 1.5

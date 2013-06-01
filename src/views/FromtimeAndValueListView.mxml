@@ -86,11 +86,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (data.title)
 					title = data.title;
 				if (!listOfElements)
-					//if listOfElements is not null, then it means listOfElements has already been assigned in addhandler, so no need to check again on the data.setting value
+					//if listOfElements is not null, then it means listOfElements has already been assigned in addhandler, so no need to check again on the data.settingid value
 					//this would only reset the list to the initial value, as it still exists in the settings
-					if (data.setting) {
-						//expecting the settings string that contains the list to be edit
-						listOfElements =  FromtimeAndValueArrayCollection.createList(data.setting);
+					if (data.settingid) {
+						//expecting the settingid that contains the list to be edit
+						listOfElements =  FromtimeAndValueArrayCollection.createList(
+							Settings.getInstance().getSetting(new Number(data.settingid)));
 						listOfElements.setArrayChangedToFalse();
 					}
 				if (data.topText)
@@ -153,7 +154,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function okClicked(e:MouseEvent = null):void {
 				if (listOfElements.arrayChanged) {
-					Settings.getInstance().setSetting(Settings.SettingsCorrectionFactor,"0:0-" + listOfElements.createCorrectionFactorAsString());
+					var rangeStringArray:Array= 
+						(Settings.getInstance().getSetting(data.settingid)).split('-');
+					var rangeString:String = "0:0-";
+					if (rangeStringArray.length > 0)
+						rangeString = rangeStringArray[0] + "-";
+					Settings.getInstance().setSetting(data.settingid,rangeString + listOfElements.createCorrectionFactorAsString());
 				}
 				navigator.popView();
 			}

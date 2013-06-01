@@ -88,13 +88,19 @@ package utilities
 		 
 		 /**
 		  * See comments on class itself to get more detals<br>
-		  * if newUnit = %, means array will be percentage based
+		  * if newUnit = %, means array will be percentage based<br>
+		  * if newUnit = "", then default value % will be used
 		  * 
 		  */public function FromtimeAndValueArrayCollection(source:Array=null,newUnit:String = "")
 		  {
 			  super(source);
 			  
 			  _unit = newUnit;
+			  if (!_unit)
+				  _unit = "%";
+			  if (_unit == "")
+				  _unit = "%";
+			  
 			  if (_unit == "%")
 				  _percentageBased = true;
 			  
@@ -106,7 +112,7 @@ package utilities
 				  }
 			  }
 			  if (cntr == length) {
-				  super.addItem(new FromtimeAndValue("00:00",percentageBased ? 100: 0,unit,percentageBased ? false:true,false));
+				  super.addItem(new FromtimeAndValue("00:00", percentageBased ? 100:0, unit, percentageBased ? false:true, false));
 			  }
 			  
 			  if (percentageBased) {
@@ -274,7 +280,13 @@ package utilities
 		  * mg/dl-00:00>1.5-08:00>2.3-20:00>1.5 betekent 1.5 tussen 00:00 en 08:00 en 2.3 tussen 8 en 20 en vanaf 20 1.5
 		  */public static function createList(correctionFactorListAsString:String):FromtimeAndValueArrayCollection {
 			  var splittedByDash:Array = correctionFactorListAsString.split("-");
-			  var unit:String = splittedByDash[1];
+			  var unit:String;
+			  
+			  if (splittedByDash.length > 1)
+			    unit = splittedByDash[1];
+			  else
+				  unit = "";//default value will be assigned in constructor FromtimeAndValueArrayCollection
+			  
 			  var returnValue:FromtimeAndValueArrayCollection = new FromtimeAndValueArrayCollection(null,unit);
 			  for (var ctr:int = 2;ctr < splittedByDash.length;ctr++) {
 				  returnValue.addItem( 

@@ -26,17 +26,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		[ResourceBundle("settingsmedicinview")]
 		[ResourceBundle("analytics")]
 	</fx:Metadata>
-
+	
 	<fx:Script>
 		<![CDATA[
-			import databaseclasses.Settings;
-			
 			import mx.events.FlexEvent;
+			
+			import spark.events.TextOperationEvent;
+			
+			import databaseclasses.Settings;
 			
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
-			
-			import spark.events.TextOperationEvent;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
@@ -48,9 +48,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable] private var medicinText5:String = "";
 			[Bindable]
 			private var back_label:String;
-
+			
 			private var helpCallOut:HelpCallOut;
-
+			
 			private function onBackKeyPressed(event:Event):void {
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType1,medicinText1);
 				Settings.getInstance().setSetting(Settings.SettingsInsulinType2,medicinText2);
@@ -60,7 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			protected function view1_initializeHandler(event:FlexEvent):void
-
+				
 			{
 				back_label = resourceManager.getString('general','back');
 				medicinText1 = Settings.getInstance().getSetting(Settings.SettingsInsulinType1);
@@ -79,7 +79,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			protected function type2_changeHandler(event:TextOperationEvent):void
-
+				
 			{
 				if (medicinText2 != Settings.getInstance().getSetting(Settings.SettingsInsulinType2)) {
 					Settings.getInstance().setSetting(Settings.SettingsInsulinType2,medicinText2);
@@ -125,6 +125,72 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function helptext1Removed(event:Event):void  {
 				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				var dataToSend:Object = new Object();
+				dataToSend.title = "Medicin profile";
+				dataToSend.topText = medicinText1;
+				dataToSend.settingid1 = Settings.SettingsMedicin1_range1_AOBChart;
+				dataToSend.settingid2 = Settings.SettingsMedicin1_range2_AOBChart;
+				dataToSend.settingid3 = Settings.SettingsMedicin1_range3_AOBChart;
+				dataToSend.settingid4 = Settings.SettingsMedicin1_range4_AOBChart;
+				dataToSend.settingidActive = Settings.SettingsMedicin1_AOBActive;
+				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
+			}
+			
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				var dataToSend:Object = new Object();
+				dataToSend.title = "Medicin profile";
+				dataToSend.topText = medicinText2;
+				dataToSend.settingid1 = Settings.SettingsMedicin2_range1_AOBChart;
+				dataToSend.settingid2 = Settings.SettingsMedicin2_range2_AOBChart;
+				dataToSend.settingid3 = Settings.SettingsMedicin2_range3_AOBChart;
+				dataToSend.settingid4 = Settings.SettingsMedicin2_range4_AOBChart;
+				dataToSend.settingidActive = Settings.SettingsMedicin2_AOBActive;
+				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
+			}
+			
+			protected function button3_clickHandler(event:MouseEvent):void
+			{
+				var dataToSend:Object = new Object();
+				dataToSend.title = "Medicin profile";
+				dataToSend.topText = medicinText3;
+				dataToSend.settingid1 = Settings.SettingsMedicin3_range1_AOBChart;
+				dataToSend.settingid2 = Settings.SettingsMedicin3_range2_AOBChart;
+				dataToSend.settingid3 = Settings.SettingsMedicin3_range3_AOBChart;
+				dataToSend.settingid4 = Settings.SettingsMedicin3_range4_AOBChart;
+				dataToSend.settingidActive = Settings.SettingsMedicin3_AOBActive;
+				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
+			}
+			
+			protected function button4_clickHandler(event:MouseEvent):void
+			{
+				var dataToSend:Object = new Object();
+				dataToSend.title = "Medicin profile";
+				dataToSend.topText = medicinText4;
+				dataToSend.settingid1 = Settings.SettingsMedicin4_range1_AOBChart;
+				dataToSend.settingid2 = Settings.SettingsMedicin4_range2_AOBChart;
+				dataToSend.settingid3 = Settings.SettingsMedicin4_range3_AOBChart;
+				dataToSend.settingid4 = Settings.SettingsMedicin4_range4_AOBChart;
+				dataToSend.settingidActive = Settings.SettingsMedicin4_AOBActive;
+				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
+			}
+			
+			protected function button5_clickHandler(event:MouseEvent):void
+			{
+				var dataToSend:Object = new Object();
+				dataToSend.title = "Medicin profile";
+				dataToSend.topText = medicinText5;
+				dataToSend.settingid1 = Settings.SettingsMedicin5_range1_AOBChart;
+				dataToSend.settingid2 = Settings.SettingsMedicin5_range2_AOBChart;
+				dataToSend.settingid3 = Settings.SettingsMedicin5_range3_AOBChart;
+				dataToSend.settingid4 = Settings.SettingsMedicin5_range4_AOBChart;
+				dataToSend.settingidActive = Settings.SettingsMedicin5_AOBActive;
+				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -138,11 +204,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type1" text="@{medicinText1}" editable="true" borderVisible="false" textAlign="left" change="type1_changeHandler(event)" />
-			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type2" text="@{medicinText2}" editable="true" borderVisible="false" textAlign="left" change="type2_changeHandler(event)"/>
-			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type3" text="@{medicinText3}" editable="true" borderVisible="false" textAlign="left" change="type3_changeHandler(event)"/>
-			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type4" text="@{medicinText4}" editable="true" borderVisible="false" textAlign="left" change="type4_changeHandler(event)"/>
-			<s:TextInput contentBackgroundColor="0xDCDCDC" id="type5" text="@{medicinText5}" editable="true" borderVisible="false" textAlign="left" change="type5_changeHandler(event)"/>
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type1" text="@{medicinText1}" editable="true" borderVisible="false" textAlign="left" change="type1_changeHandler(event)" />
+		 	<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button1_clickHandler(event)"/>
+		</s:Group>
+		
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type2" text="@{medicinText2}" editable="true" borderVisible="false" textAlign="left" change="type2_changeHandler(event)"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button2_clickHandler(event)"/>
+		</s:Group>
+		
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:TextInput width="80%" contentBackgroundColor="0xDCDCDC" id="type3" text="@{medicinText3}" editable="true" borderVisible="false" textAlign="left" change="type3_changeHandler(event)"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button3_clickHandler(event)"/>
+		</s:Group>
+		
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type4" text="@{medicinText4}" editable="true" borderVisible="false" textAlign="left" change="type4_changeHandler(event)"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button4_clickHandler(event)"/>
+		</s:Group>
+		
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>			
+			<s:TextInput width="80%" contentBackgroundColor="0xDCDCDC" id="type5" text="@{medicinText5}" editable="true" borderVisible="false" textAlign="left" change="type5_changeHandler(event)"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button5_clickHandler(event)"/>
+		</s:Group>
 	</s:Group>
-
+	
 </s:View>
