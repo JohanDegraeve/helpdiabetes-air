@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("settingsview","bolussettings"),
-				ResourceManager.getInstance().getString("settingsview","meal_times"),
+				//ResourceManager.getInstance().getString("settingsview","meal_times"), - moved to SettingsAllBolusSettingsView
 				ResourceManager.getInstance().getString("settingsview","bloodglucoseunit"),
 				ResourceManager.getInstance().getString("settingsview","medicin"),
 				ResourceManager.getInstance().getString("settingsview","exercise"),
@@ -120,22 +120,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						navigator.pushView(SettingsAllBolusSettings);
 						break;
 					case 1:
-						navigator.pushView(SettingsMealTimesView);
-						break;
-					case 2:
 						settingsList.selectedIndex = -1;
 						selectBloodGlucoseUnit();
 						break;
-					case 3:
+					case 2:
 						navigator.pushView(SettingsMedicinView);
 						break;
-					case 4:
+					case 3:
 						navigator.pushView(SettingsExerciseView);
 						break;
-					case 5:
+					case 4:
 						navigator.pushView(SettingsDatabaseView);
 						break;
-					case 6:
+					case 5:
 						elementPicker = new elementFromListPicker();
 						elementPicker.elements = new ArrayCollection([
 							resourceManager.getString('general','english'),
@@ -146,7 +143,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						PopUpManager.addPopUp(elementPicker,UIComponent(this.parentApplication),true);
 						PopUpManager.centerPopUp(elementPicker);
 						break;
-					case 7:
+					case 6:
 						MyGATracker.getInstance().trackPageview( "SetingsView-resetHelpText" );
 						for (var i:int = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;i <= Settings.SettingsHelpText100;i++) {
 							Settings.getInstance().setSetting(i,"true");
@@ -157,7 +154,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						resourceManager.getString('settingsview','resethelptextdone') ;
 						alertPopUp.show(this,textToShow);
 						break;
-					case 8:
+					case 7:
 						if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) == "" 
 							|| 
 							(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "false"
@@ -167,7 +164,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						else 
 							navigator.pushView(SynchronizeView2);
 						break;
-					case 9:
+					case 8:
 						MyGATracker.getInstance().trackPageview( "SetingsView-infoAndHelpShown" );
 						
 						alertPopUp = new AlertPopUp();

@@ -30,8 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import spark.events.IndexChangeEvent;
 			
-			import databaseclasses.Settings;
-						
 			[Bindable]
 			private var back_label:String;
 
@@ -39,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("settingsallbolussettingsview","bolus_calculation"),
+				ResourceManager.getInstance().getString("settingsview","meal_times"),
 				ResourceManager.getInstance().getString("settingsallbolussettingsview","correction_factor_settings")
 			]);	
 			
@@ -63,6 +62,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						navigator.pushView(SettingsBolusCalculationView);
 						break;
 					case 1:
+						navigator.pushView(SettingsMealTimesView);
+						break;
+					case 2:
 						navigator.pushView(SettingsAllCorrectionFactorSettingsView);
 						break;
 				}
