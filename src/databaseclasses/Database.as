@@ -45,9 +45,6 @@ package databaseclasses
 	 */ 
 	public final class Database extends EventDispatcher
 	{
-		import mx.core.FlexGlobals;
-		import mx.resources.ResourceBundle;
-		
 		[ResourceBundle("general")]
 		
 		private static var instance:Database = new Database();
@@ -63,8 +60,8 @@ package databaseclasses
 		private  static var dbFile:File  ;
 		private var xmlFileName:String;
 		
-		private const DATABASE_VERSION_1 = "version1";
-		private const DATABASE_VERSION_2 = "version2";
+		private const DATABASE_VERSION_1:String = "version1";
+		private const DATABASE_VERSION_2:String = "version2";
 		
 		private const CREATE_TABLE_VERSIONINFO:String = "CREATE TABLE IF NOT EXISTS versioninfo (info TEXT NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS fooditems (itemid INTEGER PRIMARY KEY AUTOINCREMENT, " +

@@ -30,17 +30,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<fx:Script>
 		<![CDATA[
-			import databaseclasses.Database;
-			
 			import mx.collections.ArrayList;
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			
-			import myComponents.AlertPopUp;
-			
-			import spark.components.TabbedViewNavigator;
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
+			
+			import myComponents.AlertPopUp;
 			
 			import utilities.Synchronize;
 			
@@ -60,10 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var _selectedWorkSheetIndex:int;
 
 			private function onInitialize():void {
-				/*if (popToFirstViewNecessary) {
-					navigator.popToFirstView();
-					popToFirstViewNecessary = false;
-				}*/
+				//Synchronize.getInstance().addEventListener(Synchronize.SYNCHRONIZE_ERROR_OCCURRED,onSynchronizeErrorOccurred);
 				
 				if (downloadOptions == null) {
 					downloadOptions = new ArrayList();
@@ -76,6 +70,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				Synchronize.getInstance().addEventListener(Synchronize.SPREADSHEET_LIST_RETRIEVED,onSpreadSheetListRetrieved);
 				Synchronize.getInstance().googleExcelFindAllSpreadSheets();			
 				spreadSheetList.addEventListener(Event.CHANGE,selectedSpreadSheet);
+			}
+	
+			private function onSynchronizeErrorOccurred(event:Event):void {
+				alertPopUp = new AlertPopUp();
+				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+				alertPopUp.show(this,Synchronize.getInstance().synchronize_debugString);
+			}
+
+			private function okClicked(event: PopUpEvent):void {
+				if (alertPopUp != null) {
+					PopUpManager.removePopUp(alertPopUp);
+					if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+						alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+					}
+				}
 			}
 			
 			private function onSpreadSheetListRetrieved(event:Event):void {

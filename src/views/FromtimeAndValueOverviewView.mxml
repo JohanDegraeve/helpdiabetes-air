@@ -34,8 +34,6 @@ This view is to edit the overview, ie the units for which the list is valid, and
 		<![CDATA[
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
-			import mx.messaging.channels.AMFChannel;
-			import mx.resources.ResourceManager;
 			
 			import spark.components.View;
 			
@@ -43,8 +41,6 @@ This view is to edit the overview, ie the units for which the list is valid, and
 			
 			import myComponents.AmountPicker;
 			import myComponents.PickerEvent;
-			
-			import utilities.FromtimeAndValue;
 			
 			[Bindable]
 			private var back_label:String;

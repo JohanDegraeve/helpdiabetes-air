@@ -61,13 +61,14 @@ the home screen
 			import myComponents.elementFromListPicker;
 			
 			import utilities.ExcelSorting;
+			import utilities.FromtimeAndValue;
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
 			private static var excelSorting:ExcelSorting;
 			
 			private var notificationPopUp:Notification;
-			
+			private var alertPopUp:AlertPopUp;
 			private var elementPicker:elementFromListPicker;
 			
 			private var timer:Timer;
@@ -97,6 +98,8 @@ the home screen
 			
 			private function onCreationComplete():void {
 				MyGATracker.getInstance(this);//just to make sure mygatracker is initialized with a displayobject
+
+				//Synchronize.getInstance().addEventListener(Synchronize.SYNCHRONIZE_ERROR_OCCURRED,onSynchronizeErrorOccurred);
 
 				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,initiateRetrievalOfFoodItemList);
 				
@@ -419,6 +422,26 @@ the home screen
 			private function setAllShownInList(newValue:Boolean):void  {
 				for (var fooditemctr:int = 0;fooditemctr < ModelLocator.getInstance().foodItemList.length;fooditemctr++) {
 					(ModelLocator.getInstance().foodItemList.getItemAt(fooditemctr) as FoodItem).shownInList = newValue;
+				}
+			}
+			
+			private function onSynchronizeErrorOccurred(event:Event):void {
+				if (alertPopUp != null)	{
+					alertPopUp.message = alertPopUp.message + "\n\n" + 	Synchronize.getInstance().synchronize_debugString;				
+				} else  {
+					alertPopUp = new AlertPopUp();
+					alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+					alertPopUp.show(this,Synchronize.getInstance().synchronize_debugString);
+				}
+			}
+
+			private function okClicked(event: PopUpEvent):void {
+				if (alertPopUp != null) {
+					PopUpManager.removePopUp(alertPopUp);
+					if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+						alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+					}
+					alertPopUp = null;
 				}
 			}
 			

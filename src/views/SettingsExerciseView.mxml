@@ -28,14 +28,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<fx:Script>
 		<![CDATA[
-			import databaseclasses.Settings;
-			
 			import mx.events.FlexEvent;
+			import mx.resources.ResourceManager;
+			
+			import spark.events.TextOperationEvent;
+			
+			import databaseclasses.Settings;
 			
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
-			
-			import spark.events.TextOperationEvent;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
@@ -111,6 +112,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
 			{
 				MyGATracker.getInstance().trackPageview( "SettingsExerciseView-viewOpened" );
+
+				title = ResourceManager.getInstance().getString("settingsview","exercise");
 
 				helpCallOut = new HelpCallOut();
 				helpCallOut.helpText = resourceManager.getString('settingsexerciseview','help_text_changeExerciseTypes');

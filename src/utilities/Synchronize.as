@@ -17,17 +17,6 @@
  */
 package utilities
 {
-	import databaseclasses.BloodGlucoseEvent;
-	import databaseclasses.Database;
-	import databaseclasses.DatabaseEvent;
-	import databaseclasses.ExerciseEvent;
-	import databaseclasses.FoodItem;
-	import databaseclasses.MealEvent;
-	import databaseclasses.MedicinEvent;
-	import databaseclasses.SelectedFoodItem;
-	import databaseclasses.Settings;
-	import databaseclasses.Unit;
-	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -39,19 +28,30 @@ package utilities
 	import flash.net.URLVariables;
 	import flash.system.Capabilities;
 	
-	import model.ModelLocator;
-	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
 	import mx.formatters.DateFormatter;
 	import mx.resources.ResourceManager;
 	
-	import myComponents.IListElement;
-	import myComponents.TrackingViewElement;
-	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
 	import spark.formatters.DateTimeFormatter;
+	
+	import databaseclasses.BloodGlucoseEvent;
+	import databaseclasses.Database;
+	import databaseclasses.DatabaseEvent;
+	import databaseclasses.ExerciseEvent;
+	import databaseclasses.FoodItem;
+	import databaseclasses.MealEvent;
+	import databaseclasses.MedicinEvent;
+	import databaseclasses.SelectedFoodItem;
+	import databaseclasses.Settings;
+	import databaseclasses.Unit;
+	
+	import model.ModelLocator;
+	
+	import myComponents.IListElement;
+	import myComponents.TrackingViewElement;
 	
 	/**
 	 * class with function to synchronize with google docs, and to export tracking history 
@@ -186,6 +186,15 @@ package utilities
 		 */
 		private var asOfTimeStamp:Number
 		
+		private var _synchronize_debugString:String = "";
+
+		public function get synchronize_debugString():String
+		{
+			return _synchronize_debugString;
+		}
+
+		public static const SYNCHRONIZE_ERROR_OCCURRED:String="error_occurred";
+
 		/////columnnames
 		private static var ColumnName_id:String = "id";
 		private static var ColumnName_medicinname:String = "medicinname";
@@ -442,7 +451,7 @@ package utilities
 		
 		private var amountofSpaces:int;
 		
-		private static var traceNeeded:Boolean = true;
+		private var debugMode:Boolean;
 		
 		private var localElementsUpdated:Boolean;
 		
@@ -596,6 +605,8 @@ package utilities
 			if (instance != null) {
 				throw new Error("Synchronize class can only be accessed through Synchronize.getInstance()");	
 			}
+			debugMode = ModelLocator.debugMode;
+			
 			syncRunning = false;
 			findAllSpreadSheetsWaiting = false;
 			downloadFoodTableSpreadSheetWaiting = false;
@@ -679,7 +690,7 @@ package utilities
 				trackingList = ModelLocator.getInstance().trackingList;
 				currentSyncTimeStamp = new Date().valueOf();
 				lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
-				if (traceNeeded)
+				if (debugMode)
 					trace("lastsynctimestamp = " + new DateFormatter().format(new Date(lastSyncTimeStamp)));
 				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 				rerunNecessary = false;
@@ -714,7 +725,7 @@ package utilities
 		 * Google Fusion Tables 
 		 */
 		private function synchronize(event:Event = null):void {
-			
+			_synchronize_debugString = "";
 			if (event != null)  {
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -730,7 +741,7 @@ package utilities
 							//go through each item, see if name matches one in the tablelist, if so store tableid
 							for (var j:int = 0;j < tableNamesAndColumnNames.length;j++) {
 								if (eventAsJSONObject.items[i].name == tableNamesAndColumnNames[j][0]) {
-									if (traceNeeded)
+									if (debugMode)
 										trace("found a table : " + eventAsJSONObject.items[i].name);
 									tableNamesAndColumnNames[j][1] = eventAsJSONObject.items[i].tableId;	
 								}
@@ -746,7 +757,7 @@ package utilities
 				}
 			} else  {
 				trackingListAlreadyModified = false;
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method synchronize");
 				
 				//we could be arriving here after a retempt, example, first time failed due to invalid credentials, token refresh occurs, with success, we come back to here
@@ -782,7 +793,7 @@ package utilities
 		}
 		
 		private function createMissingTables(event:Event = null): void {
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method createMissingTables");
 			
 			if (event != null) {
@@ -875,7 +886,7 @@ package utilities
 		 * functionToRecall will be called when finished 
 		 */
 		private function addColumnToExistingTable(functionToReCall:Function,tableId:String,columnName:String,columnType:String):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method addColumnToExistingTable for tableid = " + tableId + "columnName = " + columnName);
 			
 			var jsonObject:Object = new Object();
@@ -911,7 +922,7 @@ package utilities
 			var positionId:int;
 			var eventAsJSONObject:Object;
 			
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method getTheMedicinEvents");
 			//ModelLocator.getInstance().logString += "start method getthemedicinevents"+ "\n";;
 			//start with remoteElements
@@ -1022,8 +1033,8 @@ package utilities
 							if ((trackingList.getItemAt(l) as MedicinEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][5][0])] as String) == "true") {
-									if (traceNeeded)
-										if (traceNeeded) trace("local element deleted, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
+									if (debugMode)
+										if (debugMode) trace("local element deleted, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
 									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as MedicinEvent).updateMedicinEvent(
@@ -1032,7 +1043,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]));
-									if (traceNeeded) trace("local element updated, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
+									if (debugMode) trace("local element updated, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
 								}
 								break;
 							}
@@ -1051,7 +1062,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]),
 								true));
-							if (traceNeeded) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
+							if (debugMode) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
 				}
@@ -1065,7 +1076,7 @@ package utilities
 			var positionId:int;
 			var eventAsJSONObject:Object;
 			
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method getTheBloodGlucoseEvents");
 			
 			//start with remoteElements
@@ -1178,8 +1189,8 @@ package utilities
 							if ((trackingList.getItemAt(l) as BloodGlucoseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
-									if (traceNeeded)
-										if (traceNeeded) trace("local element deleted, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
+									if (debugMode)
+										if (debugMode) trace("local element deleted, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).updateBloodGlucoseEvent(
@@ -1188,7 +1199,7 @@ package utilities
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]));
-									if (traceNeeded) trace("local element updated, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
+									if (debugMode) trace("local element updated, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
 								}
 								break;
 							}
@@ -1208,7 +1219,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
-							if (traceNeeded) trace("local element created, id = " + remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)]);
+							if (debugMode) trace("local element created, id = " + remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)]);
 						}
 					}
 				}
@@ -1222,7 +1233,7 @@ package utilities
 			var positionId:int;
 			var eventAsJSONObject:Object;
 			
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method getTheExerciseEvents");
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
@@ -1333,8 +1344,8 @@ package utilities
 							if ((trackingList.getItemAt(l) as ExerciseEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
-									if (traceNeeded)
-										if (traceNeeded) trace("local element deleted, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
+									if (debugMode)
+										if (debugMode) trace("local element deleted, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
 									(trackingList.getItemAt(l) as ExerciseEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as ExerciseEvent).updateExerciseEvent(
@@ -1342,7 +1353,7 @@ package utilities
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)]);
-									if (traceNeeded) trace("local element updated, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
+									if (debugMode) trace("local element updated, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
 								}
 								break;
 							}
@@ -1361,7 +1372,7 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
-							if (traceNeeded) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
+							if (debugMode) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
 				}
@@ -1376,7 +1387,7 @@ package utilities
 			var positionId:int;
 			var eventAsJSONObject:Object;
 			
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method getTheMealEvents");
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
@@ -1505,7 +1516,7 @@ package utilities
 							if ((trackingList.getItemAt(l) as MealEvent).eventid == remoteElements.getItemAt(m)[positionId] ) {
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
-									if (traceNeeded)
+									if (debugMode)
 										(trackingList.getItemAt(l) as MealEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as MealEvent).updateMealEvent(
@@ -1515,7 +1526,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_correctionfactor)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]));
-									if (traceNeeded) trace("local element updated, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
+									if (debugMode) trace("local element updated, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
 								}
 								break;
 							}
@@ -1537,7 +1548,7 @@ package utilities
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 								true));
-							if (traceNeeded) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
+							if (debugMode) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
 				}
@@ -1550,7 +1561,7 @@ package utilities
 			var positionId:int;
 			var eventAsJSONObject:Object;
 			
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method getTheSelectedItems");
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
@@ -1678,7 +1689,7 @@ package utilities
 												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitfat)]),
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)],
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_chosenamount)]);
-										if (traceNeeded) trace("local element updated, id = " + theSelectedFoodItem.eventid);
+										if (debugMode) trace("local element updated, id = " + theSelectedFoodItem.eventid);
 									}
 									break;
 									//l =  trackingList.length;
@@ -1726,7 +1737,7 @@ package utilities
 		}
 		
 		private function getRowIdsOfRemoteElementsToBeDeleted(event:Event = null):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace ("in method getRowIdsOfRemoteElementsToBeDeleted");
 			if (event != null) {
 				removeEventListeners();
@@ -1766,7 +1777,7 @@ package utilities
 		 * I think actually there's never going to be any more event, this was added before getrowidsofremotelementstobedeleted, which will delete all double events
 		 */
 		private function deleteRemoteEvents(event:Event = null):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace ("in method deleteremoteevents");
 			if (remoteElementRowIdsToBeDeleted != null) {
 				if (remoteElementRowIdsToBeDeleted.length > 0) {
@@ -1786,7 +1797,7 @@ package utilities
 		 * we need to get the rowids for all localevents that have a remote copy, we need to do that to be able to update 
 		 */
 		private function getRowIdsOfLocalElements(event:Event = null):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace ("in method getrowids");
 			//ModelLocator.getInstance().logString += "in method getrowids" + "\n";
 			if (event != null) {
@@ -1889,7 +1900,7 @@ package utilities
 		 * inserts and updates local events to remote server
 		 */
 		private function syncLocalEvents(event:Event = null):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace ("in method synclocalevents");
 			if (event != null) {
 				removeEventListeners();
@@ -2201,7 +2212,7 @@ package utilities
 					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 					request.contentType = "application/x-www-form-urlencoded";
 					
-					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,syncLocalEvents,true,null);
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + escape(sqlStatement)),null,syncLocalEvents,true,null);
 				}
 				
 			} else {
@@ -2222,7 +2233,7 @@ package utilities
 			//we will end up with remotelements that need remote update, localemenets that need local update, remoteelementids that need remote insert
 			//localelements will be all local elements that are not in the remotelements
 			
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method getTheSettings");
 			
 			var positionId:int;
@@ -2309,7 +2320,7 @@ package utilities
 		 * take next setting in remoteelementids that need to be inserted remotely
 		 */
 		private function insertNextSetting(event:Event):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace ("in method insertNextSetting");
 			if (event != null) {
 				removeEventListeners();
@@ -2344,7 +2355,7 @@ package utilities
 		}
 		
 		private function getSettingRowIds(event:Event = null):void  {
-			if (traceNeeded)
+			if (debugMode)
 				trace ("in method getSettingRowIds");
 			if (event != null) {
 				removeEventListeners();
@@ -2371,7 +2382,7 @@ package utilities
 		}
 		
 		private function updateRemoteSettings(event:Event = null):void  {
-			if (traceNeeded)
+			if (debugMode)
 				trace ("in method updateRemoteSettings");
 			if (event != null) {
 				removeEventListeners();
@@ -2411,8 +2422,13 @@ package utilities
 		}
 		
 		private function googleAPICallFailed(event:Event):void {
+			if (debugMode) {
+				_synchronize_debugString = event.target.data as String;
+				this.dispatchEvent(new Event(SYNCHRONIZE_ERROR_OCCURRED));
+			}
+
 			removeEventListeners();
-			if (traceNeeded)
+			if (debugMode)
 				trace("in googleapicall failed : event.target.data = " + event.target.data as String);
 			//let's first see if the event.target.data has json
 			try {
@@ -2433,7 +2449,7 @@ package utilities
 						loader.addEventListener(Event.COMPLETE,accessTokenRefreshed);
 						loader.addEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
 						loader.load(request);
-						if (traceNeeded)
+						if (debugMode)
 							trace("loader : request = " + request.data); 
 				} else {
 					syncFinished(false);
@@ -2496,13 +2512,13 @@ package utilities
 				tableNamesAndColumnNames[index][1] +
 				" WHERE " + ColumnName_addedtoormodifiedintabletimestamp +  ">= '" + lastSyncTimeStamp.toString() + "' AND " +
 				"creationtimestamp >= '" + asOfTimeStamp.toString() + "'";
-			if (traceNeeded)
+			if (debugMode)
 				trace("querystring = " + returnValue);
 			return returnValue;
 		}
 		
 		private function deleteRemoteMedicinEvent(event:Event,medicinEvent:MedicinEvent = null):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace("in method deleteremotemedicinevent");
 			if (medicinEvent != null)
 				objectToBeDeleted = medicinEvent;
@@ -2527,7 +2543,7 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
-					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + escape(sqlStatement)),null,deleteRemoteItems,true,null);
 					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
 				} else {
@@ -2535,7 +2551,7 @@ package utilities
 					deleteRemoteItems();
 				}
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method deleteMedicinEvent");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
@@ -2552,7 +2568,7 @@ package utilities
 		}
 		
 		private function deleteRemoteBloodGlucoseEvent(event:Event, bloodglucoseEvent:BloodGlucoseEvent = null):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace("in method deleteremotebloodglucoseevent");
 			if (bloodglucoseEvent != null)
 				objectToBeDeleted = bloodglucoseEvent;
@@ -2577,7 +2593,7 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
-					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + escape(sqlStatement)),null,deleteRemoteItems,true,null);
 					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
 				} else {
@@ -2585,7 +2601,7 @@ package utilities
 					deleteRemoteItems();
 				}
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method deleteBloodGlucoseEvent");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
@@ -2606,7 +2622,7 @@ package utilities
 		}
 		
 		private function deleteRemoteExerciseEvent(event:Event, exerciseEvent:ExerciseEvent = null):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace("in method deleteremoteexerciseevent");
 			if (exerciseEvent != null)
 				objectToBeDeleted = exerciseEvent;
@@ -2630,7 +2646,7 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
-					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + escape(sqlStatement)),null,deleteRemoteItems,true,null);
 					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
 				} else {
@@ -2638,7 +2654,7 @@ package utilities
 					deleteRemoteItems();
 				}
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method deleteExerciseEvent");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
@@ -2653,7 +2669,7 @@ package utilities
 		}
 		
 		private function deleteRemoteMealEvent(event:Event, mealEvent:MealEvent = null):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace("in method deleteremotemealevent");
 			if (mealEvent != null)
 				objectToBeDeleted = mealEvent;
@@ -2679,7 +2695,7 @@ package utilities
 						"deleted = \'true\' WHERE ROWID = \'" +
 						eventAsJSONObject.rows[0][0] + "\'";
 					
-					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + escape(sqlStatement)),null,deleteRemoteItems,true,null);
 					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
 				} else {
@@ -2687,7 +2703,7 @@ package utilities
 					deleteRemoteItems();
 				}
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method deleteRemoteMealEvent");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
@@ -2701,7 +2717,7 @@ package utilities
 		}
 		
 		private function deleteRemoteSelectedFoodItem(event:Event, selectedFoodItem:SelectedFoodItem = null):void {
-			if (traceNeeded)
+			if (debugMode)
 				trace("in method deleteremoteselectedfooditem");
 			if (selectedFoodItem != null)
 				objectToBeDeleted = selectedFoodItem;
@@ -2735,7 +2751,7 @@ package utilities
 						eventAsJSONObject.rows[0][0] + "\'";
 					
 					
-					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + sqlStatement),null,deleteRemoteItems,true,null);
+					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + escape(sqlStatement)),null,deleteRemoteItems,true,null);
 					
 					listOfElementsToBeDeleted.removeItem(objectToBeDeleted);//next time we come into deleteRemoteItems, we won't treat this element anymore
 				} else {
@@ -2743,7 +2759,7 @@ package utilities
 					deleteRemoteItems();
 				}
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method deleteRemoteSelectedFoodItem");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
@@ -2766,7 +2782,7 @@ package utilities
 				removeEventListeners();
 			} else  {
 			}
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method googleExcelInsertLogBookEvents");
 			this.dispatchEvent(new Event(INSERTING_NEW_EVENTS));
 			var dateFormatter:DateTimeFormatter =  new DateTimeFormatter();
@@ -2871,7 +2887,7 @@ package utilities
 			} else  {//first time we come here, we need to initialize foodItemIdBeingTreated
 				foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAddInFoodTable));
 			}
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method googleExcelInsertFoodItems");
 			
 			var dispatcher:EventDispatcher = new EventDispatcher();
@@ -2941,7 +2957,7 @@ package utilities
 				}
 			} 
 			
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method googleExcelCreateLogBookHeader");
 			
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInLogBook)) == googleExcelLogBookColumnNames.length)  {
@@ -2981,7 +2997,7 @@ package utilities
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) == googleExcelFoodTableColumnNames.length)  {
 				googleExcelInsertFoodItems();
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelCreateHeader");
 				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingheaders');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
@@ -3032,7 +3048,7 @@ package utilities
 				}
 				
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelCreateLoogBook");
 				this.dispatchEvent(new Event(CREATING_LOGBOOK_SPREADSHEET));
 				var jsonObject:Object = new Object();
@@ -3080,7 +3096,7 @@ package utilities
 				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingfoodtablespreadsheet');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelCreateFoodTable");
 				
 				var jsonObject:Object = new Object();
@@ -3143,7 +3159,7 @@ package utilities
 					googleExcelCreateLogBookHeader(null);
 				}
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelCreateLogBookWorkSheet");
 				this.dispatchEvent(new Event(CREATING_LOGBOOK_WORKSHEET));
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
@@ -3213,7 +3229,7 @@ package utilities
 				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingfoodtableworksheet');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelCreateWorkSheet");
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
@@ -3242,7 +3258,7 @@ package utilities
 			if (googleExcelDeleteWorkSheetUrl == "")
 				return;
 			
-			if (traceNeeded)
+			if (debugMode)
 				trace("start method googleExcelDeleteWorkSheet1");
 			createAndLoadURLRequest(googleExcelDeleteWorkSheetUrl,URLRequestMethod.DELETE,null,null,null,false,null);
 			googleExcelDeleteWorkSheetUrl = "";
@@ -3317,7 +3333,7 @@ package utilities
 				}
 				
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelFindLogBookWorkSheet");
 				this.dispatchEvent(new Event(SEARCHING_LOGBOOK_WORKSHEET));
 				createAndLoadURLRequest(
@@ -3339,7 +3355,7 @@ package utilities
 				removeEventListeners();
 				googleExcelCreateLogBookHeader(null);//will actuall add the missing columnheaders
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelAddColumnToLogBookWorksheet");
 				
 				createAndLoadURLRequest(
@@ -3403,7 +3419,7 @@ package utilities
 				}
 				
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelFindFoodTableWorkSheet");
 				createAndLoadURLRequest(
 					googleExcelFindWorkSheetUrl.replace("{key}",helpDiabetesFoodTableSpreadSheetKey),
@@ -3453,7 +3469,7 @@ package utilities
 					}
 				}
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelFindFoodTableSpreadSheet");
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.q = "title = '" + foodtableName + "'";
@@ -3503,7 +3519,7 @@ package utilities
 					}
 				}
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelFindLogBookSpreadSheet");
 				this.dispatchEvent(new Event(SEARCHING_LOGBOOK));
 				var urlVariables:URLVariables = new URLVariables();
@@ -3525,6 +3541,13 @@ package utilities
 		 */
 		private function syncFinished(success:Boolean):void {
 			
+			if (debugMode) {
+				_synchronize_debugString = "in syncFinished with success = " + success + "\n" 
+					+ "syncRunning = " + syncRunning;
+				this.dispatchEvent(new Event(SYNCHRONIZE_ERROR_OCCURRED));
+			}
+
+			
 			if (!syncRunning)//syncfinished must have been called although sync is not running, not need to process any further
 				return;
 			
@@ -3532,7 +3555,7 @@ package utilities
 			
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			if (traceNeeded)
+			if (debugMode)
 				trace("in syncFinished with success = " + success);
 			
 			if (success) {
@@ -3695,7 +3718,7 @@ package utilities
 				loader.addEventListener(IOErrorEvent.IO_ERROR,googleAPICallFailed);
 			
 			loader.load(request);
-			if (traceNeeded)
+			if (debugMode)
 				trace("loader : url = " + request.url + ", request.data = " + request.data); 
 		}
 		
@@ -3741,7 +3764,7 @@ package utilities
 					}
 				}
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelFindAllSpreadSheets");
 				_spreadSheetList = new ArrayList();
 				
@@ -3805,7 +3828,7 @@ package utilities
 				
 				this.dispatchEvent(new Event(WORKSHEETS_IN_FOODTABLE_RETRIEVED));
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelFindAllWorkSheetsInFoodTableSpreadSheet");
 				_workSheetList = new ArrayList();
 				
@@ -3939,7 +3962,7 @@ package utilities
 				return;
 				
 			} else {
-				if (traceNeeded)
+				if (debugMode)
 					trace("start method googleExcelDownloadFoodTableSpreadSheet");
 
 				MyGATracker.getInstance().trackPageview( "DownLoadFoodTable" );

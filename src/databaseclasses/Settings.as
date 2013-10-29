@@ -40,6 +40,49 @@ package databaseclasses
 	{
 		[ResourceBundle("editmedicineventview")]
 		[ResourceBundle("editexerciseeventview")]
+		[ResourceBundle("settingsmealprofilesview")]
+		
+		/** default values for active carbs on board, per range **/ 
+		public static const Meal1_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal1_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal1_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal1_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal2_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal2_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal2_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal2_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal3_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal3_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal3_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal3_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal4_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal4_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal4_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal4_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal5_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal5_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal5_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal5_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal6_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal6_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal6_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal6_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal7_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal7_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal7_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal7_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal8_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal8_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal8_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal8_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal9_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal9_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal9_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal9_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal10_range_1_AOCChart_FactoryValue:String = "0:15-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal10_range_2_AOCChart_FactoryValue:String = "15:25-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal10_range_3_AOCChart_FactoryValue:String = "25:35-{carbs}-00:00>100-01:00>60-02:00>50";
+		public static const Meal10_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
 		
 		/** default values for active insulin on board, per range **/
 		public static const Medicin1_range1_AOBChart_FactoryValue:String= "0:15-%-00:00>100-01:00>60-02:00>50";
@@ -65,7 +108,73 @@ package databaseclasses
 
 		
 		/** EXTEND LIST OF CONSTANTS IN CASE NEW SETTING NEEDS TO BE DEFINED  */
-	
+
+		/** Descriptions of the meal graphs **/
+		public static const SettingsMeal1GraphDescription:int = -86;
+		public static const SettingsMeal2GraphDescription:int = -85;
+		public static const SettingsMeal3GraphDescription:int = -84;
+		public static const SettingsMeal4GraphDescription:int = -83;
+		public static const SettingsMeal5GraphDescription:int = -82;
+		public static const SettingsMeal6GraphDescription:int = -81;
+		public static const SettingsMeal7GraphDescription:int = -80;
+		public static const SettingsMeal8GraphDescription:int = -79;
+		public static const SettingsMeal9GraphDescription:int = -78;
+		public static const SettingsMeal10GraphDescription:int = -77;
+		
+		/** is meal aob calculation active or not ? **/
+		public static const SettingsMeal1_AOBActive:int = -76;
+		public static const SettingsMeal2_AOBActive:int = -75;
+		public static const SettingsMeal3_AOBActive:int = -74;
+		public static const SettingsMeal4_AOBActive:int = -73;
+		public static const SettingsMeal5_AOBActive:int = -72;
+		public static const SettingsMeal6_AOBActive:int = -71;
+		public static const SettingsMeal7_AOBActive:int = -70;
+		public static const SettingsMeal8_AOBActive:int = -69;
+		public static const SettingsMeal9_AOBActive:int = -68;
+		public static const SettingsMeal10_AOBActive:int = -67;
+		
+		/** charts for meal active  on board, per range **/
+		public static const SettingsMeal1_range1_AOBChart:int = -66;
+		public static const SettingsMeal1_range2_AOBChart:int = -65;
+		public static const SettingsMeal1_range3_AOBChart:int = -64;
+		public static const SettingsMeal1_range4_AOBChart:int = -63;
+		public static const SettingsMeal2_range1_AOBChart:int = -62;
+		public static const SettingsMeal2_range2_AOBChart:int = -61;
+		public static const SettingsMeal2_range3_AOBChart:int = -60;
+		public static const SettingsMeal2_range4_AOBChart:int = -59;
+		public static const SettingsMeal3_range1_AOBChart:int = -58;
+		public static const SettingsMeal3_range2_AOBChart:int = -57;
+		public static const SettingsMeal3_range3_AOBChart:int = -56;
+		public static const SettingsMeal3_range4_AOBChart:int = -55;
+		public static const SettingsMeal4_range1_AOBChart:int = -54;
+		public static const SettingsMeal4_range2_AOBChart:int = -53;
+		public static const SettingsMeal4_range3_AOBChart:int = -52;
+		public static const SettingsMeal4_range4_AOBChart:int = -51;
+		public static const SettingsMeal5_range1_AOBChart:int = -50;
+		public static const SettingsMeal5_range2_AOBChart:int = -49;
+		public static const SettingsMeal5_range3_AOBChart:int = -48;
+		public static const SettingsMeal5_range4_AOBChart:int = -47;
+		public static const SettingsMeal6_range1_AOBChart:int = -46;
+		public static const SettingsMeal6_range2_AOBChart:int = -45;
+		public static const SettingsMeal6_range3_AOBChart:int = -44;
+		public static const SettingsMeal6_range4_AOBChart:int = -43;
+		public static const SettingsMeal7_range1_AOBChart:int = -42;
+		public static const SettingsMeal7_range2_AOBChart:int = -41;
+		public static const SettingsMeal7_range3_AOBChart:int = -40;
+		public static const SettingsMeal7_range4_AOBChart:int = -39;
+		public static const SettingsMeal8_range1_AOBChart:int = -38;
+		public static const SettingsMeal8_range2_AOBChart:int = -37;
+		public static const SettingsMeal8_range3_AOBChart:int = -36;
+		public static const SettingsMeal8_range4_AOBChart:int = -35;
+		public static const SettingsMeal9_range1_AOBChart:int = -34;
+		public static const SettingsMeal9_range2_AOBChart:int = -33;
+		public static const SettingsMeal9_range3_AOBChart:int = -32;
+		public static const SettingsMeal9_range4_AOBChart:int = -31;
+		public static const SettingsMeal10_range1_AOBChart:int = -30;
+		public static const SettingsMeal10_range2_AOBChart:int = -29;
+		public static const SettingsMeal10_range3_AOBChart:int = -28;
+		public static const SettingsMeal10_range4_AOBChart:int = -27;
+
 		/** is medicin aob calculation active or not ? **/
 		public static const SettingsMedicin1_AOBActive:int = -26;
 		public static const SettingsMedicin2_AOBActive:int = -25;
@@ -359,66 +468,66 @@ package databaseclasses
 			"",
 			"",
 			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
-			"",
+			"",//meal Type 1
+			"",//meal Type 2
+			"",//meal Type 3
+			"",//meal Type 4
+			"",//meal Type 5
+			"",//meal Type 6
+			"",//meal Type 7
+			"",//meal Type 8
+			"",//meal Type 9
+			"",//meal Type 10
+			"false",//carbs 1 aob active or not
+			"false",//carbs 2 aob active or not
+			"false",//carbs 3 aob active or not
+			"false",//carbs 4 aob active or not
+			"false",//carbs 5 aob active or not
+			"false",//carbs 1 aob active or not
+			"false",//carbs 2 aob active or not
+			"false",//carbs 3 aob active or not
+			"false",//carbs 4 aob active or not
+			"false",//carbs 5 aob active or not
+			Meal1_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal1_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal1_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal1_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal2_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal2_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal2_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal2_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal3_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal3_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal3_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal3_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal4_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal4_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal4_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal4_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal5_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal5_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal5_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal5_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal6_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal6_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal6_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal6_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal7_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal7_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal7_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal7_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal8_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal8_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal8_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal8_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal9_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal9_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal9_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal9_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal10_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal10_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal10_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal10_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
 			"false",//medicin 1 aob active or not
 			"false",//medicin 2 aob active or not
 			"false",//medicin 3 aob active or not
@@ -596,6 +705,17 @@ package databaseclasses
 			settings[100 + SettingsExerciseType5] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype5');
 			settings[100 + SettingsFirstStartUp] = (new Date()).valueOf().toString();
 			settings[100 + SettingsCorrectionFactor] = "0:0-" /* first values not used in cf */ + ResourceManager.getInstance().getString('general','mgperdl') ; 
+	
+			settings[100 + SettingsMeal1GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype1description');
+			settings[100 + SettingsMeal2GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype2description');
+			settings[100 + SettingsMeal3GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype3description');
+			settings[100 + SettingsMeal4GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype4description');
+			settings[100 + SettingsMeal5GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype5description');
+			settings[100 + SettingsMeal6GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype6description');
+			settings[100 + SettingsMeal7GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype7description');
+			settings[100 + SettingsMeal8GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype8description');
+			settings[100 + SettingsMeal9GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype9description');
+			settings[100 + SettingsMeal10GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype10description');
 			
 			settingsLastModifiedTimeStamp = new Array(settings.length);
 			for (var i:int = 0;i < settingsLastModifiedTimeStamp.length;i++)
