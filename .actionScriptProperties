@@ -45,7 +45,7 @@
   <buildTargets>
     <buildTarget airDownloadURL="https://market.android.com/details?id=com.adobe.air" androidSettingsVersion="2" buildTargetName="device" isCurrent="false" platformId="com.adobe.flexide.multiplatform.android.platform">
       <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.android.platform" reducedSizePackaging="false" version="2"/>
-      <airSettings airCertificatePath="/Volumes/Fileservers/JohanDegraeve-2/Allerlei/mykey.p12" airTimestamp="true" anePathSet="true" version="1">
+      <airSettings airCertificatePath="/Volumes/Fileservers/JohanDegraeve/Allerlei/mykey.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes>
           <pathEntry path="blackberry-tablet.xml"/>
           <pathEntry path="build_old.xml"/>
@@ -74,7 +74,6 @@
       <actionScriptSettings version="1"/>
     </buildTarget>
     <buildTarget buildTargetName="device" iosSettingsVersion="2" isCurrent="false" platformId="com.adobe.flexide.multiplatform.ios.platform" provisioningFile="/Volumes/Fileservers/JohanDegraeve-2/Allerlei/HelpDiabetes_for_ipad_jdg_and_ipod_development.mobileprovision" releasePackageType="ipa-app-store">
-      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" reducedSizePackaging="false" version="2"/>
       <airSettings airCertificatePath="/Volumes/Fileservers/JohanDegraeve-2/Allerlei/JohanDegraeveiOScertificateDistribution-2013-06-30.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes>
           <pathEntry path="views"/>
@@ -92,6 +91,7 @@
         <newPackagingParams/>
         <modifiedPackagingParams/>
       </airSettings>
+      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" reducedSizePackaging="false" version="2"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
     <buildTarget buildTargetName="default" isCurrent="false" platformId="com.qnx.flexide.multiplatform.qnx.platform">

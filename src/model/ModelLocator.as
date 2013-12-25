@@ -296,7 +296,7 @@ package model
 		 */
 		public var firstStartUp:Boolean = true;
 		
-		public static var debugMode:Boolean = true;
+		public static var debugMode:Boolean = false;
 		
 		/**
 		 * offset to be used top and bottom of a label itemrenderer, to make sure the text is in the middle
