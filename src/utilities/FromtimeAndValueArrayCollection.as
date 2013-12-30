@@ -234,18 +234,18 @@ package utilities
 		  * This is treated as real date, new utc conversion or something like that.
 		  * </li>
 		  * </ul>
-		  */public function getValue(fromTimeAsNumber:Number = Number.NaN,fromTimeAsString:String = "",fromTimeAsDate:Date = null):Number {
+		  */public function getValue(timeAsNumber:Number = Number.NaN,timeAsString:String = "",timeAsDate:Date = null):Number {
 			  
-			  if (!isNaN(fromTimeAsNumber)) {
-				  if (fromTimeAsNumber > 129600)
+			  if (!isNaN(timeAsNumber)) {
+				  if (timeAsNumber > 129600)
 					  throw new Error("fromTimeAsNumber should not be > 129600");
 			  }
-			  if (!fromTimeAsString == "") {
-				  return getValue(((new Number(fromTimeAsString.split(":")[0])) * 60 + (new Number(fromTimeAsString.split(":")[1])))*60); 
+			  if (!timeAsString == "") {
+				  return getValue(((new Number(timeAsString.split(":")[0])) * 60 + (new Number(timeAsString.split(":")[1])))*60); 
 			  }
 			  
-			  if (fromTimeAsDate != null) {
-				  return getValue(((new Number(fromTimeAsDate.hours)) * 60 + (new Number(fromTimeAsDate.minutes)))*60); 
+			  if (timeAsDate != null) {
+				  return getValue(((new Number(timeAsDate.hours)) * 60 + (new Number(timeAsDate.minutes)))*60); 
 			  }
 			  
 			  var previousItem:int;
@@ -255,7 +255,7 @@ package utilities
 				  //it's definitely not a percentage based list, so no need to interpolate
 				  return (getItemAt(0) as FromtimeAndValue).value;
 			  
-			  while (previousItem < length - 1 && (getItemAt(previousItem + 1) as FromtimeAndValue).from < fromTimeAsNumber)
+			  while (previousItem < length - 1 && (getItemAt(previousItem + 1) as FromtimeAndValue).from < timeAsNumber)
 				  previousItem++;
 			  
 			  var returnValue:Number;
@@ -267,7 +267,7 @@ package utilities
 				  returnValue =  
 					  (getItemAt(previousItem) as FromtimeAndValue).value 
 					  + 
-					  increase * (fromTimeAsNumber - (getItemAt(previousItem) as FromtimeAndValue).from);
+					  increase * (timeAsNumber - (getItemAt(previousItem) as FromtimeAndValue).from);
 			  } else
 				  returnValue = (getItemAt(previousItem) as FromtimeAndValue).value;
 			  

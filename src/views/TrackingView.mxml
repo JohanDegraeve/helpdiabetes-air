@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			
 			import databaseclasses.BloodGlucoseEvent;
@@ -50,12 +51,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.TrackingViewElement;
 			
 			import utilities.ExcelSorting;
+			import utilities.FromtimeAndValueArrayCollection;
 			import utilities.MyGATracker;
 			
 			private static var lastClickOnTrackingView:Number;
 			private var helpCallOut:HelpCallOut;
 			private var timer:Timer;
-
+			
+			[Bindable]
+			private var activeInsulin_text:String;
+			/**
+			 * maximum insulin activity in milliseconds, initialized to 36 hours
+			 */
+			public static var maxInsulinActivity:Number = 129600000;
+			
+			
 			private function addHandler():void {
 				if (!navigator.poppedViewReturnedObject) return; 
 				if (!navigator.poppedViewReturnedObject.object) return;
@@ -116,7 +126,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					timer.addEventListener(TimerEvent.TIMER,timerEnd);
 					timer.start();
 				}
-			
+				
 				function timerEnd():void {
 					reDrawActionButtons();
 				}
@@ -130,7 +140,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * It is necessary that the views that can be pushed by trackingview, call this method each time they are initialized and if pushed by trackingview, or reactivated ?
 			 */
 			public static function popToFirstViewNecessary():Boolean
-
+				
 			{
 				if (isNaN(lastClickOnTrackingView)) {
 					lastClickOnTrackingView = (new Date()).valueOf();
@@ -152,7 +162,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) as TrackingViewElement).eventid;
 				if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
 					MyGATracker.getInstance().trackPageview( "TrackingView-MealEventClicked" );
-
+					
 					navigator.pushView(EditMealEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex)); 					
 				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MedicinEvent) {
 					MyGATracker.getInstance().trackPageview( "TrackingView-MedicinEventClicked" );
@@ -221,8 +231,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					while (splittedTextCntr < splittedText.length)
 						if (ExcelSorting.stringAhasStringB(allTextInOneString,splittedText[splittedTextCntr] as String))
 							splittedTextCntr++;
-						else
-							break;
+					else
+					break;
 					if (splittedTextCntr == splittedText.length) {
 						(ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).mark = true;
 						ModelLocator.getInstance().lastMarkedItemEventId = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).eventid;
@@ -231,10 +241,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						elementsFound = true;
 					}
 				}
-
+				
 				(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
 				ModelLocator.getInstance().trackingList.refresh();//forces a redraw
-
+				
 				if (elementsFound) {
 					ModelLocator.getInstance().trackingEventToShow = ModelLocator.getInstance().lastMarkedItemEventId;
 					ModelLocator.getInstance().searchActive = true;
@@ -284,7 +294,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				}
 			}
-
+			
 			private function cancelClicked(e:MouseEvent = null):void {
 				ModelLocator.getInstance().searchActive = false;
 				ModelLocator.getInstance().firstMarkedItemEventId = 0;
@@ -295,9 +305,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
 				ModelLocator.getInstance().trackingList.refresh();
 			}
-
+			
 			protected function creationCompleteHandler(event:FlexEvent):void
-
+				
 			{
 				reDrawActionButtons();
 				if (!navigator) return;
@@ -309,11 +319,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
 					helpCallOut.open(searchButton,true)
 				} /*else
-					helptext0Removed();*/
+				helptext0Removed();*/
+				
+				//calculate activeInsulin_text
+				var list:ArrayCollection = ModelLocator.getInstance().copyOfTrackingList;
+				var activeInsulin:Number = new Number(0);
+				var now:Date = new Date();
+				for (var cntr:int = list.length - 1; cntr >= 0 ; cntr-- ) {
+					//we go back maximum maxInsulinActivity
+					if ((list.getItemAt(cntr) as TrackingViewElement).timeStamp + maxInsulinActivity < now.valueOf())
+						break;
+					if ((list.getItemAt(cntr) as TrackingViewElement).timeStamp < now.valueOf()) {//we don't include events in the future
+						if (list.getItemAt(cntr) is MedicinEvent) {
+							var theEvent:MedicinEvent = list.getItemAt(cntr) as MedicinEvent;
+							//let's find if the name of the medicinevent matches one of the medicins in the settings
+							for (var medicincntr:int = 0;medicincntr <  5;medicincntr++) {
+								if (Settings.getInstance().getSetting( Settings.SettingsInsulinType1 + medicincntr) == theEvent.medicinName)  {
+									if (Settings.getInstance().getSetting(Settings.SettingsMedicin1_AOBActive + medicincntr) == "true")  {
+										//..zien welke range we moeten nemen
+										var x_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range1_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
+										var y_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range2_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
+										var z_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range3_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
+										var x_value:Number = Number(x_valueasString);
+										var y_value:Number = Number(y_valueasString);
+										var z_value:Number = Number(z_valueasString);
+										var settingToUse:int;	
+										if (theEvent.amount < x_value)
+											settingToUse = Settings.SettingsMedicin1_range1_AOBChart + medicincntr * 4;
+										else if (theEvent.amount < y_value)
+											settingToUse = Settings.SettingsMedicin2_range1_AOBChart + medicincntr * 4;
+										else if (theEvent.amount < z_value)
+											settingToUse = Settings.SettingsMedicin3_range1_AOBChart + medicincntr * 4;
+										else 
+											settingToUse = Settings.SettingsMedicin4_range1_AOBChart + medicincntr * 4;
+										var fromTimeAndValueArrayCollection:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(settingToUse));
+										activeInsulin += theEvent.amount * fromTimeAndValueArrayCollection.getValue((now.valueOf() - (list.getItemAt(cntr) as TrackingViewElement).timeStamp)/1000) / 100;
+									}
+								}
+							}
+							
+						}
+					}
+				}
+				activeInsulin_text = ((Math.round(activeInsulin * 10))/10).toString();
 			}
 			
 			/*private function helptext0Removed(event:Event = null):void {
-				
+			
 			}*/
 			
 			/**
@@ -327,9 +379,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 					helpCallOut.open(upButton,true)
 				} else
-				helptext1Removed();
+					helptext1Removed();
 			}
-
+			
 			private function helptext1Removed(event:Event = null):void  {
 				if (navigator.actionBar.actionContent.indexOf(downButton) != -1) {
 					helpCallOut = new HelpCallOut();
@@ -349,7 +401,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
 					helpCallOut.open(cancelButton,true)
 				} /*else
-					helptext2Removed();*/
+				helptext2Removed();*/
 			}
 		]]>
 	</fx:Script>
@@ -359,13 +411,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" />
 		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
-
-	<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
-			dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
-			click="onListElementClicked(event)"
-			itemRendererFunction="getItemRenderer">
-		<s:layout>
-			<myComponents:TrackingViewLayout useVirtualLayout="true" id="trackinglistlayout"/>
+	<s:Group width="100%" >
+		<s:layout >
+			<s:VerticalLayout gap="0">
+			</s:VerticalLayout>
 		</s:layout>
-	</s:List>
+		<s:Label id="activeInsulin" paddingLeft="10" paddingBottom="12" paddingTop="12" width="100%"  text="{activeInsulin_text}"/>
+		
+		<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
+				dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
+				click="onListElementClicked(event)"
+				itemRendererFunction="getItemRenderer">
+			<s:layout>
+				<myComponents:TrackingViewLayout useVirtualLayout="true" id="trackinglistlayout"/>
+			</s:layout>
+		</s:List>
+	</s:Group>
 </s:View>
