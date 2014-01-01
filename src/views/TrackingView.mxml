@@ -361,7 +361,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 					}
 				}
-				activeInsulin_text = ((Math.round(activeInsulin * 10))/10).toString();
+				activeInsulin_text = 
+					resourceManager.getString('trackingview','active_insulin')
+					+ " " 
+					+ ((Math.round(activeInsulin * 10))/10).toString() 
+					+ " " 
+					+ resourceManager.getString('trackingview','internationalunit');
 			}
 			
 			/*private function helptext0Removed(event:Event = null):void {
@@ -411,14 +416,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" />
 		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
-	<s:Group width="100%" >
-		<s:layout >
-			<s:VerticalLayout gap="0">
-			</s:VerticalLayout>
-		</s:layout>
-		<s:Label id="activeInsulin" paddingLeft="10" paddingBottom="12" paddingTop="12" width="100%"  text="{activeInsulin_text}"/>
+		<s:Label id="activeInsulin" left="10" right="0" top="10" bottom="0" width="100%"  text="{activeInsulin_text}"/>
 		
-		<s:List id = "trackinglist" left="0" right="0" top="0" bottom="0" width="100%" useVirtualLayout="true" 
+		<s:List id = "trackinglist" left="0" right="0" top="40" bottom="0" width="100%" useVirtualLayout="true" 
 				dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
 				click="onListElementClicked(event)"
 				itemRendererFunction="getItemRenderer">
@@ -426,5 +426,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<myComponents:TrackingViewLayout useVirtualLayout="true" id="trackinglistlayout"/>
 			</s:layout>
 		</s:List>
-	</s:Group>
 </s:View>
