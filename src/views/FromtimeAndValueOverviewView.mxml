@@ -29,6 +29,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 	</fx:Declarations>
 	<fx:Metadata>
 		[ResourceBundle("fromtimeandvalueoverviewview")]
+		[ResourceBundle("fromtimeandvaluelistview")]
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
@@ -188,15 +189,19 @@ This view is to edit the overview, ie the units for which the list is valid, and
 			private function graphButton_clickHandler(buttonClickEvent:MouseEvent):void
 			{
 				var dataToSend:Object = new Object();
-				dataToSend.title = "let's put something else here";
-				dataToSend.topText = "and here we need to put some toptext";
+				dataToSend.title = topText;
+				dataToSend.topText = resourceManager.getString('fromtimeandvaluelistview','editprofile');
 				if ((buttonClickEvent.target as Button) == zerotoxGraphButton) {
+					dataToSend.topText += " : " + xRangeLabel.text + xRangeButton.label;
 					dataToSend.settingid = data.settingid1;
 				} else if ((buttonClickEvent.target as Button) == xToyRangeButton) {
+					dataToSend.topText += " : " + yRangeLabel.text + yRangeButton.label;
 					dataToSend.settingid = data.settingid2;
 				} else if ((buttonClickEvent.target as Button) == yTozRangeButton) {
+					dataToSend.topText += " : " + zRangeLabel.text + zRangeButton.label;
 					dataToSend.settingid = data.settingid3;
 				} else if ((buttonClickEvent.target as Button) == zTo9999RangeButton) {
+					dataToSend.topText += " : " + zto9999RangeLabel.text + zTo9999RangeButton.label;
 					dataToSend.settingid = data.settingid4;
 				} 
 
@@ -241,7 +246,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  height="48"  width="100" text="{'0 ' + to + ' '}" verticalAlign="middle"/>
+			<s:Label  id="xRangeLabel" height="48"  width="100" text="{'0 ' + to + ' '}" verticalAlign="middle"/>
 			<s:Button id="xRangeButton" height="47" width="70" label="@{x_value}" click="rangeButton_clickHandler(event)"/>
 			<s:Button id="zerotoxGraphButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
 		</s:Group>
@@ -255,7 +260,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  height="48"  width="100" text="{x_value + ' ' + to + ' '}" verticalAlign="middle"/>
+			<s:Label  id="yRangeLabel"  height="48"  width="100" text="{x_value + ' ' + to + ' '}" verticalAlign="middle"/>
 			<s:Button id="yRangeButton" height="47" width="70" label="@{y_value}" click="rangeButton_clickHandler(event)"/>
 			<s:Button id="xToyRangeButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
 		</s:Group>
@@ -269,7 +274,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  height="48"  width="100" text="{y_value + ' ' + to + ' '}" verticalAlign="middle"/>
+			<s:Label  id="zRangeLabel" height="48"  width="100" text="{y_value + ' ' + to + ' '}" verticalAlign="middle"/>
 			<s:Button id="zRangeButton" height="47" width="70" label="@{z_value}" click="rangeButton_clickHandler(event)"/>
 			<s:Button id="yTozRangeButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
 		</s:Group>
@@ -283,7 +288,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  height="48"  width="200" text="{higherthan + ' ' + z_value}" verticalAlign="middle"/>
+			<s:Label id="zto9999RangeLabel"  height="48"  width="200" text="{higherthan + ' ' + z_value}" verticalAlign="middle"/>
 			<s:Button id="zTo9999RangeButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
 		</s:Group>
 	</s:Group>
