@@ -2226,7 +2226,7 @@ package utilities
 		}
 		
 		private function getTheSettings(event:Event = null):void {
-			//here remoteelements are all remote settings, since we queried on id > 2 and < 29
+			//here remoteelements are all remote settings, since we queried on id >= -86 and < 29
 			//we will go through them and any missing settingid will be added in remoteelementids
 			//any element in remotelements that needs no update (ie same modifiedtimestamp)  will be removed
 			//any element in remotelements that needs local update will be added in localElements and then removed from remotelements
@@ -2265,7 +2265,7 @@ package utilities
 					spaces +=" ";
 				urlVariables.sql = "SELECT * FROM " + spaces +
 					tableNamesAndColumnNames[5][1] +
-					" WHERE id > 2 AND id < 29";
+					" WHERE id > -87 AND id < 29";
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;//probably not used
 				
@@ -2275,7 +2275,7 @@ package utilities
 				//here the remoteelements  need to be interpreted differently than with events
 				//but how ... well read the fucking code
 				var settingCtr:int;
-				for (settingCtr  = 2 + 1;settingCtr < 29;settingCtr++) {
+				for (settingCtr  = -86;settingCtr < 29;settingCtr++) {
 					var settingFoundInRemoteElements:Boolean = false;
 					//first see if that setting is in the remoteelements
 					for (var remoteElementCtr:int = 0;remoteElementCtr < remoteElements.length;remoteElementCtr++) {

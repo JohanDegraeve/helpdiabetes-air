@@ -85,10 +85,10 @@ package databaseclasses
 		public static const Meal10_range_4_AOCChart_FactoryValue:String = "35:45-{carbs}-00:00>100-01:00>60-02:00>50";
 		
 		/** default values for active insulin on board, per range **/
-		public static const Medicin1_range1_AOBChart_FactoryValue:String= "0:15-%-00:00>100-01:00>60-02:00>50";
-		public static const Medicin1_range2_AOBChart_FactoryValue:String= "15:25-%-00:00>100-01:00>60-02:00>50";
-		public static const Medicin1_range3_AOBChart_FactoryValue:String= "25:35-%-00:00>100-01:00>60-02:00>50";
-		public static const Medicin1_range4_AOBChart_FactoryValue:String= "35:9999-%-00:00>100-01:00>60-02:00>50";
+		public static const Medicin1_range1_AOBChart_FactoryValue:String= "0:15-%-00:00>100-00:30>90-01:00>70-01:30>50-02:00>35-02:30>20-03:00>10-04:00>0";
+		public static const Medicin1_range2_AOBChart_FactoryValue:String= "15:25-%-00:00>100-00:30>90-01:00>70-01:30>50-02:00>35-02:30>20-03:00>10-04:00>0";
+		public static const Medicin1_range3_AOBChart_FactoryValue:String= "25:35-%-00:00>100-00:30>90-01:00>70-01:30>50-02:00>35-02:30>20-03:00>10-04:00>0";
+		public static const Medicin1_range4_AOBChart_FactoryValue:String= "35:9999-%-00:00>100-00:30>90-01:00>70-01:30>50-02:00>35-02:30>20-03:00>10-04:00>0";
 		public static const Medicin2_range1_AOBChart_FactoryValue:String= "0:15-%-00:00>100-01:00>60-02:00>50";
 		public static const Medicin2_range2_AOBChart_FactoryValue:String= "15:25-%-00:00>100-01:00>60-02:00>50";
 		public static const Medicin2_range3_AOBChart_FactoryValue:String= "25:35-%-00:00>100-01:00>60-02:00>50";
