@@ -35,10 +35,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			import mx.managers.PopUpManager;
+			import mx.resources.ResourceManager;
 			
 			import spark.components.TabbedViewNavigator;
 			import spark.components.ViewNavigator;
 			
+			import databaseclasses.Database;
 			import databaseclasses.MedicinEvent;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
@@ -60,6 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var amountPicker:AmountPicker;
 			private var medicinPicker:elementFromListPicker;
+			private var bolusTypePicker:elementFromListPicker;
 			private var dateOrTimePicker:Group;
 			private var confirmationPicker:RequestConfirmation;
 
@@ -69,6 +72,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var dateText:String ;
 			[Bindable]
 			private var timeText:String;
+			[Bindable]
+			private var bolusTypeText:String;
 			[Bindable]
 			private var amountText:String = "0";
 			[Bindable]
@@ -105,11 +110,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					if (TrackingView.popToFirstViewNecessary())
 						navigator.popToFirstView();
 					else {
+						bolusTypeText = (data as MedicinEvent).bolustype;
+						medicinName = (data as MedicinEvent).medicinName;
+
 						theMedicinEvent = data as MedicinEvent;
 						eventDateAndTime = new Date((data as MedicinEvent).timeStamp);
 						dateText = dateformatter.format(_eventDateAndTime);
 						timeText = timeformatter.format(_eventDateAndTime);
-						medicinName = (data as MedicinEvent).medicinName;
 						comment = theMedicinEvent.comment;
 						amountText = (new Number((data as MedicinEvent).amount)).toString();
 						newMedicinEvent = false;
@@ -192,6 +199,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dateText = dateformatter.format(_eventDateAndTime);
 				timeText = timeformatter.format(_eventDateAndTime);
 				medicinName = Settings.getInstance().getSetting(parseInt(Settings.getInstance().getSetting(Settings.SettingsDefaultMedicin)));
+				bolusTypeText = ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
 				back_label = resourceManager.getString('general','back');
 				newMedicinEvent = true;
 				TrashButton.visible = false;
@@ -277,6 +285,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				PopUpManager.centerPopUp(dateOrTimePicker);
 			}
 			
+			private function bolusTypeGroupClicked(e:MouseEvent = null):void {
+				var bolusTypeList:ArrayCollection = new ArrayCollection();
+				bolusTypeList.addItem(resourceManager.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL));
+				bolusTypeList.addItem(resourceManager.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_SQUARE_WAVE));
+				
+				bolusTypePicker = new elementFromListPicker();
+				bolusTypePicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, bolusTypeSelected);
+				bolusTypePicker.elements = bolusTypeList;
+				bolusTypePicker.labelText1 = resourceManager.getString('editmedicineventview','select_bolustype');
+				
+				PopUpManager.addPopUp(bolusTypePicker,UIComponent(this.parentApplication),true);
+				PopUpManager.centerPopUp(bolusTypePicker);
+				
+				function bolusTypeSelected(event:UnitChangedEvent):void {
+					bolusTypePicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED,bolusTypeSelected);
+					PopUpManager.removePopUp(bolusTypePicker);
+					bolusTypeText = bolusTypeList.getItemAt(event.index) as String;
+					
+					//if it's a square wave that is being selected, then show pop-up to select the time.
+					if (event.index == 1) {
+						
+					}
+				}
+			}
+			
 			private function okClicked(e:MouseEvent = null):void {
 				MyGATracker.getInstance().trackPageview( "EditMedicinEventView-OkClicked" );
 
@@ -286,10 +319,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						medicinName,
 						new Date().valueOf(),
 						comment,//comment,
-						eventDateAndTime.valueOf());
+						eventDateAndTime.valueOf(),
+						(new Date()).valueOf(),
+						true,
+						bolusTypeText);
 					ModelLocator.getInstance().trackingList.addItem(theMedicinEvent);
 				} else {
-					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText),comment,eventDateAndTime.valueOf(),new Date().valueOf());
+					theMedicinEvent.updateMedicinEvent(bolusTypeText, medicinName,new Number(amountText),comment,eventDateAndTime.valueOf(),new Date().valueOf());
 				}
 				
 				var creationTimeStampAsDate:Date = new Date(theMedicinEvent.timeStamp);
@@ -379,7 +415,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				} else {
 					//updating the bg event, this means even if the user would hit the back button afterwards, the bgevent will be updated
 					//this is in case user updates eg result or timing, then hits comment button, when coming back, we need to have the new values
-					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText), comment, eventDateAndTime.valueOf(),new Date().valueOf());
+					theMedicinEvent.updateMedicinEvent(bolusTypeText, medicinName,new Number(amountText), comment, eventDateAndTime.valueOf(),new Date().valueOf());
 					passbackObject = theMedicinEvent;
 				}
 				dataToPass.dataToPassBack = passbackObject;
@@ -416,7 +452,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				comment = textSet;
 				if (newMedicinEvent) {
 				} else {
-					theMedicinEvent.updateMedicinEvent(medicinName,new Number(amountText),comment,eventDateAndTime.valueOf(),new Date().valueOf());
+					theMedicinEvent.updateMedicinEvent(bolusTypeText, medicinName,new Number(amountText),comment,eventDateAndTime.valueOf(),new Date().valueOf());
 				}
 			}
 		]]>
@@ -487,6 +523,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			</s:layout>
 			<s:Label  id="timetext" height="47" width="30%" text="{resourceManager.getString('general','time')}"  verticalAlign="middle"/>
 			<s:Button id="time" height="47" width="70%" label="@{timeText}" />
+		</s:Group>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+			</s:stroke>
+		</s:Line>	
+		<s:Group id="bolusTypeGroup" y="0" x="0" width="100%" click="bolusTypeGroupClicked(event)">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:Label  id="bolustypetext" height="47" width="30%" text="{resourceManager.getString('editmedicineventview','bolustype')}"  verticalAlign="middle"/>
+			<s:Button id="bolustype" height="47" width="70%" label="@{bolusTypeText}" />
 		</s:Group>
 		<s:Line width="100%">
 			<s:stroke>

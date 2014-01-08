@@ -25,6 +25,17 @@ package databaseclasses
 	
 	public class MedicinEvent extends TrackingViewElement implements IListElement
 	{
+		/**
+		 * constant string for normal bolus type, equals "normal",
+		 * if you change this value, then also change the entry in editmedicineventview.properties
+		 */
+		public static const BOLUS_TYPE_NORMAL:String = "normal";
+		
+		/**
+		 * constant string for square bolus type, equals "square" 
+		 */
+		public static const BOLUS_TYPE_SQUARE_WAVE:String = "square";
+
 		private var _comment:String;
 
 		public function get comment():String
@@ -51,6 +62,22 @@ package databaseclasses
 			return _amount;
 		}
 		
+		private var _bolustype:String;
+
+		/**
+		 * type can be normal or squarewave 
+		 */
+		public function get bolustype():String
+		{
+			return _bolustype;
+		}
+
+		private function set bolustype(value:String):void
+		{
+			_bolustype = value;
+		}
+
+		
 		private var _lastModifiedTimestamp:Number;
 		
 		public function get lastModifiedTimestamp():Number
@@ -66,11 +93,13 @@ package databaseclasses
 		/**
 		 * creates a medicin event and stores it immediately in the database if storeInDatabase = true<br>
 		 * if creationTimeStamp = null, then current date and time is used<br>
-		 * if newLastModifiedTimestamp = null, then current date and time is used
+		 * if newLastModifiedTimestamp = null, then current date and time is used<br>
+		 * 
 		 */
-		public function MedicinEvent( amount:Number, medicin:String, medicineventid:Number, newcomment:String, creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN,storeInDatabase:Boolean = true)
+		public function MedicinEvent(amount:Number, medicin:String, medicineventid:Number, newcomment:String, creationTimeStamp:Number, newLastModifiedTimeStamp:Number,storeInDatabase:Boolean, bolusType:String )
 		{
 			this._medicinName = medicin;
+			this._bolustype = bolusType;
 			this.eventid = medicineventid;
 			this._amount = amount;
 			this._comment = newcomment;
@@ -85,7 +114,7 @@ package databaseclasses
 				_lastModifiedTimestamp = (new Date()).valueOf();
 			
 			if (storeInDatabase)
-				Database.getInstance().createNewMedicinEvent(amount, medicin, _timeStamp,_lastModifiedTimestamp,medicineventid, _comment, null);
+				Database.getInstance().createNewMedicinEvent(bolusType,amount, medicin, _timeStamp,_lastModifiedTimestamp,medicineventid, _comment, null);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -96,7 +125,8 @@ package databaseclasses
 		/**
 		 * will update the medicinevent in the database with the new values for medicinName and amount<br>
 		 */
-		public function updateMedicinEvent(newMedicinName:String,newAmount:Number, newComment:String, newCreationTimeStamp:Number , newLastModifiedTimeStamp:Number):void {
+		public function updateMedicinEvent(bolusType:String, newMedicinName:String,newAmount:Number, newComment:String, newCreationTimeStamp:Number , newLastModifiedTimeStamp:Number):void {
+			_bolustype = bolusType;
 			_amount = newAmount;
 			_medicinName = newMedicinName;
 			_comment = newComment;
@@ -106,7 +136,7 @@ package databaseclasses
 			
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
-			Database.getInstance().updateMedicinEvent(this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp, _comment);
+			Database.getInstance().updateMedicinEvent(this._bolustype, this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp, _comment);
 		}
 		
 		/**
