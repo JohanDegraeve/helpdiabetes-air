@@ -17,11 +17,12 @@
  */
 package myComponents
 {
-	import databaseclasses.MedicinEvent;
 	import mx.graphics.BitmapFillMode;
 	
 	import spark.components.Image;
 	import spark.components.supportClasses.StyleableTextField;
+	
+	import databaseclasses.MedicinEvent;
 
 	public class MedicinEventItemRenderer extends TrackingViewElementItemRenderer
 	{
@@ -33,11 +34,16 @@ package myComponents
 		[Embed(source = "assets/Notes_16x16.png")]
 		public static var notesIcon:Class;
 
+		private var squareWaveBolusImage:Image;
+		[Embed(source = "assets/squarewavebolus.png")]
+		public static var squareWaveBolusIcon:Class;
+
 		static private var itemHeight:int;
 		static private var offsetToPutTextInTheMiddle:int;
 		static private var iconHeight:int;
 		static private var iconWidth:int;
 		static private var notesIconWidthAndHeight:int = 17;
+		static private var squareWaveBolusWidthAndHeight:int = 17;
 		
 		
 		/**
@@ -75,6 +81,33 @@ package myComponents
 				notesImage.source = notesIcon;
 				addChild(notesImage);
 			}
+		}
+		
+		private var _bolusType:String
+
+		public function get bolusType():String
+		{
+			return _bolusType;
+		}
+
+		public function set bolusType(value:String):void
+		{
+			if (_bolusType == value)
+				return;
+			_bolusType = value;
+			if (bolusType == null)
+				return;
+			if (bolusType == "")
+				return;
+			if (bolusType == resourceManager.getString('editmedicineventview','square')) {
+				if (!squareWaveBolusImage) {
+					squareWaveBolusImage  = new Image();
+					squareWaveBolusImage.fillMode = BitmapFillMode.CLIP;
+					squareWaveBolusImage.source = squareWaveBolusIcon;
+					addChild(squareWaveBolusImage)
+				}
+			} else
+				squareWaveBolusImage = null;
 		}
 
 		
@@ -127,6 +160,7 @@ package myComponents
 			
 			amount = (value as MedicinEvent).amount.toString();
 			comment = (value as MedicinEvent).comment;
+			bolusType = (value as MedicinEvent).bolustype;
 		}
 
 		override protected function createChildren():void {
@@ -158,6 +192,15 @@ package myComponents
 						addChild(notesImage);
 					}
 				}
+			
+			if (bolusType == resourceManager.getString('editmedicineventview','square')) {
+				if (!squareWaveBolusImage) {
+					squareWaveBolusImage  = new Image();
+					squareWaveBolusImage.fillMode = BitmapFillMode.CLIP;
+					squareWaveBolusImage.source = squareWaveBolusIcon;
+					addChild(squareWaveBolusImage)
+				}
+			} 
 		}
 
 		override public function getHeight(item:TrackingViewElement = null):Number {
@@ -167,11 +210,9 @@ package myComponents
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
 			amountDisplay.text = amount + " " + resourceManager.getString('trackingview','internationalunit');
 			var amountDisplayWidth:Number = getElementPreferredWidth(amountDisplay);
-			var temp:Object = getElementPreferredWidth(labelDisplay);
-			var temp2:Object = unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth - iconWidth- (notesImage ? notesIconWidthAndHeight:0);
-			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth - iconWidth - (notesImage ? notesIconWidthAndHeight:0));
+			var labelDisplayWidth:Number = Math.min(getElementPreferredWidth(labelDisplay),unscaledWidth - PADDING_LEFT - PADDING_RIGHT - amountDisplayWidth - iconWidth - (notesImage ? notesIconWidthAndHeight:0) - (squareWaveBolusImage ? squareWaveBolusWidthAndHeight:0) );
 			amountDisplayWidth = Math.min(unscaledWidth - PADDING_LEFT - labelDisplayWidth - GAP_HORIZONTAL_MINIMUM - PADDING_RIGHT, getElementPreferredWidth(amountDisplay));
-			if (iconWidth + (notesImage ? notesIconWidthAndHeight:0) + labelDisplayWidth + amountDisplayWidth + PADDING_RIGHT + GAP_HORIZONTAL_MINIMUM < unscaledWidth)
+			if (iconWidth + (notesImage ? notesIconWidthAndHeight:0) + (squareWaveBolusImage ? squareWaveBolusWidthAndHeight:0) + labelDisplayWidth + amountDisplayWidth + PADDING_RIGHT + GAP_HORIZONTAL_MINIMUM < unscaledWidth)
 				labelDisplayWidth = unscaledWidth;//same reason as in exerciseventitemrenderer and bgeventitemrender but this works better
 			
 			setElementSize(labelDisplay,labelDisplayWidth,itemHeight);
@@ -180,12 +221,16 @@ package myComponents
 			labelDisplay.truncateToFit();
 			amountDisplay.truncateToFit();
 			
-			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);
-			setElementPosition(amountDisplay,unscaledWidth - PADDING_RIGHT - amountDisplayWidth - (notesImage ? notesIconWidthAndHeight:0),offsetToPutTextInTheMiddle);
 			setElementPosition(eventTypeImage,0,0);
+			setElementPosition(labelDisplay,0  + iconWidth,offsetToPutTextInTheMiddle);
+			setElementPosition(amountDisplay,unscaledWidth - PADDING_RIGHT - amountDisplayWidth - (notesImage ? notesIconWidthAndHeight:0) - (squareWaveBolusImage ? squareWaveBolusWidthAndHeight:0),offsetToPutTextInTheMiddle);
 			if (notesImage)  {
 				setElementSize(notesImage,notesIconWidthAndHeight,notesIconWidthAndHeight);
-				setElementPosition(notesImage,unscaledWidth- notesIconWidthAndHeight,offsetToPutTextInTheMiddle);
+				setElementPosition(notesImage,unscaledWidth- notesIconWidthAndHeight - (squareWaveBolusImage ? squareWaveBolusWidthAndHeight:0),offsetToPutTextInTheMiddle);
+			}
+			if (squareWaveBolusImage) {
+				setElementSize(squareWaveBolusImage,squareWaveBolusWidthAndHeight,squareWaveBolusWidthAndHeight);
+				setElementPosition(squareWaveBolusImage,unscaledWidth- squareWaveBolusWidthAndHeight ,offsetToPutTextInTheMiddle);
 			}
 		}
 		

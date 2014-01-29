@@ -65,6 +65,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			public static var maxInsulinActivity:Number = 129600000;
 			
+			private static var BOLUS_INTERVAL_FOR_SQUARE_WAVE_BOLUSSES:int = 1;//in minutes
+			
 			
 			private function addHandler():void {
 				if (!navigator.poppedViewReturnedObject) return; 
@@ -353,7 +355,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 										else 
 											settingToUse = Settings.SettingsMedicin4_range1_AOBChart + medicincntr * 4;
 										var fromTimeAndValueArrayCollection:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(settingToUse));
-										activeInsulin += theEvent.amount * fromTimeAndValueArrayCollection.getValue((now.valueOf() - (list.getItemAt(cntr) as TrackingViewElement).timeStamp)/1000) / 100;
+										if (theEvent.bolustype == resourceManager.getString('editmedicineventview','square')) {
+											//split over 1 injection per minute
+											var amountOfInjections:int = theEvent.bolusDuration / BOLUS_INTERVAL_FOR_SQUARE_WAVE_BOLUSSES;
+											var bolusAmountPerInjectionAsInt:Number = theEvent.amount / amountOfInjections;
+											var injectionsCntr:int;
+											var timeStampOfInjection:Number;
+											for (injectionsCntr = 0;injectionsCntr < amountOfInjections;injectionsCntr++) {
+												timeStampOfInjection = ((list.getItemAt(cntr) as TrackingViewElement).timeStamp + injectionsCntr * BOLUS_INTERVAL_FOR_SQUARE_WAVE_BOLUSSES * 60 * 1000);
+												if (timeStampOfInjection < now.valueOf()) {
+													var percentage:Number = fromTimeAndValueArrayCollection.getValue((now.valueOf() - timeStampOfInjection)/1000);
+													activeInsulin += bolusAmountPerInjectionAsInt *  percentage / 100;
+												}
+											}
+											/*timeStampOfInjection = ((list.getItemAt(cntr) as TrackingViewElement).timeStamp + injectionsCntr * BOLUS_INTERVAL_FOR_SQUARE_WAVE_BOLUSSES * 60 * 1000);
+											if (timeStampOfInjection < now.valueOf())
+												activeInsulin += (theEvent.amount - bolusAmountPerInjectionAsInt * amountOfInjections)  * fromTimeAndValueArrayCollection.getValue((now.valueOf() - timeStampOfInjection)/1000) / 100;*/
+										} else {
+											activeInsulin += theEvent.amount * fromTimeAndValueArrayCollection.getValue((now.valueOf() - (list.getItemAt(cntr) as TrackingViewElement).timeStamp)/1000) / 100;
+										}
 									}
 								}
 							}

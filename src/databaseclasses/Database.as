@@ -60,7 +60,7 @@ package databaseclasses
 		private static const dbFileName:String = "foodfile.db";
 		private  static var dbFile:File  ;
 		private var xmlFileName:String;
-		public static const medicinnamesplitter = "-";//medicinname stored in database will be used for medicinname and bolustype
+		public static const medicinnamesplitter:String = "-";//medicinname stored in database will be used for medicinname and bolustype
 		
 		private const DATABASE_VERSION_1:String = "version1";
 		private const DATABASE_VERSION_2:String = "version2";
@@ -2144,14 +2144,19 @@ package databaseclasses
 							var medicinArray:Array = (o.medicinname as String).split(medicinnamesplitter);
 							
 							var bolusType:String;
+							var bolusDuration:Number;
 							if (medicinArray.length > 1)
 								bolusType = medicinArray[1];
 							else 
 								bolusType = ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
+							if (medicinArray.length > 2)
+								bolusDuration = new Number(medicinArray[2] as String);
+							else
+								bolusDuration = new Number(0);
 							
 							var medicinName:String = medicinArray[0];
 							
-							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number, medicinName, o.medicineventid as Number, o.comment_2 as String, o.creationtimestamp as Number, o.lastmodifiedtimestamp as Number, false, bolusType);
+							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number, medicinName, o.medicineventid as Number, o.comment_2 as String, o.creationtimestamp as Number, o.lastmodifiedtimestamp as Number, false, bolusType, bolusDuration);
 							ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
 							var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2346,7 +2351,7 @@ package databaseclasses
 		 * new medicin event will be added to the database<br>
 		 * here the medicineventid will get the value of current date and time as Number 
 		 */
-		internal function createNewMedicinEvent(bolusType:String, amount:Number,medicin:String, timeStamp:Number,newLastModifiedTimeStamp:Number,medicineventid:Number, comment:String,dispatcher:EventDispatcher = null):void {
+		internal function createNewMedicinEvent(bolusType:String, bolusDuration:Number, amount:Number,medicin:String, timeStamp:Number,newLastModifiedTimeStamp:Number,medicineventid:Number, comment:String,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -2363,7 +2368,7 @@ package databaseclasses
 				localSqlStatement.parameters[":medicineventid"] = medicineventid;
 				localSqlStatement.parameters[":amount"] = amount;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
-				localSqlStatement.parameters[":medicinname"] = medicin + medicinnamesplitter + bolusType;
+				localSqlStatement.parameters[":medicinname"] = medicin + medicinnamesplitter + bolusType + medicinnamesplitter + bolusDuration.toString();
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.parameters[":comment_2"] = comment;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventCreated);
@@ -2404,7 +2409,7 @@ package databaseclasses
 		/**
 		* medicinevent with specified medicineventid is updated with new values for timestamp, amount and medicinname
 		*/ 	
-		internal function updateMedicinEvent(newBolusType:String, medicinEventId:Number,newAmount:Number,newMedicinName:String,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number, comment:String,dispatcher:EventDispatcher = null):void {
+		internal function updateMedicinEvent(newBolusType:String, newBolusDuration:Number, medicinEventId:Number,newAmount:Number,newMedicinName:String,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number, comment:String,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -2420,7 +2425,7 @@ package databaseclasses
 				localSqlStatement.parameters[":id"] = medicinEventId;
 				localSqlStatement.parameters[":amount"] = newAmount;
 				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;
-				localSqlStatement.parameters[":medicinname"] = newMedicinName + medicinnamesplitter + newBolusType;
+				localSqlStatement.parameters[":medicinname"] = newMedicinName + medicinnamesplitter + newBolusType + medicinnamesplitter + newBolusDuration.toString();
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.parameters[":comment_2"] = comment;
 				localSqlStatement.addEventListener(SQLEvent.RESULT, medicinEventUpdated);

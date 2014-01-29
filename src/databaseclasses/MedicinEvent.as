@@ -90,16 +90,36 @@ package databaseclasses
 			_lastModifiedTimestamp = value;
 		}
 		
+		private var _bolusDuration:Number;
+
+		 /**
+		  * used only for square wave bolus, duration in minutes
+		  */
+		 public function get bolusDuration():Number
+		 {
+			 return _bolusDuration;
+		 }
+
+		 /**
+		  * @private
+		  */
+		 private function set bolusDuration(value:Number):void
+		 {
+			 _bolusDuration = value;
+		 }
+
+		
 		/**
 		 * creates a medicin event and stores it immediately in the database if storeInDatabase = true<br>
 		 * if creationTimeStamp = null, then current date and time is used<br>
 		 * if newLastModifiedTimestamp = null, then current date and time is used<br>
 		 * 
 		 */
-		public function MedicinEvent(amount:Number, medicin:String, medicineventid:Number, newcomment:String, creationTimeStamp:Number, newLastModifiedTimeStamp:Number,storeInDatabase:Boolean, bolusType:String )
+		public function MedicinEvent(amount:Number, medicin:String, medicineventid:Number, newcomment:String, creationTimeStamp:Number, newLastModifiedTimeStamp:Number,storeInDatabase:Boolean, bolusType:String, bolusDuration:Number )
 		{
 			this._medicinName = medicin;
 			this._bolustype = bolusType;
+			this._bolusDuration = bolusDuration;
 			this.eventid = medicineventid;
 			this._amount = amount;
 			this._comment = newcomment;
@@ -114,7 +134,7 @@ package databaseclasses
 				_lastModifiedTimestamp = (new Date()).valueOf();
 			
 			if (storeInDatabase)
-				Database.getInstance().createNewMedicinEvent(bolusType,amount, medicin, _timeStamp,_lastModifiedTimestamp,medicineventid, _comment, null);
+				Database.getInstance().createNewMedicinEvent(bolusType,bolusDuration, amount, medicin, _timeStamp,_lastModifiedTimestamp,medicineventid, _comment, null);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -125,18 +145,19 @@ package databaseclasses
 		/**
 		 * will update the medicinevent in the database with the new values for medicinName and amount<br>
 		 */
-		public function updateMedicinEvent(bolusType:String, newMedicinName:String,newAmount:Number, newComment:String, newCreationTimeStamp:Number , newLastModifiedTimeStamp:Number):void {
+		public function updateMedicinEvent(bolusType:String, bolusDuration:Number, newMedicinName:String,newAmount:Number, newComment:String, newCreationTimeStamp:Number , newLastModifiedTimeStamp:Number):void {
 			_bolustype = bolusType;
 			_amount = newAmount;
 			_medicinName = newMedicinName;
 			_comment = newComment;
+			_bolusDuration = bolusDuration;
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
 			_lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
-			Database.getInstance().updateMedicinEvent(this._bolustype, this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp, _comment);
+			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDuration, this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp, _comment);
 		}
 		
 		/**

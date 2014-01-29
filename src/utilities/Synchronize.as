@@ -1039,14 +1039,21 @@ package utilities
 								} else {
 									var medicinArray:Array = (remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][1][0])] as String).split(Database.medicinnamesplitter);
 									var bolusType:String;
+									var bolusDuration:Number;
 									if (medicinArray.length > 1)
 										bolusType = medicinArray[1];
 									else 
 										bolusType = ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
+									if (medicinArray.length > 2)
+										bolusDuration = new Number(medicinArray[2] as String);
+									else
+										bolusDuration = new Number(0);
+
 									var medicinName:String = medicinArray[0];
 
 									(trackingList.getItemAt(l) as MedicinEvent).updateMedicinEvent(
 										bolusType,
+										bolusDuration,
 										medicinName,
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
@@ -1065,10 +1072,16 @@ package utilities
 							localElementsUpdated = true;
 							var medicinArray1:Array = (remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][1][0])] as String).split(Database.medicinnamesplitter);
 							var bolusType1:String;
+							var bolusDuration2:Number;
 							if (medicinArray1.length > 1)
 								bolusType1 = medicinArray1[1];
 							else 
 								bolusType1 = ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
+							if (medicinArray1.length > 2)
+								bolusDuration2 = new Number(medicinArray1[2] as String);
+							else
+								bolusDuration2 = new Number(0);
+
 							var medicinName1:String = medicinArray1[0];
 
 							(new MedicinEvent(
@@ -1079,7 +1092,8 @@ package utilities
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]),
 								true,
-								bolusType1));
+								bolusType1,
+								bolusDuration2));
 							if (debugMode) trace("local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
@@ -1947,7 +1961,7 @@ package utilities
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[0][1] + " ";
 							sqlStatement += "(id,medicinname,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as MedicinEvent).eventid.toString() + "\',\'" +
-								(localElements.getItemAt(i) as MedicinEvent).medicinName + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolustype + "\',\'" +
+								(localElements.getItemAt(i) as MedicinEvent).medicinName + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolusDuration.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).amount.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).timeStamp.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).lastModifiedTimestamp.toString() + "\'," +
@@ -2077,7 +2091,7 @@ package utilities
 									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
 									sqlStatement += 
 										"id = \'" + (localElements.getItemAt(k) as MedicinEvent).eventid.toString() + "\'," +
-										"medicinname = \'" + (localElements.getItemAt(k) as MedicinEvent).medicinName + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolustype + "\'," +
+										"medicinname = \'" + (localElements.getItemAt(k) as MedicinEvent).medicinName + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolusDuration.toString() + "\'," +
 										"value = \'" + (localElements.getItemAt(k) as MedicinEvent).amount.toString() + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as MedicinEvent).timeStamp.toString() + "\'," +
 										"comment = \'" + (localElements.getItemAt(k) as MedicinEvent).comment + "\'," +
@@ -2547,7 +2561,7 @@ package utilities
 					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
-						"medicinname = \'" + (objectToBeDeleted as MedicinEvent).medicinName + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolustype + "\'," + 
+						"medicinname = \'" + (objectToBeDeleted as MedicinEvent).medicinName + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolustype + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolusDuration.toString() +"\'," + 
 						"value = \'" + (objectToBeDeleted as MedicinEvent).amount.toString() + "\'," +
 						"creationtimestamp = \'" + (objectToBeDeleted as MedicinEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
