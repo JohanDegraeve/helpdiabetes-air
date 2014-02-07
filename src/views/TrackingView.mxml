@@ -436,9 +436,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" />
 		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
-		<s:Label id="activeInsulin" left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.extendedFunctionsActive}" visible="{ModelLocator.extendedFunctionsActive}"/>
+		<s:Label id="activeInsulin" left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
 		
-		<s:List id="trackinglist" left="0" right="0" top="{ModelLocator.extendedFunctionsActive ? 40:0}" bottom="0" width="100%" useVirtualLayout="true" 
+		<s:List id="trackinglist" left="0" right="0" top="{ModelLocator.getInstance().extendedFunctionsActive() ? 40:0}" bottom="0" width="100%" useVirtualLayout="true" 
 				dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
 				click="onListElementClicked(event)"
 				itemRendererFunction="getItemRenderer">

@@ -298,11 +298,13 @@ package model
 		 */
 		public var firstStartUp:Boolean = true;
 		
-		public static var debugMode:Boolean = true;
+		public static var debugMode:Boolean = false;
 		
 
-		public static function extendedFunctionsActive():Boolean
+		public  function extendedFunctionsActive():Boolean
 		{
+			//return false;
+			var test:Object = null;
 			return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
 		}
 
