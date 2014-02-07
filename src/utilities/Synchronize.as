@@ -95,6 +95,8 @@ package utilities
 		 */
 		private static var maxResults:int = 25;
 		
+		private static var minimSettingCntrToSync = -87;
+		
 		/**
 		 * how many minutes between two synchronisations, normal value
 		 */
@@ -2297,7 +2299,7 @@ package utilities
 					spaces +=" ";
 				urlVariables.sql = "SELECT * FROM " + spaces +
 					tableNamesAndColumnNames[5][1] +
-					" WHERE id > -87 AND id < 29";
+					" WHERE id > " + (new Number(minimSettingCntrToSync -1)).toString() + " AND id < 29";
 				if (nextPageToken != null)
 					urlVariables.pageToken = nextPageToken;//probably not used
 				
@@ -2307,7 +2309,7 @@ package utilities
 				//here the remoteelements  need to be interpreted differently than with events
 				//but how ... well read the fucking code
 				var settingCtr:int;
-				for (settingCtr  = -86;settingCtr < 29;settingCtr++) {
+				for (settingCtr  = minimSettingCntrToSync; settingCtr < 29;settingCtr++) {
 					var settingFoundInRemoteElements:Boolean = false;
 					//first see if that setting is in the remoteelements
 					for (var remoteElementCtr:int = 0;remoteElementCtr < remoteElements.length;remoteElementCtr++) {

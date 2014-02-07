@@ -40,6 +40,8 @@ package model
 	
 	import utilities.FromtimeAndValueArrayCollection;
 	
+	import views.SettingsExerciseView;
+	
 	/**
 	 * has some data fields used throughout the application<br>
 	 * - 
@@ -298,6 +300,13 @@ package model
 		
 		public static var debugMode:Boolean = true;
 		
+
+		public static function extendedFunctionsActive():Boolean
+		{
+			return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
+		}
+
+		
 		/**
 		 * offset to be used top and bottom of a label itemrenderer, to make sure the text is in the middle
 		 public static function get offSetSoThatTextIsInTheMiddle():Number
@@ -351,6 +360,7 @@ package model
 			
 			infoTrackingList = new ArrayCollection();
 			infoTrackingList.addItem(new SimpleTextEvent(ResourceManager.getInstance().getString("general","storingnewevents")));
+			
 		}
 		
 		/** 

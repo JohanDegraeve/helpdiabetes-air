@@ -109,6 +109,9 @@ package databaseclasses
 		
 		/** EXTEND LIST OF CONSTANTS IN CASE NEW SETTING NEEDS TO BE DEFINED  */
 
+		/** extended functions active or not
+		 */
+		public static const SettingsExtendedFunctionsActive:int = -87;
 		/** Descriptions of the meal graphs **/
 		public static const SettingsMeal1GraphDescription:int = -86;
 		public static const SettingsMeal2GraphDescription:int = -85;
@@ -467,7 +470,7 @@ package databaseclasses
 			"",
 			"",
 			"",
-			"",
+			"false",// extended functions active or not
 			"",//meal Type 1
 			"",//meal Type 2
 			"",//meal Type 3

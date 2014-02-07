@@ -664,7 +664,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:SolidColorStroke color="0xcccccc" weight="1"/>
 			</s:stroke>
 		</s:Line>	
-		<s:Group id="bolusTypeGroup" y="0" x="0" width="100%" >
+		<s:Group id="bolusTypeGroup" y="0" x="0" width="100%" includeInLayout="{ModelLocator.extendedFunctionsActive}" visible="{ModelLocator.extendedFunctionsActive}">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
@@ -673,7 +673,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:Button id="bolustype" height="47"  label="@{bolusTypeText}" click="bolusTypeGroupClicked(event)"/>
 			<s:Button id="stopButton" height="47" width="{stopButtonVisible ? 47:0}" icon="@Embed('assets/stopsign.png')" click="stopButtonClicked(event)" visible="{stopButtonVisible}"/>
 		</s:Group>
-		<s:Line width="100%">
+		<s:Line width="100%" includeInLayout="{ModelLocator.extendedFunctionsActive}" visible="{ModelLocator.extendedFunctionsActive}">
 			<s:stroke>
 				<s:SolidColorStroke color="0xcccccc" weight="1"/>
 			</s:stroke>

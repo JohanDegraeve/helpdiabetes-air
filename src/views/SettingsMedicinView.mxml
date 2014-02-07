@@ -36,6 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import databaseclasses.Settings;
 			
+			import model.ModelLocator;
+			
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
@@ -213,7 +215,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type1" text="@{medicinText1}" editable="true" borderVisible="false" textAlign="left" change="type1_changeHandler(event)" />
-		 	<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button1_clickHandler(event)"/>
+		 	<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button1_clickHandler(event)" includeInLayout="{ModelLocator.extendedFunctionsActive}" visible="{ModelLocator.extendedFunctionsActive}"/>
 		</s:Group>
 		
 		<s:Group y="0" x="0" width="100%">
@@ -222,7 +224,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type2" text="@{medicinText2}" editable="true" borderVisible="false" textAlign="left" change="type2_changeHandler(event)"/>
-			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button2_clickHandler(event)"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button2_clickHandler(event)" includeInLayout="{ModelLocator.extendedFunctionsActive}" visible="{ModelLocator.extendedFunctionsActive}"/>
 		</s:Group>
 		
 		<s:Group y="0" x="0" width="100%">
@@ -231,7 +233,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextInput width="80%" contentBackgroundColor="0xDCDCDC" id="type3" text="@{medicinText3}" editable="true" borderVisible="false" textAlign="left" change="type3_changeHandler(event)"/>
-			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button3_clickHandler(event)"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button3_clickHandler(event)" includeInLayout="{ModelLocator.extendedFunctionsActive}" visible="{ModelLocator.extendedFunctionsActive}"/>
 		</s:Group>
 		
 		<s:Group y="0" x="0" width="100%">
@@ -240,7 +242,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type4" text="@{medicinText4}" editable="true" borderVisible="false" textAlign="left" change="type4_changeHandler(event)"/>
-			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button4_clickHandler(event)"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button4_clickHandler(event)" includeInLayout="{ModelLocator.extendedFunctionsActive}" visible="{ModelLocator.extendedFunctionsActive}"/>
 		</s:Group>
 		
 		<s:Group y="0" x="0" width="100%">
@@ -249,7 +251,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>			
 			<s:TextInput width="80%" contentBackgroundColor="0xDCDCDC" id="type5" text="@{medicinText5}" editable="true" borderVisible="false" textAlign="left" change="type5_changeHandler(event)"/>
-			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button5_clickHandler(event)"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button5_clickHandler(event)" includeInLayout="{ModelLocator.extendedFunctionsActive}" visible="{ModelLocator.extendedFunctionsActive}"/>
 		</s:Group>
 	</s:Group>
 	

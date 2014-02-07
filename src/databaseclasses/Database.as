@@ -1715,6 +1715,7 @@ package databaseclasses
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = (isNaN(lastModifiedTimeStamp) ? (new Date()).valueOf() : lastModifiedTimeStamp);
 				localSqlStatement.addEventListener(SQLEvent.RESULT, settingUpdated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, settingUpdateFailed);
+				//SQLErrorEvent.
 				localSqlStatement.execute();
 			}
 			

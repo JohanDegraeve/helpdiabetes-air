@@ -30,6 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import spark.events.IndexChangeEvent;
 			
+			import model.ModelLocator;
+			
 			[Bindable]
 			private var back_label:String;
 
@@ -37,8 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("settingsallbolussettingsview","bolus_calculation"),
-				ResourceManager.getInstance().getString("settingsview","meal_times"),
-				ResourceManager.getInstance().getString("settingsallbolussettingsview","correction_factor_settings")
+				ResourceManager.getInstance().getString("settingsview","meal_times")
+				
 			]);	
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -51,6 +53,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function init():void {
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
+				if (ModelLocator.extendedFunctionsActive)
+					menuList.addItem(ResourceManager.getInstance().getString("settingsallbolussettingsview","correction_factor_settings"));
 			}
 			
 			/**
