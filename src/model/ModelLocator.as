@@ -304,7 +304,6 @@ package model
 		public  function extendedFunctionsActive():Boolean
 		{
 			//return false;
-			var test:Object = null;
 			return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
 		}
 
