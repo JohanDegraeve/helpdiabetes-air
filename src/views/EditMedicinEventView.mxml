@@ -65,7 +65,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var bolusTypePicker:elementFromListPicker;
 			private var dateOrTimePicker:Group;
 			private var confirmationPicker:RequestConfirmation;
-
+			
 			[Bindable]
 			private var medicinName:String;
 			[Bindable]
@@ -83,13 +83,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var back_label:String;
 			[Bindable]
 			private var stopButtonVisible:Boolean = false;
-
+			
 			private var comment:String;
 			
 			private var defaultBolusDurationAsDate:Date = new Date(240*60*1000);
 			private var defaultBolusDurationAsString:String = "04:00";
 			private var bolusTypeList:ArrayCollection ;
-
+			
 			/**
 			 * if true then this view is created for a new mealevent 
 			 */
@@ -99,9 +99,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * stores the medicinevent in case it's an existing event that is being modified, used also in case a new event is created 
 			 */
 			private var theMedicinEvent:MedicinEvent;
-
+			
 			private var helpCallOut:HelpCallOut;
-
+			
 			private var _eventDateAndTime:Date;
 			private function get eventDateAndTime():Date
 			{
@@ -135,7 +135,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 								stopButtonVisible = true;
 						}
 						medicinName = (data as MedicinEvent).medicinName;
-
+						
 						theMedicinEvent = data as MedicinEvent;
 						eventDateAndTime = new Date((data as MedicinEvent).timeStamp);
 						dateText = dateformatter.format(_eventDateAndTime);
@@ -215,7 +215,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				}
 			}
-
+			
 			private function onInitialize():void {
 				//setting initial values, will be overwritten in oncreationcomplete if data is an medicinevent
 				eventDateAndTime = new Date();
@@ -227,7 +227,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				newMedicinEvent = true;
 				TrashButton.visible = false;
 			}
-
+			
 			private function insulinTypeGroupClicked(e:MouseEvent = null):void {
 				var unitList:ArrayCollection = new ArrayCollection();
 				for (var i:int = Settings.SettingsInsulinType1; i <= Settings.SettingsInsulinType5;i++) {
@@ -243,7 +243,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				PopUpManager.addPopUp(medicinPicker,UIComponent(this.parentApplication),true);
 				PopUpManager.centerPopUp(medicinPicker);
-
+				
 				function medicinSelected(event:UnitChangedEvent):void {
 					medicinPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED,medicinSelected);
 					PopUpManager.removePopUp(medicinPicker);
@@ -297,7 +297,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				eventDateAndTime = (event.newValue as Date);
-
+				
 				var bolusTypeTextSplitted:Array = bolusTypeText.split(" - ");
 				var bolusDuration:Number = new Number();
 				if (bolusTypeTextSplitted.length > 1) {
@@ -345,7 +345,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				//if it's a square wave that is being selected, then show pop-up to select the time.
 				if (event.index == 1) {
 					dateOrTimePicker = new TimePicker();
-
+					
 					var bolusTypeTextSplitted:Array = previousBolusTypeText.split(" - ");
 					var bolusDuration:Number = new Number();//duration in minutes
 					if (bolusTypeTextSplitted.length > 1) {
@@ -368,7 +368,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					PopUpManager.centerPopUp(dateOrTimePicker);
 				}
 			}
-
+			
 			private function onDurationCancel(event: PickerEvent): void
 			{
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, onDurationSet);
@@ -396,7 +396,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				else 
 					stopButtonVisible = false;
 			}
-
+			
 			
 			private function okClicked(e:MouseEvent = null):void {
 				MyGATracker.getInstance().trackPageview( "EditMedicinEventView-OkClicked" );
@@ -471,12 +471,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				function onYesClicked(event: PickerEvent): void
 				{
 					MyGATracker.getInstance().trackPageview( "EditMedicinEventView-deleteClicked" );
-
+					
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					Synchronize.getInstance().addObjectToBeDeleted(theMedicinEvent);
 					Synchronize.getInstance().startSynchronize(true,false);
-
+					
 					theMedicinEvent.deleteEvent();
 					//we need to make sure the previous tracking event is visible so we store the itemindex
 					var trackinglistPointer:Number = ModelLocator.getInstance().trackingList.getItemIndex(theMedicinEvent);
@@ -519,7 +519,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							+
 							(new Number(durationAsString[1] as String));
 					}
-
+					
 					//updating the bg event, this means even if the user would hit the back button afterwards, the bgevent will be updated
 					//this is in case user updates eg result or timing, then hits comment button, when coming back, we need to have the new values
 					theMedicinEvent.updateMedicinEvent(bolusTypeTextSplitted[0], bolusDuration, medicinName,new Number(amountText), comment, eventDateAndTime.valueOf(),new Date().valueOf());
@@ -575,8 +575,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function stopButtonClicked(buttonClickEvent:MouseEvent):void
 			{
 				var newBolusDuration:Number = ((new Date()).valueOf() - eventDateAndTime.valueOf() - 1) / 1000 / 60;
-				//var temp1:Date = (new Date());
-				//var temp2:Date = eventDateAndTime;
+				
+				var bolusTypeTextSplitted:Array = bolusTypeText.split(" - ");
+				var oldBolusDuration:Number = new Number();
+				var durationAsString:Array = bolusTypeTextSplitted[1].split(":");
+				oldBolusDuration = 
+					(new Number(durationAsString[0] as String)) * 60
+					+
+					(new Number(durationAsString[1] as String));
+				
+				var newAmount:Number = (new Number(amountText))/ oldBolusDuration * newBolusDuration;
+				amountText = ((Math.round(newAmount * 10)) / 10).toString();
+				
 				bolusTypeText = resourceManager.getString('editmedicineventview','square');
 				var hoursAsInt:int = newBolusDuration/60;
 				var hoursAsString:String = (new Number(hoursAsInt)).toString();
@@ -600,7 +610,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="@Embed(source='../assets/Notes_48x48.png')" id="NotesButton" click="editNote(event)"/>
 		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked(event)"/>
 	</s:actionContent>
-
+	
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
 		<s:layout>
 			<s:VerticalLayout >
