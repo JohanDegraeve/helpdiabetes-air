@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
+			import mx.events.CollectionEvent;
 			import mx.events.FlexEvent;
 			
 			import databaseclasses.BloodGlucoseEvent;
@@ -323,6 +324,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				} /*else
 				helptext0Removed();*/
 				
+				recalculateActiveInsulin();				
+				ModelLocator.getInstance().copyOfTrackingList.addEventListener(CollectionEvent.COLLECTION_CHANGE,recalculateActiveInsulin);
+			}
+			
+			private function recalculateActiveInsulin(event:Event = null):void  {
 				//calculate activeInsulin_text
 				var list:ArrayCollection = ModelLocator.getInstance().copyOfTrackingList;
 				var activeInsulin:Number = new Number(0);
@@ -370,7 +376,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 											}
 											/*timeStampOfInjection = ((list.getItemAt(cntr) as TrackingViewElement).timeStamp + injectionsCntr * BOLUS_INTERVAL_FOR_SQUARE_WAVE_BOLUSSES * 60 * 1000);
 											if (timeStampOfInjection < now.valueOf())
-												activeInsulin += (theEvent.amount - bolusAmountPerInjectionAsInt * amountOfInjections)  * fromTimeAndValueArrayCollection.getValue((now.valueOf() - timeStampOfInjection)/1000) / 100;*/
+											activeInsulin += (theEvent.amount - bolusAmountPerInjectionAsInt * amountOfInjections)  * fromTimeAndValueArrayCollection.getValue((now.valueOf() - timeStampOfInjection)/1000) / 100;*/
 										} else {
 											activeInsulin += theEvent.amount * fromTimeAndValueArrayCollection.getValue((now.valueOf() - (list.getItemAt(cntr) as TrackingViewElement).timeStamp)/1000) / 100;
 										}
