@@ -298,7 +298,7 @@ package model
 		 */
 		public var firstStartUp:Boolean = true;
 		
-		public static var debugMode:Boolean = false;
+		public static var debugMode:Boolean = true;
 		
 
 		public  function extendedFunctionsActive():Boolean

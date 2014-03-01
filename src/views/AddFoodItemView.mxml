@@ -45,13 +45,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import databaseclasses.*;
-			import databaseclasses.FoodItem;
-			import databaseclasses.Unit;
-			import databaseclasses.UnitChangedEvent;
-						
-			import model.ModelLocator;
-			
 			import mx.collections.ArrayCollection;
 			import mx.collections.ArrayList;
 			import mx.core.FlexGlobals;
@@ -61,15 +54,27 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceBundle;
 			
+			import spark.components.Label;
+			import spark.events.ViewNavigatorEvent;
+			
+			import databaseclasses.Database;
+			import databaseclasses.DatabaseEvent;
+			import databaseclasses.FoodItem;
+			import databaseclasses.Meal;
+			import databaseclasses.MealEvent;
+			import databaseclasses.SelectedFoodItem;
+			import databaseclasses.Settings;
+			import databaseclasses.Unit;
+			import databaseclasses.UnitChangedEvent;
+			
+			import model.ModelLocator;
+			
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
-			
-			import spark.components.Label;
-			import spark.events.ViewNavigatorEvent;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
@@ -396,22 +401,24 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				
 				
 				PopUpManager.addPopUp(aSelectUnit,UIComponent(this.parentApplication),true);
+				//PopUpManager.createPopUp(UIComponent(this.parentApplication),aSelectUnit,true);
 				PopUpManager.centerPopUp(aSelectUnit);
 				
-				function selectedUnitChanged(event:UnitChangedEvent):void {
-					aSelectUnit.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
-					PopUpManager.removePopUp(aSelectUnit);
-					details_button_text = createDetailsButtonText(event.index,-1);
-					selectedUnit = event.index;
-					
-					//if (retrievedFoodItem.getUnit(event.index).standardAmount != 100)
-					amount_textinput_text = retrievedFoodItem.getUnit(event.index).standardAmount.toString();
-					//else
-					//set it to empty string, this allows the user to immediately start typing an amount
-					//amount_textinput_text = "";
-				}
 			}
 			
+			private function selectedUnitChanged(event:UnitChangedEvent):void {
+				aSelectUnit.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
+				PopUpManager.removePopUp(aSelectUnit);
+				details_button_text = createDetailsButtonText(event.index,-1);
+				selectedUnit = event.index;
+				
+				//if (retrievedFoodItem.getUnit(event.index).standardAmount != 100)
+				amount_textinput_text = retrievedFoodItem.getUnit(event.index).standardAmount.toString();
+				//else
+				//set it to empty string, this allows the user to immediately start typing an amount
+				//amount_textinput_text = "";
+			}
+
 			private function initMealButtonText():String {
 				var returnValue:String = " ";
 				if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null) {

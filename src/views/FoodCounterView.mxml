@@ -119,6 +119,7 @@ the home screen
 					onReturn();
 				} else {
 					firstStartUp = true;
+					//onReturn(null);
 					notificationPopUp = new Notification();
 					notificationPopUp.notificationText = resourceManager.getString('helpdiabetes','infoaboutlanguageselection');
 					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
@@ -166,22 +167,23 @@ the home screen
 					//if event is not a unitchaged event, it means this application doesn't start first the first itme, so a database already existed and user didn't have to pick a preferred language
 					if (event is UnitChangedEvent)  {
 						if ((event as UnitChangedEvent).index == 0) {
-							resourceManager.localeChain = ["en_US","nl_NL","fr_FR","ro_RO"];
-							localeChainAsString = "en_US,nl_NL,fr_FR,ro_RO";
+							resourceManager.localeChain = ["en_US","nl_NL","fr_FR"];
+							localeChainAsString = "en_US,nl_NL,fr_FR";
 						}
 						if ((event as UnitChangedEvent).index == 1) {
-							resourceManager.localeChain = ["nl_NL","en_US","fr_FR","ro_RO"];
-							localeChainAsString = "nl_NL,en_US,fr_FR,ro_RO";
+							resourceManager.localeChain = ["nl_NL","en_US","fr_FR"];
+							localeChainAsString = "nl_NL,en_US,fr_FR";
 						}
 						if ((event as UnitChangedEvent).index == 2) {
-							resourceManager.localeChain = ["fr_FR","en_US","nl_NL","ro_RO"];
-							localeChainAsString = "fr_FR,en_US,nl_NL,ro_RO";
+							resourceManager.localeChain = ["fr_FR","en_US","nl_NL"];
+							localeChainAsString = "fr_FR,en_US,nl_NL";
 						}
 						if ((event as UnitChangedEvent).index == 3) {
-							resourceManager.localeChain = ["ro_RO","en_US","fr_FR","nl_NL"];
-							localeChainAsString = "ro_RO,en_US,fr_FR,nl_NL";
+							resourceManager.localeChain = ["ro_RO","en_US","fr_FR"];
+							localeChainAsString = "en_US,fr_FR,nl_NL";
 						}
-					}
+					} 
+						
 					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
 					Settings.getInstance().setSettingWithoutDatabaseUpdate(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
 					

@@ -23,6 +23,7 @@ after creation and before showing set labelText and amount
 you can also define maximum amount of digits after decimal point, maximum amount of digits before decimal point and to labeltexts
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 implements="mx.managers.IFocusManagerContainer"
 		 xmlns:s="library://ns.adobe.com/flex/spark">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -32,6 +33,9 @@ you can also define maximum amount of digits after decimal point, maximum amount
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import mx.core.ContainerGlobals;
+			import mx.core.IFlexDisplayObject;
+			import mx.managers.IFocusManagerContainer;
 			import mx.managers.PopUpManager;
 			
 			[Bindable] private var hundreds:String;
@@ -39,6 +43,18 @@ you can also define maximum amount of digits after decimal point, maximum amount
 			[Bindable] private var units:String;
 			[Bindable] private var tenths:String;
 			[Bindable] private var hundredths:String;
+
+			private var _defaultButton:IFlexDisplayObject;
+			
+			public function get defaultButton():IFlexDisplayObject
+			{
+				return _defaultButton;
+			}
+			public function set defaultButton(value:IFlexDisplayObject):void
+			{
+				_defaultButton = value;
+				ContainerGlobals.focusedContainer = null;
+			}
 			
 			private var _minimumAmount :Number= 0;
 

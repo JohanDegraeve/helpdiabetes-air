@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 implements="mx.managers.IFocusManagerContainer"
 		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -26,7 +27,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import mx.core.ContainerGlobals;
+			import mx.core.IFlexDisplayObject;
+			import mx.managers.IFocusManagerContainer;
 			import mx.managers.PopUpManager;
+
+			private var _defaultButton:IFlexDisplayObject;
+			
+			public function get defaultButton():IFlexDisplayObject
+			{
+				return _defaultButton;
+			}
+			public function set defaultButton(value:IFlexDisplayObject):void
+			{
+				_defaultButton = value;
+				ContainerGlobals.focusedContainer = null;
+			}			
 
 			/**
 			 * two labels will be shown this is the first label 
