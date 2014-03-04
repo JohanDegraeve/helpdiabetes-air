@@ -57,6 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private static var lastClickOnTrackingView:Number;
 			private var helpCallOut:HelpCallOut;
+			private var timer2:Timer;
 			private var timer:Timer;
 			
 			[Bindable]
@@ -329,6 +330,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function recalculateActiveInsulin(event:Event = null):void  {
+				if (timer2 != null) {
+					if (timer2.hasEventListener(TimerEvent.TIMER))
+						timer2.removeEventListener(TimerEvent.TIMER,recalculateActiveInsulin );
+				}
+				
 				//calculate activeInsulin_text
 				var list:ArrayCollection = ModelLocator.getInstance().copyOfTrackingList;
 				var activeInsulin:Number = new Number(0);
@@ -393,6 +399,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					+ ((Math.round(activeInsulin * 10))/10).toString() 
 					+ " " 
 					+ resourceManager.getString('trackingview','internationalunit');
+				
+				timer2 = new Timer(60000, 1);
+				timer2.addEventListener(TimerEvent.TIMER,recalculateActiveInsulin);
+				timer2.start();
+
 			}
 			
 			/*private function helptext0Removed(event:Event = null):void {
