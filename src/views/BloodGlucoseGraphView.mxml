@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		creationComplete="view1_creationCompleteHandler(event)"
+		xmlns:s="library://ns.adobe.com/flex/spark" title="BloodGlucoseGraphView">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.resources.ResourceManager;
+			
+			import spark.formatters.DateTimeFormatter;
+			
+			import databaseclasses.BloodGlucoseEvent;
+			import databaseclasses.MedicinEvent;
+			import databaseclasses.Settings;
+			
+			import model.ModelLocator;
+			
+			import myComponents.TrackingViewElement;
+			
+			import utilities.FromtimeAndValueArrayCollection;
+
+			private static const maxBGValue:int = 400;//we don't draw dots any higher
+			private static const minBGValue:int = 40;//we don't draw dots any lower
+			private static var resolutinInMinutes:int = 240;//user may in or decrease later on, so not const
+			private var numberOfMeasurements:Number = 100;
+			private var trackingList:ArrayCollection;//just to have a short reference to the trackinglist
+			private var debugCounter:int;
+
+			/**
+			 * will draw a new measurement point at given timestamp and value<br>
+			 * timestamp is ms since 1 jan 1970<br>
+			 * value is bloodglucose level
+			 */
+			private function drawNewPredictionPoint(timeStamp:Number,value:Number):void {
+				var timeFormatter:DateTimeFormatter = new DateTimeFormatter();
+				timeFormatter.dateTimePattern = ResourceManager.getInstance().getString('uploadtrackingview','timepattern');
+				timeFormatter.useUTC = false;
+				timeFormatter.setStyle("locale",Capabilities.language.substr(0,2));
+
+				trace(debugCounter++ + " timeStamp as Number = " + timeStamp.toString() + ", formatted = " + timeFormatter.format(timeStamp) + ", bglevel = " + value.toString().replace(".",","));
+			}
+			
+			/**
+			 * draws the complete graph<br>
+			 * returnvalue will tell if draw was complete or not, and if not why not
+			 */
+			private function reDrawCompleteGraph(from:Number,to:Number):String {				
+				var initialActiveInsulin:Number;
+				var newActiveInsulin:Number;
+				var consumedInsulin:Number;
+				var  CFList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
+				var previousBGlevel:Number;
+				var previousTimeStamp:Number;
+				var previousActiveInsulin:Number;
+				var nextTimeStamp:Number;
+				var returnValue:String = "completed";
+				debugCounter = 0;
+				/**
+				 * we want to keep a list of square waves within the calculated intervals, because we need to be able to calculate between two timestamps who much of it has been given by the pump
+				 */
+				var listOfBolusses:ArrayCollection = new ArrayCollection();
+
+				/**
+				 * in ms
+				 */
+				var minimumIntervalBetweenTwoCalculations:Number = (to - from) / numberOfMeasurements;
+				
+				trackingList = ModelLocator.getInstance().copyOfTrackingList;				
+
+				var cntr1:int;
+				for (cntr1 = trackingList.length - 1;cntr1 >= 0;cntr1--) {
+					if (((trackingList.getItemAt(cntr1)) as TrackingViewElement).timeStamp < from) {
+						break;//cntr1 points to first element in trackinglist coming before from		
+					}
+				}
+				if (cntr1 < 0)
+					return "no bloodglucoseevents found before from";//there's nothing to draw
+
+				//cntr3 will be used when searching for the bolusses to be taken into account, but first find the previous bloodglucose event, because that's where we will start
+				var cntr3:int = cntr1;
+				var cntr4:int = cntr1 + 1;
+
+
+				//loop until you find a bloodglucoseevent
+				while (!((trackingList.getItemAt(cntr1)) is BloodGlucoseEvent) && cntr1 >=0) {
+					cntr1--;
+				}
+
+				//if cntr1 >= 0 then event on cntr1 is bloodglucoseevent
+				if (cntr1 < 0)
+					return "no bloodglucoseevents found before from";//there's no bloodglucoseevent before - can't making a drawing
+
+				//make list of bolusses , normal bolusses that fall within the timeperiod
+				//square wave bolusses that started maximum 36 hours before timestampofbgevent and not after end period
+				var previousBloodGlucoseTimeStamp:Number = ((trackingList.getItemAt(cntr1)) as TrackingViewElement).timeStamp;
+				
+				while (cntr3 >= 0 && ((trackingList.getItemAt(cntr3)) as TrackingViewElement).timeStamp > previousBloodGlucoseTimeStamp - 36 * 3600 * 1000) {
+					var event:TrackingViewElement = trackingList.getItemAt(cntr3) as TrackingViewElement;
+					if (event is MedicinEvent) {
+						var medicinEvent:MedicinEvent = event as MedicinEvent;
+						if (medicinEvent.bolustype == resourceManager.getString('editmedicineventview','square')) {
+							//it's a square wave that started less than 36 hours before from
+							if (medicinEvent.timeStamp + medicinEvent.bolusDurationInMilliSeconds() < previousBloodGlucoseTimeStamp) {
+								//we don't need it
+							} else {
+								if (medicinEvent.timeStamp > to) {
+									//we don't need it
+								} else {
+									listOfBolusses.addItem(medicinEvent);	
+								}
+							}
+						} else {
+							//it's a normal bolus
+							if (medicinEvent.timeStamp < previousBloodGlucoseTimeStamp) {
+								//we don't need it
+							} else {
+								if (medicinEvent.timeStamp > to) {
+									//we don't need it
+								} else {
+									listOfBolusses.addItem(medicinEvent);	
+								}
+							}
+						}
+					}
+					cntr3--;
+				}
+
+				while (cntr4 < trackingList.length && ((trackingList.getItemAt(cntr4)) as TrackingViewElement).timeStamp < to) {
+					var event:TrackingViewElement = trackingList.getItemAt(cntr4) as TrackingViewElement;
+					if (event is MedicinEvent) {
+						var medicinEvent:MedicinEvent = event as MedicinEvent;
+						if (medicinEvent.bolustype == resourceManager.getString('editmedicineventview','square')) {
+							//it's a square wave that started less than 36 hours before from
+							if (medicinEvent.timeStamp + medicinEvent.bolusDurationInMilliSeconds() < previousBloodGlucoseTimeStamp) {
+								//we don't need it
+							} else {
+								if (medicinEvent.timeStamp > to) {
+									//we don't need it
+								} else {
+									listOfBolusses.addItem(medicinEvent);	
+								}
+							}
+						} else {
+							//it's a normal bolus
+							if (medicinEvent.timeStamp < previousBloodGlucoseTimeStamp) {
+								//we don't need it
+							} else {
+								if (medicinEvent.timeStamp > to) {
+									//we don't need it
+								} else {
+									listOfBolusses.addItem(medicinEvent);	
+								}
+							}
+						}
+					}
+					cntr4++;
+				}
+								
+				//first calculate active insulin at timestamp of bgevent
+				initialActiveInsulin = ModelLocator.getInstance().calculateActiveInsulin((trackingList.getItemAt(cntr1) as BloodGlucoseEvent).timeStamp);
+				var initialTimeStamp:Number = (trackingList.getItemAt(cntr1) as BloodGlucoseEvent).timeStamp;
+				//active insulin of from
+				newActiveInsulin = ModelLocator.getInstance().calculateActiveInsulin(from);
+				if (isNaN(newActiveInsulin))
+					return "calculatedActiveInsulin is not calculated - probably because medicin profile is not activated";
+				//how much active insulin is consumed ?
+				consumedInsulin = initialActiveInsulin - newActiveInsulin + getInjectedPartsOfBolusses(listOfBolusses,initialTimeStamp,from);
+				
+				//this is now the first calculated bg level - immediately assigned to previousbglevel
+				previousBGlevel = (trackingList.getItemAt(cntr1) as BloodGlucoseEvent).bloodGlucoseLevel - CFList.getValue(Number.NaN,"",new Date(from)) * consumedInsulin;
+				previousActiveInsulin = newActiveInsulin;
+				previousTimeStamp = from;
+				
+				//we have a first dot to draw
+				drawNewPredictionPoint(previousTimeStamp,previousBGlevel); 
+				
+				//continue
+				//get next element that has a timestamp <= lasttimestamp + interval, if it's not a bg event or a medicinevent, then ignore it
+				nextTimeStamp = previousTimeStamp + minimumIntervalBetweenTwoCalculations;
+				while (nextTimeStamp <= to) {
+					var weAlreadyCalculatedTheNextPoint:Boolean = false;
+					//the first time we come here, cntr1 points still to first element in trackinglist coming before now
+					cntr1++;
+					var cntr2:int = cntr1;
+					while (cntr2 < trackingList.length) {
+						var theElement:TrackingViewElement = trackingList.getItemAt(cntr2) as TrackingViewElement;
+						if 	(theElement.timeStamp > previousTimeStamp && theElement.timeStamp < nextTimeStamp) 
+						{
+							if (theElement is BloodGlucoseEvent) {
+								//we will actually draw a vertical line from the calculated bloodglucose amount to the measured bloodglucseamount
+								//first calculate new bloodglucose amount
+								newActiveInsulin = ModelLocator.getInstance().calculateActiveInsulin(theElement.timeStamp);
+								if (isNaN(newActiveInsulin))
+									return "calculatedActiveInsulin is not calculated - probably because medicin profile is not activated";
+								consumedInsulin = previousActiveInsulin - newActiveInsulin + getInjectedPartsOfBolusses(listOfBolusses,previousTimeStamp,(theElement as BloodGlucoseEvent).timeStamp);
+
+								//this is now the first calculated bg level - immediately assigned to previousbglevel
+								previousBGlevel -= CFList.getValue(Number.NaN,"",new Date(theElement.timeStamp)) * consumedInsulin;
+								//newActiveInsulin;
+								previousTimeStamp = (theElement as BloodGlucoseEvent).timeStamp;
+								//draw the dot
+								drawNewPredictionPoint(previousTimeStamp,previousBGlevel);
+								
+								//now the new measured bloodglucoselevel
+								previousBGlevel = (theElement as BloodGlucoseEvent).bloodGlucoseLevel;
+								//previoustimestamp same value as just assigned
+								drawNewPredictionPoint(previousTimeStamp,previousBGlevel);
+								//previoustimestamp is already set
+								previousActiveInsulin = newActiveInsulin;
+								cntr1 = cntr2;
+								cntr2 = trackingList.length - 1;
+								weAlreadyCalculatedTheNextPoint = true;
+							}
+						} else {
+							if (!(theElement.timeStamp < nextTimeStamp)) {
+								//we reached an element that passed the end time of our new period
+								//no need to continue, but next time we want to restart also with this element, so we set cntr1 to cntr 2 - 1
+								cntr1 = cntr2 - 1;
+								//and nowe we make sure we break the loop
+								cntr2 = trackingList.length - 1;
+							}
+						}
+						cntr2++;
+					} 
+					//we reached the end of the trackinglist, so now we just calculate
+					if (!weAlreadyCalculatedTheNextPoint) {
+						newActiveInsulin = ModelLocator.getInstance().calculateActiveInsulin(nextTimeStamp);
+						consumedInsulin = previousActiveInsulin - newActiveInsulin + getInjectedPartsOfBolusses(listOfBolusses,previousTimeStamp,nextTimeStamp);
+						previousBGlevel -= CFList.getValue(Number.NaN,"",new Date(nextTimeStamp)) * consumedInsulin;
+						drawNewPredictionPoint(nextTimeStamp,previousBGlevel);
+						//after drawing
+						previousTimeStamp = nextTimeStamp;
+						previousActiveInsulin = newActiveInsulin;
+					}
+					nextTimeStamp =  previousTimeStamp + minimumIntervalBetweenTwoCalculations;
+				}
+				return returnValue;
+			}
+			
+			/**
+			 * will calculate injected bolusses between timestamp start and end - as well for square wave as normal bolusses<br>
+			 * list must contain medicinevents
+			 */private function getInjectedPartsOfBolusses(list:ArrayCollection,start:Number,end:Number):Number {
+				var returnvalue:Number = new Number(0);
+				for (var listcntr:int = 0;listcntr < list.length;listcntr++) {
+					if ((list.getItemAt(listcntr) as MedicinEvent).timeStamp > end) {
+						//it starts after end so nothing has been given
+					} else if ((list.getItemAt(listcntr) as MedicinEvent).timeStamp + (list.getItemAt(listcntr) as MedicinEvent).bolusDurationInMilliSeconds() < start) {
+						//it ends before begin, so nothing has been given
+					} else if ((list.getItemAt(listcntr) as MedicinEvent).bolustype != resourceManager.getString('editmedicineventview','square')) {
+						returnvalue += (list.getItemAt(listcntr) as MedicinEvent).amount;
+					} else {
+						//so it's not a square wave and  there's definitely an overlap
+						//if it's start and end are completely within given period, then the complete amount has been given
+						if ( 
+							(list.getItemAt(listcntr) as MedicinEvent).timeStamp >= start 
+							&& 
+							(list.getItemAt(listcntr) as MedicinEvent).timeStamp + (list.getItemAt(listcntr) as MedicinEvent).bolusDurationInMilliSeconds() <= end
+							) {
+							returnvalue += (list.getItemAt(listcntr) as MedicinEvent).amount;
+						} else {
+							var amountGivenDuringPeriod:Number = new Number(0);
+							var amountOfInjections:int = (list.getItemAt(listcntr) as MedicinEvent).amount / ModelLocator.BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES;
+							var intervalBetweenInjectionsInMinutes:Number = (list.getItemAt(listcntr) as MedicinEvent).bolusDurationInMinutes / amountOfInjections;
+							var injectionsCntr:int;
+							var timeStampOfInjection:Number;
+							for (injectionsCntr = 0;injectionsCntr < amountOfInjections;injectionsCntr++) {
+								timeStampOfInjection = ((list.getItemAt(listcntr) as MedicinEvent).timeStamp + injectionsCntr * intervalBetweenInjectionsInMinutes * 60 * 1000);
+								if (timeStampOfInjection > start && timeStampOfInjection < end) {
+									amountGivenDuringPeriod += ModelLocator.BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES;
+								} 
+							}
+
+							returnvalue += amountGivenDuringPeriod;
+						}
+					}
+				}
+				return returnvalue;
+			}
+			
+			protected function view1_creationCompleteHandler(event:FlexEvent):void {
+				//graph.graphics.lineStyle(2, 0x990000, .75);
+				//graph.drawRoundRect(10,10,100,100);
+				trace(reDrawCompleteGraph((new Date()).valueOf(),(new Date()).valueOf() + 4 * 3600 * 1000));
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Graphic id="graph">
+		
+	</s:Graphic>
+</s:View>

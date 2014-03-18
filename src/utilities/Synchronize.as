@@ -1963,7 +1963,7 @@ package utilities
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[0][1] + " ";
 							sqlStatement += "(id,medicinname,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as MedicinEvent).eventid.toString() + "\',\'" +
-								(localElements.getItemAt(i) as MedicinEvent).medicinName + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolusDuration.toString() + "\',\'" +
+								(localElements.getItemAt(i) as MedicinEvent).medicinName + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolusDurationInMinutes.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).amount.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).timeStamp.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).lastModifiedTimestamp.toString() + "\'," +
@@ -2093,7 +2093,7 @@ package utilities
 									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
 									sqlStatement += 
 										"id = \'" + (localElements.getItemAt(k) as MedicinEvent).eventid.toString() + "\'," +
-										"medicinname = \'" + (localElements.getItemAt(k) as MedicinEvent).medicinName + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolusDuration.toString() + "\'," +
+										"medicinname = \'" + (localElements.getItemAt(k) as MedicinEvent).medicinName + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolusDurationInMinutes.toString() + "\'," +
 										"value = \'" + (localElements.getItemAt(k) as MedicinEvent).amount.toString() + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as MedicinEvent).timeStamp.toString() + "\'," +
 										"comment = \'" + (localElements.getItemAt(k) as MedicinEvent).comment + "\'," +
@@ -2563,7 +2563,7 @@ package utilities
 					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
-						"medicinname = \'" + (objectToBeDeleted as MedicinEvent).medicinName + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolustype + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolusDuration.toString() +"\'," + 
+						"medicinname = \'" + (objectToBeDeleted as MedicinEvent).medicinName + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolustype + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolusDurationInMinutes.toString() +"\'," + 
 						"value = \'" + (objectToBeDeleted as MedicinEvent).amount.toString() + "\'," +
 						"creationtimestamp = \'" + (objectToBeDeleted as MedicinEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +

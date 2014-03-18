@@ -121,17 +121,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					else {
 						bolusTypeText = (data as MedicinEvent).bolustype;
 						if (bolusTypeText == resourceManager.getString('editmedicineventview','square')) {
-							var hoursAsInt:int = (data as MedicinEvent).bolusDuration/60;
+							var hoursAsInt:int = (data as MedicinEvent).bolusDurationInMinutes/60;
 							var hoursAsString:String = (new Number(hoursAsInt)).toString();
 							if (hoursAsString.length == 1)
 								hoursAsString = "0" + hoursAsString;
-							var minutesAsInt:int = (data as MedicinEvent).bolusDuration - 60 * hoursAsInt;
+							var minutesAsInt:int = (data as MedicinEvent).bolusDurationInMinutes - 60 * hoursAsInt;
 							var minutesAsString:String = (new Number(minutesAsInt)).toString();
 							if (minutesAsString.length == 1)
 								minutesAsString = "0" + minutesAsString;
 							
 							bolusTypeText += " - " +  hoursAsString + ":" + minutesAsString;
-							if ((data as MedicinEvent).timeStamp + (data as MedicinEvent).bolusDuration * 60 * 1000 > (new Date()).valueOf())
+							if ((data as MedicinEvent).timeStamp + (data as MedicinEvent).bolusDurationInMinutes * 60 * 1000 > (new Date()).valueOf())
 								stopButtonVisible = true;
 						}
 						medicinName = (data as MedicinEvent).medicinName;

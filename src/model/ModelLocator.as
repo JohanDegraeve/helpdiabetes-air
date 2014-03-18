@@ -23,6 +23,8 @@ package model
 {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
@@ -32,6 +34,7 @@ package model
 	
 	import databaseclasses.Meal;
 	import databaseclasses.MealEvent;
+	import databaseclasses.MedicinEvent;
 	import databaseclasses.Settings;
 	
 	import myComponents.DayLine;
@@ -203,7 +206,11 @@ package model
 		
 		private var _trackingList:ArrayCollection;
 		
-		//public var logString:String;
+		/**
+		 * maximum insulin activity in milliseconds, initialized to 36 hours
+		 */
+		public static var maxInsulinActivity:Number = 129600000;
+
 		
 		[Bindable]
 		
@@ -299,12 +306,13 @@ package model
 		public var firstStartUp:Boolean = true;
 		
 		public static var debugMode:Boolean = false;
-		
+
+		public static var BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES:Number = 0.1;//unit s of insulin
 
 		public  function extendedFunctionsActive():Boolean
 		{
-			//return false;
-			return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
+			return true;
+			//return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
 		}
 
 		
@@ -770,5 +778,74 @@ package model
 			}
 		}
 		
+		/**
+		 * calculates active insulin at given time, if time = null then active insulin now is calculated, time in ms since 1 1 1970
+		 */
+		public function calculateActiveInsulin(time:Number = NaN):Number  {
+			
+			if (isNaN(time))
+				time = (new Date()).valueOf();
+
+			var activeInsulin:Number = new Number(0);
+			for (var cntr:int = copyOfTrackingList.length - 1; cntr >= 0 ; cntr-- ) {
+				//we go back maximum maxInsulinActivity
+				if ((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp + maxInsulinActivity < time)
+					break;
+				if ((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp < time) {//we don't include events in the future
+					if (copyOfTrackingList.getItemAt(cntr) is MedicinEvent) {
+						var theEvent:MedicinEvent = copyOfTrackingList.getItemAt(cntr) as MedicinEvent;
+						//let's find if the name of the medicinevent matches one of the medicins in the settings
+						for (var medicincntr:int = 0;medicincntr <  5;medicincntr++) {
+							if (Settings.getInstance().getSetting( Settings.SettingsInsulinType1 + medicincntr) == theEvent.medicinName)  {
+								if (Settings.getInstance().getSetting(Settings.SettingsMedicin1_AOBActive + medicincntr) == "true")  {
+									//..zien welke range we moeten nemen
+									var x_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range1_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
+									var y_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range2_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
+									var z_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range3_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
+									var x_value:Number = Number(x_valueasString);
+									var y_value:Number = Number(y_valueasString);
+									var z_value:Number = Number(z_valueasString);
+									var settingToUse:int;	
+									if (theEvent.amount < x_value)
+										settingToUse = Settings.SettingsMedicin1_range1_AOBChart + medicincntr * 4;
+									else if (theEvent.amount < y_value)
+										settingToUse = Settings.SettingsMedicin2_range1_AOBChart + medicincntr * 4;
+									else if (theEvent.amount < z_value)
+										settingToUse = Settings.SettingsMedicin3_range1_AOBChart + medicincntr * 4;
+									else 
+										settingToUse = Settings.SettingsMedicin4_range1_AOBChart + medicincntr * 4;
+									var fromTimeAndValueArrayCollection:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(settingToUse));
+									if (theEvent.bolustype == ResourceManager.getInstance().getString('editmedicineventview','square')) {
+										//split over 0.1 unit per injection
+										var amountOfInjections:int = theEvent.amount / BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES;
+										//var bolusAmountPerInjectionAsInt:Number = theEvent.amount / amountOfInjections;
+										var intervalBetweenInjections:Number = theEvent.bolusDurationInMinutes / amountOfInjections;
+										var injectionsCntr:int;
+										var timeStampOfInjection:Number;
+										for (injectionsCntr = 0;injectionsCntr < amountOfInjections;injectionsCntr++) {
+											timeStampOfInjection = ((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp + injectionsCntr * intervalBetweenInjections * 60 * 1000);
+											if (timeStampOfInjection < time) {
+												var percentage:Number = fromTimeAndValueArrayCollection.getValue((time - timeStampOfInjection)/1000);
+												activeInsulin += BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES *  percentage / 100;
+											} else 
+												break;
+										}
+										/*timeStampOfInjection = ((list.getItemAt(cntr) as TrackingViewElement).timeStamp + injectionsCntr * BOLUS_INTERVAL_FOR_SQUARE_WAVE_BOLUSSES * 60 * 1000);
+										if (timeStampOfInjection < now.valueOf())
+										activeInsulin += (theEvent.amount - bolusAmountPerInjectionAsInt * amountOfInjections)  * fromTimeAndValueArrayCollection.getValue((now.valueOf() - timeStampOfInjection)/1000) / 100;*/
+									} else {
+										activeInsulin += theEvent.amount * fromTimeAndValueArrayCollection.getValue((time - (copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp)/1000) / 100;
+									}
+								} else {
+									activeInsulin = Number.NaN;//there's a medicinevent found with type of insulin that has a not-enbled profile
+								}
+							}
+						}
+						
+					}
+				}
+			}
+			return activeInsulin;
+		}
 	}
 }

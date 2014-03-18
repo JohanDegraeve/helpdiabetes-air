@@ -90,22 +90,26 @@ package databaseclasses
 			_lastModifiedTimestamp = value;
 		}
 		
-		private var _bolusDuration:Number;
+		private var _bolusDurationInMinutes:Number;
 
 		 /**
 		  * used only for square wave bolus, duration in minutes
 		  */
-		 public function get bolusDuration():Number
+		 public function get bolusDurationInMinutes():Number
 		 {
-			 return _bolusDuration;
+			 return _bolusDurationInMinutes;
 		 }
 
 		 /**
 		  * @private
 		  */
-		 private function set bolusDuration(value:Number):void
+		 private function set bolusDurationInMinutes(value:Number):void
 		 {
-			 _bolusDuration = value;
+			 _bolusDurationInMinutes = value;
+		 }
+		 
+		 public function bolusDurationInMilliSeconds():Number {
+			 return _bolusDurationInMinutes * 60 * 1000;
 		 }
 
 		
@@ -119,7 +123,7 @@ package databaseclasses
 		{
 			this._medicinName = medicin;
 			this._bolustype = bolusType;
-			this._bolusDuration = bolusDuration;
+			this._bolusDurationInMinutes = bolusDuration;
 			this.eventid = medicineventid;
 			this._amount = amount;
 			this._comment = newcomment;
@@ -150,14 +154,14 @@ package databaseclasses
 			_amount = newAmount;
 			_medicinName = newMedicinName;
 			_comment = newComment;
-			_bolusDuration = bolusDuration;
+			_bolusDurationInMinutes = bolusDuration;
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
 			_lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
-			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDuration, this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp, _comment);
+			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDurationInMinutes, this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp, _comment);
 		}
 		
 		/**

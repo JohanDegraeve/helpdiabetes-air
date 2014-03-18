@@ -230,8 +230,8 @@ package utilities
 		  * </li>
 		  * <li>
 		  * a date object - in this case only the Hour of the Day and the Minutes will be taken into account<br>
-		  * Which means, if a data object is used , the maximum value can be 23:59<br>
-		  * This is treated as real date, new utc conversion or something like that.
+		  * Which means, if a date object is used , the maximum value can be 23:59<br>
+		  * This is treated as real date, no utc conversion or something like that.
 		  * </li>
 		  * </ul>
 		  */public function getValue(timeAsNumber:Number = Number.NaN,timeAsString:String = "",timeAsDate:Date = null):Number {
