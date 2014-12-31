@@ -109,6 +109,12 @@ package databaseclasses
 		
 		/** EXTEND LIST OF CONSTANTS IN CASE NEW SETTING NEEDS TO BE DEFINED  */
 
+		/**
+		 * maximum duration of insulin in seconds<br>
+		 * will be adapted here as soon as one of the profiles gets changed<br>
+		 * not really necessary to synchronize it because it will be udpated here as soon as one of the insulin profiles gets updated
+		 */
+		public static const SettingsMaximumInsulinDurationInSeconds = -88;
 		/** extended functions active or not
 		 */
 		public static const SettingsExtendedFunctionsActive:int = -87;
@@ -455,6 +461,10 @@ package databaseclasses
 		 **/
 		public static const SettingsDayOfLastCompleteSync:int=109;
 		
+		/**
+		 * used in blood glucose graph, how many timestamps will be calculated.
+		 */public static const SettingsAmountOfCalculationsInBloodGlucoseGraph:int = 110;
+		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
 			"",
@@ -469,7 +479,7 @@ package databaseclasses
 			"",
 			"",
 			"",
-			"",
+			"14400",//maximum duration insulin in seconds - default values is 4 hours, so 
 			"false",// extended functions active or not
 			"",//meal Type 1
 			"",//meal Type 2
@@ -677,7 +687,8 @@ package databaseclasses
 			"0",//SettingsNextRowToAdd
 			"false",//all fooditmes uploaded or not
 			"0",
-			"-1"//SettingsDayOfLastCompleteSync
+			"-1",//SettingsDayOfLastCompleteSync
+			"100"//SettingsAmountOfCalculationsInBloodGlucoseGraph
 		];
 		
 		/** array with lastmodifiedtimestamp<br> 
@@ -788,6 +799,34 @@ package databaseclasses
 				//update all mealevents
 				//	 NOG AANPASSEN, ENKEL IN DIEN SETTING IS CORRECTIONFACTORSETTING
 				ModelLocator.getInstance().resetCorrectionFactorsInMeals(new Date());
+				
+				//if it's a medicinprofile then update maxium duration
+				if (settingId >= SettingsMedicin1_range1_AOBChart + 100 && settingId <= SettingsMedicin5_range4_AOBChart + 100) {
+					var highestValueInSeconds:Number = new Number(0);
+					for (var cntr:int = SettingsMedicin1_range1_AOBChart;cntr <= SettingsMedicin5_range4_AOBChart;cntr++) {
+						var settingAsString:String = getSetting(cntr);
+						//"0:15-%-00:00>100-00:30>90-01:00>70-01:30>50-02:00>35-02:30>20-03:00>10-04:00>0";
+						var splittedSettingString:Array = settingAsString.split("-");
+						var firstPieceWithPercentageValueZero:String;// = splittedSettingString[splitted.length - 1];
+						var cntr27:int = 2;
+						while (cntr27 < splittedSettingString.length) {
+							firstPieceWithPercentageValueZero = splittedSettingString[cntr27];
+							if (new Number((firstPieceWithPercentageValueZero.split(">")[1]) == 0))
+								cntr27 = splittedSettingString.length;
+							else
+								cntr27++;
+						}
+						splittedSettingString = firstPieceWithPercentageValueZero.split(">");
+						firstPieceWithPercentageValueZero = splittedSettingString[0];//it's actually the first pice
+						splittedSettingString = firstPieceWithPercentageValueZero.split(":");
+						var firstpiece = splittedSettingString[0];
+						firstPieceWithPercentageValueZero = splittedSettingString[1];
+						var durationInSeconds:Number = (new Number(firstpiece)) * 3600 + (new Number(firstPieceWithPercentageValueZero)) * 60;
+						if (durationInSeconds > highestValueInSeconds)
+							highestValueInSeconds = durationInSeconds;
+					}
+					setSetting(SettingsMaximumInsulinDurationInSeconds,highestValueInSeconds.toString(),(new Date()).valueOf());
+				}
 			}
 		}
 		

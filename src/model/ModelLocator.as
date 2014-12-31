@@ -43,8 +43,6 @@ package model
 	
 	import utilities.FromtimeAndValueArrayCollection;
 	
-	import views.SettingsExerciseView;
-	
 	/**
 	 * has some data fields used throughout the application<br>
 	 * - 
@@ -96,6 +94,8 @@ package model
 		{
 			return _searchActive;
 		}
+		
+		private static var counter:int = 0;
 		
 		/**
 		 * sets searchActive<br>
@@ -206,11 +206,6 @@ package model
 		
 		private var _trackingList:ArrayCollection;
 		
-		/**
-		 * maximum insulin activity in milliseconds, initialized to 36 hours
-		 */
-		public static var maxInsulinActivity:Number = 129600000;
-
 		
 		[Bindable]
 		
@@ -311,8 +306,8 @@ package model
 
 		public  function extendedFunctionsActive():Boolean
 		{
-			return true;
-			//return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
+			//return false;
+			return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
 		}
 
 		
@@ -783,13 +778,17 @@ package model
 		 */
 		public function calculateActiveInsulin(time:Number = NaN):Number  {
 			
+			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
+			
+			//trace("in calculateActiveInsulin " + ++counter);
 			if (isNaN(time))
 				time = (new Date()).valueOf();
 
 			var activeInsulin:Number = new Number(0);
 			for (var cntr:int = copyOfTrackingList.length - 1; cntr >= 0 ; cntr-- ) {
+				//trace("cntr = " + cntr + " date = " + (new Date((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp)).toString());
 				//we go back maximum maxInsulinActivity
-				if ((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp + maxInsulinActivity < time)
+				if ((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp + maxInsulinDurationInSeconds * 1000 < time)
 					break;
 				if ((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp < time) {//we don't include events in the future
 					if (copyOfTrackingList.getItemAt(cntr) is MedicinEvent) {

@@ -159,6 +159,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:ViewNavigator icon="@Embed('assets/ic_tab_glucose_unselected.png')"  width="100%" height="100%" firstView="views.EditBGEventView"/>
 	<s:ViewNavigator icon="@Embed('assets/ic_tab_exercise_unselected.png')"   width="100%" height="100%" firstView="views.EditExerciseEventView"/>
 	<s:ViewNavigator icon="@Embed('assets/ic_tab_settings_unselected.png')"   width="100%" height="100%" firstView="views.SettingsView"/>
-	<s:ViewNavigator icon="@Embed('assets/ic_tab_settings_unselected.png')"   width="100%" height="100%" firstView="views.BloodGlucoseGraphView"/>
 	
 </s:TabbedViewNavigatorApplication>

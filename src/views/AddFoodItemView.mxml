@@ -32,7 +32,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		title=""
 		initialize="init()"
 		backKeyPressed="onBackKeyPressed(event)"
-		
 		>
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dateformatter" dateTimePattern="{resourceManager.getString('general','shortdatepattern')}" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -46,16 +45,9 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
-			import mx.collections.ArrayList;
-			import mx.core.FlexGlobals;
-			import mx.core.IFlexDisplayObject;
 			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
-			import mx.resources.ResourceBundle;
-			
-			import spark.components.Label;
-			import spark.events.ViewNavigatorEvent;
 			
 			import databaseclasses.Database;
 			import databaseclasses.DatabaseEvent;
@@ -139,7 +131,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 * value only makes sense if mealevent = null,  
 			 */
 			private var defaultMealTimeSTamp:Boolean;
-			
+
 			private function init():void {
 				trackerId = resourceManager.getString('analytics','trackeraccount');
 			}

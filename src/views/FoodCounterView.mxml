@@ -61,7 +61,6 @@ the home screen
 			import myComponents.elementFromListPicker;
 			
 			import utilities.ExcelSorting;
-			import utilities.FromtimeAndValue;
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
@@ -97,6 +96,7 @@ the home screen
 			}
 			
 			private function onCreationComplete():void {
+
 				MyGATracker.getInstance(this);//just to make sure mygatracker is initialized with a displayobject
 
 				//Synchronize.getInstance().addEventListener(Synchronize.SYNCHRONIZE_ERROR_OCCURRED,onSynchronizeErrorOccurred);

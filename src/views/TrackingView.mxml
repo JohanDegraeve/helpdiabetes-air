@@ -32,7 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
 			import mx.events.CollectionEvent;
 			import mx.events.FlexEvent;
 			
@@ -52,7 +51,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.TrackingViewElement;
 			
 			import utilities.ExcelSorting;
-			import utilities.FromtimeAndValueArrayCollection;
 			import utilities.MyGATracker;
 			
 			private static var lastClickOnTrackingView:Number;
@@ -63,7 +61,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			private var activeInsulin_text:String;
 			
-			
 			private function addHandler():void {
 				if (!navigator.poppedViewReturnedObject) return; 
 				if (!navigator.poppedViewReturnedObject.object) return;
@@ -73,10 +70,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
+				stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE,stageOrientationChangeHandler);
+
 				title = resourceManager.getString('trackingview','logbook');
-				
 				lastClickOnTrackingView = (new Date()).valueOf();
 				ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
+				
+				//stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE, orientationChangeHandler);
+				//stage.autoOrients = true;
+			}
+			
+			/*private function orientationChangeHandler(event:Event):void {
+				trace("Device orientation: " + stage.deviceOrientation);
+				trace("Screen orientation: " + stage.orientation);
+			}*/
+			
+			private function stageOrientationChangeHandler(event:StageOrientationEvent):void {
+				trace("in trackingview checking stage");
+				if (stage != null) {
+					trace("and stage not null ..");
+					trace("Device orientation: " + stage.deviceOrientation);
+					trace("Screen orientation: " + stage.orientation);
+					
+					if ((event.afterOrientation == StageOrientation.ROTATED_LEFT)  || (event.afterOrientation == StageOrientation.ROTATED_RIGHT)) {
+						navigator.popView();
+						navigator.pushView(BloodGlucoseGraphView);
+					}
+				} else trace("and stage  null ..");
 			}
 			
 			private function reDrawActionButtons(event:Event = null):void {
