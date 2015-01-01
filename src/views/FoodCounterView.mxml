@@ -214,7 +214,8 @@ the home screen
 							resourceManager.getString('settingsview','version') + 
 							resourceManager.getString('settingsview','copyright') +
 							resourceManager.getString('settingsview','infoabouttext');
-						licensePopUp.show(thisView,textToShow);
+						licensePopUp.show(thisView);
+						licensePopUp.setMessage(textToShow);
 					} else {
 						Synchronize.getInstance().startSynchronize(false,false);
 						showSearchTextBoxHelpText();
@@ -429,11 +430,12 @@ the home screen
 			
 			private function onSynchronizeErrorOccurred(event:Event):void {
 				if (alertPopUp != null)	{
-					alertPopUp.message = alertPopUp.message + "\n\n" + 	Synchronize.getInstance().synchronize_debugString;				
+					alertPopUp.setMessage(alertPopUp.getMessage + "\n\n" + 	Synchronize.getInstance().synchronize_debugString);				
 				} else  {
 					alertPopUp = new AlertPopUp();
 					alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-					alertPopUp.show(this,Synchronize.getInstance().synchronize_debugString);
+					alertPopUp.show(this);
+					alertPopUp.setMessage(Synchronize.getInstance().synchronize_debugString);
 				}
 			}
 

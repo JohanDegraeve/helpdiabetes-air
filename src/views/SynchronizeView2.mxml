@@ -80,7 +80,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 				if (event.code != "Service.available") {
 					alertPopUp = new AlertPopUp();
 					alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-					alertPopUp.show(this,resourceManager.getString('settingsview','internetnotavailable'));
+					alertPopUp.show(this);
+					alertPopUp.setMessage(resourceManager.getString('settingsview','internetnotavailable'));
 				}
 			}
 			
@@ -98,7 +99,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-						alertPopUp.show(this,resourceManager.getString('settingsview','syncstarted'));
+						alertPopUp.show(this);
+						alertPopUp.setMessage(resourceManager.getString('settingsview','syncstarted'));
 						break;
 					case 3:
 						navigateToURL(new URLRequest(helpUrl));

@@ -125,7 +125,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				alertPopUp = new AlertPopUp();
 				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-				alertPopUp.show(this,errorMessage);
+				alertPopUp.show(this);
+				alertPopUp.setMessage(errorMessage);
 				
 				function okClicked(event: PopUpEvent):void {
 					if (alertPopUp != null) {
@@ -161,10 +162,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				alertPopUp = new AlertPopUp();
 				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-				if (event.type == Database.NEW_FOOD_DATABASE_STORED_SUCCESS) 
-					alertPopUp.show(this,resourceManager.getString('downloadfoodtableview','newfoodtablestoredsuccess'));
-				else
-					alertPopUp.show(this,resourceManager.getString('downloadfoodtableview','newfoodtablestoredfailed'));
+				if (event.type == Database.NEW_FOOD_DATABASE_STORED_SUCCESS) {
+					alertPopUp.show(this);
+					alertPopUp.setMessage(resourceManager.getString('downloadfoodtableview','newfoodtablestoredsuccess'));
+				}
+					
+				else {
+					alertPopUp.show(this);
+					alertPopUp.setMessage(resourceManager.getString('downloadfoodtableview','newfoodtablestoredfailed'));
+				}
+					
 				
 				function okClicked(event: PopUpEvent):void {
 					if (alertPopUp != null) {

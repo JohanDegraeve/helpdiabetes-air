@@ -253,7 +253,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				alertPopUp = new AlertPopUp();
 				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-				alertPopUp.show(this,mealEvent.recalculateInsulinAmount()
+				alertPopUp.show(this);
+				alertPopUp.setMessage(
+					mealEvent.recalculateInsulinAmount()
 					.replace("{carb_amount}",resourceManager.getString('editmealeventview','carb_amount'))
 					.replace("{calculated_insulinamount}",resourceManager.getString('editmealeventview','calculated_insulinamount'))
 					.replace("{calculated_insulinamount}",resourceManager.getString('editmealeventview','calculated_insulinamount'))
@@ -263,7 +265,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					.replace("{correction}",resourceManager.getString('editmealeventview','correction'))
 					.replace("{targetbglevel}",resourceManager.getString('editmealeventview','targetbglevel'))
 					.replace("{active_insulin}",resourceManager.getString('trackingview','active_insulin'))
-				);
+					);
 
 				function okClicked(event: PopUpEvent):void {
 					if (alertPopUp != null) {

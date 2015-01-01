@@ -75,7 +75,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function onSynchronizeErrorOccurred(event:Event):void {
 				alertPopUp = new AlertPopUp();
 				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-				alertPopUp.show(this,Synchronize.getInstance().synchronize_debugString);
+				alertPopUp.show(this);
+				alertPopUp.setMessage(Synchronize.getInstance().synchronize_debugString);
 			}
 
 			private function okClicked(event: PopUpEvent):void {

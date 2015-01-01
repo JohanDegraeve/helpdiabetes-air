@@ -157,7 +157,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						textToShow = 
 						resourceManager.getString('settingsview','resethelptextdone') ;
-						alertPopUp.show(this,textToShow);
+						alertPopUp.show(this);
+						alertPopUp.setMessage(textToShow);
 						break;
 					case 7:
 						if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) == "" 
@@ -178,7 +179,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						resourceManager.getString('settingsview','version') + 
 						resourceManager.getString('settingsview','copyright') +
 						resourceManager.getString('settingsview','infoabouttext');
-						alertPopUp.show(this,textToShow);
+						alertPopUp.show(this);
+						alertPopUp.setMessage(textToShow);
 						break;
 					case 9:
 						navigator.pushView(SettingsMealProfilesView);
