@@ -402,10 +402,12 @@ package databaseclasses
 		 * {correction_factor} = ...<br>
 		 * {correction} = ...<br>
 		 * {targetbglevel} = ...<br>
+		 * {active_insulin} = ... <br>
 		 * 
 		 */public function recalculateInsulinAmount():String {
 			 this._calculatedInsulinAmount = Number.NaN;
 			 var diff:Number = Number.NaN;
+			 var activeInsulin:Number = Number.NaN;
 			 var correctionUnits:Number = Number.NaN;
 			 var previousBGEvent:BloodGlucoseEvent = null;
 			 var returnValue:String = "";
@@ -441,6 +443,8 @@ package databaseclasses
 							 }
 						 }
 					 }
+					 
+					 
 					 returnValue += "{carb_amount} = " + Math.round(totalCarbs).toString() + "\n";
 					 returnValue += "{insulin_ratio} = " + _insulinRatio.toString() + "\n";
 					 if (!isNaN(diff)) {
@@ -467,6 +471,13 @@ package databaseclasses
 						 )
 						 + " = " +
 						 ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
+					 
+					 //now substract the active insulin
+					 activeInsulin = ModelLocator.getInstance().calculateActiveInsulin(timeStamp);
+					 _calculatedInsulinAmount -= activeInsulin;
+					 returnValue += "{active_insulin} = " + ((Math.round(activeInsulin * 10))/10).toString() + "\n";
+					 returnValue += "{calculated_insulinamount} = " + ((Math.round(_calculatedInsulinAmount * 10))/10).toString();
+
 					 
 				 } else {
 					 returnValue = "{calculated_insulinamount} = ...\n";

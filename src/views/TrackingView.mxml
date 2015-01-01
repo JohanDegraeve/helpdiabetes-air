@@ -352,7 +352,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				//calculate activeInsulin_text
 				activeInsulin_text = 
 					resourceManager.getString('trackingview','active_insulin')
-					+ " " 
+					+ " = " 
 					+ ((Math.round(ModelLocator.getInstance().calculateActiveInsulin((new Date()).valueOf()) * 10))/10).toString() 
 					+ " " 
 					+ resourceManager.getString('trackingview','internationalunit');
