@@ -141,6 +141,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToSend.settingid3 = Settings.SettingsMedicin1_range3_AOBChart;
 				dataToSend.settingid4 = Settings.SettingsMedicin1_range4_AOBChart;
 				dataToSend.settingidActive = Settings.SettingsMedicin1_AOBActive;
+				dataToSend.titleforFromtimeAndValueElementView = medicinText1;
+				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
 			
@@ -154,6 +156,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToSend.settingid3 = Settings.SettingsMedicin2_range3_AOBChart;
 				dataToSend.settingid4 = Settings.SettingsMedicin2_range4_AOBChart;
 				dataToSend.settingidActive = Settings.SettingsMedicin2_AOBActive;
+				dataToSend.titleforFromtimeAndValueElementView = medicinText2;
+				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
 			
@@ -167,6 +171,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToSend.settingid3 = Settings.SettingsMedicin3_range3_AOBChart;
 				dataToSend.settingid4 = Settings.SettingsMedicin3_range4_AOBChart;
 				dataToSend.settingidActive = Settings.SettingsMedicin3_AOBActive;
+				dataToSend.titleforFromtimeAndValueElementView = medicinText3;
+				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
+
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
 			
@@ -180,6 +187,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToSend.settingid3 = Settings.SettingsMedicin4_range3_AOBChart;
 				dataToSend.settingid4 = Settings.SettingsMedicin4_range4_AOBChart;
 				dataToSend.settingidActive = Settings.SettingsMedicin4_AOBActive;
+				dataToSend.titleforFromtimeAndValueElementView = medicinText4;
+				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
 			
@@ -192,6 +201,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToSend.settingid2 = Settings.SettingsMedicin5_range2_AOBChart;
 				dataToSend.settingid3 = Settings.SettingsMedicin5_range3_AOBChart;
 				dataToSend.settingid4 = Settings.SettingsMedicin5_range4_AOBChart;
+				dataToSend.titleforFromtimeAndValueElementView = medicinText5;
+				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
 				dataToSend.settingidActive = Settings.SettingsMedicin5_AOBActive;
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}

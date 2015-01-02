@@ -68,6 +68,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						dataToSend.title = ResourceManager.getInstance().getString("settingsallbolussettingsview","correction_factor_settings");
 						dataToSend.topText = ResourceManager.getInstance().getString("settingsallbolussettingsview","topText");
 						dataToSend.settingid = Settings.SettingsCorrectionFactor;
+						dataToSend.titleforFromtimeAndValueElementView = resourceManager.getString('settingsallbolussettingsview','correction_factor_settings');
+						dataToSend.topTextforFromtimeAndValueElementView = resourceManager.getString('fromtimeandvalueelementview','editcorrectionfactor');
+
 						navigator.pushView(FromtimeAndValueListView,dataToSend);
 						break;
 					case 2:

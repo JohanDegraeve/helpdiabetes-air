@@ -191,6 +191,8 @@ This view is to edit the overview, ie the units for which the list is valid, and
 				var dataToSend:Object = new Object();
 				dataToSend.title = topText;
 				dataToSend.topText = resourceManager.getString('fromtimeandvaluelistview','editprofile');
+				dataToSend.titleforFromtimeAndValueElementView = data.titleforFromtimeAndValueElementView;
+				dataToSend.topTextforFromtimeAndValueElementView = data.topTextforFromtimeAndValueElementView;
 				if ((buttonClickEvent.target as Button) == zerotoxGraphButton) {
 					dataToSend.topText += " : " + xRangeLabel.text + xRangeButton.label;
 					dataToSend.settingid = data.settingid1;

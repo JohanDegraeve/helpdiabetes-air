@@ -115,26 +115,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function list_changeHandler(event:IndexChangeEvent):void
 			{
-				var dataToSend:Object;
+				var dataToSend:Object = new Object;
+				dataToSend.title = data.titleforFromtimeAndValueElementView;
+				dataToSend.topText = data.topTextforFromtimeAndValueElementView;
 				if (deleteClicked) {
 					listOfElements.removeItemAt(event.newIndex);
 					deleteClicked = false;
 				} else if (editClicked) {
-					dataToSend = new Object;
-					dataToSend.title = resourceManager.getString('settingsallbolussettingsview','correction_factor_settings');
 					dataToSend.selectedIndex = event.newIndex;
 					dataToSend.listOfElements = listOfElements;
-					dataToSend.topText = resourceManager.getString('fromtimeandvalueelementview','editcorrectionfactor');
 					navigator.pushView(FromtimeAndValueElementView,dataToSend,CONTEXT_EDIT_LIST_ELEMENT);
 					editClicked = false;
 				} else if (addClicked)  {
-					dataToSend = new Object;
-					dataToSend.title = resourceManager.getString('settingsallbolussettingsview','correction_factor_settings');
 					var clickedItem:FromtimeAndValue = listOfElements.getItemAt(event.newIndex) as FromtimeAndValue;
 					listOfElements.addItem(new FromtimeAndValue(clickedItem.from + 60,clickedItem.value,clickedItem.unit,true,true));
 					dataToSend.selectedIndex = event.newIndex + 1;//tricky here, if everything goes right, the new element should be at event.newIndex +1
 					dataToSend.listOfElements = listOfElements;
-					dataToSend.topText = resourceManager.getString('fromtimeandvalueelementview','editcorrectionfactor');
 					navigator.pushView(FromtimeAndValueElementView,dataToSend,CONTEXT_EDIT_LIST_ELEMENT);
 					addClicked = false;
 				}
