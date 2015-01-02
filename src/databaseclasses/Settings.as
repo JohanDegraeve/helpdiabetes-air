@@ -114,7 +114,7 @@ package databaseclasses
 		 * will be adapted here as soon as one of the profiles gets changed<br>
 		 * not really necessary to synchronize it because it will be udpated here as soon as one of the insulin profiles gets updated
 		 */
-		public static const SettingsMaximumInsulinDurationInSeconds = -88;
+		public static const SettingsMaximumInsulinDurationInSeconds:int = -88;
 		/** extended functions active or not
 		 */
 		public static const SettingsExtendedFunctionsActive:int = -87;
@@ -819,7 +819,7 @@ package databaseclasses
 						splittedSettingString = firstPieceWithPercentageValueZero.split(">");
 						firstPieceWithPercentageValueZero = splittedSettingString[0];//it's actually the first pice
 						splittedSettingString = firstPieceWithPercentageValueZero.split(":");
-						var firstpiece = splittedSettingString[0];
+						var firstpiece:String = splittedSettingString[0];
 						firstPieceWithPercentageValueZero = splittedSettingString[1];
 						var durationInSeconds:Number = (new Number(firstpiece)) * 3600 + (new Number(firstPieceWithPercentageValueZero)) * 60;
 						if (durationInSeconds > highestValueInSeconds)

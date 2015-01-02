@@ -24,13 +24,6 @@ package myComponents
 {
 	import databaseclasses.SelectedFoodItem;
 	
-	import flash.display.GradientType;
-	import flash.geom.Matrix;
-	
-	import flashx.textLayout.factory.TruncationOptions;
-	import flashx.textLayout.formats.BackgroundColor;
-	
-	import spark.components.DataGroup;
 	import spark.components.LabelItemRenderer;
 	import spark.components.supportClasses.StyleableTextField;
 	

@@ -1,6 +1,5 @@
 package skins
 {
-	import flash.display.DisplayObject;
 	import flash.display.GradientType;
 	import flash.geom.Matrix;
 	
@@ -9,8 +8,8 @@ package skins
 	public class TabbedViewNavigatorTabBarTabSkin extends ButtonBarButtonSkinBase
 	{
 		
-		static var tabBackGroundColors:Array;
-		static var matrix:Matrix;
+		static private var tabBackGroundColors:Array;
+		static private var matrix:Matrix;
 
 		
 		public function TabbedViewNavigatorTabBarTabSkin()

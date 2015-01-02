@@ -19,12 +19,7 @@ package myComponents
 {
 	
 	import databaseclasses.Meal;
-	
-	import mx.formatters.DateFormatter;
-	import mx.states.AddChild;
-	
 	import spark.components.LabelItemRenderer;
-	import spark.components.supportClasses.StyleableTextField;
 	
 	public class MealItemRenderer extends LabelItemRenderer
 	{

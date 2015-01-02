@@ -20,17 +20,10 @@ package databaseclasses
 	import flash.events.EventDispatcher;
 	
 	import mx.core.ClassFactory;
-	import mx.core.mx_internal;
-	
 	import databaseclasses.MealEvent;
-	
-	import flashx.textLayout.tlf_internal;
-	
 	import model.ModelLocator;
-	
 	import myComponents.IListElement;
 	import myComponents.MealItemRenderer;
-	
 	import utilities.FromtimeAndValueArrayCollection;
 	import utilities.Synchronize;
 	

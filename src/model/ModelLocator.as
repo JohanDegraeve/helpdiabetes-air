@@ -23,9 +23,6 @@ package model
 {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import flash.events.TimerEvent;
-	import flash.utils.Timer;
-	
 	import mx.collections.ArrayCollection;
 	import mx.resources.ResourceManager;
 	

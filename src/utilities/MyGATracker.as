@@ -18,8 +18,6 @@
 package utilities
 {
 	import com.google.analytics.GATracker;
-	import com.google.analytics.debug.DebugConfiguration;
-	import com.google.analytics.v4.Configuration;
 	
 	import databaseclasses.Settings;
 	

@@ -4,8 +4,6 @@ package skins
 	import flash.display.BitmapData;
 	import flash.geom.Matrix;
 	
-	import mx.core.BitmapAsset;
-	
 	import spark.components.Image;
 	import spark.skins.mobile.TabbedViewNavigatorApplicationSkin;
 	

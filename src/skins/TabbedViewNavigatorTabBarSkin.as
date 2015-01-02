@@ -21,11 +21,6 @@
 */
 package skins
 {
-	import flash.display.GradientType;
-	import flash.geom.Matrix;
-	
-	import mx.utils.ColorUtil;
-	
 	import spark.components.ButtonBarButton;
 	import spark.components.DataGroup;
 	import spark.skins.mobile.ButtonBarSkin;

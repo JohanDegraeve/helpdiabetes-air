@@ -20,8 +20,6 @@ package myComponents
 	import databaseclasses.MealEvent;
 	import databaseclasses.Settings;
 	
-	import flash.display.GradientType;
-	import flash.geom.Matrix;
 	import flash.text.TextLineMetrics;
 	
 	import model.ModelLocator;

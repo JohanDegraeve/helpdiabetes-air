@@ -95,7 +95,7 @@ package utilities
 		 */
 		private static var maxResults:int = 25;
 		
-		private static var minimSettingCntrToSync = -87;
+		private static var minimSettingCntrToSync:int = -87;
 		
 		/**
 		 * how many minutes between two synchronisations, normal value
