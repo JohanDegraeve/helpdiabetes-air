@@ -589,9 +589,7 @@ package databaseclasses
 			"61200000", // January 1, 1970, 17 Hr in ms, gmt time,
 			"0", //correction factor - not used anymore, this is now in SettingsCorrectionFactor
 			"0", //the first blood glucose event id to be used
-			"999999", // a low value for maximum time difference last bloodglucose event and meal
-			//originally the default value was 999999, but that was wrong
-			//so in get Settings, if value is 999999, 0 will be returned
+			"999999", //in get setting if 999999 , then 900 will be returned which corresponds to 15 minutes
 			"mgperdl", //unit for bloodglucose metering, this value must be known in locale/general.properties
 			"120",//targetbloodglucoselevel
 			"carbs",//possible values are "carbs", "protein", "fat", "kilocalories"
@@ -749,7 +747,7 @@ package databaseclasses
 		public function getSetting(settingId:int):String {
 			if (settingId == SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL) {
 				if (settings[100 + settingId] == "999999")
-					return "0";
+					return "900";
 			}
 			return settings[100 + settingId];
 		}
