@@ -82,9 +82,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				title =  ResourceManager.getInstance().getString("settingsview","titlesettings");
 				if (debugging) 
 					menuList.addItem("debug info");
-				if (ModelLocator.getInstance().extendedFunctionsActive())
-					menuList.addItem(ResourceManager.getInstance().getString("settingsview","mealprofiles"));
-
 			}
 			
 			private function selectBloodGlucoseUnit():void {
