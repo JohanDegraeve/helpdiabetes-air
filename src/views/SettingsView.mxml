@@ -182,9 +182,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						alertPopUp.show(this);
 						alertPopUp.setMessage(textToShow);
 						break;
-					case 9:
-						navigator.pushView(SettingsMealProfilesView);
-						break;
 				}
 				
 				function okClicked(event: PopUpEvent):void {

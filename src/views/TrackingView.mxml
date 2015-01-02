@@ -70,8 +70,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
-				stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE,stageOrientationChangeHandler);
-
 				title = resourceManager.getString('trackingview','logbook');
 				lastClickOnTrackingView = (new Date()).valueOf();
 				ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
@@ -84,20 +82,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				trace("Device orientation: " + stage.deviceOrientation);
 				trace("Screen orientation: " + stage.orientation);
 			}*/
-			
-			private function stageOrientationChangeHandler(event:StageOrientationEvent):void {
-				trace("in trackingview checking stage");
-				if (stage != null) {
-					trace("and stage not null ..");
-					trace("Device orientation: " + stage.deviceOrientation);
-					trace("Screen orientation: " + stage.orientation);
-					
-					if ((event.afterOrientation == StageOrientation.ROTATED_LEFT)  || (event.afterOrientation == StageOrientation.ROTATED_RIGHT)) {
-						navigator.popView();
-						navigator.pushView(BloodGlucoseGraphView);
-					}
-				} else trace("and stage  null ..");
-			}
 			
 			private function reDrawActionButtons(event:Event = null):void {
 				if (navigator) {
