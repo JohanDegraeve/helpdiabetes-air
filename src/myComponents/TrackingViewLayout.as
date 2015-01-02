@@ -174,7 +174,7 @@ package myComponents
 			var i1:int;
 			if (y0 < 0) {
 				i0 = 0;
-				i1 = _yToIndex.length - 1 > g.height ? _yToIndex[g.height + 1]  : g.numElements - 1;
+				i1 = _yToIndex.length - 1 > g.height ? _yToIndex[Math.floor(g.height + 1)]  : g.numElements - 1;
 				setIndexInView(i0,i1);
 				return;	
 			}
@@ -186,7 +186,7 @@ package myComponents
 				if (_yToIndex.length - 1 - g.height < 0)
 					i0 = 0;
 				else
-					i0 = _yToIndex[_yToIndex.length - 1 - g.height];
+					i0 = _yToIndex[Math.floor(_yToIndex.length - 1 - g.height)];
 				i1 = _yToIndex[_yToIndex.length - 1];
 			}
 			setIndexInView(i0,i1);
