@@ -303,8 +303,8 @@ package model
 
 		public  function extendedFunctionsActive():Boolean
 		{
-			//return false;
-			return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
+			return true;
+			//return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
 		}
 
 		
