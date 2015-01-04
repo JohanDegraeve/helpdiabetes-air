@@ -155,6 +155,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function button2_clickHandler(event:MouseEvent):void
 			{
+				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
 				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText2;
@@ -170,6 +171,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function button3_clickHandler(event:MouseEvent):void
 			{
+				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
 				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText3;
@@ -186,6 +188,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function button4_clickHandler(event:MouseEvent):void
 			{
+				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
 				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText4;
@@ -201,6 +204,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function button5_clickHandler(event:MouseEvent):void
 			{
+				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
 				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText5;
