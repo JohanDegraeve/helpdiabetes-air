@@ -29,15 +29,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import flash.net.navigateToURL;
+			
 			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
 			
+			import spark.events.PopUpEvent;
 			import spark.events.TextOperationEvent;
 			
 			import databaseclasses.Settings;
 			
 			import model.ModelLocator;
 			
+			import myComponents.AlertPopUp;
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
@@ -51,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable] private var medicinText5:String = "";
 			[Bindable]
 			private var back_label:String;
+			private var alertPopUp:AlertPopUp;
 			
 			private var helpCallOut:HelpCallOut;
 			
@@ -133,6 +139,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function button1_clickHandler(event:MouseEvent):void
 			{
+				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
 				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText1;
@@ -207,6 +214,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
 			
+			protected function showAlertNavigateToHelp():void
+			{
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextMedicinProfile) == 'false')
+					return;
+				alertPopUp = new AlertPopUp();
+				alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+				alertPopUp.show(this);
+				alertPopUp.setMessage(
+					resourceManager.getString('settingsmedicinview','redirecttohelp')
+				);
+				
+				function okClicked(event: PopUpEvent):void {
+					if (alertPopUp != null) {
+						PopUpManager.removePopUp(alertPopUp);
+						if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+							alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+						}
+					}
+					navigateToURL(new URLRequest(resourceManager.getString('settingsmedicinview','redirecturl')));
+					Settings.getInstance().setSetting(Settings.SettingsHelpTextMedicinProfile,'false');
+				}
+			}
+
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -263,6 +294,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			</s:layout>			
 			<s:TextInput width="80%" contentBackgroundColor="0xDCDCDC" id="type5" text="@{medicinText5}" editable="true" borderVisible="false" textAlign="left" change="type5_changeHandler(event)"/>
 			<s:Button height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="button5_clickHandler(event)" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+		</s:Group>
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle">
+				</s:HorizontalLayout>
+			</s:layout>			
+			<s:Button width="100%" label="Help" click="{navigateToURL(new URLRequest(resourceManager.getString('settingsmedicinview','redirecturl')));}"/>
 		</s:Group>
 	</s:Group>
 	

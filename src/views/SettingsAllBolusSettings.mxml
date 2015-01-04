@@ -25,6 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import flash.net.navigateToURL;
+			
 			import mx.collections.ArrayCollection;
 			import mx.resources.ResourceManager;
 			
@@ -55,6 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
 				if (ModelLocator.getInstance().extendedFunctionsActive())
 					menuList.addItem(ResourceManager.getInstance().getString("settingsallbolussettingsview","correction_factor_settings"));
+				menuList.addItem("Help");
 			}
 			
 			/**
@@ -70,6 +73,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						break;
 					case 2:
 						navigator.pushView(SettingsAllCorrectionFactorSettingsView);
+						break;
+					case 3:
+						navigateToURL(new URLRequest(resourceManager.getString('settingsallbolussettingsview','redirecturl')));
 						break;
 				}
 			}

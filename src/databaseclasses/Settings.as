@@ -386,7 +386,7 @@ package databaseclasses
 		public static const SettingsHelpTextFoodCounterViewSearchText:int=60;
 		public static const SettingsHelpTextFoodCounterViewSearchButton:int=61;
 		public static const SettingsHelpTextFoodCounterViewCancelButton:int=62;
-		public static const SettingsHelpText63:int=63;
+		public static const SettingsHelpTextMedicinProfile:int=63;
 		public static const SettingsHelpText64:int=64;
 		public static const SettingsHelpText65:int=65;
 		public static const SettingsHelpText66:int=66;
@@ -638,8 +638,8 @@ package databaseclasses
 			"true",//59
 			"true",//SettingsHelpTextFoodCounterViewSearchField
 			"true",//SettingsHelpTextFoodCounterViewSearchButton
-			"true",
-			"true",
+			"true",//SettingsHelpTextFoodCounterViewCancelButton
+			"true",//SettingsHelpTextMedicinProfile
 			"true",
 			"true",
 			"true",
