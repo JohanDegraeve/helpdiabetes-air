@@ -37,12 +37,15 @@ This view is to edit the overview, ie the units for which the list is valid, and
 			import mx.managers.PopUpManager;
 			
 			import spark.components.View;
+			import spark.events.PopUpEvent;
 			
 			import databaseclasses.Settings;
 			
+			import myComponents.AlertPopUp;
 			import myComponents.AmountPicker;
 			import myComponents.PickerEvent;
 			
+			private var alertPopUp:AlertPopUp;
 			[Bindable]
 			private var back_label:String;
 			private var thisView:View;
@@ -216,11 +219,27 @@ This view is to edit the overview, ie the units for which the list is valid, and
 				var settingAsString:String = Settings.getInstance().getSetting(new Number(data.settingid1));
 				if ((settingAsString.length - settingAsString.indexOf("00:00>100") == 9) || (settingAsString.indexOf("00:00>100-36:00") > -1)) {
 					active = false;
+					alertPopUp = new AlertPopUp();
+					alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+					var textToShow:String = 
+						resourceManager.getString('fromtimeandvalueoverviewview','alertthatprofilecannotbeenabled') ;
+					alertPopUp.show(this);
+					alertPopUp.setMessage(textToShow);
+					
 				} else {
 					Settings.getInstance().setSetting(new Number(data.settingidActive),onoroffCheckBox.selected ? "true":"false");
 				}
 			}
 			
+			function okClicked(event: PopUpEvent):void {
+				if (alertPopUp != null) {
+					PopUpManager.removePopUp(alertPopUp);
+					if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+						alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+					}
+				}
+			}
+
 		]]>
 	</fx:Script>
 	<s:navigationContent>
