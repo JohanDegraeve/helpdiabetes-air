@@ -254,6 +254,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function upClicked(e:MouseEvent = null):void {
+				if (!ModelLocator.getInstance().searchActive)
+					return;
 				if (ModelLocator.getInstance().trackingEventToShow == ModelLocator.getInstance().firstMarkedItemEventId)
 					return;
 				//first find the location of the current eventtoshow
@@ -276,6 +278,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function downClicked(e:MouseEvent = null):void {
+				if (!ModelLocator.getInstance().searchActive)
+					return;
 				if (ModelLocator.getInstance().trackingEventToShow == ModelLocator.getInstance().lastMarkedItemEventId)
 					return;
 				//first find the location of the current eventtoshow
