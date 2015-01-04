@@ -833,8 +833,7 @@ package model
 										activeInsulin += theEvent.amount * fromTimeAndValueArrayCollection.getValue((time - (copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp)/1000) / 100;
 									}
 								} else {
-									activeInsulin = Number.NaN;//there's a medicinevent found with type of insulin that has a not-enbled profile
-									//the searching through medicin events will actually continue, but activeInsulin will remain Number.NaN if it is being set here
+									//there's a medicinevent found with type of insulin that has a not-enbled profile
 								}
 								medicincntr = 5;
 							}
