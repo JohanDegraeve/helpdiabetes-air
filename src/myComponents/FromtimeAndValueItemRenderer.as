@@ -33,7 +33,7 @@ package myComponents
 	public class FromtimeAndValueItemRenderer extends LabelItemRenderer
 	{
 		private var editImage:Image;//Pencil-icon48x48
-		[Embed(source="assets/Pencil-icon48x48.png")]
+		[Embed(source="assets/edit48x48.png")]
 		[Bindable]
 		public var editIcon:Class;
 
