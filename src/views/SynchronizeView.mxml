@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2014  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,30 +31,22 @@ initial setup of sync settings
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import com.google.analytics.AnalyticsTracker;
-			
-			import databaseclasses.Settings;
-			
-			import flash.net.drm.AuthenticationMethod;
 			import flash.net.navigateToURL;
-			
-			import mx.events.BrowserChangeEvent;
-			import mx.events.DragEvent;
 			import mx.events.FlexEvent;
-			import mx.managers.BrowserManager;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
+			
+			import databaseclasses.Settings;
 			
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
-			import utilities.MyGATracker;
 			import utilities.Synchronize;
-			
-			
 			private var _authorizationCode:String;
+			private var stageWebView:StageWebView;
 			
 			private var errorWarning:HelpCallOut;
+			private var timer:Timer;
 			
 			private static var googleAuthUrl:String = "https://accounts.google.com/o/oauth2/token";
 			
@@ -75,8 +67,6 @@ initial setup of sync settings
 				_authorizationCode = value;
 				if ((value == "") || (value == resourceManager.getString('synchronizeview','copyauthorizationcode')) )
 					return;
-				
-				
 				buttonStoreAuthorizationCode.label = resourceManager.getString('synchronizeview','startsynchronizing') ;
 				buttonStoreAuthorizationCode.visible = true;
 				buttonStoreAuthorizationCode.addEventListener(MouseEvent.CLICK,getAccessTokenAndRefreshToken);				
@@ -90,7 +80,7 @@ initial setup of sync settings
 				title = resourceManager.getString('synchronizeview','titlesettingssync');
 				authorizationCode_text = resourceManager.getString('synchronizeview','copyauthorizationcode');
 				authorizationcodeTextArea.addEventListener(FocusEvent.FOCUS_IN, authorizationcodeTextAreaClicked);
-
+				
 				if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) != "") {
 					//access token is not empty but still we got here, this is because user started syncing, then went to other tab, and back to this tab,
 					//apparently oninitialize gets called
@@ -108,7 +98,41 @@ initial setup of sync settings
 			}
 			
 			private function buttonClicked(event:MouseEvent):void {
-				navigateToURL(new URLRequest("https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/fusiontables.readonly https://www.googleapis.com/auth/fusiontables https://spreadsheets.google.com/feeds https://docs.google.com/feeds&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&client_id=" + resourceManager.getString('client_secret','client_id') + "&hl=nl&from_login=1&as=6d24e440f72448b2&pli=1"));
+				stageWebView = new StageWebView();
+				stageWebView.stage = stage;
+				stageWebView.viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+				stageWebView.loadURL("https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/fusiontables.readonly https://www.googleapis.com/auth/fusiontables https://spreadsheets.google.com/feeds https://docs.google.com/feeds&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&client_id=" + resourceManager.getString('client_secret','client_id') + "&hl=nl&from_login=1&as=6d24e440f72448b2&pli=1");
+				timer = new Timer(500, 1);
+				timer.addEventListener(TimerEvent.TIMER,timerEnd);
+				timer.start();
+			}
+			
+			private function timerEnd(event:TimerEvent):void {
+				var authorizationCode:String = getValue('code=', stageWebView.title);
+				if (authorizationCode) {
+					authorizationCode_text = authorizationCode;
+					getAccessTokenAndRefreshToken();
+					stageWebView.dispose();
+					stageWebView = null;
+				} else if (stageWebView.title.indexOf("error") > -1) {
+						stageWebView.dispose();
+						stageWebView = null;
+				} else {
+					timer = new Timer(500, 1);
+					timer.addEventListener(TimerEvent.TIMER,timerEnd);
+					timer.start();
+				}
+			}
+			
+			private function getValue(key:String, str:String):String {
+				const pattern:RegExp = /[-_a-zA-Z0-9\/.]+/;
+				var index:int = str.indexOf(key);
+				if (index > -1) {
+					var matches:Array = str.substring(index + key.length).match(pattern);
+					if (matches.length > 0)
+						return matches[0];
+				}
+				return null;
 			}
 			
 			private function authorizationcodeTextAreaClicked(event:Event):void {
@@ -116,7 +140,7 @@ initial setup of sync settings
 				authorizationcodeTextArea.removeEventListener(FocusEvent.FOCUS_IN, authorizationcodeTextAreaClicked);
 			}
 			
-			private function getAccessTokenAndRefreshToken(event:MouseEvent):void {
+			private function getAccessTokenAndRefreshToken(event:MouseEvent = null):void {
 				var request:URLRequest = new URLRequest(googleAuthUrl);
 				request.contentType = "application/x-www-form-urlencoded";
 				request.data = new URLVariables("code=" + authorizationCode_text + "&" + 
@@ -142,7 +166,6 @@ initial setup of sync settings
 					if (eventAsJSONObject.error == "invalid_grant") {
 						showErrorMessage(resourceManager.getString('synchronizeview','authenticationerror'),authorizationcodeTextArea);						
 					}
-
 			}
 			
 			private function showErrorMessage(errorText:String, owner:DisplayObjectContainer):void {
@@ -183,7 +206,7 @@ initial setup of sync settings
 					Synchronize.getInstance().addEventListener(Synchronize.NEW_EVENT_UPLOADED,setViewInStatusSynchronizing);
 				else  {
 					topLabelText1+= Synchronize.getInstance().uploadFoodDatabaseStatus.
-					replace("{outof}",resourceManager.getString('synchronizeview','outof')).
+						replace("{outof}",resourceManager.getString('synchronizeview','outof')).
 						replace("{elementsuploaded}",resourceManager.getString('synchronizeview','elementsuploaded'));	
 				}
 			}
