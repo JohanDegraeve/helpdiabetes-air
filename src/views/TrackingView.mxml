@@ -32,6 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
 			import mx.events.CollectionEvent;
 			import mx.events.FlexEvent;
 			
@@ -79,8 +80,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			/*private function orientationChangeHandler(event:Event):void {
-				trace("Device orientation: " + stage.deviceOrientation);
-				trace("Screen orientation: " + stage.orientation);
+			trace("Device orientation: " + stage.deviceOrientation);
+			trace("Screen orientation: " + stage.orientation);
 			}*/
 			
 			private function reDrawActionButtons(event:Event = null):void {
@@ -313,7 +314,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			protected function creationCompleteHandler(event:FlexEvent):void
-				
 			{
 				reDrawActionButtons();
 				if (!navigator) return;
@@ -322,7 +322,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					helpCallOut = new HelpCallOut();
 					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_searchbutton');
 					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewSearchButton;
-					//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
 					helpCallOut.open(searchButton,true)
 				} /*else
 				helptext0Removed();*/
@@ -348,12 +348,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				timer2 = new Timer(60000, 1);
 				timer2.addEventListener(TimerEvent.TIMER,recalculateActiveInsulin);
 				timer2.start();
-
 			}
 			
-			/*private function helptext0Removed(event:Event = null):void {
-			
-			}*/
+			private function helptext0Removed(event:Event = null):void {
+				if (trackinglist.dataProvider.length > 0) {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_editevent');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditTrackingEvent;
+					//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					//helpCallOut.verticalPosition = "before";
+					helpCallOut.open(trackinglist,true);
+				}
+			}
 			
 			/**
 			 * helptexts related to up, down and cancel button 
@@ -398,14 +404,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" />
 		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
-		<s:Label id="activeInsulin" left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
-		
-		<s:List id="trackinglist" left="0" right="0" top="{ModelLocator.getInstance().extendedFunctionsActive() ? 40:0}" bottom="0" width="100%" useVirtualLayout="true" 
-				dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
-				click="onListElementClicked(event)"
-				itemRendererFunction="getItemRenderer">
-			<s:layout>
-				<myComponents:TrackingViewLayout useVirtualLayout="true" id="trackinglistlayout"/>
-			</s:layout>
-		</s:List>
+	<s:Label id="activeInsulin" left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+	
+	<s:List id="trackinglist" left="0" right="0" top="{ModelLocator.getInstance().extendedFunctionsActive() ? 40:0}" bottom="0" width="100%" useVirtualLayout="true" 
+			dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
+			click="onListElementClicked(event)"
+			itemRendererFunction="getItemRenderer">
+		<s:layout>
+			<myComponents:TrackingViewLayout useVirtualLayout="true" id="trackinglistlayout"/>
+		</s:layout>
+	</s:List>
 </s:View>

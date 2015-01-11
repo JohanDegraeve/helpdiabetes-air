@@ -104,7 +104,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function helptext1Removed(event:Event):void {
 				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editmealeventview','editdateandtime');
+				helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editdateandtime');
 				helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditDateAndTime;
 				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
 				helpCallOut.verticalPosition = "after";
@@ -113,6 +113,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function helptext2Removed(event:Event):void {
 				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_viewboluscalculationdetails');
+				helpCallOut.settingId = Settings.SettingsHelpTextViewBolusCalculationDetails;
+				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+				helpCallOut.verticalPosition = "after";
+				helpCallOut.open(carbAmountGroup,true);
+			}
+			
+			private function helptext3Removed(event:Event):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
 			}
 			
 			private function onCreationComplete():void {
@@ -299,7 +309,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:SolidColorStroke color="0x000000" weight="1"/>
 			</s:stroke>
 		</s:Line>
-		<s:Group click="carbAmountGroupClicked(event)">
+		<s:Group id="carbAmountGroup" click="carbAmountGroupClicked(event)">
 			<s:layout >
 				<s:VerticalLayout paddingLeft="10" paddingBottom="5"
 								  gap="4" paddingTop="5">
