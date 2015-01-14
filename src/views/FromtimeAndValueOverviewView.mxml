@@ -275,7 +275,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 			</s:layout>
 			<s:Label  id="xRangeLabel" height="48"  width="100" text="{'0 ' + to + ' '}" verticalAlign="middle"/>
 			<s:Button id="xRangeButton" height="47" width="70" label="@{x_value}" click="rangeButton_clickHandler(event)"/>
-			<s:Button id="zerotoxGraphButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
+			<s:Button id="zerotoxGraphButton" height="48" width="48" icon="@Embed('assets/graph3.png')" click="graphButton_clickHandler(event)"/>
 		</s:Group>
 		<s:Line width="100%" height="1">
 			<s:stroke>
@@ -289,7 +289,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 			</s:layout>
 			<s:Label  id="yRangeLabel"  height="48"  width="100" text="{x_value + ' ' + to + ' '}" verticalAlign="middle"/>
 			<s:Button id="yRangeButton" height="47" width="70" label="@{y_value}" click="rangeButton_clickHandler(event)"/>
-			<s:Button id="xToyRangeButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
+			<s:Button id="xToyRangeButton" height="48" width="48" icon="@Embed('assets/graph3.png')" click="graphButton_clickHandler(event)"/>
 		</s:Group>
 		<s:Line width="100%" height="1">
 			<s:stroke>
@@ -303,7 +303,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 			</s:layout>
 			<s:Label  id="zRangeLabel" height="48"  width="100" text="{y_value + ' ' + to + ' '}" verticalAlign="middle"/>
 			<s:Button id="zRangeButton" height="47" width="70" label="@{z_value}" click="rangeButton_clickHandler(event)"/>
-			<s:Button id="yTozRangeButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
+			<s:Button id="yTozRangeButton" height="48" width="48" icon="@Embed('assets/graph3.png')" click="graphButton_clickHandler(event)"/>
 		</s:Group>
 		<s:Line width="100%" height="1">
 			<s:stroke>
@@ -316,7 +316,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:Label id="zto9999RangeLabel"  height="48"  width="200" text="{higherthan + ' ' + z_value}" verticalAlign="middle"/>
-			<s:Button id="zTo9999RangeButton" height="48" width="48" icon="@Embed('assets/ic_tab_tracking_selected.png')" click="graphButton_clickHandler(event)"/>
+			<s:Button id="zTo9999RangeButton" height="48" width="48" icon="@Embed('assets/graph3.png')" click="graphButton_clickHandler(event)"/>
 		</s:Group>
 	</s:Group>
 </s:View>
