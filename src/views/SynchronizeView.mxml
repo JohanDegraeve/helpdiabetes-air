@@ -229,9 +229,9 @@ initial setup of sync settings
 			</s:VerticalLayout>
 		</s:layout>
 		<s:Label id="topLabel1" width="100%" text="{topLabelText1}" />
-		<s:Button id="buttonHelp" width="100%" label="{resourceManager.getString('synchronizeview','step1help')}" click="{navigateToURL(new URLRequest(SynchronizeView2.helpUrl))}"/>
 		<s:Button id="buttonAuthenticateToGoogle" width="100%" label="{resourceManager.getString('synchronizeview','buttonauthenticatetogoogletext')}"/>
 		<s:TextArea id="authorizationcodeTextArea" width="100%"  height = "65" text="@{authorizationCode_text}"/>
 		<s:Button id="buttonStoreAuthorizationCode" width="100%" visible="false"/>
+		<s:Button id="buttonHelp" width="100%" label="{resourceManager.getString('synchronizeview','step1help')}" click="{navigateToURL(new URLRequest(SynchronizeView2.helpUrl))}"/>
 	</s:Group>
 </s:View>
