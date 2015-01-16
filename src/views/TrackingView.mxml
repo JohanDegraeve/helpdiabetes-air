@@ -350,14 +350,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				timer2.start();
 			}
 			
+			/**
+			 * helptext for tracking list 
+			 */
 			private function helptext0Removed(event:Event = null):void {
 				if (trackinglist.dataProvider.length > 0) {
 					helpCallOut = new HelpCallOut();
 					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_editevent');
 					helpCallOut.settingId = Settings.SettingsHelpTextEditTrackingEvent;
-					//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helpText3Removed);
 					//helpCallOut.verticalPosition = "before";
 					helpCallOut.open(trackinglist,true);
+				}
+			}
+			
+			/**
+			 * helptext for active insulin 
+			 */
+			private function helpText3Removed(event:Event = null):void {
+				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helpText3Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextActiveInsulinInt) == 'true') {
+					var cntr:int;
+					for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
+						if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MedicinEvent) {
+							helpCallOut = new HelpCallOut();
+							helpCallOut.helpText = resourceManager.getString('trackingview','help_text_activeinsulin');
+							helpCallOut.settingId = Settings.SettingsHelpTextActiveInsulinInt;
+							//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+							helpCallOut.verticalPosition = "after";
+							helpCallOut.open(activeInsulin,true);
+							cntr = ModelLocator.getInstance().copyOfTrackingList.length;
+						}  
+					}
 				}
 			}
 			
@@ -404,8 +428,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" />
 		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
-	<s:Label id="activeInsulin" left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
-	
+	<s:Group id="activeInsulin">
+		<s:Label left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+	</s:Group>	
 	<s:List id="trackinglist" left="0" right="0" top="{ModelLocator.getInstance().extendedFunctionsActive() ? 40:0}" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
 			click="onListElementClicked(event)"

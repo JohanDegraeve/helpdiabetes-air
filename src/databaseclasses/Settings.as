@@ -389,8 +389,8 @@ package databaseclasses
 		public static const SettingsHelpTextMedicinProfile:int=63;
 		public static const SettingsHelpTextViewBolusCalculationDetails:int=64;
 		public static const SettingsHelpTextEditTrackingEvent:int=65;
-		public static const SettingsHelpText66:int=66;
-		public static const SettingsHelpText67:int=67;
+		public static const SettingsHelpTextActiveInsulinInt:int=66;
+		public static const SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView:int=67;
 		public static const SettingsHelpText68:int=68;
 		public static const SettingsHelpText69:int=69;
 		public static const SettingsHelpText70:int=70;
@@ -642,8 +642,8 @@ package databaseclasses
 			"true",//SettingsHelpTextMedicinProfile
 			"true",//SettingsHelpTextViewBolusCalculationDetails
 			"true",//SettingsHelpTextEditTrackingEvent
-			"true",
-			"true",
+			"true",//SettingsHelpTextActiveInsulinInt
+			"true",//SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView
 			"true",
 			"true",
 			"true",

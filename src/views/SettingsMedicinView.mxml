@@ -135,6 +135,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function helptext1Removed(event:Event):void  {
 				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				helpCallOut = new HelpCallOut();
+				helpCallOut.helpText = resourceManager.getString('settingsmedicinview','help_text_enableInsulinProfile');
+				helpCallOut.settingId = Settings.SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView;
+				//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				helpCallOut.open(buttontype1,true);
 			}
 			
 			protected function button1_clickHandler(event:MouseEvent):void
@@ -261,7 +266,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type1" text="@{medicinText1}" editable="true" borderVisible="false" textAlign="left" change="type1_changeHandler(event)" />
-		 	<s:Button height="48" width="48" icon="@Embed('assets/graph3.png')" click="button1_clickHandler(event)" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+		 	<s:Button id="buttontype1" height="48" width="48" icon="@Embed('assets/graph3.png')" click="button1_clickHandler(event)" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
 		</s:Group>
 		
 		<s:Group y="0" x="0" width="100%">
