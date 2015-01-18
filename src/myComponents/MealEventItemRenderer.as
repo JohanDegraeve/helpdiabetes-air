@@ -117,11 +117,6 @@ package myComponents
 		private var carbAmountDisplay:StyleableTextField;
 		
 		/**
-		 * the field for the calculated insulinAmount 
-		 */
-		private var insulinAmountDisplay:StyleableTextField;
-		
-		/**
 		 * the carbamount in string
 		 */
 		private var _carbAmount:String;
@@ -167,12 +162,7 @@ package myComponents
 		{
 			if (value == _insulinAmount)
 				return;
-			
 			_insulinAmount = value;
-			if (insulinAmountDisplay != null) {
-				insulinAmountDisplay.text = _insulinAmount;
-				invalidateSize();
-			}
 		}
 		
 		
