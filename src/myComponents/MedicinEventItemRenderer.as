@@ -23,6 +23,8 @@ package myComponents
 	import spark.components.supportClasses.StyleableTextField;
 	
 	import databaseclasses.MedicinEvent;
+	
+	import model.ModelLocator;
 
 	public class MedicinEventItemRenderer extends TrackingViewElementItemRenderer
 	{
@@ -44,7 +46,12 @@ package myComponents
 		static private var iconWidth:int;
 		static private var notesIconWidthAndHeight:int = 17;
 		static private var squareWaveBolusWidthAndHeight:int = 17;
-		
+		static private var activeInsulinAmountHeight:int;
+	
+		/**
+		 * the field for the calculated insulinAmount 
+		 */
+		private var activeInsulinAmountDisplay:StyleableTextField;
 		
 		/**
 		 * padding left 
@@ -65,7 +72,16 @@ package myComponents
 		{
 			return _comment;
 		}
-		
+		/**
+		 * if styleabletextfield is added, then paddingbottom is too high, next element will be uplifted by an amount of pixels which is upLiftForNextField.
+		 */
+		private static var _upLiftForNextField:int;
+		public static function get upLiftForNextField():int
+			
+		{
+			return _upLiftForNextField;
+		}
+
 		public function set comment(value:String):void
 		{
 			if (_comment == value)
@@ -83,6 +99,35 @@ package myComponents
 			}
 		}
 		
+		private var _activeInsulinAmount:String
+		
+		public function get activeInsulinAmount():String
+		{
+			return _activeInsulinAmount;
+		}
+
+		public function set activeInsulinAmount(value:String):void
+		{
+			if (_activeInsulinAmount == value)
+				return;
+			_activeInsulinAmount = value;
+			if (activeInsulinAmount == null)
+				return;
+			if (activeInsulinAmount == "")
+				return;
+			if (activeInsulinAmountDisplay == null) {
+				activeInsulinAmountDisplay = new StyleableTextField();
+				activeInsulinAmountDisplay.styleName = this;
+				activeInsulinAmountDisplay.editable = false;
+				activeInsulinAmountDisplay.multiline = false;
+				activeInsulinAmountDisplay.wordWrap = false;
+				activeInsulinAmountDisplay.setStyle("fontSize",styleManager.getStyleDeclaration(".fontSizeForSubElements").getStyle("fontSize"));//other details is written a bit smaller, fontsize defined in style.css
+				addChild(activeInsulinAmountDisplay);
+			}
+			activeInsulinAmountDisplay.text = _activeInsulinAmount;
+			invalidateSize();
+		}
+
 		private var _bolusType:String
 
 		public function get bolusType():String
@@ -142,6 +187,9 @@ package myComponents
 				offsetToPutTextInTheMiddle = styleManager.getStyleDeclaration(".trackingItems").getStyle("offsetToPutTextInTheMiddle");
 				iconWidth = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconWidth");
 				iconHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("iconHeight");
+				activeInsulinAmountHeight = styleManager.getStyleDeclaration(".trackingItems").getStyle("selectedMealHeight");
+				_upLiftForNextField = styleManager.getStyleDeclaration(".removePaddingBottomForStyleableTextField").getStyle("gap");
+
 			}
 		}
 
@@ -161,6 +209,27 @@ package myComponents
 			amount = (value as MedicinEvent).amount.toString();
 			comment = (value as MedicinEvent).comment;
 			bolusType = (value as MedicinEvent).bolustype;
+			var now:Number = (new Date()).valueOf();
+			var activeInsulin:Number = ModelLocator.getInstance().calculateActiveInsulinForSpecifiedEvent((value as MedicinEvent),now);
+			var activeInsulinText:String = resourceManager.getString('editmedicineventview','active') 
+				+ " = " + ((Math.round(activeInsulin * 10))/10).toString()
+				+ " " + resourceManager.getString('trackingview','internationalunit');
+			if (bolusType == resourceManager.getString('editmedicineventview','square')) {
+				var temp1:Number = (value as MedicinEvent).timeStamp;
+				var temp2:Number = (value as MedicinEvent).bolusDurationInMinutes * 60 * 1000;
+				var timeToGo:Number = now - ((value as MedicinEvent).timeStamp) - (value as MedicinEvent).bolusDurationInMinutes * 60 * 1000; 
+				if (timeToGo <= 0) {
+					activeInsulinText += ", " + (- Math.round((timeToGo / 1000 / 60 / 60 * 10)) / 10).toString() +  " " + resourceManager.getString('editmedicineventview','hrtogo');
+				} else {
+					if (activeInsulin == 0)
+						activeInsulinText = "";
+				} 
+			} else {
+				if (activeInsulin == 0)
+					activeInsulinText = "";
+			}
+				
+			activeInsulinAmount = activeInsulinText;
 		}
 
 		override protected function createChildren():void {
@@ -204,7 +273,7 @@ package myComponents
 		}
 
 		override public function getHeight(item:TrackingViewElement = null):Number {
-			return itemHeight;
+			return itemHeight + (_activeInsulinAmount == "" ? 0 : activeInsulinAmountHeight);
 		}
 		
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -231,6 +300,10 @@ package myComponents
 			if (squareWaveBolusImage) {
 				setElementSize(squareWaveBolusImage,squareWaveBolusWidthAndHeight,squareWaveBolusWidthAndHeight);
 				setElementPosition(squareWaveBolusImage,unscaledWidth- squareWaveBolusWidthAndHeight ,offsetToPutTextInTheMiddle);
+			}
+			if (activeInsulinAmountDisplay != null) {
+				setElementSize(activeInsulinAmountDisplay,unscaledWidth - PADDING_RIGHT - PADDING_LEFT,activeInsulinAmountHeight);
+				setElementPosition(activeInsulinAmountDisplay,0 + PADDING_LEFT,itemHeight + offsetToPutTextInTheMiddle - _upLiftForNextField);
 			}
 		}
 		

@@ -45,6 +45,7 @@
   <flashCatalyst validateFlashCatalystCompatibility="false"/>
   <buildTargets>
     <buildTarget airDownloadURL="https://market.android.com/details?id=com.adobe.air" androidSettingsVersion="2" buildTargetName="device" isCurrent="true" platformId="com.adobe.flexide.multiplatform.android.platform">
+      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.android.platform" reducedSizePackaging="false" version="2"/>
       <airSettings airCertificatePath="G:/Allerlei/mykey.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes>
           <pathEntry path="blackberry-tablet.xml"/>
@@ -56,7 +57,6 @@
         <newPackagingParams/>
         <modifiedPackagingParams/>
       </airSettings>
-      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.android.platform" reducedSizePackaging="false" version="2"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
     <buildTarget buildTargetName="default" isCurrent="false" platformId="default">
@@ -71,7 +71,8 @@
       </airSettings>
       <actionScriptSettings version="1"/>
     </buildTarget>
-    <buildTarget buildTargetName="device" iosSettingsVersion="2" isCurrent="true" platformId="com.adobe.flexide.multiplatform.ios.platform" provisioningFile="C:/Users/Johan/Downloads/developmentiPhone6SamanthaBuysse.mobileprovision" releasePackageType="ipa-app-store">
+    <buildTarget buildTargetName="device" iosSettingsVersion="2" isCurrent="true" platformId="com.adobe.flexide.multiplatform.ios.platform" provisioningFile="C:/Users/Johan/Downloads/developmentiPadKatiaDeS.mobileprovision" releasePackageType="ipa-app-store">
+      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" reducedSizePackaging="false" version="2"/>
       <airSettings airCertificatePath="G:/Allerlei/johandegraeveIOSCertificate.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
         <anePaths/>
@@ -80,7 +81,6 @@
         <newPackagingParams/>
         <modifiedPackagingParams/>
       </airSettings>
-      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" reducedSizePackaging="false" version="2"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
     <buildTarget buildTargetName="default" isCurrent="false" platformId="com.qnx.flexide.multiplatform.qnx.platform">
