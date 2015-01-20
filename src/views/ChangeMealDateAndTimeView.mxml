@@ -206,10 +206,10 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 		</s:layout>
 		
 		<!-- the mealname -->
-		<s:Label   id="meal_name"  height="100%" maxHeight="45" textAlign="center" verticalAlign="middle" width="100%" text="{mealname_textarea_text}" />
+		<s:Label   id="meal_name"   height="100%" maxHeight="45" textAlign="center" verticalAlign="middle" width="100%" text="{mealname_textarea_text}" />
 		
 		<!-- the date -->
-		<s:Button id="date_button" width="100%"  label="{dateformatter.format(buttonDateAndTime)}" click="dateClicked()" />
+		<s:Button id="date_button" width="100%" label="{dateformatter.format(buttonDateAndTime)}" click="dateClicked()" />
 		
 		<!-- the time -->
 		<s:Button id="time_button" width="100%" label="{timeformatter.format(buttonDateAndTime)}" click="timeClicked()" />
