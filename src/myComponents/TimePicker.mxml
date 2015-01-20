@@ -39,6 +39,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			import mx.managers.PopUpManager;
 			
 			import spark.components.calendarClasses.DateSelectorDisplayMode;
+			import spark.formatters.DateTimeFormatter;
 			
 			import myComponents.PickerEvent;
 			
@@ -125,7 +126,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			
 			protected function group1_creationCompleteHandler(event:FlexEvent):void
 			{
-				dt.setStyle("locale",Capabilities.language);
+				//dt.setStyle("locale",Capabilities.language);
 				
 				dt.minDate = _minTime;
 				dt.maxDate = _maxTime;
