@@ -215,8 +215,6 @@ package myComponents
 				+ " = " + ((Math.round(activeInsulin * 10))/10).toString()
 				+ " " + resourceManager.getString('trackingview','internationalunit');
 			if (bolusType == resourceManager.getString('editmedicineventview','square')) {
-				var temp1:Number = (value as MedicinEvent).timeStamp;
-				var temp2:Number = (value as MedicinEvent).bolusDurationInMinutes * 60 * 1000;
 				var timeToGo:Number = now - ((value as MedicinEvent).timeStamp) - (value as MedicinEvent).bolusDurationInMinutes * 60 * 1000; 
 				if (timeToGo <= 0) {
 					activeInsulinText += ", " + (- Math.round((timeToGo / 1000 / 60 / 60 * 10)) / 10).toString() +  " " + resourceManager.getString('editmedicineventview','hrtogo');
@@ -273,9 +271,11 @@ package myComponents
 		}
 
 		override public function getHeight(item:TrackingViewElement = null):Number {
-			return itemHeight + (_activeInsulinAmount == "" ? 0 : activeInsulinAmountHeight);
+			var now:Number = (new Date()).valueOf();
+			var activeInsulin:Number = ModelLocator.getInstance().calculateActiveInsulinForSpecifiedEvent((item as MedicinEvent),now);
+			return itemHeight + (activeInsulin == 0  ? 0 : activeInsulinAmountHeight);
 		}
-		
+
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
 			amountDisplay.text = amount + " " + resourceManager.getString('trackingview','internationalunit');
 			var amountDisplayWidth:Number = getElementPreferredWidth(amountDisplay);
