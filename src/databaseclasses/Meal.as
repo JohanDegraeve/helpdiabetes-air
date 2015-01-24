@@ -100,22 +100,10 @@ package databaseclasses
 		 * It is here also that the insulinratio to be used is defined,  this will be redefined each time a selectedfooditem is added<br>
 		 */
 		public function addSelectedFoodItem(selectedFoodItem:SelectedFoodItem):void {
-			var now:Date = new Date();
 			var previousBGlevel:Number = Number.NaN;
 			var insulinRatio:Number;
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			
-			var nowAsNumber:Number = (now.hours * 3600 + now.minutes * 60 + now.seconds)*1000;
-			if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
-				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST));
-			} else if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))) {
-				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_LUNCH));
-			} else if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))) {
-				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SNACK));
-			} else {
-				insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SUPPER));
-			}
-			now = new Date();
+			var timeStampAsDate = new Date(_timeStamp);
 			
 			if (_mealEvent == null) {
 				//it's the first selectedfooditem, and if no timestamp was supplied then set _timestamp to current time
@@ -126,10 +114,25 @@ package databaseclasses
 				_timeStamp = (new Date()).valueOf();
 				}
 				}*/
+				
+				//added 2015 01 24
+				//correction calculation insulinratio, should use timestamp of the meal, not the current time
+				//also correctionfactor used in call to new MealEvent, is now taking current timestamp
+				var nowAsNumber:Number = (timeStampAsDate.hours * 3600 + timeStampAsDate.minutes * 60 + timeStampAsDate.seconds)*1000;
+				if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
+					insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST));
+				} else if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))) {
+					insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_LUNCH));
+				} else if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))) {
+					insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SNACK));
+				} else {
+					insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SUPPER));
+				}
+				
 				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
 				var correctionFactorList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
-				_mealEvent = new MealEvent(mealName,insulinRatio, correctionFactorList.getValue(Number.NaN,"",new Date(_timeStamp)),_timeStamp,localdispatcher,new Date().valueOf(), "",new Date().valueOf(),true,null,thisMeal);
+				_mealEvent = new MealEvent(mealName,insulinRatio, correctionFactorList.getValue(Number.NaN,"",timeStampAsDate),timeStampAsDate,localdispatcher,new Date().valueOf(), "",new Date().valueOf(),true,null,thisMeal);
 			} else
 				mealEventCreated(null);
 			

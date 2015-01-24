@@ -162,9 +162,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					if (mealEvent.insulinRatio != 0) {
 						insulinAmount_text =  ((Math.round(mealEvent.calculatedInsulinAmount * 10))/10).toString() + 
 							" " + 
-							resourceManager.getString('editmealeventview','unitsofinsulin') + 
-							", " + resourceManager.getString('editmealeventview','insulinRatioUsed')
-							+ " " + mealEvent.insulinRatio;
+							resourceManager.getString('editmealeventview','unitsofinsulin');
 					} else insulinAmount_text = null;
 					
 					fooditemlist.addEventListener(Event.CHANGE,onClick);

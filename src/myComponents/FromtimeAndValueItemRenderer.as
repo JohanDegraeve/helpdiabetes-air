@@ -159,7 +159,7 @@ package myComponents
 			deletable = theDataAsFromToAndValue.deletable;
 			editable = theDataAsFromToAndValue.editable;
 			elementCanBeAdded = theDataAsFromToAndValue.unit == "%" ?
-									(theDataAsFromToAndValue.from == 129600 || theDataAsFromToAndValue.from == (129600 - 60))  ? false:true
+									(theDataAsFromToAndValue.from == 86400 || theDataAsFromToAndValue.from == (86400 - 60))  ? false:true
 									:
 									(theDataAsFromToAndValue.from ==  86400 || theDataAsFromToAndValue.from == (86400 - 60))? false:true;
 		} 

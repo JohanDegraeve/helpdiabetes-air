@@ -48,8 +48,8 @@ package utilities
 		 */
 		public static function getInstance(display:Object = null):MyGATracker {
 			if (instance == null) 
-					instance = new MyGATracker();
-
+				instance = new MyGATracker();
+			
 			if (gaTracker == null && display != null && display is DisplayObject) {
 				try {
 					gaTracker = new GATracker(display as DisplayObject, trackerId, "AS3", false, null, null);
@@ -67,10 +67,8 @@ package utilities
 		 */
 		public function  trackPageview(pageURL:String=""):Boolean {
 			if (gaTracker != null) {
-				if ((new Date()).valueOf() - 7*24*60*60*1000 > new Number(Settings.getInstance().getSetting(Settings.SettingsFirstStartUp))) {
-					gaTracker.trackPageview(pageURL);
-					return true;
-				}
+				gaTracker.trackPageview(pageURL);
+				return true;
 			}
 			return false;
 		}

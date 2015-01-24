@@ -118,7 +118,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						timePicker36Hour.maxTime = new Date((listOfElements.getItemAt(selectedIndex + 1) as FromtimeAndValue).from * 1000 - 1 * 60 * 1000);
 					} else if ((listOfElements.getItemAt(selectedIndex) as FromtimeAndValue).unit == "%") {
 						//we should not come here because the last element, if percentage, should not be editable, anyway let's handle it
-						timePicker36Hour.maxTime = new Date(36 * 3600 * 1000 - 1 * 60 * 1000);
+						timePicker36Hour.maxTime = new Date(24 * 3600 * 1000 - 1 * 60 * 1000);
 					} else 
 						timePicker36Hour.maxTime = new Date(24 * 3600 * 1000 - 1 * 60 * 1000);
 				} else {

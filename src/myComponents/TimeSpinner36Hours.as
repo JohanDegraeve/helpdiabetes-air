@@ -14,7 +14,7 @@ Copyright 2013 hippo and friends
    limitations under the License. */
 /**
  * based on DateSpinner.as from Adobe : http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/spark/components/DateSpinner.html<br>
- * Spinner to get a time between 00:00 and 36:00<br>
+ * Spinner to get a time between 00:00 and 24:00<br>
  * Time set here is UTC time, not local time<br>
 */
 package myComponents
@@ -79,7 +79,7 @@ package myComponents
 	include "../assets/StyleableTextFieldTextStyles.as"
 	
 	/**
-	 *  The TimeSpinner36Hours control presents an interface for picking a particular time between 00:00 and 36:00 
+	 *  The TimeSpinner36Hours control presents an interface for picking a particular time between 00:00 and 24:00 
 	 */
 	public class TimeSpinner36Hours extends SkinnableComponent
 	{
@@ -113,7 +113,7 @@ package myComponents
 		
 		// default min/max date
 		private static const MIN_DATE_DEFAULT:Date = DateTimeUtilities.convertToUTC(new Date(0));
-		private static const MAX_DATE_DEFAULT:Date = DateTimeUtilities.convertToUTC(new Date(129600000));//36 hours
+		private static const MAX_DATE_DEFAULT:Date = DateTimeUtilities.convertToUTC(new Date(86400000));//24 hours
 		
 		// the internal DateTimeFormatter that provides a set of extended functionalities
 		private var dateTimeFormatterEx:DateTimeFormatterEx = new DateTimeFormatterEx();
@@ -230,7 +230,7 @@ package myComponents
 		}
 		
 		/**
-		 * Maximum date, default value = 129600000 (36 hours)
+		 * Maximum date, default value = 86400000 (24 hours)
 		 */     
 		public function set maxDate(value:Date):void
 		{
@@ -647,7 +647,7 @@ package myComponents
 			var ac:ArrayCollection = new ArrayCollection();
 			
 			var minHour:int = 0 ;
-			var maxHour:int = 35;
+			var maxHour:int = 23;
 			
 			
 			for (var i:int = minHour; i <= maxHour; i++)

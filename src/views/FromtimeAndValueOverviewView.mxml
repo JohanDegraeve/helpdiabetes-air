@@ -217,7 +217,7 @@ This view is to edit the overview, ie the units for which the list is valid, and
 			{
 				//if user is trying to enable an insulin profile which has still has the default value of 00:00>100 then this click has not effect
 				var settingAsString:String = Settings.getInstance().getSetting(new Number(data.settingid1));
-				if ((settingAsString.length - settingAsString.indexOf("00:00>100") == 9) || (settingAsString.indexOf("00:00>100-36:00") > -1)) {
+				if ((settingAsString.length - settingAsString.indexOf("00:00>100") == 9) || (settingAsString.indexOf("00:00>100-24:00") > -1)) {
 					active = false;
 					alertPopUp = new AlertPopUp();
 					alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);

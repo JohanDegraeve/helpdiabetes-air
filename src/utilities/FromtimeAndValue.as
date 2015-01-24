@@ -22,7 +22,7 @@ package utilities
 	 * a class that can hold a from time<br>
 	 * a value (decimal value)<br>
 	 * <br>
-	 * from time between 0 and 36 hours<br>
+	 * from time between 0 and 24 hours<br>
 	 * <br>
 	 * once created, value and from can't be modified anymore. This is because the class FromTimeandValueArrayCollection
 	 * needs to be able to check the value of an element against other objects in the list, eg if percentage based, when adding 
@@ -127,8 +127,8 @@ package utilities
 			 else
 				 throw new Error("error in FromtimeAndValue, newFrom should be Number, int or String");
 			 
-			 if (_from < 0 || _from > 129600000)
-				 throw new Error("error in FromtimeAndValue, newFrom should be between 00:00 and 36:00 or between 0 and 129600");
+			 if (_from < 0 || _from > 86400000)
+				 throw new Error("error in FromtimeAndValue, newFrom should be between 00:00 and 24:00 or between 0 and 86400");
 			 _value = newValue;
 		 }
 	}

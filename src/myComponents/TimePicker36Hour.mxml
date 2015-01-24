@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <!--
-user wil enter a time, can be between 00:00 and 35:00, local time 
+user wil enter a time, can be between 00:00 and 24:00, local time 
 client needs to set currentTime, which is a timestamp in ms. User can only change hour, minutes, but year, month, date, ms and seconds will be set to zero
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
@@ -80,7 +80,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 				_currentTime = DateTimeUtilities.convertToUTC(value);
 			}
 			
-			private var _maxTime:Date = DateTimeUtilities.convertToUTC(new Date(32531915068000));
+			private var _maxTime:Date = DateTimeUtilities.convertToUTC(new Date(86400000));
 			
 			/**
 			 * This is considered as local time<br>
@@ -150,7 +150,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			
 			protected function group1_creationCompleteHandler(event:FlexEvent):void
 			{
-				dt.setStyle("locale",Capabilities.language);
+				dt.setStyle("locale","nl_NL");//use nl_NL here because i don't want to am/pm thing for this kind of spinners
 				
 				dt.minDate = _minTime;
 				dt.maxDate = _maxTime;

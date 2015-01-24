@@ -24,7 +24,7 @@ package utilities
 	
 	/**
 	 * Will hold a list of FromAndValueElements<br>
-	 * Offers methods to get the Value for a specific timing (between 00:00 and maximum 36:00:00 = 129600 seconds)<br>
+	 * Offers methods to get the Value for a specific timing (between 00:00 and maximum 24:00:00 = 86400 seconds)<br>
 	 * 
 	 * Such a list is either<br>
 	 * <ul>
@@ -32,7 +32,7 @@ package utilities
 	 * <li>percentage based<br>
 	 * Starts always from 100 % and goes down to 0 %. It is not mandatory to specify the first and last element, these
 	 * will be added automatically and will not be editable or deletable<br>
-	 * The last element will be set to 129600 seconds = 36 hours<br>
+	 * The last element will be set to 86400 seconds = 24 hours<br>
 	 * <br>
 	 * When adding an item, the value will be checked with the value of the element before and after, it must be respectively smaller and greater than<br>
 	 * When adding an element with a fromtime that already exists, then it will be overwrite the existing element.<br>
@@ -116,14 +116,14 @@ package utilities
 			  }
 			  
 			  if (percentageBased) {
-				  //check if element exists with from 36:00, if not add it
+				  //check if element exists with from 24:00, if not add it
 				  for (cntr = 0;cntr < length;cntr++) {
-					  if ((getItemAt(cntr) as FromtimeAndValue).from == 129600) {
+					  if ((getItemAt(cntr) as FromtimeAndValue).from == 86400) {
 						  break;
 					  }
 				  }
 				  if (cntr == length) {
-					  super.addItem(new FromtimeAndValue(129600,0,unit,false,false));
+					  super.addItem(new FromtimeAndValue(86400,0,unit,false,false));
 				  }
 			  }
 			  
@@ -143,7 +143,7 @@ package utilities
 				  //we don't remove the first element
 				  return (getItemAt(index));
 			  if (percentageBased) {
-				  if ((getItemAt(index) as FromtimeAndValue).from	== 129600)
+				  if ((getItemAt(index) as FromtimeAndValue).from	== 86400)
 					  //we don't remove the last element
 					  return (getItemAt(index));
 			  }
@@ -169,9 +169,9 @@ package utilities
 					  if ((item as FromtimeAndValue).value != 100)
 						  throw new Error("percentage based fromtimeandvalue, you're trying to add an element with from = 00:00 and value different from 100, that's not allowed");
 				  
-				  if ((item as FromtimeAndValue).from == 129600 )
+				  if ((item as FromtimeAndValue).from == 86400 )
 					  if ((item as FromtimeAndValue).value != 0)
-						  throw new Error("percentage based fromtimeandvalue, you're trying to add an element with from = 36:00 and value different from 0, that's not allowed");
+						  throw new Error("percentage based fromtimeandvalue, you're trying to add an element with from = 24:00 and value different from 0, that's not allowed");
 				  
 				  var previousItem:int = 0;
 				  while ((getItemAt(previousItem + 1) as FromtimeAndValue).from < (item as FromtimeAndValue).from && previousItem < length)
@@ -185,8 +185,8 @@ package utilities
 				  if ((item as FromtimeAndValue).value > 100)
 					  throw new Error("percentage based fromtimeandvalue, you're trying to add an item with value > 100");
 			  }
-			  if ((item as FromtimeAndValue).from > 129600)
-				  throw new Error("fromtimeandvalue, you're trying to add an item with from > 129600");
+			  if ((item as FromtimeAndValue).from > 86400)
+				  throw new Error("fromtimeandvalue, you're trying to add an item with from > 86400");
 			  
 			  
 			  //if any element exists with same fromtime, it is removed first
@@ -197,12 +197,12 @@ package utilities
 				  }
 			  }
 			  
-			  //if percentage based, and if fromtime = 0 or 129600, then add it as not editable and not deletable
+			  //if percentage based, and if fromtime = 0 or 86400, then add it as not editable and not deletable
 			  if (percentageBased) {
 				  if ((item as FromtimeAndValue).from == 0) {
 					  super.addItem(new FromtimeAndValue((item as FromtimeAndValue).from,(item as FromtimeAndValue).value,unit,false,false));
 				  }
-				  else if ((item as FromtimeAndValue).from == 129600) {
+				  else if ((item as FromtimeAndValue).from == 86400) {
 					  super.addItem(new FromtimeAndValue((item as FromtimeAndValue).from,(item as FromtimeAndValue).value,unit,false,false));
 				  }
 				  else
@@ -223,10 +223,10 @@ package utilities
 		  * fromTime can have one of three formats :
 		  * <ul>
 		  * <li>
-		  * a string representation of a time between 00:00 and 36:00 otherwise an error is thrown
+		  * a string representation of a time between 00:00 and 24:00 otherwise an error is thrown
 		  * </li>
 		  * <li>
-		  * a number representing time in seconds, between 0 and 129600
+		  * a number representing time in seconds, between 0 and 86400
 		  * </li>
 		  * <li>
 		  * a date object - in this case only the Hour of the Day and the Minutes will be taken into account<br>
@@ -237,8 +237,8 @@ package utilities
 		  */public function getValue(timeAsNumber:Number = Number.NaN,timeAsString:String = "",timeAsDate:Date = null):Number {
 			  
 			  if (!isNaN(timeAsNumber)) {
-				  if (timeAsNumber > 129600)
-					  throw new Error("fromTimeAsNumber should not be > 129600");
+				  if (timeAsNumber > 86400)
+					  throw new Error("fromTimeAsNumber should not be > 86400");
 			  }
 			  if (!timeAsString == "") {
 				  return getValue(((new Number(timeAsString.split(":")[0])) * 60 + (new Number(timeAsString.split(":")[1])))*60); 
