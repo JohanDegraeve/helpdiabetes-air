@@ -28,19 +28,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		@namespace s "library://ns.adobe.com/flex/spark";
 		.mystyle
 		{
-			backgroundAlpha:0;
+			backgroundAlpha:0.5;
+			backgroundColor:black;
 		}
 	</fx:Style>
 	<fx:Script>
 		<![CDATA[
 			import spark.components.View;
-			
+						
 			private var activeView:View;
 			
 			public function show(view:View):void
 			{
 				activeView = view;
-				this.center();
+				this.position();
 				this.open(activeView, false);
 				
 			}
@@ -55,13 +56,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				return alertMessageText.text;
 			}
 			
-			public function center():void
+			private function position():void
 			{
-				this.width = HelpDiabetes.deviceScreenWidth * 0.98;
-				this.height = HelpDiabetes.deviceScreenHeight * 0.98;
+				this.width = HelpDiabetes.deviceScreenWidth;
+				this.height = HelpDiabetes.deviceScreenHeight;
 				
-				this.x = (HelpDiabetes.deviceScreenWidth / 2) - (this.width /2);
-				this.y = (HelpDiabetes.deviceScreenHeight / 2) - (this.height/2);
+				this.x = 0;
+				this.y = 0;
 			}
 			
 			
@@ -74,8 +75,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<s:VGroup  width="100%" height="100%" horizontalAlign="center">
 		
-		<s:TextArea id="alertMessageText" width="100%" height="100%" selectable="false" 
-					verticalScrollPolicy="on"/>
+		<s:TextArea id="alertMessageText" width="90%" height="80%" selectable="false" 
+					x = "{HelpDiabetes.deviceScreenWidth * 0.1 / 2}"
+					y = "{HelpDiabetes.deviceScreenHeight * 0.2 / 2}"
+					 verticalScrollPolicy="on"/>
 		<s:Button label="{resourceManager.getString('general','ok')}" click="this.close()"/>
 		
 	</s:VGroup>
