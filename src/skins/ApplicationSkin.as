@@ -1,38 +1,34 @@
 package skins
 {
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
+	import flash.display.GradientType;
 	import flash.geom.Matrix;
 	
-	import spark.components.Image;
 	import spark.skins.mobile.TabbedViewNavigatorApplicationSkin;
 	
 	public class ApplicationSkin extends TabbedViewNavigatorApplicationSkin
 	{
+		//see http://code.tutsplus.com/tutorials/how-to-create-gradients-with-actionscript--active-6443
+		static private var tabBackGroundColors:Array;
+		static private var matrix:Matrix;
+
 		public function ApplicationSkin()
 		{
 			super();
 		}
 		
-		private var image:Image;
-		
-		[Embed(source="assets/bg.png")]
-		private var background:Class;
-		
-		
 		override protected function drawBackground(unscaledWidth:Number,unscaledHeight:Number):void {
-			  var imageasBitMap:Bitmap = new background();
-			//Replace the right side below with your source (including URL)
-			var bitmapData : BitmapData = imageasBitMap.bitmapData.clone();
-			
-			var matrix:Matrix ;
-			if (unscaledWidth > imageasBitMap.width || unscaledHeight > imageasBitMap.height) {
+			if (tabBackGroundColors == null) {
+				tabBackGroundColors = [] ;
+				tabBackGroundColors[0] = '0xC8C8C8';/* gradient will be applied from bottom to top, this is the bottom color*/
+				tabBackGroundColors[1] = '0xFFFFFF';
 				matrix = new Matrix();
-				matrix.scale(unscaledWidth/imageasBitMap.width,unscaledHeight/imageasBitMap.height);
+				matrix.createGradientBox(unscaledWidth, unscaledHeight, 1.57, 0, 0);
 			}
 			
-			graphics.beginBitmapFill(bitmapData,matrix ? matrix:null);
-			graphics.drawRect(0,0,unscaledWidth,unscaledHeight);
+			//only if the tab is selected, then we'll have the gradient backup
+			graphics.beginGradientFill(GradientType.LINEAR, tabBackGroundColors, [100,100],[0,255],matrix);
+			
+			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 			graphics.endFill();
 		}
 	}

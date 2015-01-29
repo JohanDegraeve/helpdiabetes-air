@@ -23,7 +23,7 @@ client needs to set currentDate, which is a timestamp in ms. User can only chang
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
 		 creationComplete="group1_creationCompleteHandler(event)"
 		 implements="mx.managers.IFocusManagerContainer"
-		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*"
+		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:components="spark.components.*" xmlns:myComponents="myComponents.*"
 		 >
 	<fx:Declarations>
 		<s:DateTimeFormatter id="dayformatter" dateTimePattern="EEEE" useUTC="false" locale="{Capabilities.language.substr(0,2)}"/>
@@ -90,8 +90,7 @@ client needs to set currentDate, which is a timestamp in ms. User can only chang
 			
 		]]>
 	</fx:Script>
-	<s:BorderContainer >
-		
+	<myComponents:MyBorderContainer>
 		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
 			<s:DateSpinner id="dt" displayMode="{DateSelectorDisplayMode.DATE}"/> 		
 			<s:BorderContainer width="100%" backgroundColor="0xcccccc">
@@ -101,5 +100,5 @@ client needs to set currentDate, which is a timestamp in ms. User can only chang
 				</s:VGroup>
 			</s:BorderContainer>
 		</s:VGroup>
-	</s:BorderContainer>
+	</myComponents:MyBorderContainer>
 </s:Group>

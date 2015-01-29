@@ -25,12 +25,12 @@ package skins
 				tabBackGroundColors[0] = styleManager.getStyleDeclaration(".tabbartabbuttoncolor").getStyle("colorbottom");/* gradient will be applied from bottom to top, this is the bottom color*/
 				tabBackGroundColors[1] = styleManager.getStyleDeclaration(".tabbartabbuttoncolor").getStyle("colortop");
 				matrix = new Matrix();
-				matrix.createGradientBox(unscaledWidth, unscaledHeight, Math.PI * 270/ 180, 0, 0);
+				matrix.createGradientBox(unscaledWidth, unscaledHeight, 1.57, 0, 0);
 				}
 			
 			//only if the tab is selected, then we'll have the gradient backup
 			if (isSelected)
-				graphics.beginGradientFill(GradientType.LINEAR, tabBackGroundColors, [1,1],[0,255],matrix);
+				graphics.beginGradientFill(GradientType.LINEAR, tabBackGroundColors, [100,100],[0,255],matrix);
 			else 
 				graphics.beginFill(0,1);
 			

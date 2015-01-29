@@ -63,6 +63,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ResourceManager.getInstance().getString("settingsview","language"),
 				ResourceManager.getInstance().getString("settingsview","resethelptext"),
 				ResourceManager.getInstance().getString("settingsview","googlesync"),
+				ResourceManager.getInstance().getString("settingsview","aboutexperit"),
 				ResourceManager.getInstance().getString("settingsview","infoabout")
 			]);	
 			
@@ -168,6 +169,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							navigator.pushView(SynchronizeView2);
 						break;
 					case 8:
+						MyGATracker.getInstance().trackPageview( "SetingsView-aboutexperit" );
+						
+						alertPopUp = new AlertPopUp();
+						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+						textToShow = 
+						resourceManager.getString('settingsview','experitinfo');
+						alertPopUp.show(this);
+						alertPopUp.setMessage(textToShow);
+						break;
+					case 9:
 						MyGATracker.getInstance().trackPageview( "SetingsView-infoAndHelpShown" );
 						
 						alertPopUp = new AlertPopUp();

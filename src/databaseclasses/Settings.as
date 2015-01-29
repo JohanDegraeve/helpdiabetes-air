@@ -391,7 +391,7 @@ package databaseclasses
 		public static const SettingsHelpTextEditTrackingEvent:int=65;
 		public static const SettingsHelpTextActiveInsulinInt:int=66;
 		public static const SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView:int=67;
-		public static const SettingsHelpText68:int=68;
+		public static const SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime:int=68;
 		public static const SettingsHelpText69:int=69;
 		public static const SettingsHelpText70:int=70;
 		public static const SettingsHelpText71:int=71;
@@ -644,7 +644,7 @@ package databaseclasses
 			"true",//SettingsHelpTextEditTrackingEvent
 			"true",//SettingsHelpTextActiveInsulinInt
 			"true",//SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView
-			"true",
+			"0",//SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime, 0 means never been set this value
 			"true",
 			"true",
 			"true",

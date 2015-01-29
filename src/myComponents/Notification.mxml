@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark"
 		 implements="mx.managers.IFocusManagerContainer"
-		 preinitialize="onPreInitialize()">
+		 preinitialize="onPreInitialize()" xmlns:myComponents="myComponents.*">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -74,7 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 		]]>
 	</fx:Script>
-	<s:BorderContainer>
+	<myComponents:MyBorderContainer>
 		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="5" paddingRight="5" paddingTop="10">
 			<s:Label id="notificationTextArea" text="{notificationText}" maxDisplayedLines="15" maxWidth="280" color="0xFFFFFF">
 			</s:Label>
@@ -82,5 +82,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:Button width="100%" height="60" label="{resourceManager.getStringArray('general','ok')}" click="okClicked()"/>
 			</s:VGroup>
 		</s:VGroup>
-	</s:BorderContainer> 
+	</myComponents:MyBorderContainer>
 </s:Group>

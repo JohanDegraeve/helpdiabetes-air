@@ -434,7 +434,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Label y="0" x="0" width="100%" height="100%" maxHeight="75" text="{resourceManager.getString('editbgeventview','addbgevent')}"  textAlign="center" verticalAlign="middle"/>
 		<s:Line width="100%">
 			<s:stroke>
-				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				<s:SolidColorStroke color="0xADADAD" weight="1"/>
 			</s:stroke>
 		</s:Line>	
 		<s:Group id="meteringResultGroup" y="0" x="0" width="100%" click="meteringResultClicked(event)">
@@ -447,7 +447,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		</s:Group>
 		<s:Line width="100%">
 			<s:stroke>
-				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				<s:SolidColorStroke color="0xADADAD" weight="1"/>
 			</s:stroke>
 		</s:Line>	
 		<s:Group id="datumGroup" y="0" x="0" width="100%" click="datumClicked(event)">
@@ -460,7 +460,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		</s:Group>
 		<s:Line width="100%">
 			<s:stroke>
-				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				<s:SolidColorStroke color="0xADADAD" weight="1"/>
 			</s:stroke>
 		</s:Line>	
 		<s:Group id="timeGroup" y="0" x="0" width="100%" click="timeClicked(event)">
@@ -473,7 +473,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		</s:Group>
 		<s:Line width="100%">
 			<s:stroke>
-				<s:SolidColorStroke color="0xcccccc" weight="1"/>
+				<s:SolidColorStroke color="0xADADAD" weight="1"/>
 			</s:stroke>
 		</s:Line>	
 	</s:Group>

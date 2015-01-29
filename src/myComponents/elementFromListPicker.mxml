@@ -22,7 +22,7 @@ to chose an element from a list of a maximum number of elements
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark"
 		 implements="mx.managers.IFocusManagerContainer"
-		 preinitialize="preInitialize()">
+		 preinitialize="preInitialize()" xmlns:myComponents="myComponents.*">
 	
 	<fx:Script>
 		<![CDATA[
@@ -163,7 +163,7 @@ to chose an element from a list of a maximum number of elements
 		]]>
 	</fx:Script>
 	
-	<s:BorderContainer >
+	<myComponents:MyBorderContainer>
 		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="5" paddingRight="5" paddingTop="10">
 			<s:Label includeInLayout="{labelText1 != ''}" text="{labelText1}" width="100%" styleName="textColorInPickerOnDarkBackground" />
 			<s:Label includeInLayout="{labelText2 != ''}" text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
@@ -175,55 +175,55 @@ to chose an element from a list of a maximum number of elements
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 0}" text="{element1}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element1')"/>
 			<s:Line includeInLayout="{nrOfElements > 1}" width="100%" >
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 1}" text="{element2}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element2')"/>
 			<s:Line includeInLayout="{nrOfElements > 2}" width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 2}" text="{element3}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element3')"/>
 			<s:Line includeInLayout="{nrOfElements > 3}" width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 3}" text="{element4}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element4')"/>
 			<s:Line includeInLayout="{nrOfElements > 4}" width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 4}" text="{element5}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element5')"/>
 			<s:Line includeInLayout="{nrOfElements > 5}" width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 5}" text="{element6}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element6')"/>
 			<s:Line includeInLayout="{nrOfElements > 6}" width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 6}" text="{element7}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element7')"/>
 			<s:Line includeInLayout="{nrOfElements > 7}" width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 7}" text="{element8}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element8')"/>
 			<s:Line includeInLayout="{nrOfElements > 8}" width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 8}" text="{element9}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element9')"/>
 			<s:Line includeInLayout="{nrOfElements > 9}" width="100%">
 				<s:stroke>
-					<s:SolidColorStroke color="0xcccccc" weight="1"/>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>
 			<s:Label minHeight="40" verticalAlign="middle" includeInLayout="{nrOfElements > 9}" text="{element10}" width="100%" textAlign="left" styleName="textColorInPickerOnDarkBackground" click="elementClicked('element10')"/>
@@ -234,6 +234,6 @@ to chose an element from a list of a maximum number of elements
 			</s:BorderContainer>
 
 		</s:VGroup>
-	</s:BorderContainer>
+	</myComponents:MyBorderContainer>
 </s:Group>
 	

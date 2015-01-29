@@ -55,7 +55,6 @@ s|BorderContainer {
 }
 
 
-
 s|TabbedViewNavigator #tabBar
 {/* tabbar will used a customized tabbartabskin, to have the background with gradient color */
 	/*chromeColor:#8EADD8  ; /* gives the tabnavigator buttons our special color*/
@@ -64,18 +63,18 @@ s|TabbedViewNavigator #tabBar
 }
 
 .tabbartabbuttoncolor {/* a tabbar in a viewnavigator has tabs, this tab has a backgroundcolor when selected, this will be the colors used for a gradient box from bottom to top */
-	colorbottom:#5C89C7;/* gradient will be applied from bottom to top, this is the bottom color*/
-	colortop:#000000;/* gradient will be applied from bottom to top, this is the top color*/
+	colorbottom:#003D6E;/* gradient will be applied from bottom to top, this is the bottom color*/
+	colortop:#153460;/* gradient will be applied from bottom to top, this is the top color*/
 }
 
 .listAlternatingColors {/*used in menu items*/
-	color1:#D0DDEF;
-	color2:#EEF3F9;
+	color1:#C8C8C8;
+	color2:#E5E5E5;
 }
 
 s|ActionBar
 {
-	chromeColor: #5C89C7; /* gives our action bar our special color*/ 
+	chromeColor: #3B6999; /* gives our action bar our special color*/ 
 	defaultButtonAppearance: beveled; /* ios style action bar buttons*/ 
 }
 

@@ -57,7 +57,7 @@ package myComponents
 		 */
 		override protected function drawBackground(unscaledWidth:Number, unscaledHeight:Number):void
 		{
-			graphics.beginFill(0x213A5C, 1);
+			graphics.beginFill(0x3B6999, 1);
 			graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 			graphics.endFill();
 

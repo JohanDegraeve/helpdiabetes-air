@@ -158,8 +158,7 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 			}
 		]]>
 	</fx:Script>
-	<s:BorderContainer>
-		
+	<myComponents:MyBorderContainer>
 		<s:VGroup width="100%" gap="10" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
 			<myComponents:TimeSpinner36Hours id="dt" skinClass="spark.skins.mobile.DateSpinnerSkin"/>
 			<s:BorderContainer backgroundColor="0xcccccc" width="100%">
@@ -169,5 +168,5 @@ client needs to set currentTime, which is a timestamp in ms. User can only chang
 				</s:VGroup>
 			</s:BorderContainer>
 		</s:VGroup>
-	</s:BorderContainer>
+	</myComponents:MyBorderContainer>
 </s:Group>

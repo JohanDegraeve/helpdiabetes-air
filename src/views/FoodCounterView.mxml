@@ -56,6 +56,7 @@ the home screen
 			
 			import myComponents.AlertPopUp;
 			import myComponents.HelpCallOut;
+			import myComponents.MySplashScreen;
 			import myComponents.Notification;
 			import myComponents.PickerEvent;
 			import myComponents.elementFromListPicker;
@@ -207,6 +208,11 @@ the home screen
 					
 					initiateRetrievalOfFoodItemList();
 					
+					//seems perfect timing to me to remove the splashscreen
+					MySplashScreen.resetDisplayTime();//moven naar initiate, als dat gebeurd is dan pas resetdisplaytime
+					
+					//en ditte zodanig doen dat die pop er komt als het firststartup is an geshowed wordt zodra splashscreen verdwijnt, kan zijn
+					//dat loaden van database dan nog bezig is
 					if (firstStartUp) {
 						licensePopUp = new AlertPopUp();
 						licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
@@ -274,7 +280,6 @@ the home screen
 					//foodItems = new ArrayCollection();
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
-					
 					ModelLocator.getInstance().foodItemList = new ArrayCollection();
 					excelSorting = new ExcelSorting(ModelLocator.getInstance().foodItemList);
 					

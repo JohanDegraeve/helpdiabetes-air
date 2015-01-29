@@ -24,7 +24,8 @@ you can also define maximum amount of digits after decimal point, maximum amount
 -->
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 implements="mx.managers.IFocusManagerContainer"
-		 xmlns:s="library://ns.adobe.com/flex/spark">
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:myComponents="myComponents.*">
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
@@ -339,7 +340,7 @@ you can also define maximum amount of digits after decimal point, maximum amount
 			}
 ]]>
 	</fx:Script>
-	<s:BorderContainer>
+	<myComponents:MyBorderContainer>
 		<s:VGroup id="vgroup" width="100%" gap="10" paddingBottom="10" paddingLeft="5" paddingRight="5" paddingTop="10">
 			<s:Label includeInLayout="{labelText1 != ''}" text="{labelText1}" width="100%" styleName="textColorInPickerOnDarkBackground" />
 			<s:Label includeInLayout="{labelText2 != ''}" text="{labelText2}" width="100%" styleName="textColorInPickerOnDarkBackground" />
@@ -390,5 +391,6 @@ you can also define maximum amount of digits after decimal point, maximum amount
 		</s:VGroup>
 		
 		
-	</s:BorderContainer>
+	</myComponents:MyBorderContainer>
+
 </s:Group>
