@@ -75,9 +75,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<s:VGroup  width="100%" height="100%" horizontalAlign="center">
 		
-		<s:TextArea id="alertMessageText" width="90%" height="80%" selectable="false" 
-					x = "{HelpDiabetes.deviceScreenWidth * 0.1 / 2}"
+		<s:TextArea id="alertMessageText" width="90%" height="80%" selectable="false" editable="false"
+					x = "{HelpDiabetes.deviceScreenWidth * 0.1 / 2}" 
 					y = "{HelpDiabetes.deviceScreenHeight * 0.2 / 2}"
+					skinClass="spark.skins.mobile.TextAreaSkin"
 					 verticalScrollPolicy="on"/>
 		<s:Button label="{resourceManager.getString('general','ok')}" click="this.close()"/>
 		
