@@ -158,11 +158,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" text="@{standardamountText}" contentBackgroundColor="0xDCDCDC" id="standardamount" editable="true" borderVisible="false" textAlign="left" restrict="0-9"/>
-			<s:TextInput width = "50%" text="@{unitdescriptionText}"  contentBackgroundColor="0xDCDCDC" id="unitdescription" editable="true" borderVisible="false" textAlign="left" />
+			<s:TextInput width = "50%" text="@{standardamountText}" contentBackgroundColor="0xDCDCDC" id="standardamount" editable="true" borderVisible="true" textAlign="left" restrict="0-9"/>
+			<s:TextInput width = "50%" text="@{unitdescriptionText}"  contentBackgroundColor="0xDCDCDC" id="unitdescription" editable="true" borderVisible="true" textAlign="left" />
 		</s:Group>
 		<s:Group>
-			<s:TextInput text="@{fooditemdescriptionText}" contentBackgroundColor="0xDCDCDC" id="fooditemdescription" editable="true" borderVisible="false" textAlign="left" />
+			<s:TextInput text="@{fooditemdescriptionText}" contentBackgroundColor="0xDCDCDC" id="fooditemdescription" editable="true" borderVisible="true" textAlign="left" />
 		</s:Group>
 		<s:Group y="0" x="0" width="100%">
 			<s:Label  height="30" text="{resourceManager.getString('ownitemview','contains')}" verticalAlign="middle"/>
@@ -172,7 +172,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" text="@{gramoffcarbsText}" contentBackgroundColor="0xDCDCDC" id="gramofcarbs" editable="true" borderVisible="false" textAlign="left" restrict="0-9.,"/>
+			<s:TextInput width = "50%" text="@{gramoffcarbsText}" contentBackgroundColor="0xDCDCDC" id="gramofcarbs" editable="true" borderVisible="true" textAlign="left" restrict="0-9.,"/>
 			<s:Label  height="30" width="50%" text="{resourceManager.getString('general','gram_of_carbs_short')}" verticalAlign="middle"/>
 		</s:Group>
 		<s:Group y="0" x="0" width="100%">
@@ -180,7 +180,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" text="@{kilocaloriesText}" contentBackgroundColor="0xDCDCDC" id="kilocalories" editable="true" borderVisible="false" textAlign="left" restrict="0-9"/>
+			<s:TextInput width = "50%" text="@{kilocaloriesText}" contentBackgroundColor="0xDCDCDC" id="kilocalories" editable="true" borderVisible="true" textAlign="left" restrict="0-9"/>
 			<s:Label  height="30" width="50%" text="{resourceManager.getString('general','kilocalories')}" verticalAlign="middle"/>
 		</s:Group>
 		<s:Group y="0" x="0" width="100%">
@@ -188,7 +188,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" text="@{gramofffatText}" contentBackgroundColor="0xDCDCDC" id="gramoffat" editable="true" borderVisible="false" textAlign="left" restrict="0-9.,"/>
+			<s:TextInput width = "50%" text="@{gramofffatText}" contentBackgroundColor="0xDCDCDC" id="gramoffat" editable="true" borderVisible="true" textAlign="left" restrict="0-9.,"/>
 			<s:Label  height="30" width="50%" text="{resourceManager.getString('general','gram_of_fat')}" verticalAlign="middle"/>
 		</s:Group>
 		<s:Group y="0" x="0" width="100%">
@@ -196,7 +196,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:TextInput width = "50%" text="@{gramoffproteinText}" contentBackgroundColor="0xDCDCDC" id="gramofprotein" editable="true" borderVisible="false" textAlign="left" restrict="0-9.,"/>
+			<s:TextInput width = "50%" text="@{gramoffproteinText}" contentBackgroundColor="0xDCDCDC" id="gramofprotein" editable="true" borderVisible="true" textAlign="left" restrict="0-9.,"/>
 			<s:Label  height="30" width="50%" text="{resourceManager.getString('general','gram_of_protein')}" verticalAlign="middle"/>
 		</s:Group>
 	</s:Group>
