@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		initialize="init()"
+		actionBarVisible="true"
+		backKeyPressed="onBackKeyPressed(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.core.UIComponent;
+			import mx.managers.PopUpManager;
+			import mx.resources.ResourceManager;
+			
+			import spark.components.View;
+			import spark.events.IndexChangeEvent;
+			import spark.events.PopUpEvent;
+			
+			import databaseclasses.Database;
+			import databaseclasses.DatabaseEvent;
+			import databaseclasses.Settings;
+			import databaseclasses.UnitChangedEvent;
+			
+			import myComponents.AlertPopUp;
+			import myComponents.MenuElementItemRenderer;
+			import myComponents.elementFromListPicker;
+			
+			import utilities.MyGATracker;
+			
+			private var elementPicker:elementFromListPicker;
+			private var dispatcher:EventDispatcher;
+			private var alertPopUp:AlertPopUp;
+			private var thisView:View;
+			
+			[Bindable]
+			private var back_label:String;
+			
+			[ResourceBundle("settingslanguageview")]
+			
+			private var menuList:ArrayCollection = 	new ArrayCollection([
+				ResourceManager.getInstance().getString("settingslanguageview","applicationlanguage"),
+				ResourceManager.getInstance().getString("settingslanguageview","foodtablelanguage")
+			]);	
+			
+			private function onBackKeyPressed(event:Event):void {
+				if (elementPicker != null) {
+					if (elementPicker.isPopUp) {
+						PopUpManager.removePopUp(elementPicker);
+						event.preventDefault();
+					}
+					elementPicker = null;
+				} 
+			}
+			
+			private function init():void {
+				back_label = resourceManager.getString('general','back');
+				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
+				title =  ResourceManager.getInstance().getString("settingslanguageview","titlesettings");
+				thisView = this;
+			}
+			
+			private function selectedElementChanged(event:IndexChangeEvent):void {
+				switch (event.newIndex) {
+					case 0:
+						elementPicker = new elementFromListPicker();
+						elementPicker.elements = new ArrayCollection([
+							resourceManager.getString('general','english'),
+							resourceManager.getString('general','dutch')]);
+						elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, applicationLanguageSelected);
+						elementPicker.labelText1 = resourceManager.getString('general','choose_language');
+						
+						PopUpManager.addPopUp(elementPicker,UIComponent(this.parentApplication),true);
+						PopUpManager.centerPopUp(elementPicker);
+						break;
+					case 1:
+						elementPicker = new elementFromListPicker();
+						elementPicker.elements = new ArrayCollection([
+							resourceManager.getString('general','english'),
+							resourceManager.getString('general','dutch'),
+							resourceManager.getString('general','french')]);
+						elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, foodtableLanguageSelected);
+						elementPicker.labelText1 = resourceManager.getString('general','choose_language');
+						
+						PopUpManager.addPopUp(elementPicker,UIComponent(this.parentApplication),true);
+						PopUpManager.centerPopUp(elementPicker);
+						break;
+				}
+				
+				function foodtableLanguageSelected(event: Event = null): void
+				{
+					MyGATracker.getInstance().trackPageview( "SettingsLanguageView-foodtablelanguageSelected" );
+					
+					if (elementPicker != null) {
+						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
+							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, applicationLanguageSelected);
+						}
+						PopUpManager.removePopUp(elementPicker);
+					}
+					
+					var selectedLanguage:String;
+					if (event is UnitChangedEvent)  {
+						if ((event as UnitChangedEvent).index == 0) {
+							selectedLanguage = "en";
+						} else if ((event as UnitChangedEvent).index == 1) {
+							selectedLanguage = "nl";
+						} else if ((event as UnitChangedEvent).index == 2) {
+							selectedLanguage = "fr";
+						}
+					}
+					var foodFileName:String;
+					foodFileName = "foodfile-" + selectedLanguage + ".xml";
+					var sourceFile:File = File.applicationDirectory.resolvePath("assets/database/" + foodFileName);
+					var fileStream:FileStream = new FileStream();
+					fileStream.open(sourceFile,FileMode.READ);
+					var foodtableXML:XML = new XML(fileStream.readUTFBytes(fileStream.bytesAvailable));
+					dispatcher = new EventDispatcher();
+					Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,onLoadFoodTable);
+					Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STATUS_UPDATE,onFoodTableStatusUpdate);
+					Database.getInstance().loadFoodTable(true,foodtableXML);
+					alertPopUp = new AlertPopUp();
+					alertPopUp.okButtonVisible = false;
+					var textToShow:String = 
+						resourceManager.getString('settingslanguageview','drinkacupofcoffee') ;
+					alertPopUp.show(thisView);
+					alertPopUp.setMessage(textToShow);
+				}
+				
+				function onFoodTableStatusUpdate(event:Event):void {
+					var textToShow:String = 
+						resourceManager.getString('settingslanguageview','drinkacupofcoffee') ;
+					textToShow  += "\n\n" + 
+						resourceManager.getString('downloadfoodtableview','storingnewfoodtable') +
+						"\n"+
+						Database.getInstance().
+						newFoodDatabaseStatus.
+						replace("{outof}",resourceManager.getString('downloadfoodtableview','outof')).
+						replace("{elementsloaded}",resourceManager.getString('downloadfoodtableview','elementsloaded'));
+					alertPopUp.setMessage(textToShow);
+				}
+				
+				function onLoadFoodTable(event:Event):void {
+					if (alertPopUp != null) {
+						PopUpManager.removePopUp(alertPopUp);
+					}
+					Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,onLoadFoodTable);
+					Database.getInstance().removeEventListener(Database.NEW_FOOD_DATABASE_STATUS_UPDATE,onFoodTableStatusUpdate);
+				}
+				
+				function applicationLanguageSelected(event: Event = null): void
+				{
+					MyGATracker.getInstance().trackPageview( "SettingsLanguageView-applicationlanguageSelected" );
+					
+					if (elementPicker != null) {
+						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
+							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, applicationLanguageSelected);
+						}
+						PopUpManager.removePopUp(elementPicker);
+					}
+					
+					var localeChainAsString:String;
+					//copied some code from HelpDiabetes.mxml
+					if (event is UnitChangedEvent)  {
+						if ((event as UnitChangedEvent).index == 0) {
+							resourceManager.localeChain = ["en_US","nl_NL"];
+							localeChainAsString = "en_US,nl_NL";
+						}
+						if ((event as UnitChangedEvent).index == 1) {
+							resourceManager.localeChain = ["nl_NL","en_US"];
+							localeChainAsString = "nl_NL,en_US";
+						}
+					}
+					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
+					Settings.getInstance().setSetting(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<s:navigationContent>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
+	</s:navigationContent>
+	
+	<s:List id="settingsList" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.MenuElementItemRenderer"
+			dataProvider="{menuList}">
+	</s:List>
+	
+</s:View>
