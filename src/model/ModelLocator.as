@@ -296,7 +296,7 @@ package model
 		/**
 		 * application just started ?
 		 */
-		public var firstStartUp:Boolean = true;
+		public var firstInitOfFoodCounterView:Boolean = true;
 		
 		public static var debugMode:Boolean = false;
 
