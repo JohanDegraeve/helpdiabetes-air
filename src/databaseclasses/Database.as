@@ -1166,13 +1166,8 @@ package databaseclasses
 		 * if foodtable == null then foodtable from xml file stored in application is used<br>
 		 * functionToCallWhenFinished is obviously function to call when finished
 		 */
-		private function loadFoodTableInternal(functionToCallWhenFinished:Function,foodtable:XML = null,dispatcher:EventDispatcher  = null):void {
-			
-			var foodtableXML:XML;
-
-			if (foodtable != null)
-				foodtableXML = foodtable;
-			else {
+		private function loadFoodTableInternal(functionToCallWhenFinished:Function,foodtableXML:XML = null,dispatcher:EventDispatcher  = null):void {
+			if (foodtableXML == null) {
 				var sourceFile:File = File.applicationDirectory.resolvePath("assets/database/" + xmlFileName);
 				var fileStream:FileStream = new FileStream();
 				fileStream.open(sourceFile,FileMode.READ);
