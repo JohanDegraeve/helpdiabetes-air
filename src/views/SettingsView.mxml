@@ -136,15 +136,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						navigator.pushView(SettingsDatabaseView);
 						break;
 					case 5:
-						elementPicker = new elementFromListPicker();
-						elementPicker.elements = new ArrayCollection([
-							resourceManager.getString('general','english'),
-							resourceManager.getString('general','dutch')]);
-						elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, languageSelected);
-						elementPicker.labelText1 = resourceManager.getString('general','choose_language');
-						
-						PopUpManager.addPopUp(elementPicker,UIComponent(this.parentApplication),true);
-						PopUpManager.centerPopUp(elementPicker);
+						navigator.pushView(SettingsLanguageView);
 						break;
 					case 6:
 						MyGATracker.getInstance().trackPageview( "SetingsView-resetHelpText" );
@@ -202,33 +194,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 				
 				
-				function languageSelected(event: Event = null): void
-				{
-					MyGATracker.getInstance().trackPageview( "SetingsView-languageSelected" );
-					
-					if (elementPicker != null) {
-						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
-							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, languageSelected);
-						}
-						PopUpManager.removePopUp(elementPicker);
-					}
-					
-					var localeChainAsString:String;
-					//copied some code from HelpDiabetes.mxml
-					if (event is UnitChangedEvent)  {
-						if ((event as UnitChangedEvent).index == 0) {
-							resourceManager.localeChain = ["en_US","nl_NL"];
-							localeChainAsString = "en_US,nl_NL";
-						}
-						if ((event as UnitChangedEvent).index == 1) {
-							resourceManager.localeChain = ["nl_NL","en_US"];
-							localeChainAsString = "nl_NL,en_US";
-						}
-					}
-					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
-					Settings.getInstance().setSetting(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
-					
-				}
 			}
 		]]>
 	</fx:Script>

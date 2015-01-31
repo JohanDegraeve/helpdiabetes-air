@@ -69,12 +69,11 @@ the home screen
 			
 			private var notificationPopUp:Notification;
 			private var alertPopUp:AlertPopUp;
-			private var elementPicker:elementFromListPicker;
 			
 			private var timer:Timer;
 			private var licensePopUp:AlertPopUp;
 			private var thisView:View;
-			private var firstStartUp:Boolean = false;
+			public var firstTimeAppIsStartedOnThisDevice:Boolean = false;
 			
 			private var helpCallOut:HelpCallOut;
 			
@@ -94,6 +93,33 @@ the home screen
 			private function init():void {
 				/* add event listener for clicking item */
 				fooditemlist.addEventListener(Event.CHANGE,selectFoodItem);
+				this.addEventListener( Event.ADDED_TO_STAGE, addedToStageHandler );
+			}
+			
+			private function addedToStageHandler(event:Event):void {
+				//actually the licensepopup might still be behind the splashscreen
+				if (firstTimeAppIsStartedOnThisDevice) {
+					licensePopUp = new AlertPopUp();
+					licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
+					var textToShow:String = 
+						resourceManager.getString('settingsview','version') + 
+						resourceManager.getString('settingsview','copyright') +
+						resourceManager.getString('settingsview','infoabouttext');
+					licensePopUp.show(thisView);
+					licensePopUp.setMessage(textToShow);
+				} else {
+					showSearchTextBoxHelpText();
+				}
+
+				function licenseAccepted(event: PopUpEvent):void {
+					if (licensePopUp != null) {
+						PopUpManager.removePopUp(licensePopUp);
+						if (licensePopUp.hasEventListener(PopUpEvent.CLOSE)) {
+							licensePopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+						}
+					}
+					showSearchTextBoxHelpText();
+				}
 			}
 			
 			private function onCreationComplete():void {
@@ -106,93 +132,26 @@ the home screen
 				
 				thisView = this;
 				
-				if (!ModelLocator.getInstance().firstStartUp)  {
+				if (!ModelLocator.getInstance().firstInitOfFoodCounterView)  {
 					Synchronize.getInstance().startSynchronize(false,false);
 					ensureIndexIsVisible();
 					showSearchTextBoxHelpText();
 					return;
 				}
-				ModelLocator.getInstance().firstStartUp = false;
+				ModelLocator.getInstance().firstInitOfFoodCounterView = false;
+				if (Database.databaseExists())
+					firstTimeAppIsStartedOnThisDevice = false;
+				else
+					firstTimeAppIsStartedOnThisDevice = true;
+						
 				
 				var dispatcher:EventDispatcher = new EventDispatcher();
 				var thisObject:DisplayObject =  this;
-				if (Database.databaseExists()) {
-					onReturn();
-				} else {
-					firstStartUp = true;
-					//onReturn(null);
-					notificationPopUp = new Notification();
-					notificationPopUp.notificationText = resourceManager.getString('helpdiabetes','infoaboutlanguageselection');
-					notificationPopUp.addEventListener(PickerEvent.PICKER_SET, okClicked);
-					PopUpManager.addPopUp(notificationPopUp, thisObject, true);
-					PopUpManager.centerPopUp(notificationPopUp);
-				}
-				
-				function okClicked(event: PickerEvent):void {
-					if (notificationPopUp != null) {
-						PopUpManager.removePopUp(notificationPopUp);
-						if (notificationPopUp.hasEventListener(PickerEvent.PICKER_SET)) {
-							notificationPopUp.removeEventListener(PickerEvent.PICKER_SET, okClicked);
-						}
-					}
-					elementPicker = new elementFromListPicker();
-					elementPicker.elements = new ArrayCollection([
-						resourceManager.getString('general','english'),
-						resourceManager.getString('general','dutch'),
-						resourceManager.getString('general','french')]);
-					elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, onReturn);
-					elementPicker.addEventListener(Event.REMOVED_FROM_STAGE,onReturn);
-					elementPicker.labelText1 = resourceManager.getString('general','choose_language');
-					
-					PopUpManager.addPopUp(elementPicker,thisObject,true);
-					PopUpManager.centerPopUp(elementPicker);
-				}
-				
-				function onReturn(event: Event = null): void
-				{
-					if (elementPicker != null) {
-						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
-							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, onReturn);
-							elementPicker.removeEventListener(Event.REMOVED_FROM_STAGE,onReturn);
-						}
-						PopUpManager.removePopUp(elementPicker);
-					}
-					
-					//we initialize first the localechain in the settngs to the current localechain
-					var localeChainAsString:String;
-					for (var i:int = 0;i <resourceManager.localeChain.length;i++) {
-						localeChainAsString += resourceManager.localeChain[i];
-					}
-					
-					//if event is a unitchangedevent, it means we got here after user clicked a language, so we'll change now the settings
-					//if event is not a unitchaged event, it means this application doesn't start first the first itme, so a database already existed and user didn't have to pick a preferred language
-					if (event is UnitChangedEvent)  {
-						if ((event as UnitChangedEvent).index == 0) {
-							resourceManager.localeChain = ["en_US","nl_NL","fr_FR"];
-							localeChainAsString = "en_US,nl_NL,fr_FR";
-						}
-						if ((event as UnitChangedEvent).index == 1) {
-							resourceManager.localeChain = ["nl_NL","en_US","fr_FR"];
-							localeChainAsString = "nl_NL,en_US,fr_FR";
-						}
-						if ((event as UnitChangedEvent).index == 2) {
-							resourceManager.localeChain = ["fr_FR","en_US","nl_NL"];
-							localeChainAsString = "fr_FR,en_US,nl_NL";
-						}
-						if ((event as UnitChangedEvent).index == 3) {
-							resourceManager.localeChain = ["ro_RO","en_US","fr_FR"];
-							localeChainAsString = "en_US,fr_FR,nl_NL";
-						}
-					} 
-						
-					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten
-					Settings.getInstance().setSettingWithoutDatabaseUpdate(Settings.SettingsLOCALECHAIN_asString,localeChainAsString);
-					
-					dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
-					dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
-					Database.getInstance().init(dispatcher);
-				}
-				
+
+				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
+				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
+				Database.getInstance().init(dispatcher);
+
 				function onInitResult(event:Event):void
 				{
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
@@ -208,35 +167,6 @@ the home screen
 					
 					initiateRetrievalOfFoodItemList();
 					
-					//seems perfect timing to me to remove the splashscreen
-					MySplashScreen.resetDisplayTime();//moven naar initiate, als dat gebeurd is dan pas resetdisplaytime
-					
-					//en ditte zodanig doen dat die pop er komt als het firststartup is an geshowed wordt zodra splashscreen verdwijnt, kan zijn
-					//dat loaden van database dan nog bezig is
-					if (firstStartUp) {
-						licensePopUp = new AlertPopUp();
-						licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
-						var textToShow:String = 
-							resourceManager.getString('settingsview','version') + 
-							resourceManager.getString('settingsview','copyright') +
-							resourceManager.getString('settingsview','infoabouttext');
-						licensePopUp.show(thisView);
-						licensePopUp.setMessage(textToShow);
-					} else {
-						Synchronize.getInstance().startSynchronize(false,false);
-						showSearchTextBoxHelpText();
-					}
-					
-				}
-				
-				function licenseAccepted(event: PopUpEvent):void {
-					if (licensePopUp != null) {
-						PopUpManager.removePopUp(licensePopUp);
-						if (licensePopUp.hasEventListener(PopUpEvent.CLOSE)) {
-							licensePopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
-						}
-					}
-					showSearchTextBoxHelpText();
 				}
 				
 				function onInitError(event:Event):void
@@ -277,7 +207,6 @@ the home screen
 				Database.getInstance().getAllFoodItemDescriptions(dispatcher);
 				
 				function retrieveFoodItemList(de:DatabaseEvent):void {
-					//foodItems = new ArrayCollection();
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
 					ModelLocator.getInstance().foodItemList = new ArrayCollection();
@@ -289,6 +218,8 @@ the home screen
 						}
 						excelSorting.foodItemList.refresh();
 					} 
+					Synchronize.getInstance().startSynchronize(false,false);
+					MySplashScreen.resetDisplayTime();
 				}
 				
 				function onRetrieveListError(event:Event):void
