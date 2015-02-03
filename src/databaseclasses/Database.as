@@ -2220,10 +2220,19 @@ package databaseclasses
 				
 				// now populate ModelLocator.getInstance().meals
 				ModelLocator.getInstance().refreshMeals();
+				
+				//for all mealevents, we will recalculate insulinamount
+				for (var eventcntr:Number = 0;eventcntr < ModelLocator.getInstance().trackingList.length;eventcntr++) {
+					if (ModelLocator.getInstance().trackingList.getItemAt(eventcntr) is MealEvent) {
+						(ModelLocator.getInstance().trackingList.getItemAt(eventcntr) as MealEvent).recalculateInsulinAmount();
+					}
+				}
+				
 				if (globalDispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					globalDispatcher.dispatchEvent(event);
 					globalDispatcher =  null;
+					trace("finished populating the database");
 				}
 			}
 			

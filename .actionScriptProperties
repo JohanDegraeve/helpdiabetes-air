@@ -71,7 +71,7 @@
       </airSettings>
       <actionScriptSettings version="1"/>
     </buildTarget>
-    <buildTarget buildTargetName="device" iosSettingsVersion="2" isCurrent="true" platformId="com.adobe.flexide.multiplatform.ios.platform" provisioningFile="C:/Users/Johan/Downloads/developmentipad1JohanDgraeve.mobileprovision" releasePackageType="ipa-app-store">
+    <buildTarget buildTargetName="device" iosSettingsVersion="2" isCurrent="true" platformId="com.adobe.flexide.multiplatform.ios.platform" provisioningFile="C:/Users/Johan/Downloads/developmentiPadMiniLaurentM.mobileprovision" releasePackageType="ipa-app-store">
       <airSettings airCertificatePath="G:/Allerlei/johandegraeveIOSCertificate.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
         <anePaths/>

@@ -267,12 +267,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					.replace("{carb_amount}",resourceManager.getString('editmealeventview','carb_amount'))
 					.replace("{calculated_insulinamount}",resourceManager.getString('editmealeventview','calculated_insulinamount'))
 					.replace("{calculated_insulinamount}",resourceManager.getString('editmealeventview','calculated_insulinamount'))
+					.replace("{calculated_insulinamount}",resourceManager.getString('editmealeventview','calculated_insulinamount'))
+					.replace("{calculated_insulinamount}",resourceManager.getString('editmealeventview','calculated_insulinamount'))
 					.replace("{insulin_ratio}",resourceManager.getString('editmealeventview','insulin_ratio'))
 					.replace("{previous_bg_level}",resourceManager.getString('editmealeventview','previous_bg_level'))
 					.replace("{correction_factor}",resourceManager.getString('editmealeventview','correction_factor'))
 					.replace("{correction}",resourceManager.getString('editmealeventview','correction'))
 					.replace("{targetbglevel}",resourceManager.getString('editmealeventview','targetbglevel'))
 					.replace("{active_insulin}",resourceManager.getString('trackingview','active_insulin'))
+					.replace("{bolus_already_given}",resourceManager.getString('editmealeventview','bolus_already_given'))
+					.replace("{new_calculated_amount}",resourceManager.getString('editmealeventview','new_calculated_amount'))
+					.replace("{explanation_activeinsulin}",resourceManager.getString('editmealeventview','explanation_activeinsulin'))
+					.replace("{explanation_insulingivenduringmeal}",resourceManager.getString('editmealeventview','explanation_insulingivenduringmeal'))
+					.replace("{active_insulin}",resourceManager.getString('trackingview','active_insulin'))
+					.replace("{bolus_already_given}",resourceManager.getString('editmealeventview','bolus_already_given'))
 					);
 
 				function okClicked(event: PopUpEvent):void {
