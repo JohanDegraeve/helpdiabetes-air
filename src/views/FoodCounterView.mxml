@@ -219,7 +219,6 @@ the home screen
 						excelSorting.foodItemList.refresh();
 					} 
 					Synchronize.getInstance().startSynchronize(false,false);
-					MySplashScreen.resetDisplayTime();
 				}
 				
 				function onRetrieveListError(event:Event):void
