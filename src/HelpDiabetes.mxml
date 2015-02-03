@@ -20,10 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 								  xmlns:s="library://ns.adobe.com/flex/spark"
 								  initialize="initApplication()"
 								  applicationDPI="160"
-								  preloader="myComponents.MySplashScreen"
-								  splashScreenImage="@Embed('assets/oie_PGXTEriPYwZG.png')"
-								  splashScreenScaleMode="zoom"
-								  splashScreenMinimumDisplayTime="4000"
 								  skinClass="skins.ApplicationSkin"
 								  >
 	<fx:Style source="HelpDiabetes.css"/>
@@ -88,8 +84,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var alertPopUp:AlertPopUp;	
 			
+			[Bindable]
 			public static var deviceScreenWidth;
+			[Bindable]
 			public static var deviceScreenHeight;
+			
+			[Bindable]
+			public static var dpifromdev:Number;
 			
 			/**
 			 * just here to make sure an instance off the modellocator is held throughout the existance of the application, so it's intialized only once<br>
@@ -100,6 +101,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function addedToStageHandler(event:Event):void {
 				deviceScreenHeight = height;
 				deviceScreenWidth = width;
+				dpifromdev = Capabilities.screenDPI;
 				
 				//tests with emulator show that minimum height of 455 is required
 				var deviceHeighestDimension:int = Math.min(width,height);
@@ -107,6 +109,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					this.stage.setAspectRatio(StageAspectRatio.PORTRAIT);
 					this.stage.autoOrients = false;
 				}
+				
+				this.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE,orientationChanged);
+			}
+			
+			private function orientationChanged(event:Event):void {
+				deviceScreenHeight = height;
+				deviceScreenWidth = width;
 			}
 			
 			/**   
