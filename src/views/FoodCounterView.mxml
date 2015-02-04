@@ -56,10 +56,8 @@ the home screen
 			
 			import myComponents.AlertPopUp;
 			import myComponents.HelpCallOut;
-			import myComponents.MySplashScreen;
 			import myComponents.Notification;
 			import myComponents.PickerEvent;
-			import myComponents.elementFromListPicker;
 			
 			import utilities.ExcelSorting;
 			import utilities.MyGATracker;
@@ -93,33 +91,7 @@ the home screen
 			private function init():void {
 				/* add event listener for clicking item */
 				fooditemlist.addEventListener(Event.CHANGE,selectFoodItem);
-				this.addEventListener( Event.ADDED_TO_STAGE, addedToStageHandler );
-			}
 			
-			private function addedToStageHandler(event:Event):void {
-				//actually the licensepopup might still be behind the splashscreen
-				if (firstTimeAppIsStartedOnThisDevice) {
-					licensePopUp = new AlertPopUp();
-					licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
-					var textToShow:String = 
-						resourceManager.getString('settingsview','version') + 
-						resourceManager.getString('settingsview','copyright') +
-						resourceManager.getString('settingsview','infoabouttext');
-					licensePopUp.show(thisView);
-					licensePopUp.setMessage(textToShow);
-				} else {
-					showSearchTextBoxHelpText();
-				}
-
-				function licenseAccepted(event: PopUpEvent):void {
-					if (licensePopUp != null) {
-						PopUpManager.removePopUp(licensePopUp);
-						if (licensePopUp.hasEventListener(PopUpEvent.CLOSE)) {
-							licensePopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
-						}
-					}
-					showSearchTextBoxHelpText();
-				}
 			}
 			
 			private function onCreationComplete():void {
@@ -139,34 +111,48 @@ the home screen
 					return;
 				}
 				ModelLocator.getInstance().firstInitOfFoodCounterView = false;
-				if (Database.databaseExists())
-					firstTimeAppIsStartedOnThisDevice = false;
-				else
-					firstTimeAppIsStartedOnThisDevice = true;
-						
 				
-				var dispatcher:EventDispatcher = new EventDispatcher();
-				var thisObject:DisplayObject =  this;
+				if (Database.databaseExists()) {
+					firstTimeAppIsStartedOnThisDevice = false;
+				} else {
+					firstTimeAppIsStartedOnThisDevice = true;
+				}
 
+				var dispatcher:EventDispatcher = new EventDispatcher();
 				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
 				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
 				Database.getInstance().init(dispatcher);
-
+				
 				function onInitResult(event:Event):void
 				{
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
 					
-					//time to check if localechain has a new value retrieved from the database
-					var localeChainAsString:String = Settings.getInstance().getSetting(Settings.SettingsLOCALECHAIN_asString);
-					var localeChainAsArray:Array = localeChainAsString.split(",");
-					resourceManager.localeChain = [];
-					for (var j:int = 0;j < localeChainAsArray.length; j++) {
-						resourceManager.localeChain.push(localeChainAsArray[j]);
-					}
-					
 					initiateRetrievalOfFoodItemList();
 					
+					if (firstTimeAppIsStartedOnThisDevice) {
+						licensePopUp = new AlertPopUp();
+						licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
+						var textToShow:String = 
+							resourceManager.getString('settingsview','version') + 
+							resourceManager.getString('settingsview','copyright') +
+							resourceManager.getString('settingsview','infoabouttext');
+						licensePopUp.show(thisView);
+						licensePopUp.setMessage(textToShow);
+					} else {
+						Synchronize.getInstance().startSynchronize(false,false);
+						showSearchTextBoxHelpText();
+					}
+				}
+				
+				function licenseAccepted(event: PopUpEvent):void {
+					if (licensePopUp != null) {
+						PopUpManager.removePopUp(licensePopUp);
+						if (licensePopUp.hasEventListener(PopUpEvent.CLOSE)) {
+							licensePopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+						}
+					}
+					showSearchTextBoxHelpText();
 				}
 				
 				function onInitError(event:Event):void
