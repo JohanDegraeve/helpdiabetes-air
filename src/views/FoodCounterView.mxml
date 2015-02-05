@@ -50,7 +50,6 @@ the home screen
 			import databaseclasses.DatabaseEvent;
 			import databaseclasses.FoodItem;
 			import databaseclasses.Settings;
-			import databaseclasses.UnitChangedEvent;
 			
 			import model.ModelLocator;
 			
@@ -70,11 +69,15 @@ the home screen
 			
 			private var timer:Timer;
 			private var licensePopUp:AlertPopUp;
-			private var thisView:View;
+			private static var thisView:View;
 			public var firstTimeAppIsStartedOnThisDevice:Boolean = false;
 			
 			private var helpCallOut:HelpCallOut;
-			
+			/**
+			 * used for event dispatching, 
+			 */
+			private static const SCREEN_SIZE_INITIALIZED:String="screen_initialized";
+
 			[Bindable]
 			/**
 			 * equal to searchtext.text 
@@ -91,14 +94,43 @@ the home screen
 			private function init():void {
 				/* add event listener for clicking item */
 				fooditemlist.addEventListener(Event.CHANGE,selectFoodItem);
-			
+				this.addEventListener(SCREEN_SIZE_INITIALIZED,onScreenSizeInitialized);
 			}
 			
+			static public function screenSizeKnown():void {
+				if (thisView)
+					thisView.dispatchEvent(new Event(SCREEN_SIZE_INITIALIZED));
+			}
+
+			private function onScreenSizeInitialized(event:Event):void {
+				if (firstTimeAppIsStartedOnThisDevice) {
+					licensePopUp = new AlertPopUp();
+					licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
+					var textToShow:String = 
+						resourceManager.getString('settingsview','version') + 
+						resourceManager.getString('settingsview','copyright') +
+						resourceManager.getString('settingsview','infoabouttext');
+					licensePopUp.show(thisView);
+					licensePopUp.setMessage(textToShow);
+				} else {
+					Synchronize.getInstance().startSynchronize(false,false);
+					showSearchTextBoxHelpText();
+				}
+			}
+			
+			private function licenseAccepted(event: PopUpEvent):void {
+				if (licensePopUp != null) {
+					PopUpManager.removePopUp(licensePopUp);
+					if (licensePopUp.hasEventListener(PopUpEvent.CLOSE)) {
+						licensePopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+					}
+				}
+				showSearchTextBoxHelpText();
+			}
+
 			private function onCreationComplete():void {
 
 				MyGATracker.getInstance(this);//just to make sure mygatracker is initialized with a displayobject
-
-				//Synchronize.getInstance().addEventListener(Synchronize.SYNCHRONIZE_ERROR_OCCURRED,onSynchronizeErrorOccurred);
 
 				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,initiateRetrievalOfFoodItemList);
 				
@@ -122,37 +154,12 @@ the home screen
 				dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,onInitResult);
 				dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,onInitError);
 				Database.getInstance().init(dispatcher);
-				
+
 				function onInitResult(event:Event):void
 				{
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
-					
 					initiateRetrievalOfFoodItemList();
-					
-					if (firstTimeAppIsStartedOnThisDevice) {
-						licensePopUp = new AlertPopUp();
-						licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
-						var textToShow:String = 
-							resourceManager.getString('settingsview','version') + 
-							resourceManager.getString('settingsview','copyright') +
-							resourceManager.getString('settingsview','infoabouttext');
-						licensePopUp.show(thisView);
-						licensePopUp.setMessage(textToShow);
-					} else {
-						Synchronize.getInstance().startSynchronize(false,false);
-						showSearchTextBoxHelpText();
-					}
-				}
-				
-				function licenseAccepted(event: PopUpEvent):void {
-					if (licensePopUp != null) {
-						PopUpManager.removePopUp(licensePopUp);
-						if (licensePopUp.hasEventListener(PopUpEvent.CLOSE)) {
-							licensePopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
-						}
-					}
-					showSearchTextBoxHelpText();
 				}
 				
 				function onInitError(event:Event):void

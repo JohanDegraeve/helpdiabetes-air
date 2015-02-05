@@ -42,6 +42,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import myComponents.AlertPopUp;
 			
+			import views.FoodCounterView;
+			
 			private var  foodItems:ArrayCollection;
 			
 			[Bindable]
@@ -85,12 +87,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var alertPopUp:AlertPopUp;	
 			
 			[Bindable]
-			public static var deviceScreenWidth;
+			public static var deviceScreenWidth:Number;
 			[Bindable]
-			public static var deviceScreenHeight;
-			
-			[Bindable]
-			public static var dpifromdev:Number;
+			public static var deviceScreenHeight:Number;
 			
 			/**
 			 * just here to make sure an instance off the modellocator is held throughout the existance of the application, so it's intialized only once<br>
@@ -101,7 +100,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function addedToStageHandler(event:Event):void {
 				deviceScreenHeight = height;
 				deviceScreenWidth = width;
-				dpifromdev = Capabilities.screenDPI;
 				
 				//tests with emulator show that minimum height of 455 is required
 				var deviceHeighestDimension:int = Math.min(width,height);
@@ -109,8 +107,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					this.stage.setAspectRatio(StageAspectRatio.PORTRAIT);
 					this.stage.autoOrients = false;
 				}
-				
 				this.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE,orientationChanged);
+				FoodCounterView.screenSizeKnown();
 			}
 			
 			private function orientationChanged(event:Event):void {
