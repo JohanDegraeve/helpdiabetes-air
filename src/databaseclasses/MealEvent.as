@@ -21,6 +21,7 @@ package databaseclasses
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
+	import mx.resources.ResourceManager;
 	
 	import model.ModelLocator;
 	
@@ -495,9 +496,11 @@ package databaseclasses
 						 if ((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as TrackingViewElement).timeStamp < timeStamp)
 							 break;
 						 if (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) is MedicinEvent) {
-							 var timeStampOfThatMedicinEvent:Number = (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).timeStamp; 
-							 if (timeStampOfThatMedicinEvent < timeOfLastMealChange ) {
-								 insulinGivenDuringMeal += (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).amount;
+							 if ((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).bolustype == ResourceManager.getInstance().getString('editmedicineventview','normal')) {
+								 var timeStampOfThatMedicinEvent:Number = (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).timeStamp; 
+								 if (timeStampOfThatMedicinEvent < timeOfLastMealChange ) {
+									 insulinGivenDuringMeal += (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).amount;
+								 }
 							 }
 						 }
 					 }

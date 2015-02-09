@@ -186,7 +186,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Label id="helpdiabeteslabel" paddingTop="{paddingTopForHelpDiabetesLabel}" paddingLeft="{paddingLeftForHelpdiabetesLabel}" text="HelpDiabetes" fontSize="{fontSizeForHelpDiabetesLabel}" color="0x81a8de" verticalAlign="middle"/>
 		<s:Spacer height="100%"/>
 		<s:Label  id="distributedbylabel" paddingLeft="{paddingLeftForHelpdiabetesLabel}" text="{resourceManager.getString('foodcounterview','distributed_by')}" fontSize="{fontSizeForDistributedByLabel}" color="0x666666" verticalAlign="middle"/>
-		<s:HGroup paddingLeft="{(width - experitLogoWidth)/2}">
+		<s:HGroup paddingLeft="{(width - experitLogoWidth)/2}" click="{navigateToURL(new URLRequest('http://' + resourceManager.getString('foodcounterview','wwwexperitbe')))}">
 			<s:BitmapImage source="{'assets/'+ imageSourceExperitLogo + '.png'}" width="{experitLogoWidth}" height="{experitLogoHeight}"/>	
 		</s:HGroup>
 		<s:HGroup paddingLeft="{paddingLeftForHelpdiabetesLabel}">
