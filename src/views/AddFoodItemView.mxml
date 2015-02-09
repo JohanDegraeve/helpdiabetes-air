@@ -213,6 +213,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						
 						if (retrievedFoodItem.getNumberOfUnits() > 1) {
 							popUpUnitList(false);
+						} else {
+							showHelpText1();
 						}
 					}
 					
@@ -270,7 +272,9 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						checkLastMealUpdate();
 					meal_button_text = 	 initMealButtonText();				
 				}
-				
+			}
+			
+			private function showHelpText1():void {
 				helpCallOut = new HelpCallOut();
 				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_selectUnitButton');
 				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;
@@ -409,6 +413,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				//else
 				//set it to empty string, this allows the user to immediately start typing an amount
 				//amount_textinput_text = "";
+				showHelpText1();
 			}
 
 			private function initMealButtonText():String {
