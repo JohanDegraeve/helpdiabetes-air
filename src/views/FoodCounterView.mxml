@@ -57,6 +57,7 @@ the home screen
 			import myComponents.HelpCallOut;
 			import myComponents.Notification;
 			import myComponents.PickerEvent;
+			import myComponents.SplashScreenPopUp;
 			
 			import utilities.ExcelSorting;
 			import utilities.MyGATracker;
@@ -67,16 +68,23 @@ the home screen
 			private var notificationPopUp:Notification;
 			private var alertPopUp:AlertPopUp;
 			
-			private var timer:Timer;
+			private var timerForEnsureIndexIsVisible:Timer;
+			private var timerForSplashScreenRemoval:Timer;
 			private var licensePopUp:AlertPopUp;
+			private var splashScreenPopUp:SplashScreenPopUp;
 			private static var thisView:View;
 			public var firstTimeAppIsStartedOnThisDevice:Boolean = false;
-			
+			private static var maxTimeForSplashScreenInSeconds:Number = 4;
+			private static var howManyDaysToShowTheSplashScreenForMaxTime:Number = 10;
 			private var helpCallOut:HelpCallOut;
 			/**
 			 * used for event dispatching, 
 			 */
 			private static const SCREEN_SIZE_INITIALIZED:String="screen_initialized";
+			private static const APPLICATION_READY_FOR_USE:String="application_ready_for_use";
+			private static var applicationReadyForUse:Boolean = false;
+			
+			
 
 			[Bindable]
 			/**
@@ -114,7 +122,24 @@ the home screen
 					licensePopUp.setMessage(textToShow);
 				} else {
 					Synchronize.getInstance().startSynchronize(false,false);
-					showSearchTextBoxHelpText();
+				}
+				if (!applicationReadyForUse) {
+					splashScreenPopUp = new SplashScreenPopUp();
+					splashScreenPopUp.show(thisView);
+					//for sure the screen will be shown maximum 4 seconds
+					timerForSplashScreenRemoval = new Timer(maxTimeForSplashScreenInSeconds * 1000, 1);
+					timerForSplashScreenRemoval.addEventListener(TimerEvent.TIMER,removeSplashScreen);
+					timerForSplashScreenRemoval.start();
+					trace("splash screen shown, removealtimer started");
+				}
+			}
+			
+			private function removeSplashScreen(event:Event = null):void {
+				trace("in removesplashscreen");
+				if (splashScreenPopUp != null) {
+					trace("removing splashscreen");
+					PopUpManager.removePopUp(splashScreenPopUp);
+					splashScreenPopUp = null;
 				}
 			}
 			
@@ -210,7 +235,16 @@ the home screen
 							excelSorting.foodItemList.addItem(new FoodItem(o.description as String, new ArrayCollection(), o.itemid as int));
 						}
 						excelSorting.foodItemList.refresh();
-					} 
+					}
+					applicationReadyForUse  = true;//is used elsewhere, to avoid that splashscreen would be started above, after being removed here
+					var lastSplashScreenShow:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime));
+					if ((new Date()).valueOf() - howManyDaysToShowTheSplashScreenForMaxTime * 24 * 3600 * 1000 > lastSplashScreenShow) {//more than 10 days ago
+					//splashscreen will be shown for 4 seconds, so we wait for the timer timerForSplashScreenRemoval
+						Settings.getInstance().setSetting(Settings.SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime,(new Date()).valueOf().toString());
+					} else {
+						trace("in retreivedfooditemlist, calling removesplashscreen");
+						removeSplashScreen();
+					}
 					Synchronize.getInstance().startSynchronize(false,false);
 				}
 				
@@ -253,6 +287,7 @@ the home screen
 				fooditemlist.ensureIndexIsVisible(excelSorting.getFirstMatchingItem(searchtext.text));				
 			}
 			
+			
 			private function displayFoodItem(item:Object):String {
 				return item.itemDescription;
 			}
@@ -272,9 +307,9 @@ the home screen
 									//searchtextchanged will be called after timer expiry so no need to call it here
 								}
 							
-							timer = new Timer(200, 1);
-							timer.addEventListener(TimerEvent.TIMER,timerEnd);
-							timer.start();
+							timerForEnsureIndexIsVisible = new Timer(200, 1);
+							timerForEnsureIndexIsVisible.addEventListener(TimerEvent.TIMER,timerEnd);
+							timerForEnsureIndexIsVisible.start();
 						}
 					}
 				}

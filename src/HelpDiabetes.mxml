@@ -90,6 +90,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			public static var deviceScreenWidth:Number;
 			[Bindable]
 			public static var deviceScreenHeight:Number;
+			[Bindable]
+			public static var minimumDeviceSize:Number;
 			
 			/**
 			 * just here to make sure an instance off the modellocator is held throughout the existance of the application, so it's intialized only once<br>
@@ -100,20 +102,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function addedToStageHandler(event:Event):void {
 				deviceScreenHeight = height;
 				deviceScreenWidth = width;
+				minimumDeviceSize = Math.min(deviceScreenHeight,deviceScreenWidth);
 				
-				//tests with emulator show that minimum height of 455 is required
-				var deviceHeighestDimension:int = Math.min(width,height);
-				if (deviceHeighestDimension < 455) {
-					this.stage.setAspectRatio(StageAspectRatio.PORTRAIT);
+				if (isTablet()) {
+					this.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE,orientationChanged);
+				} else {
 					this.stage.autoOrients = false;
 				}
-				this.stage.addEventListener(StageOrientationEvent.ORIENTATION_CHANGE,orientationChanged);
 				FoodCounterView.screenSizeKnown();
 			}
 			
 			private function orientationChanged(event:Event):void {
 				deviceScreenHeight = height;
 				deviceScreenWidth = width;
+			}
+			
+			public static function isTablet():Boolean {
+				if (!deviceScreenHeight || ! deviceScreenWidth)
+					return false;
+				var deviceWidth:Number = deviceScreenWidth / Capabilities.screenDPI;
+				var deviceHeight:Number = deviceScreenHeight / Capabilities.screenDPI;
+				var diagonalInches:Number = Math.sqrt((deviceWidth * deviceWidth)+ (deviceHeight * deviceHeight));
+				if(diagonalInches >= 6.8)
+					return true;
+				else
+					return false;
 			}
 			
 			/**   
@@ -123,7 +136,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				this.addEventListener( Event.ADDED_TO_STAGE, addedToStageHandler );
 				tabbedNavigator.addEventListener(IndexChangeEvent.CHANGE, changeIcon);
 			}
-
+			
 			private function okClicked(event: PopUpEvent):void {
 				if (alertPopUp != null) {
 					PopUpManager.removePopUp(alertPopUp);
@@ -133,7 +146,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					alertPopUp = null;
 				}
 			}
-
+			
 			
 			protected function changeIcon(event:IndexChangeEvent):void {
 				(navigators[0] as ViewNavigator).icon = nomealIcon;
