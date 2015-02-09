@@ -357,7 +357,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:Label  y="0" x="0" width="100%"  text="{resourceManager.getString('settingsboluscalculationview','explainingtext')}"/>
+		<s:Label  y="0" x="0" width="100%"  text="{resourceManager.getString('settingsboluscalculationview','explainingtext')}" height="100%" maxHeight="75" textAlign="center" verticalAlign="middle"/>
 		<s:Line width="100%">
 			<s:stroke>
 				<s:SolidColorStroke color="0xADADAD" weight="1"/>

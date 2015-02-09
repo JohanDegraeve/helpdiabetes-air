@@ -307,7 +307,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:VerticalLayout gap="0">
 			</s:VerticalLayout>
 		</s:layout>
-		<s:Group id="dateTimeAndMealNameGroup" click="dateTimeAndMealNameClicked(event)">
+		<s:Group id="dateTimeAndMealNameGroup" click="dateTimeAndMealNameClicked(event)" width="100%">
 			<s:Label id="dateTimeAndMealName" paddingLeft="10" paddingBottom="12" paddingTop="12" width="100%" text="{dateTimeAndMealName_text}"/>
 		</s:Group>
 		<s:Line width="100%">
@@ -315,7 +315,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:SolidColorStroke color="0x000000" weight="1"/>
 			</s:stroke>
 		</s:Line>
-		<s:Group id="carbAmountGroup" click="carbAmountGroupClicked(event)">
+		<s:Group id="carbAmountGroup" click="carbAmountGroupClicked(event)" width="100%">
 			<s:layout >
 				<s:VerticalLayout paddingLeft="10" paddingBottom="5"
 								  gap="4" paddingTop="5">
