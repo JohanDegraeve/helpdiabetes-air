@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import flash.net.navigateToURL;
+			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			import mx.managers.PopUpManager;
@@ -162,17 +164,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						break;
 					case 8:
 						MyGATracker.getInstance().trackPageview( "SetingsView-aboutexperit" );
-						
-						alertPopUp = new AlertPopUp();
-						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-						textToShow = 
-						resourceManager.getString('settingsview','experitinfo');
-						alertPopUp.show(this);
-						alertPopUp.setMessage(textToShow);
+						navigateToURL(new URLRequest('http://' + resourceManager.getString('foodcounterview','wwwexperitbe')));
 						break;
 					case 9:
 						MyGATracker.getInstance().trackPageview( "SetingsView-infoAndHelpShown" );
-						
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						textToShow = 
