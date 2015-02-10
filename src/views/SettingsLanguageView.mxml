@@ -91,7 +91,7 @@
 					
 					if (elementPicker != null) {
 						if (elementPicker.hasEventListener(UnitChangedEvent.ITEM_SELECTED)) {
-							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, applicationLanguageSelected);
+							elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED, foodtableLanguageSelected);
 						}
 						PopUpManager.removePopUp(elementPicker);
 					}

@@ -184,6 +184,14 @@ the home screen
 				{
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onInitError);
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, onInitResult);
+					//time to check if localechain has a new value retrieved from the database
+					var localeChainAsString:String = Settings.getInstance().getSetting(Settings.SettingsLOCALECHAIN_asString);
+					var localeChainAsArray:Array = localeChainAsString.split(",");
+					resourceManager.localeChain = [];
+					for (var j:int = 0;j < localeChainAsArray.length; j++) {
+						resourceManager.localeChain.push(localeChainAsArray[j]);
+					}
+					
 					initiateRetrievalOfFoodItemList();
 				}
 				
