@@ -74,7 +74,7 @@
 					case 1:
 						elementPicker = new elementFromListPicker();
 						elementPicker.elements = new ArrayCollection([
-							resourceManager.getString('general','english'),
+							/*resourceManager.getString('general','english'),*/
 							resourceManager.getString('general','dutch'),
 							resourceManager.getString('general','french')]);
 						elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, foodtableLanguageSelected);
@@ -98,11 +98,11 @@
 					
 					var selectedLanguage:String;
 					if (event is UnitChangedEvent)  {
-						if ((event as UnitChangedEvent).index == 0) {
+						/*if ((event as UnitChangedEvent).index == 0) {
 							selectedLanguage = "en";
-						} else if ((event as UnitChangedEvent).index == 1) {
+						} else */ if ((event as UnitChangedEvent).index == 0) {
 							selectedLanguage = "nl";
-						} else if ((event as UnitChangedEvent).index == 2) {
+						} else if ((event as UnitChangedEvent).index == 1) {
 							selectedLanguage = "fr";
 						}
 					}
