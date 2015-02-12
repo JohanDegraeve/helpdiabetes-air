@@ -35,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<id>be.experit.helpdiabetes</id>
 
 	<!-- Used as the filename for the application. Required. -->
-	<filename>HelpDiabetes</filename>
+	<filename>HelpDiabetes 3</filename>
 
 	<!-- The name that is displayed in the AIR application installer. 
 	May have multiple values for each language. See samples or xsd schema file. Optional. -->
@@ -168,7 +168,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<image48x48><![CDATA[assets/HelpdiabetesButton_48x48.png]]></image48x48>
 		<image57x57><![CDATA[assets/HelpdiabetesButton_57x57.png]]></image57x57>
 		<image72x72><![CDATA[assets/HelpdiabetesButton_72x72.png]]></image72x72>
+		<image76x76><![CDATA[assets/HelpdiabetesButton_76x76.png]]></image76x76>
 		<image114x114><![CDATA[assets/HelpdiabetesButton_114x114.png]]></image114x114>
+		<image120x120><![CDATA[assets/HelpdiabetesButton_120x120.png]]></image120x120>
+		<image152x152><![CDATA[assets/HelpdiabetesButton_152x152.png]]></image152x152>
 		<image512x512><![CDATA[assets/HelpdiabetesButton_512x512.png]]></image512x512>
 	</icon>
 			
