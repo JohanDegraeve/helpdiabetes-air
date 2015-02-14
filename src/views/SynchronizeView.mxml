@@ -32,21 +32,27 @@ initial setup of sync settings
 	<fx:Script>
 		<![CDATA[
 			import flash.net.navigateToURL;
+			
 			import mx.events.FlexEvent;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			
+			import spark.components.View;
+			
 			import databaseclasses.Settings;
 			
+			import myComponents.AlertPopUp;
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
 			import utilities.Synchronize;
 			private var _authorizationCode:String;
 			private var stageWebView:StageWebView;
-			
+			private var alertPopUp:AlertPopUp;
 			private var errorWarning:HelpCallOut;
-			private var timer:Timer;
+			private var timerToCheckIfAuthenticationCompleted:Timer;
+			private var timerToCheckBrowserConnection:Timer;
+			private var thisView:View;
 			
 			private static var googleAuthUrl:String = "https://accounts.google.com/o/oauth2/token";
 			
@@ -76,6 +82,7 @@ initial setup of sync settings
 			private var loader:URLLoader;
 			
 			private function onInitialize():void {
+				thisView = this;
 				back_label = resourceManager.getString('general','back');
 				title = resourceManager.getString('synchronizeview','titlesettingssync');
 				authorizationCode_text = resourceManager.getString('synchronizeview','copyauthorizationcode');
@@ -101,26 +108,66 @@ initial setup of sync settings
 				stageWebView = new StageWebView();
 				stageWebView.stage = stage;
 				stageWebView.viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+				//stageWebView.loadURL("http://www.scobleizer.com");
 				stageWebView.loadURL("https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/fusiontables.readonly https://www.googleapis.com/auth/fusiontables https://spreadsheets.google.com/feeds https://docs.google.com/feeds&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&client_id=" + resourceManager.getString('client_secret','client_id') + "&hl=nl&from_login=1&as=6d24e440f72448b2&pli=1");
-				timer = new Timer(500, 1);
-				timer.addEventListener(TimerEvent.TIMER,timerEnd);
-				timer.start();
+				stageWebView.addEventListener(ErrorEvent.ERROR,errorLoadingURL);
+				timerToCheckIfAuthenticationCompleted = new Timer(500, 1);
+				timerToCheckIfAuthenticationCompleted.addEventListener(TimerEvent.TIMER,timerEndOftimerToCheckIfAuthenticationCompleted);
+				timerToCheckIfAuthenticationCompleted.start();
+				
+				timerToCheckBrowserConnection = new Timer(10000, 1);
+				timerToCheckBrowserConnection.addEventListener(TimerEvent.TIMER,errorLoadingURL);
+				timerToCheckBrowserConnection.start();
 			}
 			
-			private function timerEnd(event:TimerEvent):void {
+			private function errorLoadingURL(event:Event = null):void {
+				if (timerToCheckBrowserConnection)
+					if (timerToCheckBrowserConnection.running) {
+						timerToCheckBrowserConnection.stop();
+					}
+				if (stageWebView) {
+					if (stageWebView.title == null) {//was never the case in emulator mode, but you never know
+						processLoadError();
+					} else 	if (stageWebView.title == "") {//same piece off code as if stagewebview.title == null
+						processLoadError();
+					}
+				}
+				
+				function processLoadError():void {
+					stageWebView.dispose();	
+					if (timerToCheckIfAuthenticationCompleted)
+						if (timerToCheckIfAuthenticationCompleted.running)
+							timerToCheckIfAuthenticationCompleted.stop();
+					alertPopUp = new AlertPopUp();
+					var textToShow:String = 
+						resourceManager.getString('synchronizeview','erroropeningbrowser') ;
+					alertPopUp.show(thisView);
+					alertPopUp.setMessage(textToShow);
+				}
+			}
+			
+			private function timerEndOftimerToCheckIfAuthenticationCompleted(event:TimerEvent):void {
 				var authorizationCode:String = getValue('code=', stageWebView.title);
 				if (authorizationCode) {
 					authorizationCode_text = authorizationCode;
 					getAccessTokenAndRefreshToken();
 					stageWebView.dispose();
 					stageWebView = null;
+					if (timerToCheckBrowserConnection)
+						if (timerToCheckBrowserConnection.running) {
+							timerToCheckBrowserConnection.stop();
+						}
 				} else if (stageWebView.title.indexOf("error") > -1) {
-						stageWebView.dispose();
-						stageWebView = null;
+					stageWebView.dispose();
+					stageWebView = null;
+					if (timerToCheckBrowserConnection)
+						if (timerToCheckBrowserConnection.running) {
+							timerToCheckBrowserConnection.stop();
+						}
 				} else {
-					timer = new Timer(500, 1);
-					timer.addEventListener(TimerEvent.TIMER,timerEnd);
-					timer.start();
+					timerToCheckIfAuthenticationCompleted = new Timer(500, 1);
+					timerToCheckIfAuthenticationCompleted.addEventListener(TimerEvent.TIMER,timerEndOftimerToCheckIfAuthenticationCompleted);
+					timerToCheckIfAuthenticationCompleted.start();
 				}
 			}
 			
