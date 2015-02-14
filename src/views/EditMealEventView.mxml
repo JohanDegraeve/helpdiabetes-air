@@ -181,8 +181,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onClick(event:IndexChangeEvent):void {
-				if (mealEvent.meal == null)
-					return;//meal can't be changed anymore
+				if (mealEvent.meal == null) {
+					//meal can't be changed anymore
+					alertPopUp = new AlertPopUp();
+					alertPopUp.show(this);
+					alertPopUp.setMessage(resourceManager.getString('editmealeventview','selecteditemscantbechangedanymore'));
+					return;
+				}
 				
 				MyGATracker.getInstance().trackPageview( "EditMealEventView-selectedItemClicked" );
 				
@@ -193,8 +198,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function dateTimeAndMealNameClicked(event:Event):void  {
-				if (mealEvent.meal == null)
-					return;//meal can't be changed anymore
+				if (mealEvent.meal == null) {
+					//meal can't be changed anymore
+					alertPopUp = new AlertPopUp();
+					alertPopUp.show(this);
+					alertPopUp.setMessage(resourceManager.getString('editmealeventview','datecantbechangedanymore'));
+					return;
+				}
 				var mealToPush:Meal = mealEvent.meal;
 				if (mealToPush == null) {
 					mealToPush = new Meal(null,mealEvent,mealEvent.timeStamp);
