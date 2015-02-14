@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
+			import mx.events.CollectionEvent;
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
 			
@@ -482,6 +483,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					var trackinglistPointer:Number = ModelLocator.getInstance().trackingList.getItemIndex(theMedicinEvent);
 					//now delete it
 					ModelLocator.getInstance().trackingList.removeItemAt(trackinglistPointer);
+					ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(theMedicinEvent.timeStamp);					
 					//and now make sure the previous item is visible
 					if (trackinglistPointer > 0)
 						ModelLocator.getInstance().trackingEventToShow = 

@@ -265,8 +265,6 @@ package databaseclasses
 			if (_timeStamp == timeStamp)
 				return;
 			
-			this._timeStamp = timeStamp;
-			
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
 			
@@ -485,7 +483,7 @@ package databaseclasses
 					 }
 					 
 					 //get the timestamp of the last added selecteditem
-					 var timeOfLastMealChange:Number = 0;
+					 var timeOfLastMealChange:Number = timeStamp;
 					 for (var selcntr:int = 0;selcntr < selectedFoodItems.length;selcntr++) {
 						 if ((selectedFoodItems.getItemAt(selcntr) as SelectedFoodItem).lastModifiedTimestamp > timeOfLastMealChange)
 							 timeOfLastMealChange = (selectedFoodItems.getItemAt(selcntr) as SelectedFoodItem).lastModifiedTimestamp;
@@ -632,8 +630,12 @@ package databaseclasses
 			
 			recalculateTotals();
 			
+			var oldTimeStamp:Number = new Number(_timeStamp);
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
+			if (oldTimeStamp != newCreationTimeStamp)//if timestamp has changed, recalculate for all events as of the oldest itmestamp of the two
+				ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(Math.min(oldTimeStamp,newCreationTimeStamp));
+			
 			
 			Database.getInstance().updateMealEvent(this.eventid,newMealName,newInsulinRatio,newCorrectionFactor,newLastModifiedTimeStamp,newCreationTimeStamp,_comment,null);
 		}

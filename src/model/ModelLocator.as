@@ -742,12 +742,13 @@ package model
 		
 		/**
 		 * recalculates the insulinamounts in all mealevents in the trackinglist, with a timestamp younger then specified asof<br>
-		 * asof represents time in ms since 1970 blabla
+		 * but going one day earlier, because the event might have been used in calculation of the insulin for older events<br>
 		 */
 		public function recalculateInsulinAmoutInAllYoungerMealEvents(asOf:Number):void {
+			var newAsOf:Number = asOf - 24 * 3600 * 1000;
 			for (var cntr:int = trackingList.length - 1;cntr >= 0;cntr--) {
 				if (trackingList.getItemAt(cntr) is MealEvent) {
-					if ((trackingList.getItemAt(cntr) as MealEvent).timeStamp > asOf) {
+					if ((trackingList.getItemAt(cntr) as MealEvent).timeStamp > newAsOf) {
 						(trackingList.getItemAt(cntr) as MealEvent).recalculateInsulinAmount();
 					} else {
 						break;
@@ -755,6 +756,7 @@ package model
 				}
 			}
 		}
+
 		/**
 		 * updates correctionfactors in all existing mealevents, according to correction factor stored in the setting<br>
 		 */
@@ -783,14 +785,14 @@ package model
 				time = (new Date()).valueOf();
 
 			var activeInsulin:Number = new Number(0);
-			for (var cntr:int = copyOfTrackingList.length - 1; cntr >= 0 ; cntr-- ) {
+			for (var cntr:int = trackingList.length - 1; cntr >= 0 ; cntr-- ) {
 				//trace("cntr = " + cntr + " date = " + (new Date((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp)).toString());
 				//we go back maximum maxInsulinActivity
-				if ((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp + maxInsulinDurationInSeconds * 1000 < time)
+				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp + maxInsulinDurationInSeconds * 1000 < time)
 					break;
-				if ((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp < time) {//we don't include events in the future
-					if (copyOfTrackingList.getItemAt(cntr) is MedicinEvent) {
-						var theEvent:MedicinEvent = copyOfTrackingList.getItemAt(cntr) as MedicinEvent;
+				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp < time) {//we don't include events in the future
+					if (trackingList.getItemAt(cntr) is MedicinEvent) {
+						var theEvent:MedicinEvent = trackingList.getItemAt(cntr) as MedicinEvent;
 						activeInsulin += calculateActiveInsulinForSpecifiedEvent(theEvent, time);						
 					}
 				}

@@ -235,10 +235,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					
 					//find back the mealevent to which this selectedfooditem belongs
 					//then check if it belongs to a meal and if no don't show the trashbutton
-					for (var cntr:int = ModelLocator.getInstance().copyOfTrackingList.length - 1 ;cntr >= 0;cntr--) {
-						if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MealEvent) {
-							if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent).eventid == (data.selectedFoodItem as SelectedFoodItem).mealEventId) {
-								if ((ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent).meal == null)
+					for (var cntr:int = ModelLocator.getInstance().trackingList.length - 1 ;cntr >= 0;cntr--) {
+						if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is MealEvent) {
+							if ((ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent).eventid == (data.selectedFoodItem as SelectedFoodItem).mealEventId) {
+								if ((ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent).meal == null)
 									TrashButton.visible = false;
 								else 
 									TrashButton.visible = true;
@@ -458,9 +458,9 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				
 				if (data.selectedFoodItem) {
 					var mealEventId:Number = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
-					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().copyOfTrackingList.length;trackingCntr++) {
-						if (((ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
-							(ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr) as MealEvent)
+					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().trackingList.length;trackingCntr++) {
+						if (((ModelLocator.getInstance().trackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
+							(ModelLocator.getInstance().trackingList.getItemAt(trackingCntr) as MealEvent)
 							.updateSelectedFoodItemChosenAmount(data.selectedFoodItem,new Number(amount_textinput_text));
 							break;
 						}
@@ -607,10 +607,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
 
 					var mealEventId:Number = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
-					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().copyOfTrackingList.length;trackingCntr++) {
-						if (((ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
-							length = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr) as MealEvent).selectedFoodItems.length;
-							(ModelLocator.getInstance().copyOfTrackingList.getItemAt(trackingCntr) as MealEvent)
+					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().trackingList.length;trackingCntr++) {
+						if (((ModelLocator.getInstance().trackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
+							length = (ModelLocator.getInstance().trackingList.getItemAt(trackingCntr) as MealEvent).selectedFoodItems.length;
+							(ModelLocator.getInstance().trackingList.getItemAt(trackingCntr) as MealEvent)
 							.meal
 							.deleteSelectedFoodItem(data.selectedFoodItem,localdispatcher);
 							break;

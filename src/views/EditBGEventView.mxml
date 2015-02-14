@@ -343,6 +343,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					var trackinglistPointer:Number = ModelLocator.getInstance().trackingList.getItemIndex(theBloodGlucoseEvent);
 					//now delete it
 					ModelLocator.getInstance().trackingList.removeItemAt(trackinglistPointer);
+					ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(theBloodGlucoseEvent.timeStamp);					
 					//and now make sure the previous item is visible
 					if (trackinglistPointer > 0)
 						ModelLocator.getInstance().trackingEventToShow = 

@@ -19,6 +19,8 @@ package databaseclasses
 {
 	import mx.core.ClassFactory;
 	
+	import model.ModelLocator;
+	
 	import myComponents.IListElement;
 	import myComponents.MedicinEventItemRenderer;
 	import myComponents.TrackingViewElement;
@@ -139,6 +141,7 @@ package databaseclasses
 			
 			if (storeInDatabase)
 				Database.getInstance().createNewMedicinEvent(bolusType,bolusDuration, amount, medicin, _timeStamp,_lastModifiedTimestamp,medicineventid, _comment, null);
+			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -162,6 +165,7 @@ package databaseclasses
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
 			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDurationInMinutes, this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp, _comment);
+			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		/**
@@ -170,6 +174,7 @@ package databaseclasses
 		 */
 		public function deleteEvent():void {
 			Database.getInstance().deleteMedicinEvent(this.eventid);
+			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 	}
 }

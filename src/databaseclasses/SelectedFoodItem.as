@@ -17,6 +17,7 @@
  */
 package databaseclasses
 {
+	import model.ModelLocator;
 
 	/**
 	 * a fooditem with one unit, and a chosen amount<br>
@@ -143,7 +144,7 @@ package databaseclasses
 			_chosenAmount = newChosenAmount;
 			
 			Database.getInstance().updateSelectedFoodItem(_eventid,_mealEventId,_itemDescription,_chosenAmount,unit,_lastModifiedTimestamp,null);
-
+			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(newLastModifiedTimeStamp);
 		}
 
 	}
