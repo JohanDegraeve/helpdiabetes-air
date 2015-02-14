@@ -437,7 +437,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		</s:stroke>
 	</s:Line>	
 	
-	<s:List id="trackinglist" left="0" right="0" top="55" bottom="0" width="100%" useVirtualLayout="true" 
+	<s:List id="trackinglist" left="0" right="0" top="45" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
 			click="onListElementClicked(event)"
 			itemRendererFunction="getItemRenderer">
