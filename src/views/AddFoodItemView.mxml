@@ -550,7 +550,11 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (amount_textinput_text == "")
 					amount_textinput_text = "0";
 				
-				details_button_text = createDetailsButtonText(selectedUnit,parseFloat(amount_textinput_text));
+				var amountToAdd:Number = amount_textinput_text == "." ? new Number(0) : parseFloat(amount_textinput_text);
+				var addDecimalPoint:Boolean = false;
+				if (amount_textinput_text.substring(amount_textinput_text.length - 1,amount_textinput_text.length) == ".")
+					addDecimalPoint = true;
+				details_button_text = createDetailsButtonText(selectedUnit,amountToAdd, addDecimalPoint);
 			}
 			
 			/**
@@ -569,13 +573,19 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				return returnObject;
 			}
 			
-			private function createDetailsButtonText(index:int, chosenAmount:Number):String {
+			/**
+			 * addDecimalPoint only to be added in specific case by function amountTextChanged
+			 */
+			private function createDetailsButtonText(index:int, chosenAmount:Number, addDecimalPoint:Boolean = false):String {
 				var standardAmount:Number = retrievedFoodItem.getUnit(index).standardAmount;
 				if (chosenAmount == -1)
 					chosenAmount = standardAmount;
-				return chosenAmount + " " +
-					retrievedFoodItem.getUnit(index).unitDescription + " : " +
-					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *10)/10) + " " +  resourceManager.getString("general","gram_of_carbs_short") + "";
+				return chosenAmount + (addDecimalPoint ? "." : "") + " " +
+					retrievedFoodItem.getUnit(index).unitDescription + 
+					" : " +
+					(Math.round(retrievedFoodItem.getUnit(index).carbs/standardAmount*chosenAmount *10)/10) +
+					" " +  
+					resourceManager.getString("general","gram_of_carbs_short") + "";
 			}
 			
 			private function deleteEvent(e:MouseEvent = null):void {//should only be called in case the trash button is available, meaning a selectedfooditem is being deleted from an existing meal
