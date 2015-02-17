@@ -49,8 +49,6 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			private var alertPopUp:AlertPopUp;
 			private var monitor:URLMonitor;
 			
-			public static var helpUrl:String = "https://sites.google.com/site/hippoandfriends/synchronisation";
-
 			[Bindable]
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_downloadfoodtable"),
@@ -103,7 +101,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						alertPopUp.setMessage(resourceManager.getString('settingsview','syncstarted'));
 						break;
 					case 3:
-						navigateToURL(new URLRequest(helpUrl));
+						navigateToURL(new URLRequest(resourceManager.getString('synchronizeview','helpurl')));
 				}
 			}
 			
