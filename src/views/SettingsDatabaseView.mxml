@@ -33,7 +33,6 @@
 			[Bindable]
 			private var back_label:String;
 			
-			private var trackerId:String;
 			private var helpCallOut:HelpCallOut;
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
@@ -52,7 +51,6 @@
 			
 			private function onInit():void {
 				back_label = resourceManager.getString('general','back');
-				trackerId = resourceManager.getString('analytics','trackeraccount');
 				thisView = this;
 			}
 			

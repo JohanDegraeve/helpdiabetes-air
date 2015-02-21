@@ -154,13 +154,8 @@ the home screen
 			}
 
 			private function onCreationComplete():void {
-
-				MyGATracker.getInstance(this);//just to make sure mygatracker is initialized with a displayobject
-
 				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,initiateRetrievalOfFoodItemList);
-				
 				thisView = this;
-				
 				if (!ModelLocator.getInstance().firstInitOfFoodCounterView)  {
 					Synchronize.getInstance().startSynchronize(false,false);
 					ensureIndexIsVisible();
@@ -253,6 +248,7 @@ the home screen
 						trace("in retreivedfooditemlist, calling removesplashscreen");
 						removeSplashScreen();
 					}
+					MyGATracker.getInstance(thisView).trackPageview("launch of Application");//just to make sure mygatracker is initialized with a displayobject
 					Synchronize.getInstance().startSynchronize(false,false);
 				}
 				

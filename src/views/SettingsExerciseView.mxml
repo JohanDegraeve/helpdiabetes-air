@@ -111,7 +111,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
 			{
-				MyGATracker.getInstance().trackPageview( "SettingsExerciseView-viewOpened" );
+				MyGATracker.getInstance().trackPageview( "SettingsExerciseView-viewOpened");
 
 				title = ResourceManager.getInstance().getString("settingsview","exercise");
 

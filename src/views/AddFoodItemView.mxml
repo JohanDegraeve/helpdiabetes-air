@@ -30,7 +30,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		add="addHandler()"
 		remove="onRemove()"
 		title=""
-		initialize="init()"
 		backKeyPressed="onBackKeyPressed(event)"
 		>
 	<fx:Declarations>
@@ -122,8 +121,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			
 			private var aSelectUnit:elementFromListPicker;
 			
-			private var trackerId:String;
-			
 			private var backLabelClicked:Boolean = false;
 			
 			/**
@@ -132,10 +129,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			 */
 			private var defaultMealTimeSTamp:Boolean;
 
-			private function init():void {
-				trackerId = resourceManager.getString('analytics','trackeraccount');
-			}
-			
 			private function onBackKeyPressed(event:Event):void {
 				if (aSelectUnit != null) {
 					if (aSelectUnit.isPopUp) {

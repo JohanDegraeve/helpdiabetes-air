@@ -18,11 +18,7 @@
 package utilities
 {
 	import com.google.analytics.GATracker;
-	
-	import databaseclasses.Settings;
-	
 	import flash.display.DisplayObject;
-	
 	import mx.resources.ResourceManager;
 	
 	public class MyGATracker
@@ -32,6 +28,8 @@ package utilities
 		private static var gaTracker:GATracker;
 		
 		private static var instance:MyGATracker;
+		
+		[ResourceBundle("analytics")]
 		
 		public function MyGATracker()
 		{
@@ -56,6 +54,7 @@ package utilities
 					trace("gatracker successfuly created");
 				} catch (error:Error) {
 					//creation of gatracker failed, hopefully better luck next time
+					trace("error while creating gaTracker = " + error.message);
 				}
 			}
 			
@@ -68,6 +67,7 @@ package utilities
 		public function  trackPageview(pageURL:String=""):Boolean {
 			if (gaTracker != null) {
 				gaTracker.trackPageview(pageURL);
+				trace("called trackPageview with " + pageURL);
 				return true;
 			}
 			return false;

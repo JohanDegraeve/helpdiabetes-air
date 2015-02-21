@@ -24,7 +24,6 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		preinitialize="preInit()"
-		initialize="init()"
 		creationComplete="onCreationComplete()"
 		backKeyPressed="view1_backKeyPressedHandler(event)">
 	<fx:Declarations>
@@ -84,14 +83,8 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			private var selectedMealIndex:int;
 
 			public var tracker:AnalyticsTracker;
-			private var trackerId:String;
 			
 			private var helpCallOut:HelpCallOut;
-			
-			private function init():void {
-				trackerId = resourceManager.getString('analytics','trackeraccount');
-				
-			}
 			
 			private function helptext1Removed(event:Event):void {
 				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
