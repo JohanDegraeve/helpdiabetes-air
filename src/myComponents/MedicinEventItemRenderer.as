@@ -211,20 +211,22 @@ package myComponents
 			bolusType = (value as MedicinEvent).bolustype;
 			var now:Number = (new Date()).valueOf();
 			var activeInsulin:Number = ModelLocator.getInstance().calculateActiveInsulinForSpecifiedEvent((value as MedicinEvent),now);
-			var activeInsulinText:String = resourceManager.getString('editmedicineventview','active') 
-				+ " = " + ((Math.round(activeInsulin * 10))/10).toString()
-				+ " " + resourceManager.getString('trackingview','internationalunit');
-			if (bolusType == resourceManager.getString('editmedicineventview','square')) {
-				var timeToGo:Number = now - ((value as MedicinEvent).timeStamp) - (value as MedicinEvent).bolusDurationInMinutes * 60 * 1000; 
-				if (timeToGo <= 0) {
-					activeInsulinText += ", " + (- Math.round((timeToGo / 1000 / 60 / 60 * 10)) / 10).toString() +  " " + resourceManager.getString('editmedicineventview','hrtogo');
+			if (activeInsulin > 0) {
+				var activeInsulinText:String = resourceManager.getString('editmedicineventview','active') 
+					+ " = " + ((Math.round(activeInsulin * 10))/10).toString()
+					+ " " + resourceManager.getString('trackingview','internationalunit');
+				if (bolusType == resourceManager.getString('editmedicineventview','square')) {
+					var timeToGo:Number = now - ((value as MedicinEvent).timeStamp) - (value as MedicinEvent).bolusDurationInMinutes * 60 * 1000; 
+					if (timeToGo <= 0) {
+						activeInsulinText += ", " + (- Math.round((timeToGo / 1000 / 60 / 60 * 10)) / 10).toString() +  " " + resourceManager.getString('editmedicineventview','hrtogo');
+					} else {
+						if (activeInsulin == 0) //should not happen anymore because I already checked if activeInsulin > 0, piece of code that has been changed
+							activeInsulinText = "";
+					} 
 				} else {
-					if (activeInsulin == 0)
+					if (activeInsulin == 0) //should not happen anymore because I already checked if activeInsulin > 0, piece of code that has been changed
 						activeInsulinText = "";
-				} 
-			} else {
-				if (activeInsulin == 0)
-					activeInsulinText = "";
+				}
 			}
 				
 			activeInsulinAmount = activeInsulinText;
