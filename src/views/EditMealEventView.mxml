@@ -74,6 +74,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[Bindable]
 			private var fatAmount_text:String;
 			
+			[Bindable]
 			private var mealEvent:MealEvent;
 			
 			private var comment:String;
@@ -131,7 +132,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
 					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
 					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-					helpCallOut.verticalPosition = "before";
+					//helpCallOut.verticalPosition = "before";
 					helpCallOut.open(fooditemlist,true);
 				}
 			}
@@ -166,9 +167,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					} else insulinAmount_text = null;
 					
 					fooditemlist.addEventListener(Event.CHANGE,onClick);
-					
-					if (mealEvent.insulinRatio != 0)
-						currentState="insulinAmount";
 				}
 			}
 			
@@ -318,7 +316,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			</s:VerticalLayout>
 		</s:layout>
 		<s:Group id="dateTimeAndMealNameGroup" click="dateTimeAndMealNameClicked(event)" width="100%">
-			<s:Label id="dateTimeAndMealName" paddingLeft="10" paddingBottom="12" paddingTop="12" width="100%" text="{dateTimeAndMealName_text}"/>
+			<s:Group width="100%">
+				<s:Rect radiusX="6" left="5" bottom="5" right="5" top="5" visible="{mealEvent.meal != null}">
+					<s:stroke>
+						<s:LinearGradientStroke rotation="90" weight="1">
+							<s:GradientEntry color="0x000000" alpha="0.5625"/>
+							<s:GradientEntry color="0x000000" alpha="0.75"/>
+						</s:LinearGradientStroke>
+					</s:stroke>
+				</s:Rect>
+				<s:Rect radiusX="6" left="6" bottom="6" right="6" top="6" visible="{mealEvent.meal != null}">
+						<s:fill>
+							<s:LinearGradient rotation="90">
+								<s:GradientEntry color="0xE8E8E8" ratio="0.0" alpha="1" />
+								<s:GradientEntry color="0xC9C9C9" ratio="1.0" alpha="1" />
+							</s:LinearGradient>
+						</s:fill>
+				</s:Rect>
+				<s:Label id="dateTimeAndMealName" paddingLeft="10" paddingBottom="12" paddingTop="12" width="100%" text="{dateTimeAndMealName_text}"/>
+			</s:Group>				
 		</s:Group>
 		<s:Line width="100%">
 			<s:stroke>
@@ -326,16 +342,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			</s:stroke>
 		</s:Line>
 		<s:Group id="carbAmountGroup" click="carbAmountGroupClicked(event)" width="100%">
-			<s:layout >
-				<s:VerticalLayout paddingLeft="10" paddingBottom="5"
-								  gap="4" paddingTop="5">
-				</s:VerticalLayout>
-			</s:layout>
-			<s:Label id="carbAmount" width="100%" text="{carbAmount_text}" />
-			<s:Label visible="{mealEvent.totalProtein != -1}"  id="proteinAmount" width="100%" text="{proteinAmount_text}" />
-			<s:Label visible="{mealEvent.totalFat != -1}"  id="fatAmount" width="100%" text="{fatAmount_text}"/>
-			<s:Label visible="{mealEvent.totalKilocalories != -1}"  id="kilocalorieAmount" width="100%" text="{kilocalorieAmount_text}" height="{mealEvent.totalKilocalories != -1 ? styleManager.getStyleDeclaration('.trackingItems').getStyle('selectedMealHeight') : 0}"/>
-			<s:Label includeIn="insulinAmount" id="insulinAmount" width="100%" text="{insulinAmount_text}" />
+			<s:Group width="100%">
+				<s:Rect radiusX="6" left="5" bottom="5" right="5" top="5">
+					<s:stroke>
+						<s:LinearGradientStroke rotation="90" weight="1">
+							<s:GradientEntry color="0x000000" alpha="0.5625"/>
+							<s:GradientEntry color="0x000000" alpha="0.75"/>
+						</s:LinearGradientStroke>
+					</s:stroke>
+				</s:Rect>
+				<s:Rect radiusX="6" left="6" bottom="6" right="6" top="6">
+					<s:fill>
+						<s:LinearGradient rotation="90">
+							<s:GradientEntry color="0xE8E8E8" ratio="0.0" alpha="1" />
+							<s:GradientEntry color="0xC9C9C9" ratio="1.0" alpha="1" />
+						</s:LinearGradient>
+					</s:fill>
+				</s:Rect>
+				<s:Group>
+					<s:layout >
+						<s:VerticalLayout paddingLeft="10" paddingBottom="12"
+										  gap="7" paddingTop="12">
+						</s:VerticalLayout>
+					</s:layout>
+					<s:Label id="carbAmount" width="100%" text="{carbAmount_text}"/>
+					<s:Label includeInLayout="{mealEvent.totalProtein != -1}" id="proteinAmount" width="100%" text="{proteinAmount_text}" />
+					<s:Label includeInLayout="{mealEvent.totalFat != -1}" id="fatAmount" width="100%" text="{fatAmount_text}"/>
+					<s:Label includeInLayout="{mealEvent.totalKilocalories != -1}" id="kilocalorieAmount" width="100%" text="{kilocalorieAmount_text}"/>
+					<s:Label includeInLayout="{insulinAmount_text != null}" id="insulinAmount" width="100%" text="{insulinAmount_text}" />
+				</s:Group>
+			</s:Group>				
 		</s:Group>
 		
 		<s:Line width="100%">
