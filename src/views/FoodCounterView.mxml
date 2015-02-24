@@ -111,18 +111,6 @@ the home screen
 			}
 
 			private function onScreenSizeInitialized(event:Event):void {
-				if (firstTimeAppIsStartedOnThisDevice) {
-					licensePopUp = new AlertPopUp();
-					licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
-					var textToShow:String = 
-						resourceManager.getString('settingsview','version') + 
-						resourceManager.getString('settingsview','copyright') +
-						resourceManager.getString('settingsview','infoabouttext');
-					licensePopUp.show(thisView);
-					licensePopUp.setMessage(textToShow);
-				} else {
-					Synchronize.getInstance().startSynchronize(false,false);
-				}
 				if (!applicationReadyForUse) {
 					splashScreenPopUp = new SplashScreenPopUp();
 					splashScreenPopUp.show(thisView);
@@ -140,6 +128,18 @@ the home screen
 					trace("removing splashscreen");
 					PopUpManager.removePopUp(splashScreenPopUp);
 					splashScreenPopUp = null;
+				}
+				if (firstTimeAppIsStartedOnThisDevice) {
+					licensePopUp = new AlertPopUp();
+					licensePopUp.addEventListener(PopUpEvent.CLOSE, licenseAccepted);
+					var textToShow:String = 
+						resourceManager.getString('settingsview','version') + 
+						resourceManager.getString('settingsview','copyright') +
+						resourceManager.getString('settingsview','infoabouttext');
+					licensePopUp.show(thisView);
+					licensePopUp.setMessage(textToShow);
+				} else {
+					Synchronize.getInstance().startSynchronize(false,false);
 				}
 			}
 			
