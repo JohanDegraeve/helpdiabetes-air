@@ -101,7 +101,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					y = "{HelpDiabetes.deviceScreenHeight * 0.2 / 2}"
 					skinClass="spark.skins.mobile.TextAreaSkin"
 					 verticalScrollPolicy="on"/>
-		<s:Button label="{resourceManager.getString('general','ok')}" click="this.close()" visible="{_okButtonVisible}"/>
+		<s:Button label="{resourceManager.getString('general','ok')}" click="this.close()" visible="{okButtonVisible}"/>
 		
 	</s:VGroup>
 	
