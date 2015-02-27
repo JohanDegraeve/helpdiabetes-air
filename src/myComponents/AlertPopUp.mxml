@@ -29,7 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		@namespace s "library://ns.adobe.com/flex/spark";
 		.mystyle
 		{
-			backgroundAlpha:0;
+			backgroundAlpha:0.5;
+			backgroundColor:black;
 		}
 	</fx:Style>
 	<fx:Script>
