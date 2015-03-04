@@ -136,6 +136,7 @@ the home screen
 						resourceManager.getString('settingsview','version') + 
 						resourceManager.getString('settingsview','copyright') +
 						resourceManager.getString('settingsview','infoabouttext');
+					licensePopUp.okButtonVisible = true;
 					licensePopUp.show(thisView);
 					licensePopUp.setMessage(textToShow);
 				} else {
