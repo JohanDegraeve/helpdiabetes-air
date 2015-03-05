@@ -805,7 +805,11 @@ package model
 		 */
 		public function calculateActiveInsulinForSpecifiedEvent(theEvent:MedicinEvent, time:Number = NaN):Number {
 			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
-			if ((theEvent as TrackingViewElement).timeStamp + maxInsulinDurationInSeconds * 1000 < time)
+			var additionalMaxDurationInSeconds:Number = 0;
+			if ((theEvent as MedicinEvent).bolustype == ResourceManager.getInstance().getString('editmedicineventview','square')) {
+				additionalMaxDurationInSeconds = (theEvent as MedicinEvent).bolusDurationInMinutes * 60;
+			}
+			if ((theEvent as TrackingViewElement).timeStamp + (maxInsulinDurationInSeconds  + additionalMaxDurationInSeconds) * 1000 < time)
 				return new Number(0);
 			//let's find if the name of the medicinevent matches one of the medicins in the settings
 			var activeInsulin:Number = new Number(0);
