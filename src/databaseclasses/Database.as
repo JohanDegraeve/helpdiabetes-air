@@ -91,7 +91,7 @@ package databaseclasses
 		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER PRIMARY KEY, " +
 			"mealname TEXT NOT NULL, " +
 			"lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
-			"insulinratio INTEGER," +
+			"insulinratio REAL," +
 			"correctionfactor INTEGER," +
 			"creationtimestamp TIMESTAMP NOT NULL," +
 			"previousBGlevel INTEGER)";	//previousBGlevel is not used anymore	
@@ -802,7 +802,8 @@ package databaseclasses
 							createTableSource();
 						}
 					}
-				} else {
+				} else {//so this is if database version would be version 1, in which case VERSION_INFO would not even have existed yet
+					//should normally not happen anymore
 					upgradeToVersion2();
 				}
 			}
@@ -1834,7 +1835,6 @@ package databaseclasses
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_BLOODGLUCOSEEVENT;
 				//(bloodglucoseeventid, unit, creationtimestamp, value)
-				localSqlStatement.parameters[":bloodglucoseeventid"] =  bloodglucoseeventid;
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				if (unit  == ResourceManager.getInstance().getString('general','mmoll'))
