@@ -22,11 +22,4 @@
 		<nature>com.adobe.flexbuilder.project.flexnature</nature>
 		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>[source path] gaforflash-1.0.1.319</name>
-			<type>2</type>
-			<location>G:/Adobe FB Projects/FB 47/GaforFlash/gaforflash-1.0.1.319</location>
-		</link>
-	</linkedResources>
 </projectDescription>

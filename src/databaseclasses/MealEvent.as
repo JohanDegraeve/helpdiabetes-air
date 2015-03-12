@@ -444,7 +444,7 @@ package databaseclasses
 					 }
 					 
 					 
-					 returnValue += "{carb_amount} = " + Math.round(totalCarbs).toString() + "\n";
+					 returnValue += "{carb_amount} = " + ((Math.round(totalCarbs * 10))/10).toString() + "\n";
 					 returnValue += "{insulin_ratio} = " + _insulinRatio.toString() + "\n";
 					 if (!isNaN(diff)) {
 						 returnValue += "{correction_factor} = " + correctionFactor.toString() + "\n";
@@ -458,8 +458,8 @@ package databaseclasses
 							 ((Math.round(correctionUnits * 10))/10).toString() + "\n";
 					 }
 					 returnValue += "{calculated_insulinamount} = " + 
-						 ((Math.round(totalCarbs))).toString() + " / " + 
-						 ((Math.round(insulinRatio))).toString() + 
+						 ((Math.round(totalCarbs * 10))/10).toString() + " / " + 
+						 ((Math.round(insulinRatio * 10))/10).toString() + 
 						 
 						 ( !isNaN(correctionUnits) ?
 							 
