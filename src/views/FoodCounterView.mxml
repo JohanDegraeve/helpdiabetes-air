@@ -242,7 +242,11 @@ the home screen
 					}
 					applicationReadyForUse  = true;//is used elsewhere, to avoid that splashscreen would be started above, after being removed here
 					var lastSplashScreenShow:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime));
-					if ((new Date()).valueOf() - howManyDaysToShowTheSplashScreenForMaxTime * 24 * 3600 * 1000 > lastSplashScreenShow) {//more than 10 days ago
+					if (
+						(new Date()).valueOf() - howManyDaysToShowTheSplashScreenForMaxTime * 24 * 3600 * 1000 > lastSplashScreenShow
+						||
+						firstTimeAppIsStartedOnThisDevice
+						) {//more than 10 days ago
 					//splashscreen will be shown for 4 seconds, so we wait for the timer timerForSplashScreenRemoval
 						Settings.getInstance().setSetting(Settings.SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime,(new Date()).valueOf().toString());
 					} else {
