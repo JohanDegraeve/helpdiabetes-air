@@ -160,12 +160,12 @@
 					//copied some code from HelpDiabetes.mxml
 					if (event is UnitChangedEvent)  {
 						if ((event as UnitChangedEvent).index == 0) {
-							resourceManager.localeChain = ["en_US","nl_NL"];
-							localeChainAsString = "en_US,nl_NL";
+							resourceManager.localeChain = ["en_US","nl_NL","fr_FR"];
+							localeChainAsString = "en_US,nl_NL,fr_FR";
 						}
 						if ((event as UnitChangedEvent).index == 1) {
-							resourceManager.localeChain = ["nl_NL","en_US"];
-							localeChainAsString = "nl_NL,en_US";
+							resourceManager.localeChain = ["nl_NL","en_US","fr_FR"];
+							localeChainAsString = "nl_NL,en_US,fr_FR";
 						}
 					}
 					//Settings gets the value just determined here above, in any case if the database would already be existing, the localechain from database will be taken and the Settings value will again be overwritten

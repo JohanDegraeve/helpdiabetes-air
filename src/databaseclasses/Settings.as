@@ -606,7 +606,7 @@ package databaseclasses
 			"exercise type 5 defined in constructor",
 			"23",//default exercise type, meaning exercise type 1
 			"30",//default length of trackingview, in days
-			"en_US,nl_NL,fr_FR,ro_RO",//just a default value,  
+			"en_US,nl_NL,fr_FR",//just a default value,  will be overwrittin in constructor
 			"firsttartuptime defined in constructor",//firststartuptime, will be set in constructor
 			"true",//SettingsAddFoodItemViewSelectUnitButton
 			"true",//SettingsHelpTextAddFoodItemViewSelectMealButton
@@ -728,6 +728,7 @@ package databaseclasses
 			settings[100 + SettingsMeal8GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype8description');
 			settings[100 + SettingsMeal9GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype9description');
 			settings[100 + SettingsMeal10GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype10description');
+			settings[100 + SettingsLOCALECHAIN_asString] = ResourceManager.getInstance().getString('general','localechainasstring');
 			
 			settingsLastModifiedTimeStamp = new Array(settings.length);
 			for (var i:int = 0;i < settingsLastModifiedTimeStamp.length;i++)
