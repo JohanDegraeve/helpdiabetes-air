@@ -27,7 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<fx:Metadata>
-		[ResourceBundle("helpdiabetes")]
 	</fx:Metadata>
 	<fx:Style source="assets/style.css"/>
 	<fx:Script>

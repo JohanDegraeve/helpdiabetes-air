@@ -50,7 +50,6 @@ package model
 		
 	{
 		[ResourceBundle("general")]
-		[ResourceBundle("helpdiabetes")]
 		
 		/**
 		 * one and only instance of ModelLocator
