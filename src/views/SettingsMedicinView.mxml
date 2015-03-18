@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Metadata>
 		[ResourceBundle("settingsmedicinview")]
 		[ResourceBundle("analytics")]
+		[ResourceBundle("synchronizeview")]
 	</fx:Metadata>
 	
 	<fx:Script>
@@ -309,7 +310,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>			
-			<s:Button width="100%" label="Help" click="{navigateToURL(new URLRequest(resourceManager.getString('settingsmedicinview','redirecturl')));}"/>
+			<s:Button width="100%" label="{resourceManager.getString('synchronizeview','step1help')}" click="{navigateToURL(new URLRequest(resourceManager.getString('settingsmedicinview','redirecturl')));}"/>
 		</s:Group>
 	</s:Group>
 	
