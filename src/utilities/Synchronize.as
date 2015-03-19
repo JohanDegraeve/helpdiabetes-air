@@ -2839,12 +2839,12 @@ package utilities
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamemeal'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealtype],(trackElement as MealEvent).mealName);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount],(Math.round((trackElement as MealEvent).totalCarbs)).toString());
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio],(trackElement as MealEvent).insulinRatio.toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio],((Math.round((trackElement as MealEvent).insulinRatio*10)/10)).toString().replace('.',','));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MealEvent).comment);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount],(Math.round((trackElement as MealEvent).totalKilocalories)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount],(Math.round((trackElement as MealEvent).totalProtein)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount],(Math.round((trackElement as MealEvent).totalFat)).toString());
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin],((Math.round((trackElement as MealEvent).calculatedInsulinAmount*10))/10).toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin],((Math.round((trackElement as MealEvent).calculatedInsulinAmount*10))/10).toString().replace('.',','));
 						var selectedItems:ArrayCollection = (trackElement as MealEvent).selectedFoodItems;
 						var selectedItemsString:String = "";
 						for (var selecteditemscntr:int = 0;selecteditemscntr < selectedItems.length;selecteditemscntr++) {
@@ -2856,7 +2856,7 @@ package utilities
 					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is BloodGlucoseEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamebloodglucose'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as BloodGlucoseEvent).comment);
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue],new Number((trackElement as BloodGlucoseEvent).bloodGlucoseLevel).toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue],((Math.round((trackElement as BloodGlucoseEvent).bloodGlucoseLevel * 10))/10).toString().replace('.',','));
 					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is ExerciseEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnameexercise'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as ExerciseEvent).comment);
@@ -2865,7 +2865,7 @@ package utilities
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamemedicin'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MedicinEvent).comment);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicintype],(trackElement as MedicinEvent).medicinName);
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue],new Number((trackElement as MedicinEvent).amount).toString());
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue],((Math.round((trackElement as MedicinEvent).amount*10))/10).toString().replace('.',','));
 					} else {
 						//it's a dayline, no need to export
 						Settings.getInstance().setSetting(Settings.SettingLastUploadedEventTimeStamp,trackElement.timeStamp.toString());
@@ -2874,7 +2874,11 @@ package utilities
 					}
 					
 					outputString += '</entry>\n';
+					//if (debugMode)
+					//	trace ("outputstring before replacing = " + outputString); 
 					outputString = outputString.replace(/\n/g, File.lineEnding);
+					//if (debugMode)
+					//	trace ("outputstring after replacing = " + outputString); 
 					
 					createAndLoadURLRequest(googleExcelManageWorkSheetUrl.replace("{key}",helpDiabetesLogBookSpreadSheetKey).replace("{worksheetid}",helpDiabetesLogBookWorkSheetId),
 						URLRequestMethod.POST,
@@ -3712,6 +3716,9 @@ package utilities
 		private function createAndLoadURLRequest(url:String,requestMethod:String,urlVariables:URLVariables, data:String, paramFunctionToRecall:Function,addIOErrorListener:Boolean,contentType:String):void {
 			var request:URLRequest = new URLRequest(url);
 			loader = new URLLoader();
+			if (debugMode) {
+				trace ("in createAndLoadURLRequest, urlVariable string = " + urlVariables);
+			}
 			
 			//all requestmethods
 			if (!urlVariables)  {
