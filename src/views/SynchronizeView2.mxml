@@ -53,7 +53,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_downloadfoodtable"),
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_exporttracking"),
-				ResourceManager.getInstance().getString("synchronizeview","menuitem_resyncall"),
+				//ResourceManager.getInstance().getString("synchronizeview","menuitem_resyncall"),
 				ResourceManager.getInstance().getString("synchronizeview","help")
 			]);	
 
@@ -91,7 +91,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 					case 1:
 						navigator.pushView(UploadTrackingView);
 						break;
-					case 2:
+					/*case 2:
 						Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,"0");
 						Synchronize.getInstance().startSynchronize(false,false);
 						
@@ -99,8 +99,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						alertPopUp.show(this);
 						alertPopUp.setMessage(resourceManager.getString('settingsview','syncstarted'));
-						break;
-					case 3:
+						break;*/
+					case 2:
 						navigateToURL(new URLRequest(resourceManager.getString('synchronizeview','helpurl')));
 				}
 			}

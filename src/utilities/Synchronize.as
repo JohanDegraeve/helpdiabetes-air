@@ -2950,9 +2950,9 @@ package utilities
 					outputString += '    <gsx:unit' + (unitCtr + 1) + '><![CDATA[' + retrievedFoodItem.getUnit(unitCtr).unitDescription + ']]></gsx:unit' + (unitCtr + 1) + '> \n';
 					outputString += '    <gsx:standardamount' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).standardAmount + '</gsx:standardamount' + (unitCtr + 1) + '>\n';
 					outputString += '    <gsx:kcal' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).kcal + '</gsx:kcal' + (unitCtr + 1) +  '>\n';
-					outputString += '    <gsx:protein' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).protein + '</gsx:protein' + (unitCtr + 1) + '>\n';
-					outputString += '    <gsx:carbo' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).carbs + '</gsx:carbo' + (unitCtr + 1) + '>\n';
-					outputString += '    <gsx:fat' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).fat + '</gsx:fat' + (unitCtr + 1) + '>\n';
+					outputString += '    <gsx:protein' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).protein.toString().replace('.',',') + '</gsx:protein' + (unitCtr + 1) + '>\n';
+					outputString += '    <gsx:carbo' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).carbs.toString().replace('.',',') + '</gsx:carbo' + (unitCtr + 1) + '>\n';
+					outputString += '    <gsx:fat' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).fat.toString().replace('.',',') + '</gsx:fat' + (unitCtr + 1) + '>\n';
 				}
 				outputString += '</entry>\n';
 				outputString = outputString.replace(/\n/g, File.lineEnding);

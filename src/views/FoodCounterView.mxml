@@ -253,8 +253,14 @@ the home screen
 						trace("in retreivedfooditemlist, calling removesplashscreen");
 						removeSplashScreen();
 					}
+					trace("application launchfinished");
 					MyGATracker.getInstance(thisView).trackPageview("launch of Application");//just to make sure mygatracker is initialized with a displayobject
+					
+					//forcing resync all
+					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,"0");
 					Synchronize.getInstance().startSynchronize(false,false);
+					
+					trace("applicationlaunch finished");
 				}
 				
 				function onRetrieveListError(event:Event):void

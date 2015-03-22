@@ -297,7 +297,7 @@ package model
 		 */
 		public var firstInitOfFoodCounterView:Boolean = true;
 		
-		public static var debugMode:Boolean = true;
+		public static var debugMode:Boolean = false;
 
 		public static var BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES:Number = 0.1;//unit s of insulin
 
