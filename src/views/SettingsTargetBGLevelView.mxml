@@ -29,6 +29,8 @@
 			
 			[Bindable]
 			private var back_label:String;
+			[Bindable]
+			private var unit_label:String;
 			
 			private var helpCallOut:HelpCallOut;
 			
@@ -38,14 +40,15 @@
 			
 			private function onInit():void {
 				back_label = resourceManager.getString('general','back');
+				unit_label = resourceManager.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
 				thisView = this;
 			}
 			
 			private function targetBGLevelClicked(event:Event):void  {
 				amountPicker = new AmountPicker();
 				amountPicker.amount = Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL);
-				amountPicker.maxNonDecimalDigits = 3;
-				amountPicker.decimalDigits = 0;
+				amountPicker.maxNonDecimalDigits = Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mgperdl" ? 3:2;
+				amountPicker.decimalDigits = Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mgperdl" ? 0:1;
 				//amountPicker.labelText1 = resourceManager.getString('editmedicineventview','amount_of_units');
 				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
 				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
@@ -77,13 +80,14 @@
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
+		<s:Label height="75" width="100%" text="{resourceManager.getString('settingstargetbglevelview','targetbglevel')}" textAlign="center" verticalAlign="middle"/>
 		<s:Group id="bglevel" y="0" x="0" width="100%" height = "100%"  click="targetBGLevelClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Label  width="60%" text="{resourceManager.getString('settingstargetbglevelview','targetbglevel') }" />
 			<s:Button id="targetBGLevelButton" width="40%" label="{Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)}"  />
+			<s:Label  text="{unit_label}" />
 		</s:Group>
 	</s:Group>
 </s:View>

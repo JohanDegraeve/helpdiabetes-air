@@ -153,7 +153,10 @@ package myComponents
 			label = 
 				theDataAsFromToAndValue.fromAsString() 
 				+ " "
-				+ theDataAsFromToAndValue.value
+				+ (Math.round(theDataAsFromToAndValue.value) == theDataAsFromToAndValue.value ?
+					theDataAsFromToAndValue.value
+					:
+					(Math.round((theDataAsFromToAndValue.value * 10)) / 10).toString())
 				+ " "
 				+ theDataAsFromToAndValue.unit;
 			deletable = theDataAsFromToAndValue.deletable;

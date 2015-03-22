@@ -99,7 +99,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					selectedIndex = data.selectedIndex;
 					fromtimeAndValue = listOfElements.getItemAt(selectedIndex) as FromtimeAndValue;
 					timeText = fromtimeAndValue.fromAsString();
-					value = fromtimeAndValue.value.toString();
+					value = (Math.round(fromtimeAndValue.value) == fromtimeAndValue.value ?
+						fromtimeAndValue.value.toString()
+						:
+						(Math.round((fromtimeAndValue.value * 10)) / 10).toString());
 					valueGroupLabelIdforUnit.text = fromtimeAndValue.unit;
 				}
 			}

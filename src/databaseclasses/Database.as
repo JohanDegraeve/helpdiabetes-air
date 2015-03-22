@@ -83,7 +83,7 @@ package databaseclasses
 		private const CREATE_TABLE_BLOODGLUCOSE_EVENTS:String = "CREATE TABLE IF NOT EXISTS bloodglucoseevents (bloodglucoseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"unit TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
-			"value INTEGER NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
+			"value REAL NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (medicineventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"medicinname TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
@@ -92,9 +92,9 @@ package databaseclasses
 			"mealname TEXT NOT NULL, " +
 			"lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
 			"insulinratio REAL," +
-			"correctionfactor INTEGER," +
+			"correctionfactor REAL," +
 			"creationtimestamp TIMESTAMP NOT NULL," +
-			"previousBGlevel INTEGER)";	//previousBGlevel is not used anymore	
+			"previousBGlevel REAL)";	//previousBGlevel is not used anymore	
 		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER PRIMARY KEY , " +
 			"mealevents_mealeventid INTEGER NOT NULL, " +
 			"itemdescription TEXT NOT NULL, " +
@@ -1835,6 +1835,7 @@ package databaseclasses
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = INSERT_BLOODGLUCOSEEVENT;
 				//(bloodglucoseeventid, unit, creationtimestamp, value)
+				localSqlStatement.parameters[":bloodglucoseeventid"] =  bloodglucoseeventid;
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
 				if (unit  == ResourceManager.getInstance().getString('general','mmoll'))

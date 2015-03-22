@@ -36,6 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
 			
+			import databaseclasses.BloodGlucoseEvent;
+			import databaseclasses.MealEvent;
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
 			
@@ -44,6 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.AlertPopUp;
 			import myComponents.elementFromListPicker;
 			
+			import utilities.FromtimeAndValueArrayCollection;
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
@@ -107,10 +110,79 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					
 					elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedUnitChanged);
 					PopUpManager.removePopUp(elementPicker);
-					if (event.index == 0)
-						Settings.getInstance().setSetting(Settings.SettingsBLOODGLUCOSE_UNIT,"mgperdl");
-					else if (event.index == 1)
-						Settings.getInstance().setSetting(Settings.SettingsBLOODGLUCOSE_UNIT,"mmoll");
+					var correctionFactor:String = Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor);
+					var listOfElements:FromtimeAndValueArrayCollection;
+					var cntr:int;
+					listOfElements =  FromtimeAndValueArrayCollection.createList(
+						Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
+					if (event.index == 0) {
+						if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mmoll") {
+							//change the unit
+							Settings.getInstance().setSetting(Settings.SettingsBLOODGLUCOSE_UNIT,"mgperdl");
+							//change the correctionfactor string
+							listOfElements.changeUnit("mgperdl");
+							Settings.getInstance().setSetting(Settings.SettingsCorrectionFactor,
+								"0:0-" + listOfElements.createCorrectionFactorAsString());
+							//change the target bloodglucose level
+							Settings.getInstance().setSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL,
+								((Math.round((new Number(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)))/(new Number(0.0555))))).toString());
+							//change the bloodglucoseevents that area in tracking database
+							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
+								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
+									var theEvent:BloodGlucoseEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as BloodGlucoseEvent;
+									if (theEvent.unit == ResourceManager.getInstance().getString("general","mmoll")) {
+										theEvent.updateBloodGlucoseEvent(ResourceManager.getInstance().getString("general","mgperdl"),Math.round(theEvent.bloodGlucoseLevel/(new Number(0.0555))),theEvent.timeStamp,theEvent.comment,new Date().valueOf());
+									}
+									
+								}
+							}
+							//change the correctionfactor in mealevents
+							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
+								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is MealEvent) {
+									var theMealEvent:MealEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent;
+									if (!isNaN(theMealEvent.correctionFactor)) {
+										if (theMealEvent.correctionFactor > 0) {
+											theMealEvent.updateMealEvent(theMealEvent.mealName,theMealEvent.comment,theMealEvent.insulinRatio,Math.round(theMealEvent.correctionFactor/(new Number(0.0555))),(new Date()).valueOf(),theMealEvent.timeStamp);	
+										}
+									}
+								}
+							}
+						}
+					}
+					else if (event.index == 1) {
+						if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mgperdl") {
+							//change the unit
+							Settings.getInstance().setSetting(Settings.SettingsBLOODGLUCOSE_UNIT,"mmoll");
+							//change the correctionfactor string
+							listOfElements.changeUnit("mmoll");
+							Settings.getInstance().setSetting(Settings.SettingsCorrectionFactor,
+								"0:0-" + listOfElements.createCorrectionFactorAsString());
+							//change the target bloodglucose level
+							Settings.getInstance().setSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL,
+								((Math.round((new Number(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)))*(new Number(0.0555))*10))/10).toString());
+							//change the bloodglucoseevents that area in tracking database
+							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
+								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
+									var theEvent:BloodGlucoseEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as BloodGlucoseEvent;
+									if (theEvent.unit == ResourceManager.getInstance().getString("general","mgperdl")) {
+										theEvent.updateBloodGlucoseEvent(ResourceManager.getInstance().getString("general","mmoll"),(Math.round(theEvent.bloodGlucoseLevel*(new Number(0.0555))*10))/10,theEvent.timeStamp,theEvent.comment,new Date().valueOf());
+									}
+									
+								}
+							}
+							//change the correctionfactor in mealevents
+							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
+								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is MealEvent) {
+									var theMealEvent:MealEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent;
+									if (!isNaN(theMealEvent.correctionFactor)) {
+										if (theMealEvent.correctionFactor > 0) {
+											theMealEvent.updateMealEvent(theMealEvent.mealName,theMealEvent.comment,theMealEvent.insulinRatio,(Math.round(theMealEvent.correctionFactor*(new Number(0.0555))*10))/10,(new Date()).valueOf(),theMealEvent.timeStamp);	
+										}
+									}
+								}
+							}
+						}
+					}
 					settingsList.selectedIndex = -1;
 					Synchronize.getInstance().startSynchronize(true,false);
 				}

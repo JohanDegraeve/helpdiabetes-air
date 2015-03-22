@@ -447,7 +447,7 @@ package databaseclasses
 					 returnValue += "{carb_amount} = " + ((Math.round(totalCarbs * 10))/10).toString() + "\n";
 					 returnValue += "{insulin_ratio} = " + _insulinRatio.toString() + "\n";
 					 if (!isNaN(diff)) {
-						 returnValue += "{correction_factor} = " + correctionFactor.toString() + "\n";
+						 returnValue += "{correction_factor} = " + ((Math.round(correctionFactor * 10))/10).toString() + "\n";
 						 returnValue += "{previous_bg_level} = " + previousBGEvent.bloodGlucoseLevel.toString() + "\n";
 						 returnValue += "{targetbglevel} = " + Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL) + "\n";
 						 returnValue += "{correction} = (" +

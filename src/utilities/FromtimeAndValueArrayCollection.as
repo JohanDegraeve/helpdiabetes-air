@@ -18,6 +18,7 @@
 package utilities
 {
 	import mx.collections.ArrayCollection;
+	import mx.resources.ResourceManager;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
@@ -79,8 +80,8 @@ package utilities
 		  * as the name suggests, sets arrrayChanged to false
 		  */
 		 public function setArrayChangedToFalse():void {
-			  _arrayChanged = false;
-		  }
+			 _arrayChanged = false;
+		 }
 		 
 		 
 		 private var dataSortField:SortField = new SortField();
@@ -234,94 +235,133 @@ package utilities
 		  * This is treated as real date, no utc conversion or something like that.
 		  * </li>
 		  * </ul>
-		  */public function getValue(timeAsNumber:Number = Number.NaN,timeAsString:String = "",timeAsDate:Date = null):Number {
-			  
-			  if (!isNaN(timeAsNumber)) {
-				  if (timeAsNumber > 86400)
-					  throw new Error("fromTimeAsNumber should not be > 86400");
-			  }
-			  if (!timeAsString == "") {
-				  return getValue(((new Number(timeAsString.split(":")[0])) * 60 + (new Number(timeAsString.split(":")[1])))*60); 
-			  }
-			  
-			  if (timeAsDate != null) {
-				  return getValue(((new Number(timeAsDate.hours)) * 60 + (new Number(timeAsDate.minutes)))*60); 
-			  }
-			  
-			  var previousItem:int;
-			  previousItem = 0;
-			  
-			  if (length == 1)
-				  //it's definitely not a percentage based list, so no need to interpolate
-				  return (getItemAt(0) as FromtimeAndValue).value;
-			  
-			  while (previousItem < length - 1 && (getItemAt(previousItem + 1) as FromtimeAndValue).from < timeAsNumber)
-				  previousItem++;
-			  
-			  var returnValue:Number;
-			  if (percentageBased) {
-				  var increase:Number = 
-					  ( (getItemAt(previousItem + 1) as FromtimeAndValue).value - (getItemAt(previousItem) as FromtimeAndValue).value)
-					  /
-					  ( (getItemAt(previousItem + 1) as FromtimeAndValue).from - (getItemAt(previousItem) as FromtimeAndValue).from);
-				  returnValue =  
-					  (getItemAt(previousItem) as FromtimeAndValue).value 
-					  + 
-					  increase * (timeAsNumber - (getItemAt(previousItem) as FromtimeAndValue).from);
-			  } else
-				  returnValue = (getItemAt(previousItem) as FromtimeAndValue).value;
-			  
-			  return returnValue;
-		  }
-		 
-		 /**
-		 * the first part is something like 0:0, which is not needed here
-		  * mmol/l-00:00>1.5  betekent correctiefactor 1.5 van 00:00 tot 23:59, eerste veld is de eenheid
-		  * mg/dl-00:00>1.5-08:00>2.3-20:00>1.5 betekent 1.5 tussen 00:00 en 08:00 en 2.3 tussen 8 en 20 en vanaf 20 1.5
-		  */public static function createList(correctionFactorListAsString:String):FromtimeAndValueArrayCollection {
-			  var splittedByDash:Array = correctionFactorListAsString.split("-");
-			  var unit:String;
-			  
-			  if (splittedByDash.length > 1)
-			    unit = splittedByDash[1];
-			  else
-				  unit = "";//default value will be assigned in constructor FromtimeAndValueArrayCollection
-			  
-			  var returnValue:FromtimeAndValueArrayCollection = new FromtimeAndValueArrayCollection(null,unit);
-			  for (var ctr:int = 2;ctr < splittedByDash.length;ctr++) {
-				  returnValue.addItem( 
-					  new FromtimeAndValue(
-						  splittedByDash[ctr].split(">")[0],
-						  splittedByDash[ctr].split(">")[1],
-						  unit,
-						  true,
-						  true
-					  )
-				  );
-			  }
-			  return returnValue;
-		  }
-		 
-		 /**
-		 * just overriding it to align some comment<br>
-		 * 
-		 * using addItemAt does not really make sense because a sort will always occur<br>
-		 * better to use addItem, then do getItemIndex to know the new index. 
-		  */override public function addItemAt(newObject:Object,index:int):void {
-			 return super.addItemAt(newObject,index);
+		  */
+		 public function getValue(timeAsNumber:Number = Number.NaN,timeAsString:String = "",timeAsDate:Date = null):Number {
+			 
+			 if (!isNaN(timeAsNumber)) {
+				 if (timeAsNumber > 86400)
+					 throw new Error("fromTimeAsNumber should not be > 86400");
+			 }
+			 if (!timeAsString == "") {
+				 return getValue(((new Number(timeAsString.split(":")[0])) * 60 + (new Number(timeAsString.split(":")[1])))*60); 
+			 }
+			 
+			 if (timeAsDate != null) {
+				 return getValue(((new Number(timeAsDate.hours)) * 60 + (new Number(timeAsDate.minutes)))*60); 
+			 }
+			 
+			 var previousItem:int;
+			 previousItem = 0;
+			 
+			 if (length == 1)
+				 //it's definitely not a percentage based list, so no need to interpolate
+				 return (getItemAt(0) as FromtimeAndValue).value;
+			 
+			 while (previousItem < length - 1 && (getItemAt(previousItem + 1) as FromtimeAndValue).from < timeAsNumber)
+				 previousItem++;
+			 
+			 var returnValue:Number;
+			 if (percentageBased) {
+				 var increase:Number = 
+					 ( (getItemAt(previousItem + 1) as FromtimeAndValue).value - (getItemAt(previousItem) as FromtimeAndValue).value)
+					 /
+					 ( (getItemAt(previousItem + 1) as FromtimeAndValue).from - (getItemAt(previousItem) as FromtimeAndValue).from);
+				 returnValue =  
+					 (getItemAt(previousItem) as FromtimeAndValue).value 
+					 + 
+					 increase * (timeAsNumber - (getItemAt(previousItem) as FromtimeAndValue).from);
+			 } else
+				 returnValue = (getItemAt(previousItem) as FromtimeAndValue).value;
+			 
+			 return returnValue;
 		 }
 		 
 		 /**
-		 * creates the correctionfactor list in a string as it's stored in the settings, but with the preceding 0:0
-		  */public function createCorrectionFactorAsString():String {
-			 var returnValue:String = unit;
-			 for (var cntr:int = 0;cntr < length;cntr++) {
-				 returnValue += "-";
-				 returnValue += (getItemAt(cntr) as FromtimeAndValue).fromAsString();
-				 returnValue += ">";
-				 returnValue += (getItemAt(cntr) as FromtimeAndValue).value.toString();
+		  * the first part is something like 0:0, which is not needed here
+		  * mmol/l-00:00>1.5  betekent correctiefactor 1.5 van 00:00 tot 23:59, eerste veld is de eenheid
+		  * mg/dl-00:00>1.5-08:00>2.3-20:00>1.5 betekent 1.5 tussen 00:00 en 08:00 en 2.3 tussen 8 en 20 en vanaf 20 1.5
+		  */
+		 public static function createList(correctionFactorListAsString:String):FromtimeAndValueArrayCollection {
+			 var splittedByDash:Array = correctionFactorListAsString.split("-");
+			 var unit:String;
+			 
+			 if (splittedByDash.length > 1)
+				 unit = splittedByDash[1];
+			 else
+				 unit = "";//default value will be assigned in constructor FromtimeAndValueArrayCollection
+			 
+			 var returnValue:FromtimeAndValueArrayCollection = new FromtimeAndValueArrayCollection(null,unit);
+			 for (var ctr:int = 2;ctr < splittedByDash.length;ctr++) {
+				 returnValue.addItem( 
+					 new FromtimeAndValue(
+						 splittedByDash[ctr].split(">")[0],
+						 splittedByDash[ctr].split(">")[1],
+						 unit,
+						 true,
+						 true
+					 )
+				 );
 			 }
 			 return returnValue;
 		 }
+		 
+		 /**
+		  * unit must be "mgperdl" per "mmoll"
+		  * if unit of this list is already equal to the newUnit, then nothing happens<br>
+		  * otherwise all values will be converted with formula mg/dL x 0.0555 = mmol/L
+		  */
+		 public function changeUnit(newUnit:String):void {
+			 if (!(newUnit == "mgperdl") && !(newUnit == "mmoll")) {
+				 throw new Error("FromtimeAndValueArrayCollection.changeUnit : newUnit must be mgperdl or mmoll");
+			 }
+			 
+			 if (newUnit == this.unit) 
+				 return;
+			 
+			 var ctr:int;
+			 var fromTimeAndValue:FromtimeAndValue;
+			 var newValue:Number;
+			 if (newUnit == "mgperdl") {
+				 for (ctr = 0;ctr < length;ctr++) {
+					 fromTimeAndValue = getItemAt(ctr) as FromtimeAndValue;
+					 newValue = fromTimeAndValue.value/(new Number(0.0555));
+					 fromTimeAndValue = new FromtimeAndValue(fromTimeAndValue.from,newValue,"mgperdl",fromTimeAndValue.editable,fromTimeAndValue.deletable);
+					 setItemAt(fromTimeAndValue,ctr);
+				 }
+				 _unit = ResourceManager.getInstance().getString('general','mgperdl');
+			 }
+			 
+			 if (newUnit == "mmoll") {
+				 for (ctr = 0;ctr < length;ctr++) {
+					 fromTimeAndValue = getItemAt(ctr) as FromtimeAndValue;
+					 newValue = fromTimeAndValue.value*(new Number(0.0555));
+					 fromTimeAndValue = new FromtimeAndValue(fromTimeAndValue.from,newValue,"mmoll",fromTimeAndValue.editable,fromTimeAndValue.deletable);
+					 setItemAt(fromTimeAndValue,ctr);
+				 }
+				 _unit = ResourceManager.getInstance().getString('general','mmoll');
+			 }
+		 }
+		 
+		 /**
+		  * just overriding it to align some comment<br>
+		  * 
+		  * using addItemAt does not really make sense because a sort will always occur<br>
+		  * better to use addItem, then do getItemIndex to know the new index. 
+		  */override public function addItemAt(newObject:Object,index:int):void {
+			  return super.addItemAt(newObject,index);
+		  }
+		 
+		 /**
+		  * creates the correctionfactor list in a string as it's stored in the settings, but with the preceding 0:0
+		  */public function createCorrectionFactorAsString():String {
+			  var returnValue:String = unit;
+			  for (var cntr:int = 0;cntr < length;cntr++) {
+				  returnValue += "-";
+				  returnValue += (getItemAt(cntr) as FromtimeAndValue).fromAsString();
+				  returnValue += ">";
+				  returnValue += (getItemAt(cntr) as FromtimeAndValue).value.toString();
+			  }
+			  return returnValue;
+		  }
 	 }
 }
