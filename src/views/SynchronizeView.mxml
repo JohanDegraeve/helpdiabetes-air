@@ -109,7 +109,10 @@ initial setup of sync settings
 				stageWebView.stage = stage;
 				stageWebView.viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 				//stageWebView.loadURL("http://www.scobleizer.com");
-				stageWebView.loadURL("https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/fusiontables.readonly https://www.googleapis.com/auth/fusiontables https://spreadsheets.google.com/feeds https://docs.google.com/feeds&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&client_id=" + resourceManager.getString('client_secret','client_id') + "&hl=nl&from_login=1&as=6d24e440f72448b2&pli=1");
+				stageWebView.loadURL("https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/fusiontables.readonly https://www.googleapis.com/auth/fusiontables https://spreadsheets.google.com/feeds https://docs.google.com/feeds&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&client_id=" 
+					+ resourceManager.getString('client_secret','client_id') 
+					+ "&hl=" + resourceManager.getString('general','googleauthlanguage') 
+					+ "&from_login=1&as=6d24e440f72448b2&pli=1");//googleauthlanguage
 				stageWebView.addEventListener(ErrorEvent.ERROR,errorLoadingURL);
 				timerToCheckIfAuthenticationCompleted = new Timer(500, 1);
 				timerToCheckIfAuthenticationCompleted.addEventListener(TimerEvent.TIMER,timerEndOftimerToCheckIfAuthenticationCompleted);
