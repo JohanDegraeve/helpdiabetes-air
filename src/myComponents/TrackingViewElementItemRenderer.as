@@ -17,11 +17,14 @@
  */
 package myComponents
 {
-	import databaseclasses.Settings;
-	
-	import model.ModelLocator;
+	import mx.core.LayoutDirection;
 	
 	import spark.components.LabelItemRenderer;
+	
+	import databaseclasses.Settings;
+	
+	
+	import model.ModelLocator;
 
 	/**
 	 * a superclass for the itemrenderers that are used for elements that can be in a trackingview<br>

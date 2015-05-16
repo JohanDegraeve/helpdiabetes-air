@@ -25,10 +25,12 @@ package model
 	import flash.events.EventDispatcher;
 	
 	import mx.collections.ArrayCollection;
+	import mx.core.LayoutDirection;
 	import mx.resources.ResourceManager;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
+	import spark.components.Application;
 	
 	import databaseclasses.Meal;
 	import databaseclasses.MealEvent;
@@ -93,6 +95,8 @@ package model
 		}
 		
 		private static var counter:int = 0;
+		
+		public static var ltr:Boolean;
 		
 		/**
 		 * sets searchActive<br>
@@ -351,6 +355,12 @@ package model
 			
 			trackingList = new ArrayCollection();
 			copyOfTrackingList = trackingList;
+			if (ResourceManager.getInstance().getString("general","textdirection") ==  "ltr")
+				ltr = true;
+			else {
+				//arabic
+				ltr = false;
+			}
 			
 			instance = this;
 			

@@ -101,7 +101,9 @@ package utilities
 		}
 				
 		/**
-		 * Compares two characters using Excel sorting rules.<br>
+		 * Compares two characters <br>
+		 * If both characters have uint value < 255, then Excel sorting rules are applied<br>
+		 * Otherwise simple compare of the uint value is returned.
 		 * @param characterA the first character to be compared to  <br>
 		 * @param characterB the second character<br>
 		 * @return the value 0 if characterA is equal to characterB; <br>
@@ -111,6 +113,9 @@ package utilities
 		 * 
 		 */
 		static public  function compareToAsInExcel( characterA:uint,  characterB:uint):int {
+			if (characterA > (CHARORDER.length) || characterB > (CHARORDER.length))
+				return characterA == characterB ? 0 : characterA < characterB ? -1 : 1;
+				
 			if (characterA > (CHARORDER.length - 1))//-1 because the very last element is not really considered to be a character value 
 				characterA = CHARORDER[CHARORDER.length - 1];
 			if (characterB > (CHARORDER.length - 1))//-1 because the very last element is not really considered to be a character value 

@@ -429,7 +429,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
 	<s:Group id="activeInsulin">
-		<s:Label left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+		<s:Label left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}" textAlign="{ModelLocator.ltr ? 'left':'right'}"/>
 	</s:Group>
 	<s:Line width="100%" left="0" right="0" top="40">
 		<s:stroke>

@@ -431,7 +431,7 @@ the home screen
 	</fx:Script>
 	
 	<s:titleContent>
-		<s:TextInput id="searchtext"  text="@{searchTextCopy}" width="100%" change="searchTextChanged()"/>
+		<s:TextInput id="searchtext"  text="@{searchTextCopy}" width="100%" change="searchTextChanged()" textAlign="{ModelLocator.ltr ? 'left':'right'}"/>
 	</s:titleContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" alpha="{searchActive ? 1:0.25}"/>
@@ -440,7 +440,7 @@ the home screen
 	</s:actionContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.FoodItemListItemRenderer"
 			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem"
-			scrollSnappingMode="leadingEdge">
+			scrollSnappingMode="leadingEdge" textAlign="{ModelLocator.ltr ? 'left':'right'}">
 	</s:List>
 </s:View>
 
