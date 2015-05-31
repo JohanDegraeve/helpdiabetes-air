@@ -3764,6 +3764,8 @@ package utilities
 		}
 		
 		public function googleExcelFindAllSpreadSheets(event:Event = null):void  {
+			var urlVariables:URLVariables;
+			
 			if (syncRunning) {
 				findAllSpreadSheetsWaiting=true;
 				return;
@@ -3778,7 +3780,7 @@ package utilities
 			if (event != null)  {
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-				_spreadSheetList = new ArrayList();
+				nextPageToken = eventAsJSONObject.nextPageToken;
 				
 				if (eventHasError(event,googleExcelFindAllSpreadSheets)) {
 					this.dispatchEvent(new Event(SPREADSHEET_LIST_RETRIEVED));
@@ -3794,7 +3796,22 @@ package utilities
 									if (eventAsJSONObject.items[itemLength].mimeType == "application/vnd.google-apps.spreadsheet")
 										_spreadSheetList.addItem(eventAsJSONObject.items[itemLength]);
 							}
-							this.dispatchEvent(new Event(SPREADSHEET_LIST_RETRIEVED));
+							if (nextPageToken != null) {
+								urlVariables = new URLVariables();
+								urlVariables.pageToken = nextPageToken;
+								if (debugMode)
+									trace("load url for googleExcelFindAllSpreadSheets - not the 1st call");
+								createAndLoadURLRequest(
+									googleDriveFilesUrl,
+									null,
+									urlVariables,
+									null,
+									googleExcelFindAllSpreadSheets,
+									false,
+									null);
+							} else {
+								this.dispatchEvent(new Event(SPREADSHEET_LIST_RETRIEVED));
+							}
 						} else {
 							this.dispatchEvent(new Event(SPREADSHEET_LIST_RETRIEVED));
 							return;
@@ -3806,7 +3823,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("start method googleExcelFindAllSpreadSheets");
+					trace("load url for googleExcelFindAllSpreadSheets 1 st time");
 				_spreadSheetList = new ArrayList();
 				
 				createAndLoadURLRequest(
