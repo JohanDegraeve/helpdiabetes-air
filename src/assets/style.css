@@ -85,3 +85,9 @@ s|View {
 s|List {
 	contentBackgroundAlpha: 0;
 }
+
+/*Roboto Fonts*/
+@font-face
+{ src: url(spark/skins/android4/assets/fonts/Roboto-Regular.ttf); fontFamily: RobotoRegular; embed-as-cff: true; }
+@font-face
+{ src: url(spark/skins/android4/assets/fonts/Roboto-Bold.ttf); fontFamily: RobotoBold; fontWeight: bold; embed-as-cff: true; }
