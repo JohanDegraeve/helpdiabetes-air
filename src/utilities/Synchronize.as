@@ -3510,10 +3510,23 @@ package utilities
 					return;
 				else {
 					if (eventAsJSONObject.items)  {
+						var tableFound:Boolean = false;
 						if (eventAsJSONObject.items.length > 0)  {
+							for (var itemLength:int = 0;itemLength < eventAsJSONObject.items.length;itemLength++) {
+								if (eventAsJSONObject.items[itemLength].parents[0].isRoot == true) {
+									helpDiabetesFoodTableSpreadSheetKey = eventAsJSONObject.items[itemLength].id;
+									tableFound = true;
+									break;
+								}
+							}
+						} else {
+							//tablefound remains false
+						}
+							
+						if (tableFound)  {
 							//foodtable found
 							if (Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true")  {
-								helpDiabetesFoodTableSpreadSheetKey = eventAsJSONObject.items[0].id;
+								//already set helpDiabetesFoodTableSpreadSheetKey = eventAsJSONObject.items[0].id;
 								googleExcelFindFoodTableWorkSheet();
 							} else {
 								//this instance has not created the foodtable
@@ -3566,8 +3579,20 @@ package utilities
 					return;
 				else {
 					if (eventAsJSONObject.items)  {
+						var tableFound:Boolean = false;
 						if (eventAsJSONObject.items.length > 0)  {
-							helpDiabetesLogBookSpreadSheetKey = eventAsJSONObject.items[0].id;
+							for (var itemLength:int = 0;itemLength < eventAsJSONObject.items.length;itemLength++) {
+								if (eventAsJSONObject.items[itemLength].parents[0].isRoot == true) {
+									helpDiabetesLogBookSpreadSheetKey = eventAsJSONObject.items[itemLength].id;
+									tableFound = true;
+									break;
+								}
+							}
+						} else {
+							//tablefound remains false
+						}
+						if (tableFound)  {
+							//already set -- helpDiabetesLogBookSpreadSheetKey = eventAsJSONObject.items[0].id;
 							googleExcelFindLogBookWorkSheet();
 						} else {
 							googleExcelCreateLogBook();
