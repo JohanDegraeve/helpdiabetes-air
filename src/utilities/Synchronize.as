@@ -32,6 +32,7 @@ package utilities
 	import mx.collections.ArrayList;
 	import mx.formatters.DateFormatter;
 	import mx.resources.ResourceManager;
+	import mx.utils.StringUtil;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
@@ -2999,9 +3000,31 @@ package utilities
 				trace("start method googleExcelCreateLogBookHeader");
 			
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInLogBook)) == googleExcelLogBookColumnNames.length)  {
+				//actually the first time that an app runs an a device, Settings.SettingsNextColumnToAddInLogBook is always 0, means it will always recreate all header column names
+				//bit a waste of time but not really an issue - it will only happen the first time
 				googleExcelInsertLogBookEvents();
 			} else {
+				//actually the first time that an app runs an a device, Settings.SettingsNextColumnToAddInLogBook is always 0, means it will always recreate all header column names
+				//bit a waste of time but not really an issue - it will only happen the first time
 				this.dispatchEvent(new Event(CREATING_LOGBOOK_HEADERS));
+				//first reset header names because user may have changed language after launch of app, during laung of app googleExcelLogbookcolumnames is already initialized
+				googleExcelLogBookColumnNames[foodValueNames_Index_date] = ResourceManager.getInstance().getString('uploadtrackingview','date');
+				googleExcelLogBookColumnNames[foodValueNames_Index_time] = ResourceManager.getInstance().getString('uploadtrackingview','time');
+				googleExcelLogBookColumnNames[foodValueNames_Index_eventtype] = ResourceManager.getInstance().getString('uploadtrackingview','eventtype');
+				googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue] = ResourceManager.getInstance().getString('uploadtrackingview','bloodglucosevalue');
+				googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue] = ResourceManager.getInstance().getString('uploadtrackingview','medicinvalue');
+				googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel] = ResourceManager.getInstance().getString('uploadtrackingview','exerciselevel');
+				googleExcelLogBookColumnNames[foodValueNames_Index_medicintype] = ResourceManager.getInstance().getString('uploadtrackingview','medicintype');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealtype] = ResourceManager.getInstance().getString('uploadtrackingview','mealtype');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealcarbamount');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio] = ResourceManager.getInstance().getString('uploadtrackingview','mealinsulinratio');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin] = ResourceManager.getInstance().getString('uploadtrackingview','mealcalculatedinsulin');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems] = ResourceManager.getInstance().getString('uploadtrackingview','mealselecteditems');
+				googleExcelLogBookColumnNames[foodValueNames_Index_comment] = ResourceManager.getInstance().getString('uploadtrackingview','comment');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealkcalamount');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealproteinamount');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealfatamount');
+
 				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInLogBook)) + 1;//index starts at 0, but column number at 1
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
@@ -3340,7 +3363,7 @@ package utilities
 							indexOfLogbookEntry = listCounter;
 						}
 					}
-					if (entryXMLList[listCounter]..xmlns::title == "Sheet 1") {
+					if ((entryXMLList[listCounter]..xmlns::title == "Sheet 1") || (entryXMLList[listCounter]..xmlns::title == "Blad1")) {
 						if (entryXMLList.length() > 1) {
 							googleExcelDeleteWorkSheetUrl = getEditURl(new XMLList(entryXMLList[listCounter]..xmlns::link));
 						}
@@ -3943,8 +3966,6 @@ package utilities
 					var row:int = eventAsJSONObject.feed.entry[entryCtr].gs$cell.row;
 					var fooditem:XML = <fooditem/>;
 					fooditem.description = eventAsJSONObject.feed.entry[entryCtr].content.$t;
-					if (fooditem.description == "")
-						{dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','fooditemdescriptioncannotbeempty'),row,unitlist.length + 1);return;}
 					var unitlist:XML = <unitlist/>;
 					var unit:XML = null;
 					entryCtr++;
@@ -3996,8 +4017,8 @@ package utilities
 						
 					}
 					//////////
-										
-					foodItemListArray.addItem(fooditem);
+					//if (StringUtil.trim(fooditem.description) != "")
+						foodItemListArray.addItem(fooditem);
 				}
 				
 				var sortField:SortField = new SortField();

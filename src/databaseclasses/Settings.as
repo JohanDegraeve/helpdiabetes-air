@@ -684,7 +684,7 @@ package databaseclasses
 			"false",//creator of foodtable on google excel
 			"0",//SettingsNextRowToAdd
 			"false",//all fooditmes uploaded or not
-			"0",
+			"0",//SettingsNextColumnToAddInLogBook
 			"-1",//SettingsDayOfLastCompleteSync
 			"100"//SettingsAmountOfCalculationsInBloodGlucoseGraph
 		];
