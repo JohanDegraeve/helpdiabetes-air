@@ -32,7 +32,6 @@ package utilities
 	import mx.collections.ArrayList;
 	import mx.formatters.DateFormatter;
 	import mx.resources.ResourceManager;
-	import mx.utils.StringUtil;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
@@ -222,6 +221,8 @@ package utilities
 		private static var ColumnName_chosenamount:String = "chosenamount";
 		private static var ColumnName_mealeventid:String = "mealeventid";
 		private static var ColumnName_comment:String = "comment";
+		
+		private var previousTrackingEventToShow:Number;
 		
 		/**
 		 * tablename, tableid and list of columns with columnname and type <br>
@@ -3706,6 +3707,7 @@ package utilities
 				
 				ModelLocator.getInstance().refreshMeals();
 				ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
+				ModelLocator.getInstance().trackingEventToShow = previousTrackingEventToShow;//could be a problem if that previous event was just deleted
 			}
 		}
 		
@@ -4112,6 +4114,7 @@ package utilities
 		private function copyTrackingListIfNotDoneYet():void {
 			if (!trackingListAlreadyModified) {
 				trackingListAlreadyModified = true;
+				previousTrackingEventToShow = ModelLocator.getInstance().trackingEventToShow;
 				ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
 				ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().infoTrackingList;
 			}			

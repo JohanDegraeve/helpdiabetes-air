@@ -42,6 +42,7 @@ package myComponents
 			super();
 			_message = message;
 			timeStamp = 0;
+			eventid = (new Date()).valueOf();
 		}
 		
 		public function listElementRendererFunction():ClassFactory
