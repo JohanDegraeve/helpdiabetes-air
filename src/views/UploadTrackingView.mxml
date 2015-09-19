@@ -29,7 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
-			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
 			[Bindable]

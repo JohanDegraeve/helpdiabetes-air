@@ -392,7 +392,7 @@ package databaseclasses
 		public static const SettingsHelpTextActiveInsulinInt:int=66;
 		public static const SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView:int=67;
 		public static const SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime:int=68;
-		public static const SettingsHelpText69:int=69;
+		public static const SettingsSelectedOrientation:int=69;//0 = portrait, 1 = landscape, 2 = automatic, 3 = let app decide
 		public static const SettingsHelpText70:int=70;
 		public static const SettingsHelpText71:int=71;
 		public static const SettingsHelpText72:int=72;
@@ -645,7 +645,7 @@ package databaseclasses
 			"true",//SettingsHelpTextActiveInsulinInt
 			"true",//SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView
 			"0",//SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime, 0 means never been set this value
-			"true",
+			"3",//SettingsSelectedOrientation 0 = portrait, 1 = landscape, 2 = automatic, 3 = let app decide
 			"true",
 			"true",
 			"true",
@@ -749,6 +749,16 @@ package databaseclasses
 			if (settingId == SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL) {
 				if (settings[100 + settingId] == "999999")
 					return "900";
+			}
+			//if it's getting SettingsSelectedOrientation, then first an attempt will be made to open the database
+			//but without creating it
+			//because getSetting for SettingsSelectedOrientation happens before the database is opened, so it could be that the 
+			//value here is not yet updated with value in the database
+			if (settingId == SettingsSelectedOrientation) {
+				var returnValue:String = Database.getInstance().getSetting(SettingsSelectedOrientation);
+				if (returnValue != "null") {
+					return returnValue;
+				}
 			}
 			return settings[100 + settingId];
 		}

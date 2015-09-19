@@ -42,6 +42,8 @@ package databaseclasses
 	{
 		private var _comment:String;
 		
+		private var _activeInsulin:Number;
+		
 		public function get comment():String
 		{
 			return (_comment == null ? "":_comment);

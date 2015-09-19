@@ -43,7 +43,6 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
 			
-			import utilities.Synchronize;
 			[Bindable]
 			private var back_label:String;
 			private var alertPopUp:AlertPopUp;
@@ -54,7 +53,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_downloadfoodtable"),
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_exporttracking"),
 				//ResourceManager.getInstance().getString("synchronizeview","menuitem_resyncall"),
-				ResourceManager.getInstance().getString("synchronizeview","help")
+				ResourceManager.getInstance().getString("synchronizeview","help"),
+				ResourceManager.getInstance().getString("synchronizeview","removegoogleauthorization")
 			]);	
 
 			private function onInitialize():void {
@@ -102,6 +102,13 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						break;*/
 					case 2:
 						navigateToURL(new URLRequest(resourceManager.getString('synchronizeview','helpurl')));
+						break;
+					case 3 :
+						Settings.getInstance().setSetting(Settings.SettingsAccessToken,"")
+						alertPopUp = new AlertPopUp();
+						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+						alertPopUp.show(this);
+						alertPopUp.setMessage(resourceManager.getString('synchronizeview','googlesyncremoved'));
 				}
 			}
 			

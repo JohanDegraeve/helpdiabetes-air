@@ -79,7 +79,7 @@ view to show ModelLocator.getInstance().meals in a list
 					ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
 					meallist.removeEventListener(Event.CHANGE,mealselected);
 					
-					//if it's a future meal without mealevent, we'll ask to user to enter start date and time of the meal
+					//if it's a meal without mealevent, we'll ask to user to enter start date and time of the meal
 					var theMeal:Meal = ModelLocator.getInstance().meals.getItemAt(event.newIndex) as Meal;
 					if (theMeal.hasMealEvent()) {
 						ModelLocator.getInstance().selectedMeal = event.newIndex;

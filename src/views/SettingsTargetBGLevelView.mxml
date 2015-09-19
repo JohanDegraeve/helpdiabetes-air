@@ -23,6 +23,8 @@
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
+			import utilities.Synchronize;
+			
 			private var amountPicker:AmountPicker;
 			
 			private var thisView:View;
@@ -68,6 +70,7 @@
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					targetBGLevelButton.label = (event.newValue as Number).toString();
 					Settings.getInstance().setSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL,targetBGLevelButton.label );
+					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}
 		]]>

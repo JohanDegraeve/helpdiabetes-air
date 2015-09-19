@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
 			
+			import spark.components.View;
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
 			
@@ -55,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var textToShow:String ;
 			private var debugging:Boolean = false;
+			private var thisView:View;
 			
 			[ResourceBundle("settingsview")]
 			
@@ -66,6 +68,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				ResourceManager.getInstance().getString("settingsview","exercise"),
 				ResourceManager.getInstance().getString("settingsview","database"),
 				ResourceManager.getInstance().getString("settingsview","language"),
+				ResourceManager.getInstance().getString("settingsview","portraitorlandscape"),
 				ResourceManager.getInstance().getString("settingsview","resethelptext"),
 				ResourceManager.getInstance().getString("settingsview","googlesync"),
 				ResourceManager.getInstance().getString("settingsview","aboutexperit"),
@@ -86,8 +89,70 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
 				title =  ResourceManager.getInstance().getString("settingsview","titlesettings");
+				thisView = this;
 				if (debugging) 
 					menuList.addItem("debug info");
+				Synchronize.getInstance().startSynchronize(false,false);
+			}
+			
+			private function selectOrientation():void {
+				var orientationOptionList:ArrayCollection = new ArrayCollection();
+				orientationOptionList.addItem(ResourceManager.getInstance().getString("settingsview","portrait"));
+				orientationOptionList.addItem(ResourceManager.getInstance().getString("settingsview","landscape"));
+				orientationOptionList.addItem(ResourceManager.getInstance().getString("settingsview","automaticorientation"));
+				orientationOptionList.addItem(ResourceManager.getInstance().getString("settingsview","letappdecide"));
+				
+				elementPicker = new elementFromListPicker();
+				elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, selectedOrientationOptionChanged);//using unitchanged but it's not a unit
+				elementPicker.elements = orientationOptionList;
+				elementPicker.labelText1 = resourceManager.getString('settingsview','selectorientation');
+				
+				PopUpManager.addPopUp(elementPicker,UIComponent(this.parentApplication),true);
+				PopUpManager.centerPopUp(elementPicker);
+				
+				function selectedOrientationOptionChanged(event:UnitChangedEvent):void {
+					MyGATracker.getInstance().trackPageview( "SetingsView-orientationOptionChanged" );
+					
+					var currentSetting:String = Settings.getInstance().getSetting(Settings.SettingsSelectedOrientation);
+					var newSetting:String;
+					elementPicker.removeEventListener(UnitChangedEvent.ITEM_SELECTED,selectedOrientationOptionChanged);
+					PopUpManager.removePopUp(elementPicker);
+					if (event.index == 0) {//portrait
+						Settings.getInstance().setSetting(Settings.SettingsSelectedOrientation,"0");
+						newSetting = "0";
+					}
+					else if (event.index == 1) {//landscape
+						Settings.getInstance().setSetting(Settings.SettingsSelectedOrientation,"1");
+						newSetting = "1";
+					}
+					else if (event.index == 2) {//automatic
+						Settings.getInstance().setSetting(Settings.SettingsSelectedOrientation,"2");
+						newSetting = "2";
+					}
+					else if (event.index == 3) {//let app decide
+						Settings.getInstance().setSetting(Settings.SettingsSelectedOrientation,"3");
+						newSetting = "3";
+					}
+					
+					if (currentSetting != newSetting) {
+						alertPopUp = new AlertPopUp();
+						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+						textToShow = 
+							resourceManager.getString('settingsview','restartapplication') ;
+						alertPopUp.show(thisView);
+						alertPopUp.setMessage(textToShow);
+					}
+				}
+				
+				function okClicked(event: PopUpEvent):void {
+					if (alertPopUp != null) {
+						PopUpManager.removePopUp(alertPopUp);
+						if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+							alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+						}
+					}
+				}
+
 			}
 			
 			private function selectBloodGlucoseUnit():void {
@@ -213,6 +278,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						navigator.pushView(SettingsLanguageView);
 						break;
 					case 6:
+						selectOrientation();
+						break;
+					case 7:
 						MyGATracker.getInstance().trackPageview( "SetingsView-resetHelpText" );
 						for (var i:int = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;i <= Settings.SettingsHelpText100;i++) {
 							Settings.getInstance().setSetting(i,"true");
@@ -224,7 +292,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						alertPopUp.show(this);
 						alertPopUp.setMessage(textToShow);
 						break;
-					case 7:
+					case 8:
 						if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) == "" 
 							|| 
 							(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "false"
@@ -234,11 +302,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						else 
 							navigator.pushView(SynchronizeView2);
 						break;
-					case 8:
+					case 9:
 						MyGATracker.getInstance().trackPageview( "SetingsView-aboutexperit" );
 						navigateToURL(new URLRequest('http://' + resourceManager.getString('foodcounterview','wwwexperitbe')));
 						break;
-					case 9:
+					case 10:
 						MyGATracker.getInstance().trackPageview( "SetingsView-infoAndHelpShown" );
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);

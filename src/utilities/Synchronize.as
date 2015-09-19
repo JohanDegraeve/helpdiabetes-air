@@ -20,6 +20,7 @@ package utilities
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
+	import flash.events.TimerEvent;
 	import flash.filesystem.File;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -27,6 +28,7 @@ package utilities
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import flash.system.Capabilities;
+	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
@@ -52,6 +54,8 @@ package utilities
 	
 	import myComponents.IListElement;
 	import myComponents.TrackingViewElement;
+	
+	import views.TrackingView;
 	
 	/**
 	 * class with function to synchronize with google docs, and to export tracking history 
@@ -223,6 +227,7 @@ package utilities
 		private static var ColumnName_comment:String = "comment";
 		
 		private var previousTrackingEventToShow:Number;
+		private var timer2:Timer;
 		
 		/**
 		 * tablename, tableid and list of columns with columnname and type <br>
@@ -660,8 +665,15 @@ package utilities
 		 * If  (syncRunning is true and currentSyncTimeStamp < 30 seconds ago) don't run, if immediateRunNecessary set rerunNecessary to true; else don't set anything.<br>
 		 * onlySyncTheSettings =  if true synchronize will jump immediately to syncing the settings, assuming all tables are already there. Should only be true if it's sure that tables are existing on google docs account
 		 */
-		public function startSynchronize(immediateRunNecessary:Boolean,onlySyncTheSettings:Boolean):void {
+		public function startSynchronize(immediateRunNecessary:Boolean = false,onlySyncTheSettings:Boolean = false, event:Event = null):void {
+			if (timer2 != null) {
+				if (timer2.hasEventListener(TimerEvent.TIMER))
+					timer2.removeEventListener(TimerEvent.TIMER,startSynchronize);
+				timer2.stop();
+				timer2 = null;
+			}
 
+			trace("in startsynchronize");
 			//to make sure there's at least one complete resync per day
 			if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteSync))) {
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,
@@ -720,6 +732,12 @@ package utilities
 				if (immediateRunNecessary) {
 					rerunNecessary = true;
 				}
+			}
+			
+			if (timer2 == null) {
+				timer2 = new Timer(300000, 1);
+				timer2.addEventListener(TimerEvent.TIMER, startSynchronize);
+				timer2.start();
 			}
 		}
 		
@@ -3639,12 +3657,11 @@ package utilities
 			if (!syncRunning)//syncfinished must have been called although sync is not running, not need to process any further
 				return;
 			
-			this.dispatchEvent(new Event(SYNC_FINISHED));
+			this.dispatchEvent(new Event(SYNC_FINISHED,true));
 			
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
-			if (debugMode)
-				trace("in syncFinished with success = " + success);
+			trace("in syncFinished with success = " + success);
 			
 			if (success) {
 				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
@@ -4117,6 +4134,7 @@ package utilities
 				previousTrackingEventToShow = ModelLocator.getInstance().trackingEventToShow;
 				ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
 				ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().infoTrackingList;
+				TrackingView.recalculateActiveInsulin();
 			}			
 		}
 		

@@ -44,13 +44,13 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 		<![CDATA[
 			import com.google.analytics.AnalyticsTracker;
 			
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
 			import databaseclasses.Meal;
 			import databaseclasses.Settings;
 			
 			import model.ModelLocator;
-			
-			import mx.events.FlexEvent;
-			import mx.managers.PopUpManager;
 			
 			import myComponents.DatePicker;
 			import myComponents.HelpCallOut;
@@ -96,10 +96,15 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			
 			private function onCreationComplete():void {
 				back_label = resourceManager.getString('general','back');
+				
+				//change 19/08/2015 if it's a meal with a mealevent, then we'll change the timestamp of that meal to the current date
+				//  before that, when clicking such a meal, it always showed as timestamp the default time for that type of meal, eg 00:00 for breakfast
+				if ((data.meal as Meal).mealEvent == null) {
+					buttonDateAndTime  = new Date().valueOf();
+				} else 
+					buttonDateAndTime = (data.meal as Meal).timeStamp;
+				
 				mealname_textarea_text = (data.meal as Meal).mealName ;
-				//date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
-				buttonDateAndTime = (data.meal as Meal).timeStamp;
-				//time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
 				previousTimeStamp = (data.meal as Meal).timeStamp ;
 				selectedMealIndex = ModelLocator.getInstance().meals.getItemIndex(data.meal as Meal);
 

@@ -37,7 +37,7 @@ package databaseclasses
 	import model.ModelLocator;
 	
 	import myComponents.DayLineWithTotalAmount;
-		
+	
 	
 	
 	/**
@@ -222,11 +222,11 @@ package databaseclasses
 		private var _newFoodDatabaseStatus:String = "";
 		
 		public function get newFoodDatabaseStatus():String
-
+			
 		{
 			return _newFoodDatabaseStatus;
 		}
-
+		
 		
 		/**
 		 * constructor, should not be used, use getInstance()
@@ -282,6 +282,35 @@ package databaseclasses
 				}				
 			}
 			return success;
+		}
+		
+		/**
+		 * will get the setting from the database<br>
+		 * if there's no connection yet, then a connection will be opened in synchronous mode in order to retrieve the setting<br>
+		 * Goal is that this is only used to get the setting from the database before init is called, because if that's the case, the values in the Settings class are not
+		 * yet overwritten by the values in the database<br>
+		 * returns the literal string "null" if setting not found in the database or database not existing yet
+		 */
+		public function getSetting(settingId:int):String {
+			var sqlConn:SQLConnection = new SQLConnection();
+			var sqlStatement:SQLStatement = new SQLStatement();
+			
+			dbFile  = File.applicationStorageDirectory.resolvePath(dbFileName);
+			try {
+				sqlConn.open(dbFile,SQLMode.READ);
+			} catch (error:SQLError) {
+				return "null";//database not existing yet, default values from settings should be taken
+			}
+			
+			sqlStatement.text = this.GET_ALL_SETTINGS + " where id = " + new Number(settingId);
+			sqlStatement.sqlConnection = sqlConn;
+			sqlStatement.execute();
+			var result:Object = sqlStatement.getResult().data;
+			sqlConn.close();
+			if (result != null && result is Array) {
+				return result[0].value;
+			}
+			return "null";
 		}
 		
 		/**
@@ -1026,7 +1055,7 @@ package databaseclasses
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, unitDeletionFailed);
 				localSqlStatement.execute();
 			}
-
+			
 			function unitDeletionFailed(see:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,unitsDeleted);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,unitDeletionFailed);
@@ -1080,7 +1109,7 @@ package databaseclasses
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 			}
 		};
-				
+		
 		/**
 		 * msql query for getting source<br>
 		 * if dispathcer != null then a databaseevent will be dispatched with the result of the query in the data
@@ -1133,7 +1162,7 @@ package databaseclasses
 			} else  {
 				fooddatabaseDeleted();				
 			}
-
+			
 			function fooddatabaseDeleted(se:DatabaseEvent = null):void {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,fooddatabaseDeleted);
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,foodDatabaseDeletionFailed);
@@ -1221,7 +1250,7 @@ package databaseclasses
 						_newFoodDatabaseStatus = foodItemListCounter + " {outof} " + foodItemListSize + " {elementsloaded} ";
 						(instance as EventDispatcher).dispatchEvent(new Event(NEW_FOOD_DATABASE_STATUS_UPDATE));
 					}
-						
+					
 					localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT, foodItemInserted);
 					localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT, foodItemInsertionError);
 					//var test2:String = foodItemDescriptionsXMLList[foodItemCounter];
@@ -1348,13 +1377,13 @@ package databaseclasses
 		private  function createDatabaseFromAssets(targetFile:File):Boolean 			
 		{
 			var isSuccess:Boolean = true; 
-
+			
 			var foodFileName:String;
 			foodFileName = "foodfile-" + ResourceManager.getInstance().getString("general","TableLanguage");
 			sampleDbFileName = foodFileName + "-sample.db";
 			xmlFileName = foodFileName + ".xml";
 			
-
+			
 			var sampleFile:File = File.applicationDirectory.resolvePath("assets/database/" + sampleDbFileName);
 			if ( !sampleFile.exists )
 			{
@@ -1933,7 +1962,7 @@ package databaseclasses
 					dispatcher.dispatchEvent(event);
 				}
 			}
-						
+			
 			function selectedItemCreated(se:SQLEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedItemCreated);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedItemCreationFailed);
@@ -1954,7 +1983,7 @@ package databaseclasses
 				}
 			}
 		}
-				
+		
 		/**
 		 * get all mealevents, bloodglucoseevents, medicinevents and exerciseevents and store them in the arraycollection in the modellocator as MealEvent objects<br>
 		 * The method also gets all selectedfooditems, which are stored in the correct MealEvent objects<br>
@@ -1995,13 +2024,13 @@ package databaseclasses
 			function onOpenResult(e:SQLError):void {
 				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
 				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
-
+				
 				localSqlStatement.addEventListener(SQLEvent.RESULT,bloodGlucoseEventsRetrieved);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,bloodGlucoseRetrievalFailed);
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = GET_ALLBLOODGLUCOSEEVENTS;
 				localSqlStatement.execute();
-
+				
 			}
 			
 			function selectedFoodItemsRetrieved(result:SQLEvent):void {
@@ -2124,7 +2153,7 @@ package databaseclasses
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
 				localSqlStatement.execute();
-
+				
 			}
 			
 			function medicinEventsRetrieved(result:SQLEvent):void {
@@ -2298,7 +2327,7 @@ package databaseclasses
 			localdispatcher.addEventListener(SQLErrorEvent.ERROR,onOpenError);
 			if (openSQLConnection(localdispatcher))
 				onOpenResult(null);
-
+			
 			function onOpenResult(se:SQLEvent):void {
 				localdispatcher.removeEventListener(SQLEvent.RESULT,onOpenResult);
 				localdispatcher.removeEventListener(SQLErrorEvent.ERROR,onOpenError);
@@ -2413,8 +2442,8 @@ package databaseclasses
 		}
 		
 		/**
-		* medicinevent with specified medicineventid is updated with new values for timestamp, amount and medicinname
-		*/ 	
+		 * medicinevent with specified medicineventid is updated with new values for timestamp, amount and medicinname
+		 */ 	
 		internal function updateMedicinEvent(newBolusType:String, newBolusDuration:Number, medicinEventId:Number,newAmount:Number,newMedicinName:String,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number, comment:String,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
@@ -2468,7 +2497,7 @@ package databaseclasses
 				}
 			}
 		}
-				
+		
 		/**
 		 * new exercise event will be added to the database<br>
 		 * here the exerciseeventid will get the value of current date and time as Number 
@@ -2582,7 +2611,7 @@ package databaseclasses
 				}
 			}
 		}
-
+		
 		
 		/**
 		 * bloodglucoseevent with specified bloodglucoseeventid is updated with new values  level and unit

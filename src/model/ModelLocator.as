@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2015  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -25,12 +25,10 @@ package model
 	import flash.events.EventDispatcher;
 	
 	import mx.collections.ArrayCollection;
-	import mx.core.LayoutDirection;
 	import mx.resources.ResourceManager;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
-	import spark.components.Application;
 	
 	import databaseclasses.Meal;
 	import databaseclasses.MealEvent;
@@ -173,7 +171,6 @@ package model
 		/**
 		 * @private
 		 */
-		
 		public function set trackingEventToShow(value:Number):void
 			
 		{

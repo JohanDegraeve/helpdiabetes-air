@@ -1,6 +1,7 @@
-#Thu Apr 11 08:40:14 CEST 2013
+#Mon Mar 16 21:21:28 CET 2015
 eclipse.preferences.version=1
 encoding//src/locale/en_US/general.properties=UTF-8
+encoding//src/locale/fr_FR/addfooditemview.properties=UTF-8
 encoding//src/locale/nl_NL/editbgeventview.properties=UTF-8
 encoding//src/locale/nl_NL/editexerciseeventview.properties=UTF-8
 encoding//src/locale/nl_NL/editmedicineventview.properties=UTF-8
