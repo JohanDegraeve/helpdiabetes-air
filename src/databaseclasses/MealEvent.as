@@ -266,8 +266,8 @@ package databaseclasses
 			if (_timeStamp == timeStamp)
 				return;
 			
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
 			
 			_lastModifiedTimeStamp = (new Date()).valueOf();
 			updateMealEvent(mealName, _comment,insulinRatio,_correctionFactor,lastModifiedTimeStamp,timeStamp);
@@ -324,8 +324,8 @@ package databaseclasses
 			
 			this._comment = value;
 			var newLastModifiedTimeStamp:Number = new Date().valueOf();
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
 			_lastModifiedTimeStamp = newLastModifiedTimeStamp;
 			
 			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,_lastModifiedTimeStamp,_timeStamp, _comment, null);
@@ -360,8 +360,8 @@ package databaseclasses
 				this._insulinRatio = value;
 			}
 			var newLastModifiedTimeStamp:Number = new Date().valueOf();
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
 			_lastModifiedTimeStamp = newLastModifiedTimeStamp;
 			
 			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,_lastModifiedTimeStamp,_timeStamp,_comment,null);
@@ -383,8 +383,8 @@ package databaseclasses
 			
 			this._correctionFactor = value;
 			
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
 			
 			_lastModifiedTimeStamp = (new Date()).valueOf();
 			updateMealEvent(mealName, _comment,insulinRatio,_correctionFactor,lastModifiedTimeStamp,timeStamp);
@@ -625,8 +625,8 @@ package databaseclasses
 			_correctionFactor = newCorrectionFactor;
 			_comment = newcomment;
 			
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
 			_lastModifiedTimeStamp = newLastModifiedTimeStamp;
 			
 			recalculateTotals();

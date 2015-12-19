@@ -32,10 +32,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 	<!-- A universally unique application identifier. Must be unique across all AIR applications.
 	Using a reverse DNS-style name as the id is recommended. (Eg. com.example.ExampleApplication.) Required. -->
-	<id>be.experit.helpdiabetes</id>
+	<id>com.hippoandfriends.helpdiabetes</id>
 
 	<!-- Used as the filename for the application. Required. -->
-	<filename>HelpDiabetes 3</filename>
+	<filename>HelpDiabetes</filename>
 
 	<!-- The name that is displayed in the AIR application installer. 
 	May have multiple values for each language. See samples or xsd schema file. Optional. -->

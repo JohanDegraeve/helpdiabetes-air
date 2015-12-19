@@ -679,8 +679,8 @@ package utilities
 
 			trace("in startsynchronize");
 			//to make sure there's at least one complete resync per day
-			if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteSync))) {
-				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,
+			if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteGoogleSync))) {
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,
 					( (
 						(new Date()).valueOf() 
 						- 
@@ -688,7 +688,7 @@ package utilities
 					).toString()
 					)
 				);
-				Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteSync,(new Date()).date.toString());
+				Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteGoogleSync,(new Date()).date.toString());
 			}
 			
 			if (
@@ -709,7 +709,7 @@ package utilities
 				helpDiabetesFoodTableSpreadSheetKey = "";//same comment
 				trackingList = ModelLocator.getInstance().trackingList;
 				currentSyncTimeStamp = new Date().valueOf();
-				lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp));
+				lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp));
 				if (debugMode)
 					trace("lastsynctimestamp = " + new DateFormatter().format(new Date(lastSyncTimeStamp)));
 				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
@@ -3725,7 +3725,7 @@ package utilities
 			trace("in syncFinished with success = " + success);
 			
 			if (success) {
-				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,currentSyncTimeStamp.toString());
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,currentSyncTimeStamp.toString());
 				lastSyncTimeStamp = currentSyncTimeStamp;
 			} else
 				currentSyncTimeStamp = currentSyncTimeStamp - (secondsBetweenTwoSync * 1000 + 1);

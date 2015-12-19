@@ -432,7 +432,7 @@ package databaseclasses
 		 * refresh_token for Google sync
 		 */
 		public static const SettingsRefreshToken:int=102;
-		public static const SettingsLastSyncTimeStamp:int=103;
+		public static const SettingsLastGoogleSyncTimeStamp:int=103;
 		/**
 		 * index to array of column names in the foodtable in google docs, index points to the next column that needs to be created<br>
 		 * 0 = first one , 1 = second, ... if > size of array of column names, then all column names are created 
@@ -459,11 +459,17 @@ package databaseclasses
 		/**
 		 * day of the month (ie 1..31), where last complete sync was done. -1 means not yet done. 
 		 **/
-		public static const SettingsDayOfLastCompleteSync:int=109;
+		public static const SettingsDayOfLastCompleteGoogleSync:int=109;
 		
 		/**
 		 * used in blood glucose graph, how many timestamps will be calculated.
 		 */public static const SettingsAmountOfCalculationsInBloodGlucoseGraph:int = 110;
+		/**
+		 * SettingsDayOfLastCompleteNightScoutSync day of the month (ie 1..31), where last complete sync was done. -1 means not yet done. 
+		 */
+		public static const SettingsDayOfLastCompleteNightScoutSync:int = 111;
+		public static const SettingsLastNightScoutSyncTimeStamp:int=112;
+
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -646,7 +652,7 @@ package databaseclasses
 			"true",//SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView
 			"0",//SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime, 0 means never been set this value
 			"3",//SettingsSelectedOrientation 0 = portrait, 1 = landscape, 2 = automatic, 3 = let app decide
-			"true",
+			"true", 
 			"true",
 			"true",
 			"true",
@@ -679,14 +685,16 @@ package databaseclasses
 			"true",//last helptext
 			"",//default access token
 			"",//default refresh token
-			"0",//lastsynctimestamp
+			"0",//lastgooglesynctimestamp
 			"0",//index to column names for google excel foodtable
 			"false",//creator of foodtable on google excel
 			"0",//SettingsNextRowToAdd
 			"false",//all fooditmes uploaded or not
 			"0",//SettingsNextColumnToAddInLogBook
-			"-1",//SettingsDayOfLastCompleteSync
-			"100"//SettingsAmountOfCalculationsInBloodGlucoseGraph
+			"-1",//SettingsDayOfLastCompleteGoogleSync
+			"100",//SettingsAmountOfCalculationsInBloodGlucoseGraph
+			"-1",//SettingsDayOfLastCompleteNightScoutSync
+			"0"//lastnightscoutsynctimestamp
 		];
 		
 		/** array with lastmodifiedtimestamp<br> 
