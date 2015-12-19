@@ -103,8 +103,8 @@ package databaseclasses
 		public function set chosenAmount(value:Number):void
 		{
 			_chosenAmount = value;
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimestamp.toString());
 			
 			_lastModifiedTimestamp = new Date().valueOf();
 			
@@ -136,8 +136,8 @@ package databaseclasses
 			_itemDescription = newDescription;
 			_unit = newUnit;
 
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimestamp.toString());
 
 			_lastModifiedTimestamp = newLastModifiedTimeStamp;
 			

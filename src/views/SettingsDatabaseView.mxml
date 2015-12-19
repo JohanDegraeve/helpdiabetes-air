@@ -80,7 +80,7 @@
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					trackingsizeButton.label = (event.newValue as Number).toString();
 					if (new Number(trackingsizeButton.label) > new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE))) {
-						Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,((new Date()).valueOf() - new Number(trackingsizeButton.label) * 24 * 3600 * 1000).toString());
+						Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,((new Date()).valueOf() - new Number(trackingsizeButton.label) * 24 * 3600 * 1000).toString());
 						Settings.getInstance().setSetting(Settings.SettingsMAXTRACKINGSIZE,trackingsizeButton.label );
 						Synchronize.getInstance().startSynchronize(true,false);
 					} else

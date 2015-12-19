@@ -83,8 +83,8 @@ package databaseclasses
 			_level = newLevel;
 			_comment = newComment;
 
-				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
-					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
+				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimestamp)
+					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimestamp.toString());
 				_lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
 			if (!isNaN(newCreationTimeStamp))
