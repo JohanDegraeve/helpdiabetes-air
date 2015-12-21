@@ -55,6 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.TimePicker;
 			import myComponents.TrackingViewElement;
 			
+			import utilities.DateTimeUtilities;
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
@@ -250,7 +251,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theBloodGlucoseEvent = new BloodGlucoseEvent(
 						new Number(meteringResultText),
 						unit,
-						new Date().valueOf(),
+						DateTimeUtilities.createEventId(),
 						comment,//comment
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theBloodGlucoseEvent);

@@ -226,18 +226,19 @@ package utilities
 		private static var ColumnName_mealeventid:String = "mealeventid";
 		private static var ColumnName_comment:String = "comment";
 		
-		private var previousTrackingEventToShow:Number;
+		private var previousTrackingEventToShow:String;
 		private var timer2:Timer;
+		private var tableCounterForFunctionUpdateGoogleTablesIfNecessary:int;
 		
 		/**
 		 * tablename, tableid and list of columns with columnname and type <br>
 		 * tableid "" string means there's no table i known yet
 		 */
 		private var tableNamesAndColumnNames:Array = [
-			[	"HD-MedicinEvent",
+			[	"HD-MedicinEvent",//0
 				"",	
 				[						
-					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_id,"STRING"],//the unique identifier
 					[ColumnName_medicinname,"STRING"],//medicin name
 					[ColumnName_value,"NUMBER"],//amount of medicin
 					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
@@ -248,10 +249,10 @@ package utilities
 				],
 				"MedicinEvents"//description
 			],
-			[	"HD-BloodglucoseEvent",
+			[	"HD-BloodglucoseEvent",//1
 				"",	
 				[						
-					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_id,"STRING"],//the unique identifier
 					[ColumnName_unit,"STRING"],//unit name
 					[ColumnName_value,"NUMBER"],//value
 					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
@@ -262,10 +263,10 @@ package utilities
 				],
 				"BloodglucoseEvents"//description
 			],
-			[	"HD-ExerciseEvent",
+			[	"HD-ExerciseEvent",//2
 				"",	
 				[						
-					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_id,"STRING"],//the unique identifier
 					[ColumnName_level,"STRING"],//unit name
 					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created
 					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
@@ -275,10 +276,10 @@ package utilities
 				],
 				"ExerciseEvents"//description
 			],
-			[	"HD-MealEvent",
+			[	"HD-MealEvent",//3
 				"",	
 				[						
-					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_id,"STRING"],//the unique identifier
 					[ColumnName_mealname,"STRING"],
 					[ColumnName_insulinratio,"NUMBER"],
 					[ColumnName_correctionfactor,"NUMBER"],
@@ -291,10 +292,10 @@ package utilities
 				],
 				"MealEvents"//description
 			],
-			[	"HD-SelectedFoodItem",
+			[	"HD-SelectedFoodItem",//4
 				"",	
 				[						
-					[ColumnName_id,"NUMBER"],//the unique identifier
+					[ColumnName_id,"STRING"],//the unique identifier
 					[ColumnName_description,"STRING"],
 					[ColumnName_unitdescription,"STRING"],
 					[ColumnName_unitstandardamount,"NUMBER"],
@@ -303,7 +304,7 @@ package utilities
 					[ColumnName_unitcarbs,"NUMBER"],
 					[ColumnName_unitfat,"NUMBER"],
 					[ColumnName_chosenamount,"NUMBER"],
-					[ColumnName_mealeventid,"NUMBER"],
+					[ColumnName_mealeventid,"STRING"],
 					[ColumnName_creationtimestamp,"NUMBER"],//timestamp that the event was created, in case of selectedfooditems, creationtimestamp will not really be usefull
 					[ColumnName_modifiedtimestamp,"NUMBER"],//timestamp that the event was last modified
 					[ColumnName_deleted,"STRING"],//was the event deleted or not
@@ -483,6 +484,7 @@ package utilities
 		private var foodItemIdBeingTreated:int;
 		
 		private static var callingDispatcher:EventDispatcher;
+		private static var updateGoogleTablesIsNecessary:Boolean;
 
 		
 		/**
@@ -615,7 +617,9 @@ package utilities
 				throw new Error("Synchronize class can only be accessed through Synchronize.getInstance()");	
 			}
 			debugMode = ModelLocator.debugMode;
-			
+
+			updateGoogleTablesIsNecessary = false;
+			tableCounterForFunctionUpdateGoogleTablesIfNecessary = 0;
 			syncRunning = false;
 			findAllSpreadSheetsWaiting = false;
 			downloadFoodTableSpreadSheetWaiting = false;
@@ -766,6 +770,17 @@ package utilities
 									if (debugMode)
 										trace("found a table : " + eventAsJSONObject.items[i].name);
 									tableNamesAndColumnNames[j][1] = eventAsJSONObject.items[i].tableId;	
+									//check if the tables has the column id as type int, and if so mark that we'll have to modify
+									//applicble for HD-BloodglucoseEvent, .. exercise, medicin, meals, selecteditems
+									if (eventAsJSONObject.items[i].name == tableNamesAndColumnNames[0][0]
+										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[1][0]
+										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[2][0]
+										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[3][0]
+										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[4][0]) {
+										if (eventAsJSONObject.items[i].columns[0].type == "NUMBER") {
+											updateGoogleTablesIsNecessary = true;
+										}
+									}
 								}
 							}
 						}
@@ -848,7 +863,7 @@ package utilities
 				
 				if (i == tableNamesAndColumnNames.length)	{
 					//if we get here, it means all table have a tableid, means they all exist at google docs
-					startSync();
+					updateGoogleTablesIfNecessary();
 				} else {
 					
 					var jsonObject:Object = new Object();
@@ -869,6 +884,38 @@ package utilities
 				}
 				
 			}			
+		}
+		
+		/**
+		 * to change type of column id to STRING, necessary to be able to sync with mongodb, which creates identifiers with characters in it
+		 */
+		private function updateGoogleTablesIfNecessary(event:Event = null): void {
+			if (!updateGoogleTablesIsNecessary) {
+				startSync();
+				return;
+			}
+			if (debugMode)
+				trace("start method updateGoogleTablesIfNecessary");
+
+			if (event != null) {
+				removeEventListeners();
+				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
+				if (eventHasError(event,createMissingTables))
+					return;
+				tableCounterForFunctionUpdateGoogleTablesIfNecessary++;
+			} 
+			if (tableCounterForFunctionUpdateGoogleTablesIfNecessary == 5) {//If we want to do the same for settingstable, then compare to 6
+				startSync();
+				updateGoogleTablesIsNecessary = false;
+			}
+			else {
+				//we need to update tables 0 to 4 
+				var jsonObject:Object = new Object();
+				jsonObject.name = "id";
+				jsonObject.type = "STRING";
+				createAndLoadURLRequest(googleRequestTablesUrl + "/" + tableNamesAndColumnNames[tableCounterForFunctionUpdateGoogleTablesIfNecessary][1] + "/columns/0" ,
+					URLRequestMethod.PUT,null,JSON.stringify(jsonObject),updateGoogleTablesIfNecessary,true,"application/json");
+			}
 		}
 		
 		private function startSync():void {
@@ -1165,7 +1212,7 @@ package utilities
 								}
 								if (!elementAlreadyThere) {
 									remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
-									remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
+									remoteElementIds.addItem([eventAsJSONObject.rows[rowctr][positionId],null]);
 								}
 							}
 						}
@@ -3803,7 +3850,7 @@ package utilities
 			request.method = requestMethod;
 			
 			//requestMethod = POST
-			if (requestMethod == URLRequestMethod.POST) {
+			if (requestMethod == URLRequestMethod.POST || requestMethod == URLRequestMethod.PUT) {
 				request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 			} else {
 				if (!urlVariables)  {

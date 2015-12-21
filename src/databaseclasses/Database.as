@@ -64,6 +64,7 @@ package databaseclasses
 		
 		private const DATABASE_VERSION_1:String = "version1";
 		private const DATABASE_VERSION_2:String = "version2";
+		private const DATABASE_VERSION_3:String = "version3";
 		
 		private const CREATE_TABLE_VERSIONINFO:String = "CREATE TABLE IF NOT EXISTS versioninfo (info TEXT NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS fooditems (itemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -76,26 +77,26 @@ package databaseclasses
 			"protein REAL, " +
 			"carbs REAL NOT NULL, " +
 			"fat REAL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
-		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (exerciseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
+		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (newexerciseeventid STRING PRIMARY KEY AUTOINCREMENT, " +
 			"level TEXT, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
 			"comment_2 TEXT, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
-		private const CREATE_TABLE_BLOODGLUCOSE_EVENTS:String = "CREATE TABLE IF NOT EXISTS bloodglucoseevents (bloodglucoseeventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
+		private const CREATE_TABLE_BLOODGLUCOSE_EVENTS:String = "CREATE TABLE IF NOT EXISTS bloodglucoseevents (newbloodglucoseeventid STRING PRIMARY KEY AUTOINCREMENT, " +
 			"unit TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
 			"value REAL NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
-		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (medicineventid INTEGER PRIMARY KEY AUTOINCREMENT, " +
+		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (newmedicineventid STRING PRIMARY KEY AUTOINCREMENT, " +
 			"medicinname TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
 			"amount REAL NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";		
-		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER PRIMARY KEY, " +
+		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (newmealeventid STRING PRIMARY KEY, " +
 			"mealname TEXT NOT NULL, " +
 			"lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
 			"insulinratio REAL," +
 			"correctionfactor REAL," +
 			"creationtimestamp TIMESTAMP NOT NULL," +
 			"previousBGlevel REAL)";	//previousBGlevel is not used anymore	
-		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER PRIMARY KEY , " +
+		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (newselectedfooditemid STRING PRIMARY KEY , " +
 			"mealevents_mealeventid INTEGER NOT NULL, " +
 			"itemdescription TEXT NOT NULL, " +
 			"unitdescription TEXT, " +
@@ -128,7 +129,7 @@ package databaseclasses
 		private const DELETE_ROW_IN_TABLE_EXERCISEEVENTS:String = 
 			"DELETE FROM exerciseevents where exerciseeventid = :exerciseeventid";
 		private const DELETE_ROW_IN_TABLE_BLOODGLUCOSEEVENTS:String = 
-			"DELETE FROM bloodglucoseevents where bloodglucoseeventid = :bloodglucoseeventid";
+			"DELETE FROM bloodglucoseevents where (bloodglucoseeventid = :bloodglucoseeventid OR newbloodglucoseeventid = :bloodglucoseeventid)";
 		private const DELETE_ROW_IN_TABLE_MEDICINEVENTS:String = 
 			"DELETE FROM medicinevents where medicineventid = :medicineventid";
 		private const DELETE_ROW_IN_TABLE_MEALEVENTS:String = 
@@ -180,7 +181,7 @@ package databaseclasses
 		private const UPDATE_SELECTED_FOOD_ITEM:String="UPDATE selectedfooditems set mealevents_mealeventid = :mealevents_mealeventid,itemdescription = :itemdescription, standardamount = :standardamount,unitdescription = :unitdescription,kcal = :kcal,protein = :protein,carbs = :carbs,fat = :fat,chosenamount = :chosenamount,lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE selectedfooditemid = :selectedfooditemid";
 		private const UPDATE_MEDICINEVENT:String="UPDATE medicinevents set comment_2 = :comment_2, amount = :amount, medicinname = :medicinname, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE medicineventid = :id";
 		private const UPDATE_EXERCISEEVENT:String="UPDATE exerciseevents set comment_2 = :comment_2, level = :level, comment_2 = :comment_2, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE exerciseeventid = :id";
-		private const UPDATE_BLOODGLUCOSEEVENT:String="UPDATE bloodglucoseevents set comment_2 = :comment_2, unit = :unit, value = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE bloodglucoseeventid = :id";
+		private const UPDATE_BLOODGLUCOSEEVENT:String="UPDATE bloodglucoseevents set comment_2 = :comment_2, unit = :unit, value = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp, creationtimestamp = :creationtimestamp WHERE (bloodglucoseeventid = :id OR newbloodglucoseeventid = :id)";
 		
 		/**
 		 * INSERT INTO mealevents (mealeventid , mealname , lastmodifiedtimestamp ) VALUES (:mealeventid,:mealname,:lastmodifiedtimestamp)
@@ -189,7 +190,7 @@ package databaseclasses
 		
 		private const INSERT_SELECTED_FOOD_ITEM:String = "INSERT INTO selectedfooditems (selectedfooditemid, mealevents_mealeventid,itemdescription ,unitdescription,standardamount,kcal,protein,carbs, fat, chosenamount,lastmodifiedtimestamp ) VALUES (:selectedfooditemid,:mealevents_mealeventid,:itemdescription ,:unitdescription,:standardamount,:kcal,:protein,:carbs,:fat,:chosenamount, :lastmodifiedtimestamp)";
 		
-		private const INSERT_BLOODGLUCOSEEVENT:String = "INSERT INTO bloodglucoseevents (bloodglucoseeventid, unit, creationtimestamp, value, lastmodifiedtimestamp, comment_2) VALUES (:bloodglucoseeventid, :unit,:creationtimestamp, :value, :lastmodifiedtimestamp,:comment_2)";
+		private const INSERT_BLOODGLUCOSEEVENT:String = "INSERT INTO bloodglucoseevents (bloodglucoseeventid, newbloodglucoseeventid, unit, creationtimestamp, value, lastmodifiedtimestamp, comment_2) VALUES (0, :bloodglucoseeventid, :unit,:creationtimestamp, :value, :lastmodifiedtimestamp,:comment_2)";
 		
 		private const INSERT_MEDICINEVENT:String = "INSERT INTO medicinevents (medicineventid, medicinname, amount, creationtimestamp, lastmodifiedtimestamp, comment_2) VALUES (:medicineventid, :medicinname,  :amount, :creationtimestamp, :lastmodifiedtimestamp,:comment_2)";
 		
@@ -198,10 +199,20 @@ package databaseclasses
 		private const INSERT_COMMENT_COLUMN_IN_MEALEVENTS:String = "ALTER TABLE mealevents ADD comment_2 TEXT";
 		private const INSERT_COMMENT_COLUMN_IN_MEDICINEVENTS:String = "ALTER TABLE medicinevents ADD comment_2 TEXT";
 		private const INSERT_COMMENT_COLUMN_IN_BLOODGLUCOSEEVENTS:String = "ALTER TABLE bloodglucoseevents ADD comment_2 TEXT";
+		/**
+		 * insert version info should only be used in upgrade to version 2
+		 */
 		private const INSERT_VERSIONINFO:String = "INSERT INTO versioninfo (info,lastmodifiedtimestamp) VALUES (:info, :lastmodifiedtimestamp)";
-		//later on a UPDATE_VERSIONINFO
+		private const UPDATE_VERSIONINFO:String = "UPDATE versioninfo set info = :info, lastmodifiedtimestamp = :lastmodifiedtimestamp";
+		/**
+		 * upgrade to version 3
+		 */
+		private const UPDATE_TABLE_EXERCISE_EVENTS_ADD_COLUMN_NEWEVENTID:String = "ALTER TABLE exerciseevents ADD newexerciseeventid TEXT";
+		private const UPDATE_TABLE_BLOODGLUCOSE_EVENTS_ADD_COLUMN_NEWEVENTID_ADD_COLUMN_NEWEVENTID:String = "ALTER TABLE bloodglucoseevents ADD newbloodglucoseeventid TEXT";
+		private const UPDATE_TABLE_MEDICIN_EVENTS_ADD_COLUMN_NEWEVENTID:String = "ALTER TABLE medicinevvents ADD newmedicineventid TEXT";
+		private const UPDATE_TABLE_MEAL_EVENTS_ADD_COLUMN_NEWEVENTID:String = "ALTER TABLE mealevvents ADD newmealeventid TEXT";
+		private const UPDATE_TABLE_SELECTED_FOODITMES_ADD_COLUMN_NEWEVENTID:String = "ALTER TABLE selectedfooditems ADD newselectedfooditemid TEXT";
 		
-		//exerciseevents already has the comment_2 column		
 		private var databaseWasCopiedFromSampleFile:Boolean = false;
 		
 		/**
@@ -826,8 +837,10 @@ package databaseclasses
 						var version:String = (o.info as String);
 						if (version == DATABASE_VERSION_1)//in fact will never happen, because we don't insert this string during creation of version 1
 							upgradeToVersion2();
+						else if (version == DATABASE_VERSION_2)//in fact will never happen, because we don't insert this string during creation of version 1
+							upgradeToVersion3();
 						else {
-							//we should already be on version 2, later on, if there's a version 3, will check on version 2
+							//we should already be on version 3, later on, if there's a version 4, will check on version 3
 							createTableSource();
 						}
 					}
@@ -898,7 +911,48 @@ package databaseclasses
 				trace("Failed to upgrade to version 2 :" + sqlStatement.text + ". Database0121. see.error.details = " + see.error.details);
 				if (globalDispatcher != null) {
 					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
-					errorEvent.data = "Failed to create table :" + sqlStatement.text + ". Database0121";
+					errorEvent.data = "Failed to upgrade to version 2 :" + sqlStatement.text + ". Database0121";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
+			}
+		}
+		
+		/**
+		 *  version 3 is about changing the type of eventid to TEXT
+		 */
+		private function upgradeToVersion3():void {
+			sqlStatement.text = UPDATE_TABLE_BLOODGLUCOSE_EVENTS_ADD_COLUMN_NEWEVENTID_ADD_COLUMN_NEWEVENTID;
+			sqlStatement.clearParameters();
+			sqlStatement.addEventListener(SQLEvent.RESULT,alterTableBloodGlucoseEventsFinished);
+			sqlStatement.addEventListener(SQLErrorEvent.ERROR,alterTableEventsFailed);
+			sqlStatement.execute();
+			
+			function alterTableBloodGlucoseEventsFinished(se:SQLEvent):void {
+				trace("alter table bloodglucoseevents success");
+				sqlStatement.removeEventListener(SQLEvent.RESULT,alterTableBloodGlucoseEventsFinished);
+				sqlStatement.addEventListener(SQLEvent.RESULT,updateVersionInfoFinished);
+				sqlStatement.text = UPDATE_VERSIONINFO;
+				sqlStatement.clearParameters();
+				sqlStatement.parameters[":info"] = DATABASE_VERSION_3;
+				sqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+				sqlStatement.execute();
+			}
+			
+			function updateVersionInfoFinished(se:SQLEvent):void {
+				trace("update version info success");
+				sqlStatement.removeEventListener(SQLEvent.RESULT,updateVersionInfoFinished);
+				sqlStatement.removeEventListener(SQLEvent.RESULT,alterTableEventsFailed);
+				checkVersionInfo();
+			}
+			
+			function alterTableEventsFailed(see:SQLErrorEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,alterTableBloodGlucoseEventsFinished);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,alterTableEventsFailed);
+				trace("Failed to upgrade to version 3 :" + sqlStatement.text + ". Database0122. see.error.details = " + see.error.details);
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to upgrade to version 3 :" + sqlStatement.text + ". Database0122";
 					globalDispatcher.dispatchEvent(errorEvent);
 					globalDispatcher = null;
 				}
@@ -1618,7 +1672,7 @@ package databaseclasses
 		 * newLastModifiedTimeStamp = <br>
 		 * dispatcher = a DatabaseEvent will be dispatched when finished
 		 */
-		internal function updateMealEvent(mealEventId:Number, newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newLastModifiedTimeStamp:Number,newCreationTimeStamp:Number, comment:String, dispatcher:EventDispatcher):void {
+		internal function updateMealEvent(mealEventId:String, newMealName:String,newInsulinRatio:Number,newCorrectionFactor:Number,newLastModifiedTimeStamp:Number,newCreationTimeStamp:Number, comment:String, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -1780,7 +1834,7 @@ package databaseclasses
 		 * will add the mealevent to the database
 		 */
 		internal function createNewMealEvent(
-			mealEventId:Number,
+			mealEventId:String,
 			mealname:String,
 			lastmodifiedtimestamp:Number,
 			insulinRatio:Number,
@@ -1850,7 +1904,7 @@ package databaseclasses
 		/**
 		 * new bloodglucoselevel event will be added to the database<br>
 		 */
-		internal function createNewBloodGlucoseEvent(level:Number,timeStamp:Number,newLastModifiedTimeStamp:Number,unit:String,bloodglucoseeventid:Number, comment:String,dispatcher:EventDispatcher = null ):void {
+		internal function createNewBloodGlucoseEvent(level:Number,timeStamp:Number,newLastModifiedTimeStamp:Number,unit:String,bloodglucoseeventid:String, comment:String,dispatcher:EventDispatcher = null ):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -1911,8 +1965,8 @@ package databaseclasses
 		 * will add the Selected Item to the database
 		 */
 		internal function createNewSelectedItem(
-			selectedItemId:Number,
-			mealEventId:Number,
+			selectedItemId:String,
+			mealEventId:String,
 			itemDescription:String,
 			unitDescription:String,
 			standardAmount:int,
@@ -1995,7 +2049,7 @@ package databaseclasses
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
 			var selectedFoodItems:ArrayCollection = new ArrayCollection();
-			var currentMealEventID:Number;//used in the filterfunction for the selectedfooditems
+			var currentMealEventID:String;//used in the filterfunction for the selectedfooditems
 			
 			selectedFoodItems.filterFunction = filterByMealEventId;
 			
@@ -2040,12 +2094,12 @@ package databaseclasses
 				if (tempObject != null && tempObject is Array) {
 					for each (var o:Object in tempObject ) {
 						var newSelectedFoodItem:SelectedFoodItem = new SelectedFoodItem(
-							o.selectedfooditemid as Number,
+							o.selectedfooditemid as String,
 							o.itemdescription as String,
 							new Unit(o.unitdescription as String,o.standardamount as int,o.kcal as int,o.protein as Number,o.carbs as Number,o.fat as Number),
 							o.chosenamount,
 							o.lastmodifiedtimestamp);
-						newSelectedFoodItem.mealEventId = o.mealevents_mealeventid as Number;
+						newSelectedFoodItem.mealEventId = o.mealevents_mealeventid as String;
 						selectedFoodItems.addItem(newSelectedFoodItem);
 					}
 				}
@@ -2078,16 +2132,16 @@ package databaseclasses
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
-							deleteMealEvent(o.mealeventid as Number);
+							deleteMealEvent(o.mealeventid as String);
 						} else {
-							currentMealEventID = o.mealeventid as Number;
+							currentMealEventID = o.mealeventid as String;
 							selectedFoodItems.refresh();
 							var newMealEvent:MealEvent = new MealEvent(o.mealname as String,
 								o.insulinratio as Number,
 								o.correctionfactor as Number,
 								o.creationtimestamp as Number,
 								null,
-								o.mealeventid as Number,
+								o.mealeventid as String,
 								o.comment_2 as String,
 								o.lastmodifiedtimestamp  as Number,
 								false,
@@ -2123,13 +2177,19 @@ package databaseclasses
 				
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
+						var bloodGlucoseEventId:String;
+						if (o.newbloodglucoseeventid) {
+							bloodGlucoseEventId = o.newbloodglucoseeventid as String;
+						} else {
+							bloodGlucoseEventId = (o.bloodglucoseeventid as Number).toString();
+						}
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
-							deleteBloodGlucoseEvent(o.bloodglucoseeventid as Number);
+							deleteBloodGlucoseEvent(bloodGlucoseEventId);
 						} else {
 							var tempLevel:Number = o.value as Number;
 							if (o.unit as String  == ResourceManager.getInstance().getString('general','mmoll'))
 								tempLevel = tempLevel/10;
-							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(tempLevel as Number,o.unit as String, o.bloodglucoseeventid as Number, o.comment_2 as String, o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
+							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(tempLevel as Number,o.unit as String, bloodGlucoseEventId, o.comment_2 as String, o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
 							var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2165,7 +2225,7 @@ package databaseclasses
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
-							deleteMedicinEvent(o.medicineventid as Number);
+							deleteMedicinEvent(o.medicineventid as String);
 						} else {
 							var medicinArray:Array = (o.medicinname as String).split(medicinnamesplitter);
 							
@@ -2182,7 +2242,7 @@ package databaseclasses
 							
 							var medicinName:String = medicinArray[0];
 							
-							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number, medicinName, o.medicineventid as Number, o.comment_2 as String, o.creationtimestamp as Number, o.lastmodifiedtimestamp as Number, false, bolusType, bolusDuration);
+							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number, medicinName, o.medicineventid as String, o.comment_2 as String, o.creationtimestamp as Number, o.lastmodifiedtimestamp as Number, false, bolusType, bolusDuration);
 							ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
 							var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2217,9 +2277,9 @@ package databaseclasses
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
-							deleteExerciseEvent(o.exerciseeventid as Number);
+							deleteExerciseEvent(o.exerciseeventid as String);
 						} else {
-							var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.exerciseeventid as Number,o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
+							var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,o.exerciseeventid as String,o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newExerciseEvent);
 							var creationTimeStampAsDate:Date = new Date(newExerciseEvent.timeStamp);
 							creationTimeStampAtMidNight = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2319,7 +2379,7 @@ package databaseclasses
 			}
 		}
 		
-		internal function updateSelectedFoodItem(selectedFoodItemId:Number, newMealEventId:Number,newDescription:String,newChosenAmount:Number, newUnit:Unit, newLastModifiedTimeStamp:Number, dispatcher:EventDispatcher):void {
+		internal function updateSelectedFoodItem(selectedFoodItemId:String, newMealEventId:String,newDescription:String,newChosenAmount:Number, newUnit:Unit, newLastModifiedTimeStamp:Number, dispatcher:EventDispatcher):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -2386,7 +2446,7 @@ package databaseclasses
 		 * new medicin event will be added to the database<br>
 		 * here the medicineventid will get the value of current date and time as Number 
 		 */
-		internal function createNewMedicinEvent(bolusType:String, bolusDuration:Number, amount:Number,medicin:String, timeStamp:Number,newLastModifiedTimeStamp:Number,medicineventid:Number, comment:String,dispatcher:EventDispatcher = null):void {
+		internal function createNewMedicinEvent(bolusType:String, bolusDuration:Number, amount:Number,medicin:String, timeStamp:Number,newLastModifiedTimeStamp:Number,medicineventid:String, comment:String,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -2444,7 +2504,7 @@ package databaseclasses
 		/**
 		 * medicinevent with specified medicineventid is updated with new values for timestamp, amount and medicinname
 		 */ 	
-		internal function updateMedicinEvent(newBolusType:String, newBolusDuration:Number, medicinEventId:Number,newAmount:Number,newMedicinName:String,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number, comment:String,dispatcher:EventDispatcher = null):void {
+		internal function updateMedicinEvent(newBolusType:String, newBolusDuration:Number, medicinEventId:String,newAmount:Number,newMedicinName:String,newCreationTimeStamp:Number, newLastModifiedTimeStamp:Number, comment:String,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -2502,7 +2562,7 @@ package databaseclasses
 		 * new exercise event will be added to the database<br>
 		 * here the exerciseeventid will get the value of current date and time as Number 
 		 */
-		internal function createNewExerciseEvent(level:String, comment:String, timeStamp:Number, newLastModifiedTimeStamp:Number,exerciseeventid:Number,dispatcher:EventDispatcher = null):void {
+		internal function createNewExerciseEvent(level:String, comment:String, timeStamp:Number, newLastModifiedTimeStamp:Number,exerciseeventid:String,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement()
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -2559,7 +2619,7 @@ package databaseclasses
 		/**
 		 * exerciseevent with specified exerciseeventid is updated with new values for timestamp, level and comment
 		 */ 	
-		internal function updateExerciseEvent(exerciseEventId:Number,newLevel:String,newComment_2:String,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
+		internal function updateExerciseEvent(exerciseEventId:String,newLevel:String,newComment_2:String,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -2616,7 +2676,7 @@ package databaseclasses
 		/**
 		 * bloodglucoseevent with specified bloodglucoseeventid is updated with new values  level and unit
 		 */ 	
-		internal function updateBloodGlucoseEvent(bloodglucoseEventId:Number,unit:String,bloodGlucoseLevel:Number,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number, comment:String,dispatcher:EventDispatcher = null):void {
+		internal function updateBloodGlucoseEvent(bloodglucoseEventId:String,unit:String,bloodGlucoseLevel:Number,newCreationTimeStamp:Number,  newLastModifiedTimeStamp:Number, comment:String,dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			localdispatcher.addEventListener(SQLEvent.RESULT,onOpenResult);
@@ -2674,7 +2734,7 @@ package databaseclasses
 		}
 		
 		
-		internal function deleteMealEvent(mealEventId:Number,dispatcher:EventDispatcher = null):void {
+		internal function deleteMealEvent(mealEventId:String,dispatcher:EventDispatcher = null):void {
 			var yes:int=0;
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
@@ -2752,7 +2812,7 @@ package databaseclasses
 			}
 		}
 		
-		internal function deleteMedicinEvent(medicinEventId:Number, dispatcher:EventDispatcher = null):void {
+		internal function deleteMedicinEvent(medicinEventId:String, dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -2802,7 +2862,7 @@ package databaseclasses
 			}
 		}
 		
-		internal function deleteBloodGlucoseEvent(bloodglucoseEventId:Number, dispatcher:EventDispatcher = null):void {
+		internal function deleteBloodGlucoseEvent(bloodglucoseEventId:String, dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -2853,7 +2913,7 @@ package databaseclasses
 			}
 		}
 		
-		internal function deleteExerciseEvent(exerciseEventId:Number, dispatcher:EventDispatcher = null):void {
+		internal function deleteExerciseEvent(exerciseEventId:String, dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			
@@ -2906,7 +2966,7 @@ package databaseclasses
 		/**
 		 * deletes the selectedfooditem from the database, nothing changes to the mealevent or meal that has this selectedfooditem 
 		 */
-		internal function deleteSelectedFoodItem(selectedFoodItemId:Number, dispatcher:EventDispatcher = null):void {
+		internal function deleteSelectedFoodItem(selectedFoodItemId:String, dispatcher:EventDispatcher = null):void {
 			var localSqlStatement:SQLStatement = new SQLStatement();
 			var localdispatcher:EventDispatcher = new EventDispatcher();
 			

@@ -20,10 +20,15 @@ package databaseclasses
 	import flash.events.EventDispatcher;
 	
 	import mx.core.ClassFactory;
+	
 	import databaseclasses.MealEvent;
+	
 	import model.ModelLocator;
+	
 	import myComponents.IListElement;
 	import myComponents.MealItemRenderer;
+	
+	import utilities.DateTimeUtilities;
 	import utilities.FromtimeAndValueArrayCollection;
 	import utilities.Synchronize;
 	
@@ -132,7 +137,7 @@ package databaseclasses
 				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
 				var correctionFactorList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
-				_mealEvent = new MealEvent(mealName,insulinRatio, correctionFactorList.getValue(Number.NaN,"",timeStampAsDate),timeStampAsDate,localdispatcher,new Date().valueOf(), "",new Date().valueOf(),true,null,thisMeal);
+				_mealEvent = new MealEvent(mealName,insulinRatio, correctionFactorList.getValue(Number.NaN,"",timeStampAsDate),timeStampAsDate,localdispatcher,DateTimeUtilities.createEventId(), "",new Date().valueOf(),true,null,thisMeal);
 			} else
 				mealEventCreated(null);
 			

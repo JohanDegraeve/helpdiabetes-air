@@ -17,6 +17,8 @@
  */
 package myComponents
 {
+	import utilities.DateTimeUtilities;
+
 	/**
 	 * a superclass for the object types that can be element in the trackingview<br>
 	 *  it's just here to be able to create a getHeight and getWidth method in the TrackingViewElementItemRenderer, with a single parameter<br>
@@ -39,16 +41,17 @@ package myComponents
 		
 		public function TrackingViewElement()
 		{
+			_eventid = DateTimeUtilities.createEventId();
 		}
 		
-		private var _eventid:Number;
+		private var _eventid:String;
 		
-		public function get eventid():Number
+		public function get eventid():String
 		{
 			return _eventid;
 		}
 		
-		public function set eventid(value:Number):void
+		public function set eventid(value:String):void
 		{
 			_eventid = value;
 		}
