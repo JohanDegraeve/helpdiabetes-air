@@ -77,7 +77,8 @@ package databaseclasses
 			"protein REAL, " +
 			"carbs REAL NOT NULL, " +
 			"fat REAL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
-		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (newexerciseeventid STRING PRIMARY KEY AUTOINCREMENT, " +
+		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (exerciseeventid INTEGER," +//just there for legacy , will actually always have value 0
+			"newexerciseeventid STRING PRIMARY KEY AUTOINCREMENT, " +
 			"level TEXT, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
 			"comment_2 TEXT, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
@@ -127,15 +128,15 @@ package databaseclasses
 		private const DELETE_ROW_IN_TABLE_SELECTED_FOODITEMS_MATCHING_MEALEVENTID:String = 
 			"DELETE FROM selectedfooditems where (mealevents_mealeventid = :mealevents_mealeventid OR newmealevents_mealeventid = :mealevents_mealeventid)";
 		private const DELETE_ROW_IN_TABLE_EXERCISEEVENTS:String = 
-			"DELETE FROM exerciseevents where exerciseeventid = :exerciseeventid";
+			"DELETE FROM exerciseevents where (exerciseeventid = :exerciseeventid OR newexerciseeventid = :exerciseeventid)";
 		private const DELETE_ROW_IN_TABLE_BLOODGLUCOSEEVENTS:String = 
 			"DELETE FROM bloodglucoseevents where (bloodglucoseeventid = :bloodglucoseeventid OR newbloodglucoseeventid = :bloodglucoseeventid)";
 		private const DELETE_ROW_IN_TABLE_MEDICINEVENTS:String = 
-			"DELETE FROM medicinevents where medicineventid = :medicineventid";
+			"DELETE FROM medicinevents where (medicineventid = :medicineventid OR newmedicineventid = :medicineventid)";
 		private const DELETE_ROW_IN_TABLE_MEALEVENTS:String = 
-			"DELETE FROM mealevents where mealeventid = :mealeventid";
+			"DELETE FROM mealevents where (mealeventid = :mealeventid OR newmealeventid = :mealeventid)";
 		private const DELETE_ROW_IN_TABLE_SELECTED_FOODITEMS_MATCHING_SELECTEDFOODITEMID:String = 
-			"DELETE FROM selectedfooditems where selectedfooditemid = :selectedfooditemid";
+			"DELETE FROM selectedfooditems where (selectedfooditemid = :selectedfooditemid OR newselectedfooditemid = :selectedfooditemid)";
 		private const DELETE_ALL_FOODITEMS:String = "DELETE FROM fooditems";
 		private const DELETE_ALL_UNITS:String = "DELETE FROM units";
 		/**
@@ -160,7 +161,7 @@ package databaseclasses
 		 * UPDATE settings set value = :value WHERE id = :id
 		 */
 		private const UPDATE_SETTING:String = "UPDATE settings set value = :value, lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE id = :id";
-		private const UPDATE_MEALEVENT_LASTMODIFIEDTIMESTAMP:String = "UPDATE mealevents SET lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE mealeventid = :mealeventid";
+		private const UPDATE_MEALEVENT_LASTMODIFIEDTIMESTAMP:String = "UPDATE mealevents SET lastmodifiedtimestamp = :lastmodifiedtimestamp WHERE (mealeventid = :mealeventid OR newmealeventid = :mealeventid)";
 		private const INSERT_SOURCE:String = "INSERT INTO source (source) VALUES (:source)";
 		private const INSERT_FOODITEM:String = "INSERT INTO fooditems (description,lastmodifiedtimestamp) VALUES (:description,:lastmodifiedtimestamp)";
 		private const INSERT_UNIT:String = "INSERT INTO units (fooditems_itemid," +

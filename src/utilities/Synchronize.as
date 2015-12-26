@@ -772,15 +772,19 @@ package utilities
 									tableNamesAndColumnNames[j][1] = eventAsJSONObject.items[i].tableId;	
 									//check if the tables has the column id as type int, and if so mark that we'll have to modify
 									//applicble for HD-BloodglucoseEvent, .. exercise, medicin, meals, selecteditems
-									if (eventAsJSONObject.items[i].name == tableNamesAndColumnNames[0][0]
-										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[1][0]
-										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[2][0]
-										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[3][0]
-										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[4][0]) {
+									if (eventAsJSONObject.items[i].name == tableNamesAndColumnNames[0][0]//medicinevents
+										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[1][0]//bloodglucoseevents
+										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[2][0]//exerciseevents
+										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[3][0]//mealevents
+										|| eventAsJSONObject.items[i].name == tableNamesAndColumnNames[4][0]) {//selectedfooditems
 										if (eventAsJSONObject.items[i].columns[0].type == "NUMBER") {
 											updateGoogleTablesIsNecessary = true;
 										}
 									}
+									if (eventAsJSONObject.items[i].name == tableNamesAndColumnNames[4][0])//selectedfooditems
+										if (eventAsJSONObject.items[i].columns[9].type == "NUMBER") {//mealeventid
+											updateGoogleTablesIsNecessary = true;
+										}
 								}
 							}
 						}
@@ -895,7 +899,8 @@ package utilities
 				return;
 			}
 			if (debugMode)
-				trace("start method updateGoogleTablesIfNecessary");
+				trace("updateGoogleTablesIsNecessary = true , starting method updateGoogleTablesIfNecessary");
+			//continue but it could still be that there's no more updates necessary, this depends on the value of tableCounterForFunctionUpdateGoogleTablesIfNecessary
 
 			if (event != null) {
 				removeEventListeners();
