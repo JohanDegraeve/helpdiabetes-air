@@ -836,6 +836,7 @@ package databaseclasses
 					for each ( var o:Object in tempObject)
 					{
 						var version:String = (o.info as String);
+						trace("database version = " + version);
 						if (version == DATABASE_VERSION_1)//in fact will never happen, because we don't insert this string during creation of version 1
 							upgradeToVersion2();
 						else if (version == DATABASE_VERSION_2)//in fact will never happen, because we don't insert this string during creation of version 1
