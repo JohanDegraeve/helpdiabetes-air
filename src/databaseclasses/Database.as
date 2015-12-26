@@ -2213,14 +2213,14 @@ package databaseclasses
 					for each ( var o:Object in tempObject ) {
 						var mealEventId:String;
 						if (o.newmealeventid) {
-							mealEventId = o.newmealventid as String;
+							mealEventId = o.newmealeventid as String;
 						} else {
 							mealEventId = (o.mealeventid as Number).toString();
 						}
 						if ((o.lastmodifiedtimestamp as Number) < minimumTimeStamp) {
 							deleteMealEvent(mealEventId);
 						} else {
-							currentMealEventID = o.mealeventid as String;
+							currentMealEventID = mealEventId;
 							selectedFoodItems.refresh();
 							var newMealEvent:MealEvent = new MealEvent(o.mealname as String,
 								o.insulinratio as Number,
