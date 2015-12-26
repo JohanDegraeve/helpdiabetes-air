@@ -2162,7 +2162,7 @@ package databaseclasses
 				if (tempObject != null && tempObject is Array) {
 					for each (var o:Object in tempObject ) {
 						var selectedFoodItemId:String;
-						if (o.newmedicineventid) {
+						if (o.newselectedfooditemid) {
 							selectedFoodItemId = o.newselectedfooditemid as String;
 						} else {
 							selectedFoodItemId = (o.selectedfooditemid as Number).toString();
@@ -2212,7 +2212,7 @@ package databaseclasses
 				if (tempObject != null && tempObject is Array) {
 					for each ( var o:Object in tempObject ) {
 						var mealEventId:String;
-						if (o.newmedicineventid) {
+						if (o.newmealeventid) {
 							mealEventId = o.newmealventid as String;
 						} else {
 							mealEventId = (o.mealeventid as Number).toString();
