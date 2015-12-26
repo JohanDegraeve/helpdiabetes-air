@@ -904,9 +904,18 @@ package utilities
 					return;
 				tableCounterForFunctionUpdateGoogleTablesIfNecessary++;
 			} 
-			if (tableCounterForFunctionUpdateGoogleTablesIfNecessary == 5) {//If we want to do the same for settingstable, then compare to 6
-				startSync();
-				updateGoogleTablesIsNecessary = false;
+			if (tableCounterForFunctionUpdateGoogleTablesIfNecessary > 4) {
+				if (tableCounterForFunctionUpdateGoogleTablesIfNecessary == 5) {//points to selectedfooditems but we're not going to updat ethat one
+					//selected fooditems column 0 has been updated but we still  need to update the mealeventid column
+					var jsonObject:Object = new Object();
+					jsonObject.name = "mealeventid";
+					jsonObject.type = "STRING";
+					createAndLoadURLRequest(googleRequestTablesUrl + "/" + tableNamesAndColumnNames[tableCounterForFunctionUpdateGoogleTablesIfNecessary - 1][1] + "/columns/9" ,
+						URLRequestMethod.PUT,null,JSON.stringify(jsonObject),updateGoogleTablesIfNecessary,true,"application/json");
+				} else {
+					startSync();
+					updateGoogleTablesIsNecessary = false;
+				}
 			}
 			else {
 				//we need to update tables 0 to 4 
@@ -1026,7 +1035,7 @@ package utilities
 								}
 								if (!elementAlreadyThere) {
 									remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
-									remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
+									remoteElementIds.addItem([eventAsJSONObject.rows[rowctr][positionId],null]);
 								}
 							}
 						}
@@ -1368,7 +1377,7 @@ package utilities
 								}
 								if (!elementAlreadyThere) {
 									remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
-									remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
+									remoteElementIds.addItem([eventAsJSONObject.rows[rowctr][positionId],null]);
 								}
 							}
 						}
@@ -1522,7 +1531,7 @@ package utilities
 								}
 								if (!elementAlreadyThere) {
 									remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
-									remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
+									remoteElementIds.addItem([eventAsJSONObject.rows[rowctr][positionId],null]);
 								}
 							}
 						}
@@ -1692,7 +1701,7 @@ package utilities
 							}
 							if (!elementAlreadyThere) {
 								remoteElements.addItem(eventAsJSONObject.rows[rowctr]);
-								remoteElementIds.addItem([new Number(eventAsJSONObject.rows[rowctr][positionId]),null]);
+								remoteElementIds.addItem([eventAsJSONObject.rows[rowctr][positionId],null]);
 							}
 						}
 					}
