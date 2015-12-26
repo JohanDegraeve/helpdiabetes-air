@@ -923,6 +923,9 @@ package databaseclasses
 		 *  version 3 is about changing the type of eventid to TEXT
 		 */
 		private function upgradeToVersion3():void {
+			sqlStatement = new SQLStatement();
+			sqlStatement.sqlConnection = aConn;
+
 			sqlStatement.text = UPDATE_TABLE_BLOODGLUCOSE_EVENTS_ADD_COLUMN_NEWEVENTID_ADD;
 			sqlStatement.clearParameters();
 			sqlStatement.addEventListener(SQLEvent.RESULT,alterTableBloodGlucoseEventsFinished);
@@ -932,6 +935,9 @@ package databaseclasses
 			function alterTableBloodGlucoseEventsFinished(se:SQLEvent):void {
 				trace("alter table bloodglucoseevents success");
 				sqlStatement.removeEventListener(SQLEvent.RESULT,alterTableBloodGlucoseEventsFinished);
+				sqlStatement = new SQLStatement();
+				sqlStatement.sqlConnection = aConn;
+
 				sqlStatement.text = UPDATE_TABLE_EXERCISE_EVENTS_ADD_COLUMN_NEWEVENTID;
 				sqlStatement.clearParameters();
 				sqlStatement.addEventListener(SQLEvent.RESULT,alterTableExerciseEventsFinished);
@@ -941,6 +947,9 @@ package databaseclasses
 			function alterTableExerciseEventsFinished(se:SQLEvent):void {
 				trace("alter table exerciseevents success");
 				sqlStatement.removeEventListener(SQLEvent.RESULT,alterTableExerciseEventsFinished);
+				sqlStatement = new SQLStatement();
+				sqlStatement.sqlConnection = aConn;
+
 				sqlStatement.text = UPDATE_TABLE_MEDICIN_EVENTS_ADD_COLUMN_NEWEVENTID;
 				sqlStatement.clearParameters();
 				sqlStatement.addEventListener(SQLEvent.RESULT,alterTableMedicinEventsFinished);
@@ -950,6 +959,9 @@ package databaseclasses
 			function alterTableMedicinEventsFinished(se:SQLEvent):void {
 				trace("alter table medicinevents success");
 				sqlStatement.removeEventListener(SQLEvent.RESULT,alterTableExerciseEventsFinished);
+				sqlStatement = new SQLStatement();
+				sqlStatement.sqlConnection = aConn;
+
 				sqlStatement.text = UPDATE_TABLE_MEAL_EVENTS_ADD_COLUMN_NEWEVENTID;
 				sqlStatement.clearParameters();
 				sqlStatement.addEventListener(SQLEvent.RESULT,alterTableMealEventsFinished);
@@ -959,6 +971,9 @@ package databaseclasses
 			function alterTableMealEventsFinished(se:SQLEvent):void {
 				trace("alter table mealevents success");
 				sqlStatement.removeEventListener(SQLEvent.RESULT,alterTableMealEventsFinished);
+				sqlStatement = new SQLStatement();
+				sqlStatement.sqlConnection = aConn;
+
 				sqlStatement.text = UPDATE_TABLE_SELECTED_FOODITEMS_ADD_COLUMN_NEWEVENTID;
 				sqlStatement.clearParameters();
 				sqlStatement.addEventListener(SQLEvent.RESULT,alterTableSelectedFoodItemsFinished);
@@ -968,6 +983,9 @@ package databaseclasses
 			function alterTableSelectedFoodItemsFinished(se:SQLEvent):void {
 				trace("alter table selectedfooditems success");
 				sqlStatement.removeEventListener(SQLEvent.RESULT,alterTableSelectedFoodItemsFinished);
+				sqlStatement = new SQLStatement();
+				sqlStatement.sqlConnection = aConn;
+
 				sqlStatement.text = UPDATE_TABLE_SELECTED_FOODITEMS_ADD_COLUMN_NEWMEALEVENTID;
 				sqlStatement.clearParameters();
 				sqlStatement.addEventListener(SQLEvent.RESULT,alterTableSelectedFoodItemsNewMealEventIdFinished);
@@ -977,6 +995,9 @@ package databaseclasses
 			function alterTableSelectedFoodItemsNewMealEventIdFinished(se:SQLEvent):void {
 				trace("alter table selectedfooditems 2 success");
 				sqlStatement.removeEventListener(SQLEvent.RESULT,alterTableSelectedFoodItemsNewMealEventIdFinished);
+				sqlStatement = new SQLStatement();
+				sqlStatement.sqlConnection = aConn;
+
 				sqlStatement.text = UPDATE_VERSIONINFO;
 				sqlStatement.clearParameters();
 				sqlStatement.parameters[":info"] = DATABASE_VERSION_3;
