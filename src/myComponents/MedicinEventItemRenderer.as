@@ -144,7 +144,7 @@ package myComponents
 				return;
 			if (bolusType == "")
 				return;
-			if (bolusType == resourceManager.getString('editmedicineventview','square')) {
+			if (resourceManager.getString('editmedicineventview','listofsquarewavebolustypes').indexOf(bolusType) > -1) {
 				if (!squareWaveBolusImage) {
 					squareWaveBolusImage  = new Image();
 					squareWaveBolusImage.fillMode = BitmapFillMode.CLIP;
@@ -215,7 +215,7 @@ package myComponents
 				var activeInsulinText:String = resourceManager.getString('editmedicineventview','active') 
 					+ " = " + ((Math.round(activeInsulin * 10))/10).toString()
 					+ " " + resourceManager.getString('trackingview','internationalunit');
-				if (bolusType == resourceManager.getString('editmedicineventview','square')) {
+				if (resourceManager.getString('editmedicineventview','listofsquarewavebolustypes').indexOf(bolusType) > -1) {
 					var timeToGo:Number = now - ((value as MedicinEvent).timeStamp) - (value as MedicinEvent).bolusDurationInMinutes * 60 * 1000; 
 					if (timeToGo <= 0) {
 						activeInsulinText += ", " + (- Math.round((timeToGo / 1000 / 60 / 60 * 10)) / 10).toString() +  " " + resourceManager.getString('editmedicineventview','hrtogo');
