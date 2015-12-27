@@ -812,7 +812,7 @@ package model
 		public function calculateActiveInsulinForSpecifiedEvent(theEvent:MedicinEvent, time:Number = NaN):Number {
 			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
 			var additionalMaxDurationInSeconds:Number = 0;
-			if ((theEvent as MedicinEvent).bolustype == ResourceManager.getInstance().getString('editmedicineventview','square')) {
+			if (ResourceManager.getInstance().getString('editmedicineventview','listofsquarewavebolustypes').indexOf((theEvent as MedicinEvent).bolustype) > -1) {
 				additionalMaxDurationInSeconds = (theEvent as MedicinEvent).bolusDurationInMinutes * 60;
 			}
 			if ((theEvent as TrackingViewElement).timeStamp + (maxInsulinDurationInSeconds  + additionalMaxDurationInSeconds) * 1000 < time)
@@ -839,7 +839,7 @@ package model
 						else 
 							settingToUse = Settings.SettingsMedicin4_range1_AOBChart + medicincntr * 4;
 						var fromTimeAndValueArrayCollection:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(settingToUse));
-						if (theEvent.bolustype == ResourceManager.getInstance().getString('editmedicineventview','square')) {
+						if (ResourceManager.getInstance().getString('editmedicineventview','listofsquarewavebolustypes').indexOf(theEvent.bolustype) > -1) {
 							//split over 0.1 unit per injection
 							var amountOfInjections:int = theEvent.amount / BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES;
 							var intervalBetweenInjections:Number = theEvent.bolusDurationInMinutes / amountOfInjections;

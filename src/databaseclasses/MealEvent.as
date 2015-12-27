@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -496,7 +496,7 @@ package databaseclasses
 						 if ((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as TrackingViewElement).timeStamp < timeStamp)
 							 break;
 						 if (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) is MedicinEvent) {
-							 if ((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).bolustype == ResourceManager.getInstance().getString('editmedicineventview','normal')) {
+							 if (ResourceManager.getInstance().getString('editmedicineventview','listofnormalbolustypes').indexOf((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).bolustype) > -1) {
 								 var timeStampOfThatMedicinEvent:Number = (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).timeStamp; 
 								 if (timeStampOfThatMedicinEvent < timeOfLastMealChange ) {
 									 insulinGivenDuringMeal += (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).amount;
