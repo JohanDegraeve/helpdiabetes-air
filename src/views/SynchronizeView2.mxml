@@ -104,7 +104,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						navigateToURL(new URLRequest(resourceManager.getString('synchronizeview','helpurl')));
 						break;
 					case 3 :
-						Settings.getInstance().setSetting(Settings.SettingsAccessToken,"")
+						Settings.getInstance().setSetting(Settings.SettingsAccessToken,"");
+						Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,"0");
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						alertPopUp.show(this);
