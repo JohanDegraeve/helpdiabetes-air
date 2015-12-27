@@ -49,6 +49,10 @@ package utilities
 			var returnvalue:String = "HelpDiabetesXXXXXXXXX".substr(0,eventIdLength - date.length) + date;
 			return returnvalue;
 		}
+		
+		public static function randomRange(minNum:Number, maxNum:Number):Number {
+			return (Math.floor(Math.random()*(maxNum - minNum + 1)) + minNum);
+		}
 
 	}
 }
