@@ -44,7 +44,7 @@ package databaseclasses
 			_comment = value;
 		}
 		
-		public function ExerciseEvent(level:String, newcomment:String, exerciseeventid:Number,creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true)
+		public function ExerciseEvent(level:String, newcomment:String, exerciseeventid:String,creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true)
 		{
 			this._level = level;
 			this.eventid = exerciseeventid;

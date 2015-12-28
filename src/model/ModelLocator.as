@@ -72,11 +72,11 @@ package model
 		/**
 		 * if searchActive, then this is eventid of the lastmarked item , 0 means there's no item marked
 		 */
-		public var lastMarkedItemEventId:Number;
+		public var lastMarkedItemEventId:String;
 		/**
 		 * if searchActive, then this is eventid of the firstmarked item, 0 means there's no item marked 
 		 */
-		public var firstMarkedItemEventId:Number;
+		public var firstMarkedItemEventId:String;
 		
 		private  var _searchActive:Boolean = false;
 		/**
@@ -106,8 +106,8 @@ package model
 				return;
 			_searchActive = value;
 			if (!_searchActive) {
-				firstMarkedItemEventId = 0;
-				lastMarkedItemEventId = 0;
+				firstMarkedItemEventId = "0";
+				lastMarkedItemEventId = "0";
 				for (var trackingcntr:int = 0;trackingcntr < trackingList.length;trackingcntr++) {
 					(trackingList.getItemAt(trackingcntr) as TrackingViewElement).mark = false;
 				}
@@ -152,17 +152,17 @@ package model
 		 */
 		private var _selectedMeal:int = -1;
 		
-		private var _trackingEventToShow:Number = -1;
+		private var _trackingEventToShow:String = "-1";
 		
 		/**
 		 * eventid of to the tracking event to show when going to trackingview<br>
 		 * initially set to -1, in the get trackingeventToShow, when still on -1 it will be set to the event id of the last event in the _trackingList, except when 
 		 * there are no elements in the _trackingList, then it stays -1
 		 */
-		public function get trackingEventToShow():Number
+		public function get trackingEventToShow():String
 			
 		{
-			if (_trackingEventToShow == -1)
+			if (_trackingEventToShow == "-1")
 				if (_trackingList.length > 0)
 					_trackingEventToShow = (_trackingList.getItemAt(_trackingList.length -1) as TrackingViewElement).eventid;
 			return _trackingEventToShow;
@@ -171,7 +171,7 @@ package model
 		/**
 		 * @private
 		 */
-		public function set trackingEventToShow(value:Number):void
+		public function set trackingEventToShow(value:String):void
 			
 		{
 			_trackingEventToShow = value;
@@ -408,7 +408,7 @@ package model
 		 * reads from the _trackingList the mealevent with identified mealeventid<br>
 		 * returns null if not found
 		 */
-		public function getMealEventFromTrackingList(mealEventId:Number):MealEvent {
+		public function getMealEventFromTrackingList(mealEventId:String):MealEvent {
 			for (var i:int = _trackingList.length - 1;i >= 0; i--) {
 				if (_trackingList.getItemAt(i) is MealEvent)
 					if (((_trackingList.getItemAt(i)) as MealEvent).eventid == mealEventId)

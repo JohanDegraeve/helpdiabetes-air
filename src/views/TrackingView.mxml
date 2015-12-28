@@ -188,8 +188,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				var cntr:int = 0;
 				var selitemctr:int = 0;
 				ModelLocator.getInstance().searchActive = false;
-				ModelLocator.getInstance().firstMarkedItemEventId = 0;
-				ModelLocator.getInstance().lastMarkedItemEventId = 0;
+				ModelLocator.getInstance().firstMarkedItemEventId = "0";
+				ModelLocator.getInstance().lastMarkedItemEventId = "0";
 				
 				if (textSet == "")
 					return;
@@ -234,7 +234,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					if (splittedTextCntr == splittedText.length) {
 						(ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).mark = true;
 						ModelLocator.getInstance().lastMarkedItemEventId = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).eventid;
-						if (ModelLocator.getInstance().firstMarkedItemEventId == 0)
+						if (ModelLocator.getInstance().firstMarkedItemEventId == "0")
 							ModelLocator.getInstance().firstMarkedItemEventId = ModelLocator.getInstance().lastMarkedItemEventId;
 						elementsFound = true;
 					}
@@ -299,10 +299,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function cancelClicked(e:MouseEvent = null):void {
 				ModelLocator.getInstance().searchActive = false;
-				ModelLocator.getInstance().firstMarkedItemEventId = 0;
-				ModelLocator.getInstance().lastMarkedItemEventId = 0;
+				ModelLocator.getInstance().firstMarkedItemEventId = "0";
+				ModelLocator.getInstance().lastMarkedItemEventId = "0";
 				ModelLocator.getInstance().trackingEventToShow = 
-					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null ? -1 :
+					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null ? "-1" :
 					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.eventid;
 				(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
 				ModelLocator.getInstance().trackingList.refresh();

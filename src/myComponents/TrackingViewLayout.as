@@ -207,7 +207,7 @@ package myComponents
 				if (_indexToY[_indexToY.length - 1] < containerHeight) {
 					_firstIndexInView = 0;					
 				} else {
-					var firstEventToShow:Number;
+					var firstEventToShow:String;
 					try {
 						firstEventToShow = ModelLocator.getInstance().trackingEventToShow;
 						for (var trackingCounter:int = ModelLocator.getInstance().trackingList.length - 1; trackingCounter >= 0;trackingCounter--) {

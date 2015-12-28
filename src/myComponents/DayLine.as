@@ -32,7 +32,6 @@ package myComponents
 		public function DayLine(timeStamp:Number)
 		{
 			this.timeStamp = timeStamp;
-			eventid = (new Date()).valueOf();
 		}
 		
 		public function listElementRendererFunction ():ClassFactory {

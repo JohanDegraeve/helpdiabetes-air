@@ -19,6 +19,7 @@ package utilities
 {
 	public class DateTimeUtilities
 	{
+		private static var eventIdLength:int = 24;
 		public function DateTimeUtilities()
 		{
 		}
@@ -41,6 +42,16 @@ package utilities
 			var returnValue:Date = new Date();
 			returnValue.setTime(dtDate.getTime() - (dtDate.getTimezoneOffset() * 60000))
 			return returnValue;
+		}
+		
+		public static function createEventId():String {
+			var date:String = (new Date()).valueOf().toString();
+			var returnvalue:String = "HelpDiabetesXXXXXXXXX".substr(0,eventIdLength - date.length) + date;
+			return returnvalue;
+		}
+		
+		public static function randomRange(minNum:Number, maxNum:Number):Number {
+			return (Math.floor(Math.random()*(maxNum - minNum + 1)) + minNum);
 		}
 
 	}

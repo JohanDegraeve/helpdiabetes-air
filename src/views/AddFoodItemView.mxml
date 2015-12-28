@@ -67,6 +67,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
 			
+			import utilities.DateTimeUtilities;
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
@@ -351,7 +352,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					for (var l:int = 0;l < ModelLocator.getInstance().meals.length; l++) {
 						if (ModelLocator.getInstance().meals.getItemAt(l) is Meal) {
 							if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).hasMealEvent()) {
-								if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).mealEvent.eventid == new Number(Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID))) {
+								if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).mealEvent.eventid == Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID)) {
 									ModelLocator.getInstance().selectedMeal = l;
 									l = ModelLocator.getInstance().meals.length;
 								}
@@ -450,7 +451,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					amount_textinput_text ="0";
 				
 				if (data.selectedFoodItem) {
-					var mealEventId:Number = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
+					var mealEventId:String = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
 					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().trackingList.length;trackingCntr++) {
 						if (((ModelLocator.getInstance().trackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
 							(ModelLocator.getInstance().trackingList.getItemAt(trackingCntr) as MealEvent)
@@ -474,7 +475,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					
 					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
 					.addSelectedFoodItem(
-						new SelectedFoodItem(new Date().valueOf(),
+						new SelectedFoodItem(DateTimeUtilities.createEventId(),
 							retrievedFoodItem.itemDescription,
 							retrievedFoodItem.getUnit(selectedUnit),
 							new Number(amount_textinput_text)));
@@ -609,7 +610,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
 
-					var mealEventId:Number = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
+					var mealEventId:String = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
 					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().trackingList.length;trackingCntr++) {
 						if (((ModelLocator.getInstance().trackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
 							length = (ModelLocator.getInstance().trackingList.getItemAt(trackingCntr) as MealEvent).selectedFoodItems.length;

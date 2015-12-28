@@ -121,7 +121,7 @@ package databaseclasses
 		 * if newLastModifiedTimestamp = null, then current date and time is used<br>
 		 * 
 		 */
-		public function MedicinEvent(amount:Number, medicin:String, medicineventid:Number, newcomment:String, creationTimeStamp:Number, newLastModifiedTimeStamp:Number,storeInDatabase:Boolean, bolusType:String, bolusDuration:Number )
+		public function MedicinEvent(amount:Number, medicin:String, medicineventid:String, newcomment:String, creationTimeStamp:Number, newLastModifiedTimeStamp:Number,storeInDatabase:Boolean, bolusType:String, bolusDuration:Number )
 		{
 			this._medicinName = medicin;
 			this._bolustype = bolusType;

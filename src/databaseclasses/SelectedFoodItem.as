@@ -28,15 +28,15 @@ package databaseclasses
 		private var _itemDescription:String;
 		private var _unit:Unit;
 		private var _chosenAmount:Number;
-		private var _eventid:Number;
-		private var _mealEventId:Number;
+		private var _eventid:String;
+		private var _mealEventId:String;
 
-		public function get mealEventId():Number
+		public function get mealEventId():String
 		{
 			return _mealEventId;
 		}
 
-		public function set mealEventId(value:Number):void
+		public function set mealEventId(value:String):void
 		{
 			_mealEventId = value;
 		}
@@ -57,7 +57,7 @@ package databaseclasses
 		/**
 		 * constructor taking description, unit and chosenamount as parameter
 		 */
-		public function SelectedFoodItem(newSelectedItemId:Number,description:String, unit:Unit,chosenAmount:Number, newLastModifiedTimeStamp:Number = Number.NaN):void
+		public function SelectedFoodItem(newSelectedItemId:String,description:String, unit:Unit,chosenAmount:Number, newLastModifiedTimeStamp:Number = Number.NaN):void
 		{
 			this._unit = new Unit(unit.unitDescription,unit.standardAmount,unit.kcal,unit.protein,unit.carbs,unit.fat);
 			this._itemDescription = description;
@@ -112,12 +112,12 @@ package databaseclasses
 		}
 		
 
-		public function get eventid():Number
+		public function get eventid():String
 		{
 			return _eventid;
 		}
 
-		public function set eventid(value:Number):void
+		public function set eventid(value:String):void
 		{
 			 _eventid = value;
 		}

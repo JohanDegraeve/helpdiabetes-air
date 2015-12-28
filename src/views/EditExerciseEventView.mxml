@@ -54,6 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
 			
+			import utilities.DateTimeUtilities;
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
@@ -235,7 +236,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theExerciseEvent = new ExerciseEvent(
 						exerciseName,
 						comment,
-						new Date().valueOf(),
+						DateTimeUtilities.createEventId(),
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theExerciseEvent);
 				} else {
