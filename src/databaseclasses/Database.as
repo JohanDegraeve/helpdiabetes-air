@@ -67,7 +67,9 @@ package databaseclasses
 		private const DATABASE_VERSION_1:String = "version1";
 		private const DATABASE_VERSION_2:String = "version2";
 		private const DATABASE_VERSION_3:String = "version3";
+		private const DATABASE_HIGHEST_VERSION:String = DATABASE_VERSION_3;
 		
+		private const CHECK_IF_VERSIONINFO_TABLE_EXISTS:String = "SELECT * FROM versioninfo";
 		private const CREATE_TABLE_VERSIONINFO:String = "CREATE TABLE IF NOT EXISTS versioninfo (info TEXT NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS fooditems (itemid INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			"description TEXT NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
@@ -80,17 +82,17 @@ package databaseclasses
 			"carbs REAL NOT NULL, " +
 			"fat REAL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_EXERCISE_EVENTS:String = "CREATE TABLE IF NOT EXISTS exerciseevents (exerciseeventid INTEGER," +//just there for legacy , will actually always have value 0
-			"newexerciseeventid STRING PRIMARY KEY AUTOINCREMENT, " +
+			"newexerciseeventid STRING PRIMARY KEY, " +
 			"level TEXT, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
 			"comment_2 TEXT, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_BLOODGLUCOSE_EVENTS:String = "CREATE TABLE IF NOT EXISTS bloodglucoseevents (bloodglucoseeventid INTEGER," +//just there for legacy , will actually always have value 0
-			"newbloodglucoseeventid STRING PRIMARY KEY AUTOINCREMENT, " +
+			"newbloodglucoseeventid STRING PRIMARY KEY, " +
 			"unit TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
 			"value REAL NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (medicineventid INTEGER," +//just there for legacy , will actually always have value 0
-			"newmedicineventid STRING PRIMARY KEY AUTOINCREMENT, " +
+			"newmedicineventid STRING PRIMARY KEY, " +
 			"medicinname TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
 			"amount REAL NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";		
@@ -778,18 +780,18 @@ package databaseclasses
 		{
 			sqlStatement.text = CREATE_TABLE_TEMPLATES;
 			sqlStatement.clearParameters();
-			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
+			sqlStatement.addEventListener(SQLEvent.RESULT,templateTableCreated);
 			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
 			sqlStatement.execute();
 			
-			function tableCreated(se:SQLEvent):void {
-				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
+			function templateTableCreated(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,templateTableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
-				createTableVersionInfo();
+				checkTableVersionInfo();
 			}
 			
 			function tableCreationError(see:SQLErrorEvent):void {
-				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
+				sqlStatement.removeEventListener(SQLEvent.RESULT,templateTableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0017");
 				if (globalDispatcher != null) {
@@ -801,21 +803,41 @@ package databaseclasses
 			}
 		}
 		
-		private function createTableVersionInfo():void {
-			sqlStatement.text = CREATE_TABLE_VERSIONINFO;
+		private function checkTableVersionInfo():void {
+			sqlStatement.text = CHECK_IF_VERSIONINFO_TABLE_EXISTS;
 			sqlStatement.clearParameters();
-			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
-			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
+			sqlStatement.addEventListener(SQLEvent.RESULT,tableExists);
+			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableDoesNotExist);
 			sqlStatement.execute();
 			
-			function tableCreated(se:SQLEvent):void {
-				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
-				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+			function tableExists(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,tableExists);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableDoesNotExist);
 				checkVersionInfo();
 			}
 			
+			function tableDoesNotExist(see:SQLErrorEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,tableExists);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableDoesNotExist);
+				createTableVersionInfo();
+			}
+		}
+		
+		private function createTableVersionInfo():void {
+			sqlStatement.text = CREATE_TABLE_VERSIONINFO;
+			sqlStatement.clearParameters();
+			sqlStatement.addEventListener(SQLEvent.RESULT,versionInfoTableCreated);
+			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
+			sqlStatement.execute();
+			
+			function versionInfoTableCreated(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,versionInfoTableCreated);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+				insertLatestVersionInfo();
+			}
+			
 			function tableCreationError(see:SQLErrorEvent):void {
-				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
+				sqlStatement.removeEventListener(SQLEvent.RESULT,versionInfoTableCreated);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0120");
 				if (globalDispatcher != null) {
@@ -825,6 +847,36 @@ package databaseclasses
 					globalDispatcher = null;
 				}
 			}
+			
+		}
+		
+		private function insertLatestVersionInfo():void {
+			sqlStatement.addEventListener(SQLEvent.RESULT,latestVersionInfoInserted);
+			sqlStatement.addEventListener(SQLErrorEvent.ERROR,insertLatestVersionInfoFailed);
+			sqlStatement.text = INSERT_VERSIONINFO;
+			sqlStatement.clearParameters();
+			sqlStatement.parameters[":info"] = DATABASE_HIGHEST_VERSION;
+			sqlStatement.parameters[":lastmodifiedtimestamp"] = (new Date()).valueOf();
+			sqlStatement.execute();
+			
+			function latestVersionInfoInserted(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,latestVersionInfoInserted);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,insertLatestVersionInfoFailed);
+				createTableSource();
+			}
+			
+			function insertLatestVersionInfoFailed(see:SQLErrorEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,latestVersionInfoInserted);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,insertLatestVersionInfoFailed);
+				trace("Failed to insert version :" + sqlStatement.text + ". Database0121");
+				if (globalDispatcher != null) {
+					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
+					errorEvent.data = "Failed to insert version :" + sqlStatement.text + ". Database0121";
+					globalDispatcher.dispatchEvent(errorEvent);
+					globalDispatcher = null;
+				}
+			}
+			
 		}
 		
 		private function checkVersionInfo():void {
@@ -1043,19 +1095,19 @@ package databaseclasses
 		{
 			sqlStatement.text = CREATE_TABLE_SOURCE;
 			sqlStatement.clearParameters();
-			sqlStatement.addEventListener(SQLEvent.RESULT,tableCreated);
-			sqlStatement.addEventListener(SQLErrorEvent.ERROR,tableCreationError);
+			sqlStatement.addEventListener(SQLEvent.RESULT,sourceTableCreated);
+			sqlStatement.addEventListener(SQLErrorEvent.ERROR,sourceTableCreationError);
 			sqlStatement.execute();
 			
-			function tableCreated(se:SQLEvent):void {
-				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
-				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+			function sourceTableCreated(se:SQLEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,sourceTableCreated);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceTableCreationError);
 				checkSource();
 			}
 			
-			function tableCreationError(see:SQLErrorEvent):void {
-				sqlStatement.removeEventListener(SQLEvent.RESULT,tableCreated);
-				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,tableCreationError);
+			function sourceTableCreationError(see:SQLErrorEvent):void {
+				sqlStatement.removeEventListener(SQLEvent.RESULT,sourceTableCreated);
+				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,sourceTableCreationError);
 				trace("Failed to create table :" + sqlStatement.text + ". Database0018");
 				if (globalDispatcher != null) {
 					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
