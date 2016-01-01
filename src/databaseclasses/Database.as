@@ -90,16 +90,16 @@ package databaseclasses
 			"newbloodglucoseeventid STRING PRIMARY KEY, " +
 			"unit TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
-			"value REAL NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
+			"value REAL NOT NULL, comment_2 TEXT, lastmodifiedtimestamp TIMESTAMP NOT NULL)";
 		private const CREATE_TABLE_MEDICIN_EVENTS:String = "CREATE TABLE IF NOT EXISTS medicinevents (medicineventid INTEGER," +//just there for legacy , will actually always have value 0
 			"newmedicineventid STRING PRIMARY KEY, " +
 			"medicinname TEXT NOT NULL, " +
 			"creationtimestamp TIMESTAMP NOT NULL," +
-			"amount REAL NOT NULL, lastmodifiedtimestamp TIMESTAMP NOT NULL)";		
+			"amount REAL NOT NULL, comment_2 TEXT, lastmodifiedtimestamp TIMESTAMP NOT NULL)";		
 		private const CREATE_TABLE_MEAL_EVENTS:String = "CREATE TABLE IF NOT EXISTS mealevents (mealeventid INTEGER," +//just there for legacy , will actually always have value 0
 			"newmealeventid STRING PRIMARY KEY, " +
 			"mealname TEXT NOT NULL, " +
-			"lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
+			"comment_2 TEXT, lastmodifiedtimestamp TIMESTAMP NOT NULL, " +
 			"insulinratio REAL," +
 			"correctionfactor REAL," +
 			"creationtimestamp TIMESTAMP NOT NULL," +
@@ -107,6 +107,7 @@ package databaseclasses
 		private const CREATE_TABLE_SELECTED_FOODITEMS:String = "CREATE TABLE IF NOT EXISTS selectedfooditems (selectedfooditemid INTEGER," +//just there for legacy , will actually always have value 0
 			"newselectedfooditemid STRING PRIMARY KEY , " +
 			"mealevents_mealeventid STRING NOT NULL, " +
+			"newmealevents_mealeventid TEXT, " +
 			"itemdescription TEXT NOT NULL, " +
 			"unitdescription TEXT, " +
 			"standardamount INTEGER, " +
