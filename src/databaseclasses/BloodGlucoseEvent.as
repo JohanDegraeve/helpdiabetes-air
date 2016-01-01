@@ -52,19 +52,6 @@ package databaseclasses
 			_unit = value;
 		}
 
-		private var _lastModifiedTimestamp:Number;
-		
-		public function get lastModifiedTimestamp():Number
-		{
-			return _lastModifiedTimestamp;
-		}
-		
-		internal function set lastModifiedTimestamp(value:Number):void
-		{
-			_lastModifiedTimestamp = value;
-		}
-		
-		
 		/**
 		 * creates a bloodglucose event and stores it immediately in the database if storeInDatabase = true<br>
 		 * unit is a textstring denoting the unit used, mgperdl, or ... <br>
@@ -83,12 +70,12 @@ package databaseclasses
 				_timeStamp = (new Date()).valueOf();
 
 			if (!isNaN(newLastModifiedTimeStamp))
-				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+				lastModifiedTimestamp = newLastModifiedTimeStamp;
 			else
-				_lastModifiedTimestamp = (new Date()).valueOf();
+				lastModifiedTimestamp = (new Date()).valueOf();
 
 			if (storeInDatabase)
-				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,_lastModifiedTimestamp,unit,bloodglucoseEventId,_comment,null);
+				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,lastModifiedTimestamp,unit,bloodglucoseEventId,_comment,null);
 			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
@@ -112,14 +99,14 @@ package databaseclasses
 			_bloodGlucoseLevel = newBloodGlucoseLevel;
 			_comment = newcomment;
 
-				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimestamp)
-					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimestamp.toString());
-				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
+					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
+				lastModifiedTimestamp = newLastModifiedTimeStamp;
 
 			if (!isNaN(newCreationTimeStamp)) {
 				timeStamp = newCreationTimeStamp;
 			}
-			Database.getInstance().updateBloodGlucoseEvent(this.eventid,_unit,_bloodGlucoseLevel, timeStamp,_lastModifiedTimestamp,_comment);
+			Database.getInstance().updateBloodGlucoseEvent(this.eventid,_unit,_bloodGlucoseLevel, timeStamp,lastModifiedTimestamp,_comment);
 			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
@@ -132,7 +119,7 @@ package databaseclasses
 		 * delete the event from the database<br>
 		 * once delted this event should not be used anymore
 		 */
-		public function deleteEvent():void {
+		override public function deleteEvent():void {
 			Database.getInstance().deleteBloodGlucoseEvent(this.eventid);
 			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
@@ -141,7 +128,7 @@ package databaseclasses
 			var returnValue:String;
 			returnValue += "eventid = " + eventid + "\n";
 			returnValue = "timeStamp = " + timeStamp+ "\n";
-			returnValue += "ladmodifiedtimestamp = " + _lastModifiedTimestamp+ "\n";
+			returnValue += "ladmodifiedtimestamp = " + lastModifiedTimestamp+ "\n";
 			returnValue += "bloodglucoselevel = " + _bloodGlucoseLevel.toString() + "\n";
 			returnValue += "unit = " + _unit + "\n";
 			returnValue += "comment = " + _comment + "\n";

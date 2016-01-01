@@ -56,8 +56,6 @@ package databaseclasses
 		private var _insulinRatio:Number;
 		private var _correctionFactor:Number;
 		
-		private var _lastModifiedTimeStamp:Number;
-		
 		private var _meal:Meal;
 		
 		/**
@@ -76,14 +74,6 @@ package databaseclasses
 			_meal = value;
 		}
 		
-		
-		/**
-		 * the lastmodifiedtimestamp
-		 */
-		public function get lastModifiedTimeStamp():Number
-		{
-			return _lastModifiedTimeStamp;
-		}
 		
 		[Bindable]
 		private var _selectedFoodItems:ArrayCollection;
@@ -141,7 +131,7 @@ package databaseclasses
 		 * if databaseStorage = false then creationTimeStamp must be not null<br>
 		 * new mealEventId is created if databaseStorage = true.
 		 */
-		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,timeStamp:Number,dispatcher:EventDispatcher, mealEventId:String, newcomment:String, lastModifiedTimeStamp:Number, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null,mealThatHoldsThisMealEvent:Meal = null) {
+		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,timeStamp:Number,dispatcher:EventDispatcher, mealEventId:String, newcomment:String, newLastModifiedTimeStamp:Number, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null,mealThatHoldsThisMealEvent:Meal = null) {
 			this._mealName = mealName;
 			if (isNaN(insulinRatio))
 				this._insulinRatio = 0;
@@ -155,16 +145,16 @@ package databaseclasses
 			this._meal = mealThatHoldsThisMealEvent;
 			this._comment = newcomment;
 			
-			if (!isNaN(lastModifiedTimeStamp))
-				this._lastModifiedTimeStamp = lastModifiedTimeStamp;
+			if (!isNaN(newLastModifiedTimeStamp))
+				lastModifiedTimestamp = newLastModifiedTimeStamp;
 			else
-				this._lastModifiedTimeStamp = (new Date()).valueOf();
+				lastModifiedTimestamp = (new Date()).valueOf();
 			
 			if (!isNaN(timeStamp)) {
 				this._timeStamp = timeStamp
 			}
 			else {
-				this._timeStamp = _lastModifiedTimeStamp;
+				this._timeStamp = lastModifiedTimestamp;
 			}
 			
 			eventid = mealEventId;
@@ -181,7 +171,7 @@ package databaseclasses
 				localDispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				Database.getInstance().createNewMealEvent(eventid,
 					mealName,
-					_lastModifiedTimeStamp.valueOf(),
+					lastModifiedTimestamp.valueOf(),
 					insulinRatio,
 					correctionFactor,
 					_timeStamp.valueOf(),
@@ -211,6 +201,13 @@ package databaseclasses
 			_selectedFoodItems.addItem(selectedFoodItem);
 			//selectedFoodItem.eventid = new Date().valueOf();
 			selectedFoodItem.mealEventId = this.eventid;
+			
+			//update also the lastmodifiedtimestamp of the mealevent if the selectedfooditem lastmodifiedtimestamp is more recent - which will always be the case here but check it anyway
+			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
+			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
+			if (lastModifiedTimestamp < selectedFoodItem.lastModifiedTimestamp) {
+				lastModifiedTimestamp = selectedFoodItem.lastModifiedTimestamp;
+			}
 			
 			var localDispatcher:EventDispatcher = new EventDispatcher();
 			localDispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
@@ -266,11 +263,11 @@ package databaseclasses
 			if (_timeStamp == timeStamp)
 				return;
 			
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
 			
-			_lastModifiedTimeStamp = (new Date()).valueOf();
-			updateMealEvent(mealName, _comment,insulinRatio,_correctionFactor,lastModifiedTimeStamp,timeStamp);
+			lastModifiedTimestamp = (new Date()).valueOf();
+			updateMealEvent(mealName, _comment,insulinRatio,_correctionFactor,lastModifiedTimestamp,timeStamp);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -324,11 +321,11 @@ package databaseclasses
 			
 			this._comment = value;
 			var newLastModifiedTimeStamp:Number = new Date().valueOf();
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
-			_lastModifiedTimeStamp = newLastModifiedTimeStamp;
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
+			lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
-			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,_lastModifiedTimeStamp,_timeStamp, _comment, null);
+			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,lastModifiedTimestamp,_timeStamp, _comment, null);
 		}
 		
 		/**
@@ -360,11 +357,11 @@ package databaseclasses
 				this._insulinRatio = value;
 			}
 			var newLastModifiedTimeStamp:Number = new Date().valueOf();
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
-			_lastModifiedTimeStamp = newLastModifiedTimeStamp;
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
+			lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
-			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,_lastModifiedTimeStamp,_timeStamp,_comment,null);
+			Database.getInstance().updateMealEvent(this.eventid,_mealName,_insulinRatio,_correctionFactor,lastModifiedTimestamp,_timeStamp,_comment,null);
 			recalculateInsulinAmount();
 		}
 		
@@ -383,11 +380,11 @@ package databaseclasses
 			
 			this._correctionFactor = value;
 			
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
 			
-			_lastModifiedTimeStamp = (new Date()).valueOf();
-			updateMealEvent(mealName, _comment,insulinRatio,_correctionFactor,lastModifiedTimeStamp,timeStamp);
+			lastModifiedTimestamp = (new Date()).valueOf();
+			updateMealEvent(mealName, _comment,insulinRatio,_correctionFactor,lastModifiedTimestamp,timeStamp);
 			
 			recalculateInsulinAmount();
 		}
@@ -504,14 +501,14 @@ package databaseclasses
 						 }
 					 }
 					 if (insulinGivenDuringMeal > 0) {
-						returnValue += "{bolus_already_given}** = " + ((Math.round(insulinGivenDuringMeal * 10))/10).toString() + "\n";
-						
-						returnValue += "{calculated_insulinamount} = " + 
-							((Math.round(_calculatedInsulinAmount * 10))/10).toString() + 
-							" - " +
-							((Math.round(insulinGivenDuringMeal * 10))/10).toString();
-						_calculatedInsulinAmount = _calculatedInsulinAmount - insulinGivenDuringMeal;
-						returnValue += " = " + ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
+						 returnValue += "{bolus_already_given}** = " + ((Math.round(insulinGivenDuringMeal * 10))/10).toString() + "\n";
+						 
+						 returnValue += "{calculated_insulinamount} = " + 
+							 ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + 
+							 " - " +
+							 ((Math.round(insulinGivenDuringMeal * 10))/10).toString();
+						 _calculatedInsulinAmount = _calculatedInsulinAmount - insulinGivenDuringMeal;
+						 returnValue += " = " + ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
 					 }
 					 
 					 if (activeInsulin > 0 || insulinGivenDuringMeal > 0) {
@@ -607,7 +604,7 @@ package databaseclasses
 		 * There's no call to synchronize from here, because this function should only get called from database.as (during startup) or from synchronize itself 
 		 * (when a local event needs to be deleted)
 		 */
-		public function deleteEvent():void {
+		override public function deleteEvent():void {
 			while (_selectedFoodItems.length > 0) {
 				Database.getInstance().deleteSelectedFoodItem((_selectedFoodItems.getItemAt(0) as SelectedFoodItem).eventid,null);
 				_selectedFoodItems.removeItemAt(0);
@@ -625,9 +622,9 @@ package databaseclasses
 			_correctionFactor = newCorrectionFactor;
 			_comment = newcomment;
 			
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimeStamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimeStamp.toString());
-			_lastModifiedTimeStamp = newLastModifiedTimeStamp;
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
+			lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
 			recalculateTotals();
 			

@@ -414,7 +414,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theMedicinEvent = new MedicinEvent(
 						new Number(amountText),
 						medicinName,
-						DateTimeUtilities.createEventId(),
+						DateTimeUtilities.createEventId() + "-medicin",
 						comment,//comment,
 						eventDateAndTime.valueOf(),
 						(new Date()).valueOf(),

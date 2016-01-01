@@ -251,7 +251,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theBloodGlucoseEvent = new BloodGlucoseEvent(
 						new Number(meteringResultText),
 						unit,
-						DateTimeUtilities.createEventId(),
+						DateTimeUtilities.createEventId() + "-glucose",
 						comment,//comment
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theBloodGlucoseEvent);

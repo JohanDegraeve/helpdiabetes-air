@@ -80,18 +80,6 @@ package databaseclasses
 		}
 
 		
-		private var _lastModifiedTimestamp:Number;
-		
-		public function get lastModifiedTimestamp():Number
-		{
-			return _lastModifiedTimestamp;
-		}
-		
-		internal function set lastModifiedTimestamp(value:Number):void
-		{
-			_lastModifiedTimestamp = value;
-		}
-		
 		private var _bolusDurationInMinutes:Number;
 
 		 /**
@@ -135,12 +123,12 @@ package databaseclasses
 				_timeStamp = (new Date()).valueOf();
 			
 			if (!isNaN(newLastModifiedTimeStamp))
-				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+				lastModifiedTimestamp = newLastModifiedTimeStamp;
 			else
-				_lastModifiedTimestamp = (new Date()).valueOf();
+				lastModifiedTimestamp = (new Date()).valueOf();
 			
 			if (storeInDatabase)
-				Database.getInstance().createNewMedicinEvent(bolusType,bolusDuration, amount, medicin, _timeStamp,_lastModifiedTimestamp,medicineventid, _comment, null);
+				Database.getInstance().createNewMedicinEvent(bolusType,bolusDuration, amount, medicin, _timeStamp,lastModifiedTimestamp,medicineventid, _comment, null);
 			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
@@ -158,13 +146,13 @@ package databaseclasses
 			_medicinName = newMedicinName;
 			_comment = newComment;
 			_bolusDurationInMinutes = bolusDuration;
-			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimestamp)
-				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,_lastModifiedTimestamp.toString());
-			_lastModifiedTimestamp = newLastModifiedTimeStamp;
+			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
+			lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
-			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDurationInMinutes, this.eventid,_amount,_medicinName,timeStamp,_lastModifiedTimestamp, _comment);
+			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDurationInMinutes, this.eventid,_amount,_medicinName,timeStamp,lastModifiedTimestamp, _comment);
 			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
@@ -172,7 +160,7 @@ package databaseclasses
 		 * delete the event from the database<br>
 		 * once deleted this event should not be used anymore
 		 */
-		public function deleteEvent():void {
+		override public function deleteEvent():void {
 			Database.getInstance().deleteMedicinEvent(this.eventid);
 			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}

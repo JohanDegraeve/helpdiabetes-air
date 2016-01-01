@@ -17,6 +17,8 @@
  */
 package myComponents
 {
+	import databaseclasses.Database;
+	
 	import utilities.DateTimeUtilities;
 
 	/**
@@ -27,6 +29,8 @@ package myComponents
 	public class TrackingViewElement
 		
 	{
+		public var lastModifiedTimestamp:Number;
+		
 		protected var _timeStamp:Number;
 
 		public function get timeStamp():Number
@@ -75,6 +79,11 @@ package myComponents
 			_mark = value;
 		}
 
+		/**
+		 * to be overriden for objects that require this functionality
+		 */
+		public function deleteEvent():void {
+		}
 
 	}
 }

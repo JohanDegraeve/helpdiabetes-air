@@ -236,7 +236,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theExerciseEvent = new ExerciseEvent(
 						exerciseName,
 						comment,
-						DateTimeUtilities.createEventId(),
+						DateTimeUtilities.createEventId() + "-exercise",
 						eventDateAndTime.valueOf());
 					ModelLocator.getInstance().trackingList.addItem(theExerciseEvent);
 				} else {
