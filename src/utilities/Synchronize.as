@@ -677,7 +677,7 @@ package utilities
 				//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
 				syncFinished(false);
 			} else {
-				globalImmediateRunNecessary = immediateRunNecessary
+				globalImmediateRunNecessary = immediateRunNecessary;
 				if (timer2 != null) {
 					if (timer2.hasEventListener(TimerEvent.TIMER))
 						timer2.removeEventListener(TimerEvent.TIMER,startSynchronize);
