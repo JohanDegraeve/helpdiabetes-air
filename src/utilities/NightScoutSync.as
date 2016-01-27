@@ -160,7 +160,7 @@
 		 private var trackingListAlreadyModified:Boolean;
 		 private var previousTrackingEventToShow:String;
 		 
-		 private static const apiSecret:String = "a317ef4f03f89c713e4530a58f64eeb27b5d831a";
+		 private static const apiSecret:String = "06c882c27a21a8981bf90def2da89db49068cf12";
 		 private static const nightScoutTreatmentsUrl:String = "https://testhdsync.azurewebsites.net/api/v1/treatments";
 		 /**
 		  * how many seconds between two synchronisations, actual value
