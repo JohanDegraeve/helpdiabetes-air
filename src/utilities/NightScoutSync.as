@@ -696,7 +696,7 @@
 								 }
 								 //the localelement is found remotely, so we will not upload it anymore to ns
 								 //so it can be removed from localelemeents
-								 var indexOfLocalElement = localElements.getItemIndex(localElement);
+								 var indexOfLocalElement:int = localElements.getItemIndex(localElement);
 								 if (indexOfLocalElement > -1) {
 									 localElements.removeItemAt(indexOfLocalElement);
 								 }
@@ -837,73 +837,79 @@
 				 //start preparing the json object and do the put
 				 var newElement:Object = new Object();
 				 var localElement:Object = localElements.getItemAt(0);
-				 var eventId:String = (localElement as TrackingViewElement).eventid;
-				 var indexOfDash:int = eventId.indexOf("-");
-				 if (indexOfDash > -1) {
-					 //strip off anyting like -carbs, -exercise, ...
-					 eventId = eventId.substring(0,indexOfDash);
+				 if ((localElement as TrackingViewElement).eventid.length < 24) {
+					 //we will not update these , it's been created with older version of helpdiabetes
+					 localElements.removeItemAt(0);
+					 updateRemoteElements();
+				 } else {
+					 var eventId:String = (localElement as TrackingViewElement).eventid;
+					 var indexOfDash:int = eventId.indexOf("-");
+					 if (indexOfDash > -1) {
+						 //strip off anyting like -carbs, -exercise, ...
+						 eventId = eventId.substring(0,indexOfDash);
+					 }
+					 newElement["_id"] = eventId;
+					 newElement["eventTime"] = (localElement as TrackingViewElement).timeStamp;
+					 newElement["enteredBy"] = "helpdiabetes";
+					 var helpDiabetesObject:Object = new Object();
+					 //helpDiabetesObject["deleted"] = "false"; not really useful because nightscout itself will not take this field into account - better to use google sync for that and to delete the object at NS effectively in stead of marking it as deleted
+					 helpDiabetesObject["lastmodifiedtimestamp"] = (new Date((localElement as TrackingViewElement).lastModifiedTimestamp)).valueOf();
+					 var lastModifiedAtNS:String = ((new Date()).valueOf() - (localElement as TrackingViewElement).lastModifiedTimestamp > 10000 
+						 ? 
+						 (new Date()).valueOf().toString() 
+						 :
+						 (localElement as TrackingViewElement).lastModifiedTimestamp.toString());
+					 helpDiabetesObject["lastmodifiedatns"] = lastModifiedAtNS;
+					 newElement["helpdiabetes"] = helpDiabetesObject;
+					 
+					 
+					 if (localElement is BloodGlucoseEvent) {
+						 //newElement[""] = (localElement ad BloodGlucoseEvent).;
+						 newElement["glucose"] = (localElement as BloodGlucoseEvent).bloodGlucoseLevel;
+						 newElement["eventType"] = "BG Check";
+						 newElement["glucoseType"] = "Finger";
+						 newElement["notes"] = (localElement as BloodGlucoseEvent).comment;
+						 newElement["units"] = 
+							 (localElement as BloodGlucoseEvent).unit == ResourceManager.getInstance().getString('general','mgperdl') ?
+							 "mg/dl":"mmol";
+					 } else if (localElement is ExerciseEvent) {
+						 newElement["notes"] = "Level = " + (localElement as ExerciseEvent).level;
+						 if ((localElement as ExerciseEvent).comment) 
+							 if ((localElement as ExerciseEvent).comment.length > 0)
+								 newElement["notes"] += "<br>" + (localElement as ExerciseEvent).comment;
+						 newElement["duration"] = 30; 
+						 newElement["eventType"] = "Exercise";
+					 } else if (localElement is MedicinEvent) {
+						 //we will only upload medicinevents of type insulintype1
+						 //and no lon duration bolusses
+						 var medicinEvent:MedicinEvent = (localElement as MedicinEvent);
+						 if (medicinEvent.medicinName != Settings.getInstance().getSetting(Settings.SettingsInsulinType1) || 
+							 medicinEvent.bolustype != ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL)) {
+							 //don't upload
+						 } else {
+							 newElement["eventType"] = "Bolus";
+							 if (medicinEvent.amount == 0)
+								 newElement["insulin"] = new Number(0.1);//just a little workaround because nightscout doesn't accept a value of 0, user shouldn't create a bolus with value 0
+							 else 
+								 newElement["insulin"] = medicinEvent.amount;
+							 newElement["notes"] = medicinEvent.comment;
+						 }
+					 } else if (localElement is MealEvent) {
+						 newElement["eventType"] = (localElement as MealEvent).mealName;
+						 var selectedFoodItemText:String = ""; 
+						 for (var foodItemCntr:int = 0; foodItemCntr < (localElement as MealEvent).selectedFoodItems.length; foodItemCntr++) {
+							 var selectedFoodItem:SelectedFoodItem = (localElement as MealEvent).selectedFoodItems.getItemAt(foodItemCntr) as SelectedFoodItem;
+							 selectedFoodItemText += selectedFoodItem.chosenAmount + " " + selectedFoodItem.unit.unitDescription + " " + selectedFoodItem.itemDescription;
+							 if (foodItemCntr < (localElement as MealEvent).selectedFoodItems.length - 1)
+								 selectedFoodItemText += "<br>";
+						 }
+						 if (selectedFoodItemText.length > 0) {
+							 newElement["notes"] = "Food :<br>" + selectedFoodItemText;
+						 }
+						 newElement.carbs = ((Math.round((localElement as MealEvent).totalCarbs * 10))/10);
+					 } 
+					 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.PUT,null,JSON.stringify(newElement),updateRemoteElements,true);
 				 }
-				 newElement["_id"] = eventId;
-				 newElement["eventTime"] = (localElement as TrackingViewElement).timeStamp;
-				 newElement["enteredBy"] = "helpdiabetes";
-				 var helpDiabetesObject:Object = new Object();
-				 //helpDiabetesObject["deleted"] = "false"; not really useful because nightscout itself will not take this field into account - better to use google sync for that and to delete the object at NS effectively in stead of marking it as deleted
-				 helpDiabetesObject["lastmodifiedtimestamp"] = (new Date((localElement as TrackingViewElement).lastModifiedTimestamp)).valueOf();
-				 var lastModifiedAtNS:String = ((new Date()).valueOf() - (localElement as TrackingViewElement).lastModifiedTimestamp > 10000 
-					 ? 
-					 (new Date()).valueOf().toString() 
-					 :
-					 (localElement as TrackingViewElement).lastModifiedTimestamp.toString());
-				 helpDiabetesObject["lastmodifiedatns"] = lastModifiedAtNS;
-				 newElement["helpdiabetes"] = helpDiabetesObject;
-				 
-				 
-				 if (localElement is BloodGlucoseEvent) {
-					 //newElement[""] = (localElement ad BloodGlucoseEvent).;
-					 newElement["glucose"] = (localElement as BloodGlucoseEvent).bloodGlucoseLevel;
-					 newElement["eventType"] = "BG Check";
-					 newElement["glucoseType"] = "Finger";
-					 newElement["notes"] = (localElement as BloodGlucoseEvent).comment;
-					 newElement["units"] = 
-						 (localElement as BloodGlucoseEvent).unit == ResourceManager.getInstance().getString('general','mgperdl') ?
-						 "mg/dl":"mmol";
-				 } else if (localElement is ExerciseEvent) {
-					 newElement["notes"] = "Level = " + (localElement as ExerciseEvent).level;
-					 if ((localElement as ExerciseEvent).comment) 
-						 if ((localElement as ExerciseEvent).comment.length > 0)
-							 newElement["notes"] += "<br>" + (localElement as ExerciseEvent).comment;
-					 newElement["duration"] = 30; 
-					 newElement["eventType"] = "Exercise";
-				 } else if (localElement is MedicinEvent) {
-					 //we will only upload medicinevents of type insulintype1
-					 //and no lon duration bolusses
-					 var medicinEvent:MedicinEvent = (localElement as MedicinEvent);
-					 if (medicinEvent.medicinName != Settings.getInstance().getSetting(Settings.SettingsInsulinType1) || 
-					     medicinEvent.bolustype != ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL)) {
-						 //don't upload
-					 } else {
-						 newElement["eventType"] = "Bolus";
-						 if (medicinEvent.amount == 0)
-							 newElement["insulin"] = new Number(0.1);//just a little workaround because nightscout doesn't accept a value of 0, user shouldn't create a bolus with value 0
-						 else 
-							 newElement["insulin"] = medicinEvent.amount;
-						 newElement["notes"] = medicinEvent.comment;
-					 }
-				 } else if (localElement is MealEvent) {
-					 newElement["eventType"] = (localElement as MealEvent).mealName;
-					 var selectedFoodItemText:String = ""; 
-					 for (var foodItemCntr:int = 0; foodItemCntr < (localElement as MealEvent).selectedFoodItems.length; foodItemCntr++) {
-						 var selectedFoodItem:SelectedFoodItem = (localElement as MealEvent).selectedFoodItems.getItemAt(foodItemCntr) as SelectedFoodItem;
-						 selectedFoodItemText += selectedFoodItem.chosenAmount + " " + selectedFoodItem.unit.unitDescription + " " + selectedFoodItem.itemDescription;
-						 if (foodItemCntr < (localElement as MealEvent).selectedFoodItems.length - 1)
-							 selectedFoodItemText += "<br>";
-					 }
-					 if (selectedFoodItemText.length > 0) {
-						 newElement["notes"] = "Food :<br>" + selectedFoodItemText;
-					 }
-					 newElement.carbs = ((Math.round((localElement as MealEvent).totalCarbs * 10))/10);
-				 } 
-				 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.PUT,null,JSON.stringify(newElement),updateRemoteElements,true);
 			 } else if (remoteElements.length > 0) {
 				 var remoteElement:Object = remoteElements.getItemAt(0);
 				 if (remoteElement.tobeupdatedatns) {

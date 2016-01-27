@@ -243,6 +243,8 @@ initial setup of sync settings
 				Settings.getInstance().setSetting(Settings.SettingsAccessToken,temp.access_token);
 				Settings.getInstance().setSetting(Settings.SettingsRefreshToken,temp.refresh_token);
 				Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
+				Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 				Synchronize.getInstance().startSynchronize(true,false);
 			}
 			

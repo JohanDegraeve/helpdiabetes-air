@@ -192,14 +192,14 @@ package utilities
 		private var asOfTimeStamp:Number
 		
 		private var _synchronize_debugString:String = "";
-
+		
 		public function get synchronize_debugString():String
 		{
 			return _synchronize_debugString;
 		}
-
+		
 		public static const SYNCHRONIZE_ERROR_OCCURRED:String="error_occurred";
-
+		
 		/////columnnames
 		private static var ColumnName_id:String = "id";
 		private static var ColumnName_medicinname:String = "medicinname";
@@ -426,7 +426,7 @@ package utilities
 		 * temporary variable used in getrowids
 		 */
 		private  var tableId:String;
-
+		
 		
 		/**
 		 * the access_token to use the google api 
@@ -484,7 +484,7 @@ package utilities
 		
 		private static var callingDispatcher:EventDispatcher;
 		private static var updateGoogleTablesIsNecessary:Boolean;
-
+		
 		
 		/**
 		 * used for event dispatching, when sync finished, no matter if it was successful or not
@@ -556,12 +556,12 @@ package utilities
 		}
 		
 		private var _uploadFoodDatabaseStatus:String = "";
-
+		
 		/**
 		 * text to use in downloadfoodtableview, for showing status 
 		 */
 		public function get uploadFoodDatabaseStatus():String
-
+			
 		{
 			return _uploadFoodDatabaseStatus;
 		}
@@ -618,7 +618,7 @@ package utilities
 				throw new Error("Synchronize class can only be accessed through Synchronize.getInstance()");	
 			}
 			debugMode = ModelLocator.debugMode;
-
+			
 			updateGoogleTablesIsNecessary = false;
 			tableCounterForFunctionUpdateGoogleTablesIfNecessary = 0;
 			syncRunning = false;
@@ -671,87 +671,90 @@ package utilities
 		 * onlySyncTheSettings =  if true synchronize will jump immediately to syncing the settings, assuming all tables are already there. Should only be true if it's sure that tables are existing on google docs account
 		 */
 		public function startSynchronize(immediateRunNecessary:Boolean = false,onlySyncTheSettings:Boolean = false, event:Event = null):void {
-			globalImmediateRunNecessary = immediateRunNecessary
-			if (timer2 != null) {
-				if (timer2.hasEventListener(TimerEvent.TIMER))
-					timer2.removeEventListener(TimerEvent.TIMER,startSynchronize);
-				timer2.stop();
-				timer2 = null;
-			}
-
-			trace("Synchronize.as : in startsynchronize");
-			//to make sure there's at least one complete resync per day
-			if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteGoogleSync))) {
-				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,
-					( (
-						(new Date()).valueOf() 
-						- 
-						new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000
-					).toString()
-					)
-				);
-				Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteGoogleSync,(new Date()).date.toString());
-			}
-			
-			if (
-				(!(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true"))
-				&&
-				(Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true")
-			)//uploading foodtable can take a very long time 
-				secondsBetweenTwoSync = 3600;
-			else 
-				secondsBetweenTwoSync = normalValueForSecondsBetweenTwoSync;
-			
-			var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > secondsBetweenTwoSync * 1000;
-			
-			if ((syncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!syncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
-				localElementsUpdated  = false;
-				retrievalCounter = 0;
-				helpDiabetesFoodTableWorkSheetId = "";//not really necessary to reset it each time to empty string, but you never know it could be that user deletes the foodtable worksheet in between to syncs,
-				helpDiabetesFoodTableSpreadSheetKey = "";//same comment
-				trackingList = ModelLocator.getInstance().trackingList;
-				currentSyncTimeStamp = new Date().valueOf();
-				lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp));
-				if (debugMode)
-					trace("Synchronize.as : lastsynctimestamp = " + new DateTimeFormatter().format(new Date(lastSyncTimeStamp)));
-				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
-				rerunNecessary = false;
-				syncRunning = true;
-				currentSyncTimeStamp = new Date().valueOf();
-				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
-				findAllSpreadSheetsWaiting = false;
-				downloadFoodTableSpreadSheetWaiting = false;
-				findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
-				
-				createlogbookheaderWaiting = false;
-				createlogbookWaiting = false;
-				createlogbookworksheetWaiting = false;
-				findlogbookspreadsheetWaiting = false;
-				findlogbookworksheetWaiting = false;
-				insertlogbookeventsWaiting = false;
-				
-				if (onlySyncTheSettings)
-					getTheSettings();
-				else
-					synchronize();
+			access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
+			if (access_token.length == 0  ) {
+				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
+				//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
+				syncFinished(false);
 			} else {
-				if (immediateRunNecessary) {
-					rerunNecessary = true;
+				globalImmediateRunNecessary = immediateRunNecessary
+				if (timer2 != null) {
+					if (timer2.hasEventListener(TimerEvent.TIMER))
+						timer2.removeEventListener(TimerEvent.TIMER,startSynchronize);
+					timer2.stop();
+					timer2 = null;
+				}
+				
+				trace("Synchronize.as : in startsynchronize");
+				//to make sure there's at least one complete resync per day
+				if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteGoogleSync))) {
+					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,
+						( (
+							(new Date()).valueOf() 
+							- 
+							new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000
+						).toString()
+						)
+					);
+					Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteGoogleSync,(new Date()).date.toString());
+				}
+				
+				if (
+					(!(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true"))
+					&&
+					(Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true")
+				)//uploading foodtable can take a very long time 
+					secondsBetweenTwoSync = 3600;
+				else 
+					secondsBetweenTwoSync = normalValueForSecondsBetweenTwoSync;
+				
+				var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > secondsBetweenTwoSync * 1000;
+				
+				if ((syncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!syncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
+					localElementsUpdated  = false;
+					retrievalCounter = 0;
+					helpDiabetesFoodTableWorkSheetId = "";//not really necessary to reset it each time to empty string, but you never know it could be that user deletes the foodtable worksheet in between to syncs,
+					helpDiabetesFoodTableSpreadSheetKey = "";//same comment
+					trackingList = ModelLocator.getInstance().trackingList;
+					currentSyncTimeStamp = new Date().valueOf();
+					lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp));
+					if (debugMode)
+						trace("Synchronize.as : lastsynctimestamp = " + new DateTimeFormatter().format(new Date(lastSyncTimeStamp)));
+					asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
+					rerunNecessary = false;
+					syncRunning = true;
+					currentSyncTimeStamp = new Date().valueOf();
+					asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
+					findAllSpreadSheetsWaiting = false;
+					downloadFoodTableSpreadSheetWaiting = false;
+					findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
+					
+					createlogbookheaderWaiting = false;
+					createlogbookWaiting = false;
+					createlogbookworksheetWaiting = false;
+					findlogbookspreadsheetWaiting = false;
+					findlogbookworksheetWaiting = false;
+					insertlogbookeventsWaiting = false;
+					
+					if (onlySyncTheSettings)
+						getTheSettings();
+					else
+						synchronize();
+				} else {
+					if (immediateRunNecessary) {
+						rerunNecessary = true;
+					}
+				}
+				
+				if (timer2 == null) {
+					timer2 = new Timer(300000, 1);
+					timer2.addEventListener(TimerEvent.TIMER, startSynchronize);
+					timer2.start();
 				}
 			}
 			
-			if (timer2 == null) {
-				timer2 = new Timer(300000, 1);
-				timer2.addEventListener(TimerEvent.TIMER, startSynchronize);
-				timer2.start();
-			}
 		}
 		
-		/**
-		 * if there's no valid access_token or refresh_token, then this method will do nothing<br>
-		 * if there's a valid access_token or refresh_token, then this method will synchronize the database with 
-		 * Google Fusion Tables 
-		 */
 		private function synchronize(event:Event = null):void {
 			_synchronize_debugString = "";
 			if (event != null)  {
@@ -803,35 +806,24 @@ package utilities
 				if (debugMode)
 					trace("Synchronize.as : start method synchronize");
 				
-				//we could be arriving here after a retempt, example, first time failed due to invalid credentials, token refresh occurs, with success, we come back to here
-				//first thing to do is to removeeventlisteners
-				
-				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-				
-				if (access_token.length == 0  ) {
-					//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
-					//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
-					syncFinished(false);
-				} else {
-					if (!alReadyGATracked) {
-						alReadyGATracked = MyGATracker.getInstance().trackPageview( "Synchronize-SyncStarted");
-					}
-					
-					//first get all the tables
-					var urlVariables:URLVariables = new URLVariables();
-					urlVariables.maxResults = maxResults;
-					if (nextPageToken != null)
-						urlVariables.pageToken = nextPageToken;
-					
-					createAndLoadURLRequest(
-						googleRequestTablesUrl,
-						URLRequestMethod.GET,
-						urlVariables,
-						null,
-						synchronize,
-						true,
-						null);
+				if (!alReadyGATracked) {
+					alReadyGATracked = MyGATracker.getInstance().trackPageview( "Synchronize-SyncStarted");
 				}
+				
+				//first get all the tables
+				var urlVariables:URLVariables = new URLVariables();
+				urlVariables.maxResults = maxResults;
+				if (nextPageToken != null)
+					urlVariables.pageToken = nextPageToken;
+				
+				createAndLoadURLRequest(
+					googleRequestTablesUrl,
+					URLRequestMethod.GET,
+					urlVariables,
+					null,
+					synchronize,
+					true,
+					null);
 			}
 		}
 		
@@ -903,7 +895,7 @@ package utilities
 			if (debugMode)
 				trace("Synchronize.as : updateGoogleTablesIsNecessary = true , starting method updateGoogleTablesIfNecessary");
 			//continue but it could still be that there's no more updates necessary, this depends on the value of tableCounterForFunctionUpdateGoogleTablesIfNecessary
-
+			
 			if (event != null) {
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -1018,7 +1010,7 @@ package utilities
 				
 				if (eventHasError(event,getTheMedicinEvents))
 					return;
-
+					
 				else {
 					if (eventAsJSONObject.kind != "fusiontables#column")  {//if it would have been fusiontables#column, it would mean we come here after having added a missing column
 						positionId = eventAsJSONObject.columns.indexOf(ColumnName_id);
@@ -1137,9 +1129,9 @@ package utilities
 										bolusDuration = new Number(medicinArray[2] as String);
 									else
 										bolusDuration = new Number(0);
-
+									
 									var medicinName:String = medicinArray[0];
-
+									
 									(trackingList.getItemAt(l) as MedicinEvent).updateMedicinEvent(
 										bolusType,
 										bolusDuration,
@@ -1170,9 +1162,9 @@ package utilities
 								bolusDuration2 = new Number(medicinArray1[2] as String);
 							else
 								bolusDuration2 = new Number(0);
-
+							
 							var medicinName1:String = medicinArray1[0];
-
+							
 							(new MedicinEvent(
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
 								medicinName1,
@@ -1214,7 +1206,7 @@ package utilities
 						
 						if (!(checkMissingColumn(tableNamesAndColumnNames[1][1],eventAsJSONObject.columns,tableNamesAndColumnNames[1][2],getTheBloodGlucoseEvents)))
 							return;
-
+						
 						var elementAlreadyThere:Boolean;
 						if (eventAsJSONObject.rows) {
 							for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
@@ -1315,7 +1307,7 @@ package utilities
 									if (debugMode)
 										trace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
 									//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
-									NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(l));
+									NightScoutSync.getInstance().addObjectToBeDeleted(trackingList.getItemAt(l));
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).updateBloodGlucoseEvent(
@@ -1374,7 +1366,7 @@ package utilities
 						
 						if (!(checkMissingColumn(tableNamesAndColumnNames[2][1],eventAsJSONObject.columns,tableNamesAndColumnNames[2][2],getTheExerciseEvents)))
 							return;
-
+						
 						var elementAlreadyThere:Boolean;
 						if (eventAsJSONObject.rows) {
 							for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
@@ -1532,7 +1524,7 @@ package utilities
 						
 						if (!(checkMissingColumn(tableNamesAndColumnNames[3][1],eventAsJSONObject.columns,tableNamesAndColumnNames[3][2],getTheMealEvents)))
 							return;
-
+						
 						var elementAlreadyThere:Boolean;
 						if (eventAsJSONObject.rows) {
 							for (var rowctr:int = 0;rowctr < eventAsJSONObject.rows.length;rowctr++) {
@@ -2562,7 +2554,7 @@ package utilities
 				_synchronize_debugString = event.target.data as String;
 				this.dispatchEvent(new Event(SYNCHRONIZE_ERROR_OCCURRED));
 			}
-
+			
 			removeEventListeners();
 			if (debugMode)
 				trace("Synchronize.as : in googleapicall failed : event.target.data = " + event.target.data as String);
@@ -2571,22 +2563,22 @@ package utilities
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				var message:String = eventAsJSONObject.error.message as String;
 				if (message == googleError_Invalid_Credentials) {
-						secondAttempt = true;
-						//get a new access_token
-						var request:URLRequest = new URLRequest(googleTokenRefreshUrl);
-						request.contentType = "application/x-www-form-urlencoded";
-						request.data = new URLVariables(
-							"client_id=" + ResourceManager.getInstance().getString('client_secret','client_id') + "&" +
-							"client_secret=" + ResourceManager.getInstance().getString('client_secret','client_secret') + "&" +
-							"refresh_token=" + Settings.getInstance().getSetting(Settings.SettingsRefreshToken) + "&" + 
-							"grant_type=refresh_token");
-						request.method = URLRequestMethod.POST;
-						loader = new URLLoader();
-						loader.addEventListener(Event.COMPLETE,accessTokenRefreshed);
-						loader.addEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
-						loader.load(request);
-						if (debugMode)
-							trace("Synchronize.as : loader : request = " + request.data); 
+					secondAttempt = true;
+					//get a new access_token
+					var request:URLRequest = new URLRequest(googleTokenRefreshUrl);
+					request.contentType = "application/x-www-form-urlencoded";
+					request.data = new URLVariables(
+						"client_id=" + ResourceManager.getInstance().getString('client_secret','client_id') + "&" +
+						"client_secret=" + ResourceManager.getInstance().getString('client_secret','client_secret') + "&" +
+						"refresh_token=" + Settings.getInstance().getSetting(Settings.SettingsRefreshToken) + "&" + 
+						"grant_type=refresh_token");
+					request.method = URLRequestMethod.POST;
+					loader = new URLLoader();
+					loader.addEventListener(Event.COMPLETE,accessTokenRefreshed);
+					loader.addEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
+					loader.load(request);
+					if (debugMode)
+						trace("Synchronize.as : loader : request = " + request.data); 
 				} else {
 					syncFinished(false);
 				}
@@ -2996,7 +2988,7 @@ package utilities
 			if (trackinglistcntr == ModelLocator.getInstance().trackingList.length) {
 				this.dispatchEvent(new Event(EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS));
 				MyGATracker.getInstance().trackPageview( "LogBookUploaded" );
-
+				
 				startSynchronize(true,true);
 			}
 		}
@@ -3125,7 +3117,7 @@ package utilities
 				googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealkcalamount');
 				googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealproteinamount');
 				googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealfatamount');
-
+				
 				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInLogBook)) + 1;//index starts at 0, but column number at 1
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
@@ -3155,7 +3147,7 @@ package utilities
 					return;
 				}
 			} 
-						
+			
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) == googleExcelFoodTableColumnNames.length)  {
 				googleExcelInsertFoodItems();
 			} else {
@@ -3163,7 +3155,7 @@ package utilities
 					trace("Synchronize.as : start method googleExcelCreateHeader");
 				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingheaders');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
-
+				
 				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) + 1;//index starts at 0, but column number at 1
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
@@ -3257,7 +3249,7 @@ package utilities
 			} else {
 				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingfoodtablespreadsheet');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
-
+				
 				if (debugMode)
 					trace("Synchronize.as : start method googleExcelCreateFoodTable");
 				
@@ -3390,7 +3382,7 @@ package utilities
 			} else {
 				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingfoodtableworksheet');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
-
+				
 				if (debugMode)
 					trace("Synchronize.as : start method googleExcelCreateWorkSheet");
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
@@ -3498,7 +3490,7 @@ package utilities
 				if (debugMode)
 					trace("Synchronize.as : start method googleExcelFindLogBookWorkSheet");
 				this.dispatchEvent(new Event(SEARCHING_LOGBOOK_WORKSHEET));
-
+				
 				createAndLoadURLRequest(
 					googleExcelFindWorkSheetUrl.replace("{key}",helpDiabetesLogBookSpreadSheetKey),
 					null,
@@ -3531,7 +3523,7 @@ package utilities
 					"application/atom+xml");
 			}
 		}
-				
+		
 		private function googleExcelFindFoodTableWorkSheet(event:Event = null):void {
 			if (event != null)  {
 				removeEventListeners();
@@ -3623,7 +3615,7 @@ package utilities
 						} else {
 							//tablefound remains false
 						}
-							
+						
 						if (tableFound)  {
 							//foodtable found
 							if (Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true")  {
@@ -3734,68 +3726,68 @@ package utilities
 					+ "syncRunning = " + syncRunning + "\n\n\n" ;
 				this.dispatchEvent(new Event(SYNCHRONIZE_ERROR_OCCURRED));
 			}
-
 			
-			if (!syncRunning)//syncfinished must have been called although sync is not running, not need to process any further
-				return;
-			
-			this.dispatchEvent(new Event(SYNC_FINISHED,true));
-			
-			var localdispatcher:EventDispatcher = new EventDispatcher();
-			
-			trace("Synchronize.as : in Google syncFinished with success = " + success + "\n\n\n");
-			
-			if (success) {
-				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,currentSyncTimeStamp.toString());
-				lastSyncTimeStamp = currentSyncTimeStamp;
-			} else
-				currentSyncTimeStamp = currentSyncTimeStamp - (secondsBetweenTwoSync * 1000 + 1);
-			
-			if (localElementsUpdated) {
-				localElementsUpdated = false;
-				copyTrackingListIfNotDoneYet();//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
-				ModelLocator.getInstance().trackingList = new ArrayCollection();
-				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
-				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-				Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
-			}
-			
-			if (rerunNecessary) {
-				currentSyncTimeStamp = new Date().valueOf();
-				asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
-				syncRunning = true;
-				rerunNecessary = false;
-				synchronize();
+			if (syncRunning) {
+				this.dispatchEvent(new Event(SYNC_FINISHED,true));
+				
+				var localdispatcher:EventDispatcher = new EventDispatcher();
+				
+				trace("Synchronize.as : in Google syncFinished with success = " + success + "\n\n\n");
+				
+				if (success) {
+					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,currentSyncTimeStamp.toString());
+					lastSyncTimeStamp = currentSyncTimeStamp;
+				} else
+					currentSyncTimeStamp = currentSyncTimeStamp - (secondsBetweenTwoSync * 1000 + 1);
+				
+				if (localElementsUpdated) {
+					localElementsUpdated = false;
+					copyTrackingListIfNotDoneYet();//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
+					ModelLocator.getInstance().trackingList = new ArrayCollection();
+					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
+					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
+					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
+				}
+				
+				if (rerunNecessary) {
+					currentSyncTimeStamp = new Date().valueOf();
+					asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
+					syncRunning = true;
+					rerunNecessary = false;
+					synchronize();
+				} else {
+					syncRunning = false;
+					if (findAllSpreadSheetsWaiting) {
+						findAllSpreadSheetsWaiting = false;
+						googleExcelFindAllSpreadSheets();
+					} else if (downloadFoodTableSpreadSheetWaiting) {
+						downloadFoodTableSpreadSheetWaiting = false;
+						googleExcelDownloadFoodTableSpreadSheet();
+					} else if (findAllWorkSheetsInFoodTableSpreadSheetWaiting) {
+						findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
+						googleExcelFindAllWorkSheetsInFoodTableSpreadSheet(null,-1);
+					} else if (createlogbookheaderWaiting) {
+						createlogbookheaderWaiting = false;
+						googleExcelCreateLogBookHeader(null);
+					} else if (createlogbookWaiting) {
+						createlogbookWaiting = false;
+						googleExcelCreateLogBook(null);
+					} else if (createlogbookworksheetWaiting) {
+						createlogbookworksheetWaiting = false;
+						googleExcelCreateLogBookWorkSheet(null);
+					} else if (findlogbookspreadsheetWaiting) {
+						findlogbookspreadsheetWaiting = false;
+						googleExcelFindLogBookSpreadSheet(null);
+					} else if (findlogbookworksheetWaiting) {
+						findlogbookworksheetWaiting = false;
+						googleExcelFindLogBookWorkSheet(null);
+					} else if (insertlogbookeventsWaiting) {
+						insertlogbookeventsWaiting = false;
+						googleExcelInsertLogBookEvents(null);
+					} 
+				}
 			} else {
-				syncRunning = false;
-				if (findAllSpreadSheetsWaiting) {
-					findAllSpreadSheetsWaiting = false;
-					googleExcelFindAllSpreadSheets();
-				} else if (downloadFoodTableSpreadSheetWaiting) {
-					downloadFoodTableSpreadSheetWaiting = false;
-					googleExcelDownloadFoodTableSpreadSheet();
-				} else if (findAllWorkSheetsInFoodTableSpreadSheetWaiting) {
-					findAllWorkSheetsInFoodTableSpreadSheetWaiting = false;
-					googleExcelFindAllWorkSheetsInFoodTableSpreadSheet(null,-1);
-				} else if (createlogbookheaderWaiting) {
-					createlogbookheaderWaiting = false;
-					googleExcelCreateLogBookHeader(null);
-				} else if (createlogbookWaiting) {
-					createlogbookWaiting = false;
-					googleExcelCreateLogBook(null);
-				} else if (createlogbookworksheetWaiting) {
-					createlogbookworksheetWaiting = false;
-					googleExcelCreateLogBookWorkSheet(null);
-				} else if (findlogbookspreadsheetWaiting) {
-					findlogbookspreadsheetWaiting = false;
-					googleExcelFindLogBookSpreadSheet(null);
-				} else if (findlogbookworksheetWaiting) {
-					findlogbookworksheetWaiting = false;
-					googleExcelFindLogBookWorkSheet(null);
-				} else if (insertlogbookeventsWaiting) {
-					insertlogbookeventsWaiting = false;
-					googleExcelInsertLogBookEvents(null);
-				} 
+				//syncfinished must have been called although sync is not running, not need to process any further
 			}
 			
 			NightScoutSync.getInstance().startNightScoutSync(globalImmediateRunNecessary);
@@ -3815,7 +3807,7 @@ package utilities
 		public function addObjectToBeDeleted(object:Object):void {
 			listOfElementsToBeDeleted.addItem(object);
 			//if (!(object is SelectedFoodItem))
-				NightScoutSync.getInstance().addObjectToBeDeleted(object);
+			NightScoutSync.getInstance().addObjectToBeDeleted(object);
 		}
 		
 		public function uploadLogBook():void {
@@ -4047,7 +4039,7 @@ package utilities
 				if (debugMode)
 					trace("Synchronize.as : start method googleExcelFindAllWorkSheetsInFoodTableSpreadSheet");
 				_workSheetList = new ArrayList();
-
+				
 				createAndLoadURLRequest(
 					googleExcelFindWorkSheetUrl.replace("{key}",spreadSheetList.getItemAt(indexOfSpreadSheetToFind).id),
 					null,
@@ -4118,7 +4110,7 @@ package utilities
 					
 					unitlist.appendChild(unit);
 					fooditem.appendChild(unitlist);
-
+					
 					//////verify unit contents
 					//check if mandatory fields exist
 					//unit description is already checked in synchronize.as
@@ -4148,7 +4140,7 @@ package utilities
 					}
 					//////////
 					//if (StringUtil.trim(fooditem.description) != "")
-						foodItemListArray.addItem(fooditem);
+					foodItemListArray.addItem(fooditem);
 				}
 				
 				var sortField:SortField = new SortField();
@@ -4178,7 +4170,7 @@ package utilities
 			} else {
 				if (debugMode)
 					trace("Synchronize.as : start method googleExcelDownloadFoodTableSpreadSheet");
-
+				
 				MyGATracker.getInstance().trackPageview( "DownLoadFoodTable" );
 				
 				callingDispatcher =  dispatcher;
@@ -4210,7 +4202,7 @@ package utilities
 					callingDispatcher.dispatchEvent(event);
 				}
 			}
-
+			
 			
 		}
 		
