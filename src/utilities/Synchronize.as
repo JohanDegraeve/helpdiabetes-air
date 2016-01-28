@@ -671,13 +671,15 @@ package utilities
 		 * onlySyncTheSettings =  if true synchronize will jump immediately to syncing the settings, assuming all tables are already there. Should only be true if it's sure that tables are existing on google docs account
 		 */
 		public function startSynchronize(immediateRunNecessary:Boolean = false,onlySyncTheSettings:Boolean = false, event:Event = null):void {
+			if (!globalImmediateRunNecessary && immediateRunNecessary)//we're not going to set here globalimmediatererunnecessary to false, that will only be done after calling nightscoutsync
+				globalImmediateRunNecessary = true;
+			trace("tracepoint 1, globalImmediateRunNecessary = " + globalImmediateRunNecessary);
 			access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
 			if (access_token.length == 0  ) {
 				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
 				syncFinished(false);
 			} else {
-				globalImmediateRunNecessary = immediateRunNecessary;
 				if (timer2 != null) {
 					if (timer2.hasEventListener(TimerEvent.TIMER))
 						timer2.removeEventListener(TimerEvent.TIMER,startSynchronize);
@@ -3791,6 +3793,8 @@ package utilities
 			}
 			
 			NightScoutSync.getInstance().startNightScoutSync(globalImmediateRunNecessary);
+			trace("tracepoint 2, globalImmediateRunNecessary = " + globalImmediateRunNecessary);
+			globalImmediateRunNecessary = false;
 			
 			function getAllEventsAndFillUpMealsFinished(event:Event):void
 			{

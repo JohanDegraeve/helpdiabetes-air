@@ -331,7 +331,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			static public function recalculateActiveInsulin(event:Event = null):void  {
-				//if (ModelLocator.debugMode)
+				if (ModelLocator.debugMode)
 				trace("in recalculateactiveinsulin");
 				if (timerForRecalculateActiveInsulin != null) {
 					if (timerForRecalculateActiveInsulin.hasEventListener(TimerEvent.TIMER))

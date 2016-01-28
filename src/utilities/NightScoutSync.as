@@ -346,7 +346,7 @@
 						 
 					 }
 					 if (i == trackingList.length)
-					 	createAndLoadURLRequest(nightScoutTreatmentsUrl + "/" + (elementToBeDeleted as TrackingViewElement).eventid.split("-")[0],URLRequestMethod.DELETE,null,null,deleteRemoteItems,true);
+						 createAndLoadURLRequest(nightScoutTreatmentsUrl + "/" + (elementToBeDeleted as TrackingViewElement).eventid.split("-")[0],URLRequestMethod.DELETE,null,null,deleteRemoteItems,true);
 				 }
 			 } else {
 				 syncFinished();
@@ -403,11 +403,11 @@
 							 remoteElement["tobeupdatedatns"] = "true";//to check later on, if true we will put it to NS, but remove that attribute first
 							 remoteElement["eventtime"] = DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at).valueOf();
 						 }
-						// strip off selectedfooditems in the notes, if any
-						if (remoteElement.notes)
-							if ((remoteElement.notes as String).length > 0)
-						remoteElement.notes = (remoteElement.notes as String).split("Food :")[0];
-						
+						 // strip off selectedfooditems in the notes, if any
+						 if (remoteElement.notes)
+							 if ((remoteElement.notes as String).length > 0)
+								 remoteElement.notes = (remoteElement.notes as String).split("Food :")[0];
+						 
 					 }
 				 } else {
 					 //TODO TODO what if eventAsJSONObject is not an array
@@ -458,7 +458,7 @@
 													 listOfElementsToBeDeleted.removeItemAt(indexInListOfElementsToBeDeleted);
 												 } else {
 													 if (remoteElement.tobeupdatedatns)
-													 		delete remoteElement['tobeupdatedatns'];
+														 delete remoteElement['tobeupdatedatns'];
 												 }
 											 } else {
 												 //change the applicable values of the remoteElement
@@ -509,8 +509,8 @@
 												 if ((localElement as MedicinEvent).amount == 0)
 													 remoteElement.insulin = new Number(0.1);//just a little workaround because nightscout doesn't accept a value of 0, user shouldn't create a bolus with value 0
 												 else 
-												 remoteElement.insulin = (localElement as MedicinEvent).amount;
-
+													 remoteElement.insulin = (localElement as MedicinEvent).amount;
+												 
 												 remoteElement.helpdiabetes.lastmodifiedtimestamp = (localElement as MedicinEvent).lastModifiedTimestamp;
 												 if ((localElement as MedicinEvent).comment.length > 0) {
 													 if (!notesUpdated)
@@ -710,9 +710,11 @@
 						 if (remoteElement.glucose) {
 							 //check if the element is in list of objects to be deleted, if so no need to re-add it to the local list
 							 for (var i:int = 0; i < listOfElementsToBeDeleted.length; i++) {
-								 if ((listOfElementsToBeDeleted.getItemAt(i) as TrackingViewElement).eventid == remoteElement._id + "-glucose") {
-									 elementIsInDeletionList = true;
-									 break;
+								 if (listOfElementsToBeDeleted.getItemAt(i) is TrackingViewElement) {
+									 if ((listOfElementsToBeDeleted.getItemAt(i) as TrackingViewElement).eventid == remoteElement._id + "-glucose") {
+										 elementIsInDeletionList = true;
+										 break;
+									 }
 								 }
 							 }
 							 if (!elementIsInDeletionList) {
@@ -741,7 +743,7 @@
 						 if (remoteElement.carbs) {
 							 //check if the element is in list of objects to be deleted, if so no need to re-add it to the local list
 							 for (var i:int = 0; i < listOfElementsToBeDeleted.length; i++) {
-								 if (!(listOfElementsToBeDeleted.getItemAt(i) is SelectedFoodItem)) {
+								 if (listOfElementsToBeDeleted.getItemAt(i) is TrackingViewElement) {
 									 if ((listOfElementsToBeDeleted.getItemAt(i) as TrackingViewElement).eventid == remoteElement._id + "-carbs") {
 										 elementIsInDeletionList = true;
 										 break;
@@ -767,11 +769,14 @@
 						 if (remoteElement.duration) {
 							 //check if the element is in list of objects to be deleted, if so no need to re-add it to the local list
 							 for (var i:int = 0; i < listOfElementsToBeDeleted.length; i++) {
-								 if ((listOfElementsToBeDeleted.getItemAt(i) as TrackingViewElement).eventid == remoteElement._id + "-exercise") {
-									 elementIsInDeletionList = true;
-									 break;
+								 if (listOfElementsToBeDeleted.getItemAt(i) is TrackingViewElement) {
+									 if ((listOfElementsToBeDeleted.getItemAt(i) as TrackingViewElement).eventid == remoteElement._id + "-exercise") {
+										 elementIsInDeletionList = true;
+										 break;
+									 }
 								 }
 							 }
+							 
 							 if (!elementIsInDeletionList) {
 								 new ExerciseEvent(remoteElement.duration,
 									 removeBRInNotes(remoteElement.notes as String),
@@ -785,9 +790,11 @@
 						 if (remoteElement.insulin) {
 							 //check if the element is in list of objects to be deleted, if so no need to re-add it to the local list
 							 for (var i:int = 0; i < listOfElementsToBeDeleted.length; i++) {
-								 if ((listOfElementsToBeDeleted.getItemAt(i) as TrackingViewElement).eventid == remoteElement._id + "-medicin") {
-									 elementIsInDeletionList = true;
-									 break;
+								 if (listOfElementsToBeDeleted.getItemAt(i) is TrackingViewElement) {
+									 if ((listOfElementsToBeDeleted.getItemAt(i) as TrackingViewElement).eventid == remoteElement._id + "-medicin") {
+										 elementIsInDeletionList = true;
+										 break;
+									 }
 								 }
 							 }
 							 if (!elementIsInDeletionList) {
