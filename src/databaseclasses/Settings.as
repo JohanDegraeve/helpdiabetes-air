@@ -105,6 +105,12 @@ package databaseclasses
 		public static const Medicin5_range2_AOBChart_FactoryValue:String= "15:25-%-00:00>100";
 		public static const Medicin5_range3_AOBChart_FactoryValue:String= "25:35-%-00:00>100";
 		public static const Medicin5_range4_AOBChart_FactoryValue:String= "35:9999-%-00:00>100";
+		
+		/**
+		 * default values for nightscout api secret and url
+		 */
+		public static const NightScoutDefaultAPISECRET:String = "API_SECRET";
+		public static const NightScoutDefaultWebsiteURL:String = "your-website.azurewebsites.net";
 
 		
 		/** EXTEND LIST OF CONSTANTS IN CASE NEW SETTING NEEDS TO BE DEFINED  */
@@ -393,9 +399,9 @@ package databaseclasses
 		public static const SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView:int=67;
 		public static const SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime:int=68;
 		public static const SettingsSelectedOrientation:int=69;//0 = portrait, 1 = landscape, 2 = automatic, 3 = let app decide
-		public static const SettingsHelpText70:int=70;
-		public static const SettingsHelpText71:int=71;
-		public static const SettingsHelpText72:int=72;
+		public static const SettingsNightScoutAPISECRET:int=70;
+		public static const SettingsNightScoutWebsiteURL:int=71;
+		public static const SettingsNightScoutHashedAPISecret:int=72;
 		public static const SettingsHelpText73:int=73;
 		public static const SettingsHelpText74:int=74;
 		public static const SettingsHelpText75:int=75;
@@ -469,7 +475,6 @@ package databaseclasses
 		 */
 		public static const SettingsDayOfLastCompleteNightScoutSync:int = 111;
 		public static const SettingsLastNightScoutSyncTimeStamp:int=112;
-
 		
 		/** EXTEND ARRAY WITH DEFAULT VALUES IN CASE NEW SETTING NEEDS TO BE DEFINED */
 		private var settings:Array = [
@@ -652,9 +657,9 @@ package databaseclasses
 			"true",//SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView
 			"0",//SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime, 0 means never been set this value
 			"3",//SettingsSelectedOrientation 0 = portrait, 1 = landscape, 2 = automatic, 3 = let app decide
-			"true", 
-			"true",
-			"true",
+			NightScoutDefaultAPISECRET, 
+			NightScoutDefaultWebsiteURL,
+			"",//hashed api secret
 			"true",
 			"true",
 			"true",

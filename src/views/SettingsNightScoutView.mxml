@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2016  hippoandfriends
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
+-->
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="SettingsNightScoutView"
+		initialize="onInitialize()">
+	
+	<fx:Metadata>
+		[ResourceBundle("settingsnightscoutview")]
+	</fx:Metadata>
+
+	<fx:Script>
+		<![CDATA[
+			import com.hurlant.crypto.hash.SHA1;
+			import com.hurlant.util.Hex;
+			
+			import databaseclasses.Settings;
+			
+			import utilities.Synchronize;
+
+			[Bindable] private var back_label:String;
+			[Bindable] private var usersAPISecret:String = Settings.NightScoutDefaultAPISECRET;
+			[Bindable] private var usersNightScoutUrl:String = Settings.NightScoutDefaultWebsiteURL;
+			
+			private function onInitialize():void {
+				back_label = resourceManager.getString('general','back');
+				title = resourceManager.getString('settingsnightscoutview','titlesettingsnightscoutview');
+				var apiSecretInSettings:String = Settings.getInstance().getSetting(Settings.SettingsNightScoutAPISECRET);
+				if (apiSecretInSettings != "true") {
+					usersAPISecret = apiSecretInSettings;//true might be there for legacy reasons
+				}
+				var websiteUrlInSettings:String = Settings.getInstance().getSetting(Settings.SettingsNightScoutWebsiteURL);
+				if (websiteUrlInSettings != "true") {
+					usersNightScoutUrl = websiteUrlInSettings;//true might be there for legacy reasons
+				}
+			}
+			
+			private function nightScoutUrlSaveClickHandler(event:MouseEvent):void
+			{
+				Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,usersAPISecret);
+				Settings.getInstance().setSetting(Settings.SettingsNightScoutWebsiteURL,usersNightScoutUrl);
+				//calculate sha-1 for the api-secret
+				var hash:SHA1 = new SHA1();
+				var result:String = Hex.fromArray(hash.hash(Hex.toArray(Hex.fromString(usersAPISecret))));
+				Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,result);
+				navigator.popView();
+				Synchronize.getInstance().startSynchronize(true);
+			}
+
+			private function showErrorListClickHandler(event:MouseEvent):void {
+				navigator.pushView(NightScoutSyncErrorsView);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:navigationContent>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
+	</s:navigationContent>
+	<s:Group y="0" x="0" width="100%" height="100%"  left="5" top="15" right="5">
+		<s:layout>
+			<s:VerticalLayout>
+			</s:VerticalLayout>
+		</s:layout>
+		<s:Group y="0" x="0" width="100%">
+			<s:layout>
+				<s:VerticalLayout verticalAlign="middle">
+				</s:VerticalLayout>
+			</s:layout>			
+			<s:Label  y="0" x="0" width="100%"  text="{resourceManager.getString('settingsnightscoutview','yourapisecret')}" height="100%" maxHeight="75" textAlign="left" verticalAlign="middle"/>
+			<s:TextInput width="100%" contentBackgroundColor="0xDCDCDC" id="apiSecretTextInput" text="@{usersAPISecret}" editable="true" borderVisible="true" textAlign="left"/>
+			<s:Line width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
+				</s:stroke>
+			</s:Line>	
+
+			<s:Label  y="0" x="0" width="100%" top="35" text="{resourceManager.getString('settingsnightscoutview','yourwebsite')}" height="100%" maxHeight="75" textAlign="left" verticalAlign="middle"/>
+			<s:TextInput width="100%" contentBackgroundColor="0xDCDCDC" id="nightScoutUrlTextInput" text="@{usersNightScoutUrl}" editable="true" borderVisible="true" textAlign="left"/>
+			<s:Line width="100%">
+				<s:stroke>
+					<s:SolidColorStroke color="0xADADAD" weight="1"/>
+				</s:stroke>
+			</s:Line>	
+
+			<s:Button height="48" width="100%" label="{resourceManager.getString('general','save')}" click="nightScoutUrlSaveClickHandler(event)"/>
+			<s:Button height="48" width="100%" label="Show recent Sync Errors" click="showErrorListClickHandler(event)"/>
+		</s:Group>
+
+	</s:Group>
+	
+</s:View>

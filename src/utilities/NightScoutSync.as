@@ -66,8 +66,7 @@
 		 private var retrievalCounter:int;
 		 private var nightScoutError_Invalid_Credentials:String = "TO BE COMPLETED";
 		 private var secondAttempt:Boolean;
-		 private static var createdAtNSDateTimePattern:String = "yyyy-MM-ddTHH:mm:ss.SSSZ";
-		 private static var createdAtNSDateTimeFormatter:spark.formatters.DateTimeFormatter;
+		 public static var syncErrorList:ArrayList;
 		 /**
 		  * when a function tries to access nightscout api, but that fails ... to be completed<br>
 		  * copied from google sync which works with access_tokens that need to be refreshed, not necessary here
@@ -156,12 +155,11 @@
 		  */
 		 private var elementToBeDeleted:Object;
 		 private var loader:URLLoader;
-		 private var nightScoutSyncActive:Boolean = true;
 		 private var trackingListAlreadyModified:Boolean;
 		 private var previousTrackingEventToShow:String;
 		 
-		 private static const apiSecret:String = "06c882c27a21a8981bf90def2da89db49068cf12";
-		 private static const nightScoutTreatmentsUrl:String = "https://testhdsync.azurewebsites.net/api/v1/treatments";
+		 private static var hashedApiSecret:String = "";
+		 private static var nightScoutTreatmentsUrl:String = "";
 		 /**
 		  * how many seconds between two synchronisations, actual value
 		  */
@@ -184,9 +182,7 @@
 			 listOfElementsToBeDeleted = new ArrayList();
 			 instance = this;
 			 currentSyncTimeStamp = 0;
-			 createdAtNSDateTimeFormatter = new DateTimeFormatter();
-			 createdAtNSDateTimeFormatter.dateTimePattern = createdAtNSDateTimePattern;
-			 createdAtNSDateTimeFormatter.useUTC = true;
+			 syncErrorList = new ArrayList();
 		 }
 		 
 		 public static function getInstance():NightScoutSync {
@@ -202,54 +198,63 @@
 		  * onlySyncTheSettings =  if true synchronize will jump immediately to syncing the settings, assuming all tables are already there. Should only be true if it's sure that tables are existing on google docs account
 		  */
 		 public function startNightScoutSync(immediateRunNecessary:Boolean):void {
-			 if (timer2 != null) {
-				 if (timer2.hasEventListener(TimerEvent.TIMER))
-					 timer2.removeEventListener(TimerEvent.TIMER,startNightScoutSync);
-				 timer2.stop();
-				 timer2 = null;
-			 }
-			 
-			 trace("NightScoutSync.as : in startNightScoutSync");
-			 //to make sure there's at least one complete resync per day
-			 if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteNightScoutSync))) {
-				 Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,
-					 ( (
-						 (new Date()).valueOf() 
-						 - 
-						 new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000
-					 ).toString()
-					 )
-				 );
-				 Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteNightScoutSync,(new Date()).date.toString());
-			 }
-			 
-			 var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > normalValueForSecondsBetweenTwoSync * 1000;
-			 if ((nightScoutSyncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!nightScoutSyncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
-				 localElementsUpdated  = false;
-				 retrievalCounter = 0;
-				 trackingList = ModelLocator.getInstance().trackingList;
-				 currentSyncTimeStamp = new Date().valueOf();
-				 lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastNightScoutSyncTimeStamp));
-				 if (debugMode) 
-					 trace("NightScoutSync.as : lastsynctimestamp = " + new DateTimeFormatter().format(new Date(lastSyncTimeStamp)));
-				 asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
-				 rerunNecessary = false;
-				 nightScoutSyncRunning = true;
-				 currentSyncTimeStamp = new Date().valueOf();
-				 asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
-				 
-				 synchronize();
+			 //first check if we have a (not necessariliy valid) api-secret, if not we stop
+			 hashedApiSecret = Settings.getInstance().getSetting(Settings.SettingsNightScoutHashedAPISecret);
+			 if (hashedApiSecret == "" || hashedApiSecret == "true") {
+				 syncFinished(false);
 			 } else {
-				 if (immediateRunNecessary) {
-					 rerunNecessary = true;
+				 //let's calculate the url, it might have changed
+				 nightScoutTreatmentsUrl = "https://" + Settings.getInstance().getSetting(Settings.SettingsNightScoutWebsiteURL) + "/api/v1/treatments";
+				 if (timer2 != null) {
+					 if (timer2.hasEventListener(TimerEvent.TIMER))
+						 timer2.removeEventListener(TimerEvent.TIMER,startNightScoutSync);
+					 timer2.stop();
+					 timer2 = null;
+				 }
+				 
+				 trace("NightScoutSync.as : in startNightScoutSync");
+				 //to make sure there's at least one complete resync per day
+				 if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteNightScoutSync))) {
+					 Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,
+						 ( (
+							 (new Date()).valueOf() 
+							 - 
+							 new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000
+						 ).toString()
+						 )
+					 );
+					 Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteNightScoutSync,(new Date()).date.toString());
+				 }
+				 
+				 var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > normalValueForSecondsBetweenTwoSync * 1000;
+				 if ((nightScoutSyncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!nightScoutSyncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
+					 localElementsUpdated  = false;
+					 retrievalCounter = 0;
+					 trackingList = ModelLocator.getInstance().trackingList;
+					 currentSyncTimeStamp = new Date().valueOf();
+					 lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastNightScoutSyncTimeStamp));
+					 if (debugMode) 
+						 trace("NightScoutSync.as : lastsynctimestamp = " + new DateTimeFormatter().format(new Date(lastSyncTimeStamp)));
+					 asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
+					 rerunNecessary = false;
+					 nightScoutSyncRunning = true;
+					 currentSyncTimeStamp = new Date().valueOf();
+					 asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
+					 
+					 synchronize();
+				 } else {
+					 if (immediateRunNecessary) {
+						 rerunNecessary = true;
+					 }
+				 }
+				 
+				 if (timer2 == null) {
+					 timer2 = new Timer(300000, 1);
+					 timer2.addEventListener(TimerEvent.TIMER, startNightScoutSync);
+					 timer2.start();
 				 }
 			 }
-			 
-			 if (timer2 == null) {
-				 timer2 = new Timer(300000, 1);
-				 timer2.addEventListener(TimerEvent.TIMER, startNightScoutSync);
-				 timer2.start();
-			 }
+
 		 }
 		 
 		 /**
@@ -278,7 +283,6 @@
 		 /**
 		  * 
 		  */
-		 //corresponds to stratSync in Synchronize.as
 		 private function synchronize():void {
 			 if (debugMode)
 				 trace("NightScoutSync.as : in synchronize");
@@ -292,8 +296,10 @@
 		 }
 		 
 		 public function addObjectToBeDeleted(object:Object):void {
-			 if (nightScoutSyncActive)
+			 if (hashedApiSecret == "" || hashedApiSecret == "true") {
+			 } else {
 				 listOfElementsToBeDeleted.addItem(object);
+			 }
 		 }
 		 
 		 /**
@@ -318,7 +324,7 @@
 				 if (elementToBeDeleted is SelectedFoodItem) {
 					 //Don't delete the selectedfooditem @ ns (because there isn't any), but set lastmodifiedtimestamp of the parentmeal to that of the fooditem
 					 //next sync the mealevent will be uploaded
-					 for (var i = 0; i < trackingList.length; i++) {
+					 for (var i:int = 0; i < trackingList.length; i++) {
 						 if ((trackingList.getItemAt(i) as TrackingViewElement).eventid == (elementToBeDeleted as SelectedFoodItem).mealEventId) {
 							 (trackingList.getItemAt(i) as MealEvent).lastModifiedTimestamp = (new Date()).valueOf();
 							 break;
@@ -329,24 +335,30 @@
 				 } else {
 					 if (debugMode)
 						 trace("NightScoutSync.as : in method deleteRemoteItems, there's an alement to be deleted");
-					 //it could be that this element is part of another larger object at NS, in this case we don't delete but update
-					 var i:int;
-					 for (i = 0; i < trackingList.length; i++) {
-						 var item:TrackingViewElement = trackingList.getItemAt(i) as TrackingViewElement;
-						 if (item.eventid == (elementToBeDeleted as TrackingViewElement).eventid) {
-							 //skip this one - this is the item that is marked as to be deleted
-						 } else {
-							 if ((elementToBeDeleted as TrackingViewElement).eventid.split("-")[0] == item.eventid.split("-")[0]) {
-								 var urlVariables:URLVariables = new URLVariables();
-								 urlVariables["find[_id]"] = item.eventid.split("-")[0];
-								 createAndLoadURLRequest(nightScoutTreatmentsUrl + ".json",URLRequestMethod.GET,urlVariables,null,usedByDeleteRemoteItems,true);
-								 break;
+					 //if the lengthe of the eventid is less than 24, then it's an  old element that was 'downloaded' from google sync, we will skip it
+					 if ((elementToBeDeleted as TrackingViewElement).eventid.length < 24) {
+						 listOfElementsToBeDeleted.removeItem(elementToBeDeleted);
+						 deleteRemoteItems();
+					 } else {
+						 //it could be that this element is part of another larger object at NS, in this case we don't delete but update
+						 var i:int;
+						 for (i = 0; i < trackingList.length; i++) {
+							 var item:TrackingViewElement = trackingList.getItemAt(i) as TrackingViewElement;
+							 if (item.eventid == (elementToBeDeleted as TrackingViewElement).eventid) {
+								 //skip this one - this is the item that is marked as to be deleted
+							 } else {
+								 if ((elementToBeDeleted as TrackingViewElement).eventid.split("-")[0] == item.eventid.split("-")[0]) {
+									 var urlVariables:URLVariables = new URLVariables();
+									 urlVariables["find[_id]"] = item.eventid.split("-")[0];
+									 createAndLoadURLRequest(nightScoutTreatmentsUrl + ".json",URLRequestMethod.GET,urlVariables,null,usedByDeleteRemoteItems,true);
+									 break;
+								 }
 							 }
+							 
 						 }
-						 
+						 if (i == trackingList.length)
+							 createAndLoadURLRequest(nightScoutTreatmentsUrl + "/" + (elementToBeDeleted as TrackingViewElement).eventid.split("-")[0],URLRequestMethod.DELETE,null,null,deleteRemoteItems,true);
 					 }
-					 if (i == trackingList.length)
-						 createAndLoadURLRequest(nightScoutTreatmentsUrl + "/" + (elementToBeDeleted as TrackingViewElement).eventid.split("-")[0],URLRequestMethod.DELETE,null,null,deleteRemoteItems,true);
 				 }
 			 } else {
 				 syncFinished();
@@ -608,6 +620,7 @@
 										 if (localElement is BloodGlucoseEvent) {
 											 if (remoteElement.glucose) {
 												 //we're not changing the units of the local element but we change the blood glucose value accordingly
+												 newBloodGlucoseLevel = (remoteElement.glucose as Number);
 												 if ((remoteElement.units as String).toUpperCase().indexOf(ResourceManager.getInstance().getString('general','mgperdl').toUpperCase()) > -1) {
 													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == ResourceManager.getInstance().getString('general','mmoll')) {
 														 newBloodGlucoseLevel = Math.round((remoteElement.glucose as Number)/(new Number(0.0555)));
@@ -816,8 +829,12 @@
 				 //the second list is localelements, those also need to be stored remotely,
 				 updateRemoteElements();
 			 } else {
-				 //still need to make the call to nightscout
-				 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.GET,null,null,getAllEvents,true);
+				 //call to nightscout
+				 //we will restrict to all treatments less than 1 day old, because I haven't succeeded yet in filtering on lastmodifiedtimestamp (or lastModifiedAtNS)
+				 //this field is added anyway by the api
+				 var urlVariables:URLVariables = new URLVariables();
+				 urlVariables["find[created_at][$gte]"] = DateTimeUtilities.createNSFormattedDateAndTime(new Date((new Date()).valueOf() - 3600 * 24 * 1000));
+				 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.GET,urlVariables,null,getAllEvents,true);
 			 }
 		 }
 		 
@@ -948,6 +965,7 @@
 				 trace("Synchronize.as : in nightscoutapicall failed : event.target.data = " + event.target.data as String);
 			 }
 			 removeEventListeners();
+			 syncErrorList.addItem((new Date()).toLocaleString() + " " + event.target.data);
 			 syncFinished(false);
 		 }
 		 
@@ -967,7 +985,7 @@
 				 trace ("in createAndLoadURLRequest");
 			 }
 			 
-			 request.requestHeaders.push(new URLRequestHeader("api-secret", apiSecret));
+			 request.requestHeaders.push(new URLRequestHeader("api-secret", hashedApiSecret));
 			 request.requestHeaders.push(new URLRequestHeader("Content-type", "application/json"));
 			 //request.requestHeaders.push(new URLRequestHeader("Accept", "application/json"));
 			 

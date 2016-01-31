@@ -30,18 +30,18 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import air.net.URLMonitor;
-			
-			import databaseclasses.Settings;
-			
 			import mx.collections.ArrayCollection;
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
 			
-			import myComponents.AlertPopUp;
-			
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
+			
+			import air.net.URLMonitor;
+			
+			import databaseclasses.Settings;
+			
+			import myComponents.AlertPopUp;
 			
 			[Bindable]
 			private var back_label:String;
@@ -52,7 +52,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_downloadfoodtable"),
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_exporttracking"),
-				//ResourceManager.getInstance().getString("synchronizeview","menuitem_resyncall"),
+				"NightScout",
 				ResourceManager.getInstance().getString("synchronizeview","help"),
 				ResourceManager.getInstance().getString("synchronizeview","removegoogleauthorization")
 			]);	
@@ -91,21 +91,18 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 					case 1:
 						navigator.pushView(UploadTrackingView);
 						break;
-					/*case 2:
-						Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,"0");
-						Synchronize.getInstance().startSynchronize(false,false);
-						
-						alertPopUp = new AlertPopUp();
-						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-						alertPopUp.show(this);
-						alertPopUp.setMessage(resourceManager.getString('settingsview','syncstarted'));
-						break;*/
 					case 2:
+						navigator.pushView(SettingsNightScoutView);
+						break;
+					case 3:
 						navigateToURL(new URLRequest(resourceManager.getString('synchronizeview','helpurl')));
 						break;
-					case 3 :
+					case 4 :
 						Settings.getInstance().setSetting(Settings.SettingsAccessToken,"");
 						Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
+						Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");//also nightscoutsync is reset
+						Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);//also nightscoutsync is reset
+						Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						alertPopUp.show(this);

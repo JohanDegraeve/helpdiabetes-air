@@ -2609,8 +2609,11 @@ package utilities
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				if (eventAsJSONObject.error == "invalid_grant") {
 					//reset access_token and grant_token, user needs to go back to settingsscreen to reinitialize
-					Settings.getInstance().setSetting(Settings.SettingsAccessToken,  "");
+					Settings.getInstance().setSetting(Settings.SettingsAccessToken, "");
 					Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
+					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");//also nightscoutsync is reset
+					Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);//also nightscoutsync is reset
+					Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 					//the show stops
 				}
 			} catch (e:SyntaxError) {
@@ -3809,9 +3812,10 @@ package utilities
 		}
 		
 		public function addObjectToBeDeleted(object:Object):void {
-			listOfElementsToBeDeleted.addItem(object);
-			//if (!(object is SelectedFoodItem))
-			NightScoutSync.getInstance().addObjectToBeDeleted(object);
+			if (access_token.length > 0) {
+				listOfElementsToBeDeleted.addItem(object);
+				NightScoutSync.getInstance().addObjectToBeDeleted(object);
+			}
 		}
 		
 		public function uploadLogBook():void {

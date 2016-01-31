@@ -409,17 +409,6 @@ the home screen
 				}
 			}
 			
-			private function onSynchronizeErrorOccurred(event:Event):void {
-				if (alertPopUp != null)	{
-					alertPopUp.setMessage(alertPopUp.getMessage + "\n\n" + 	Synchronize.getInstance().synchronize_debugString);				
-				} else  {
-					alertPopUp = new AlertPopUp();
-					alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
-					alertPopUp.show(this);
-					alertPopUp.setMessage(Synchronize.getInstance().synchronize_debugString);
-				}
-			}
-
 			private function okClicked(event: PopUpEvent):void {
 				if (alertPopUp != null) {
 					PopUpManager.removePopUp(alertPopUp);
