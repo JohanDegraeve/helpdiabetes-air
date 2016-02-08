@@ -63,7 +63,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			static private var activeInsulinAmount:Number;
 			
 			[Bindable]
-			static private var activeInsulin_text:String;
+			private var activeInsulin_text:String;
 			
 			private function addHandler():void {
 				if (!navigator.poppedViewReturnedObject) return; 
@@ -314,11 +314,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (!navigator) return;
 				if (!navigator.actionBar.actionContent) return;
 				if (navigator.actionBar.actionContent.indexOf(searchButton) != -1) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_searchbutton');
-					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewSearchButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
-					helpCallOut.open(searchButton,true)
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextTrackingViewSearchButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_searchbutton');
+						helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewSearchButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+						helpCallOut.open(searchButton,true)
+					} else {
+						helptext0Removed(null);
+					}
 				} /*else
 				helptext0Removed();*/
 				recalculateActiveInsulin();
@@ -330,9 +334,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				recalculateActiveInsulin();
 			}
 			
-			static public function recalculateActiveInsulin(event:Event = null):void  {
+			public function recalculateActiveInsulin(event:Event = null):void  {
 				if (ModelLocator.debugMode)
-				trace("in recalculateactiveinsulin");
+					trace("in recalculateactiveinsulin");
 				if (timerForRecalculateActiveInsulin != null) {
 					if (timerForRecalculateActiveInsulin.hasEventListener(TimerEvent.TIMER))
 						timerForRecalculateActiveInsulin.removeEventListener(TimerEvent.TIMER,recalculateActiveInsulin );
@@ -348,7 +352,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					+ " " 
 					+ ResourceManager.getInstance().getString('trackingview','internationalunit');
 				
-				timerForRecalculateActiveInsulin = new Timer(300000, 1);
+				timerForRecalculateActiveInsulin = new Timer(30000, 1);
 				timerForRecalculateActiveInsulin.addEventListener(TimerEvent.TIMER,recalculateActiveInsulin);
 				timerForRecalculateActiveInsulin.start();
 			}
@@ -396,11 +400,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private function helptext0Removed(event:Event = null):void {
 				if (trackinglist.dataProvider.length > 0) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_editevent');
-					helpCallOut.settingId = Settings.SettingsHelpTextEditTrackingEvent;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helpText3Removed);
-					helpCallOut.open(trackinglist,true);
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditTrackingEvent) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_editevent');
+						helpCallOut.settingId = Settings.SettingsHelpTextEditTrackingEvent;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helpText3Removed);
+						helpCallOut.open(trackinglist,true);
+					} else {
+						helpText3Removed(null);
+					}
 				}
 			}
 			
@@ -408,7 +416,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * helptext for active insulin 
 			 */
 			private function helpText3Removed(event:Event = null):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helpText3Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helpText3Removed);
 				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextActiveInsulinInt) == 'true') {
 					var cntr:int;
 					for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
@@ -430,35 +438,45 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private function openHelpTexts():void {
 				if (navigator.actionBar.actionContent.indexOf(upButton) != -1) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_upbutton');
-					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewUpButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-					helpCallOut.open(upButton,true)
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextTrackingViewUpButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_upbutton');
+						helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewUpButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+						helpCallOut.open(upButton,true)
+					} else {
+						helptext1Removed(null);
+					}
 				} else
 					helptext1Removed();
 			}
 			
 			private function helptext1Removed(event:Event = null):void  {
 				if (navigator.actionBar.actionContent.indexOf(downButton) != -1) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_downbutton');
-					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewDownButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-					helpCallOut.open(downButton,true)
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextTrackingViewDownButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_downbutton');
+						helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewDownButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+						helpCallOut.open(downButton,true)
+					} else {
+						helptext2Removed(null);
+					}
 				} else
 					helptext2Removed();
 			}
 			
 			private function helptext2Removed(event:Event = null):void  {
 				if (navigator.actionBar.actionContent.indexOf(cancelButton) != -1) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_cancelbutton');
-					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewCancelButton;
-					//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-					helpCallOut.open(cancelButton,true)
-				} /*else
-				helptext2Removed();*/
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextTrackingViewCancelButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_cancelbutton');
+						helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewCancelButton;
+						helpCallOut.open(cancelButton,true)
+					} else {
+						
+					}
+				}
 			}
 		]]>
 	</fx:Script>
@@ -469,7 +487,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
 	<s:Group id="activeInsulin">
-		<s:Label left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}" textAlign="{ModelLocator.ltr ? 'left':'right'}"/>
+		<s:Label left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}"/>
 	</s:Group>
 	<s:Line width="100%" left="0" right="0" top="40">
 		<s:stroke>
@@ -480,7 +498,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<s:List id="trackinglist" left="0" right="0" top="45" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
 			click="onListElementClicked(event)"
-			change="recalculateActiveInsulin(null)"
+			updateComplete="recalculateActiveInsulin(null)"
 			itemRendererFunction="getItemRenderer">
 		<s:layout>
 			<myComponents:TrackingViewLayout useVirtualLayout="true" id="trackinglistlayout"/>

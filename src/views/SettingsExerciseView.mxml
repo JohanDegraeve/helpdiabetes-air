@@ -115,15 +115,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 				title = ResourceManager.getInstance().getString("settingsview","exercise");
 
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('settingsexerciseview','help_text_changeExerciseTypes');
-				helpCallOut.settingId = Settings.SettingsHelpTextExerciseViewChangeMedicinType;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(type2,true);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextExerciseViewChangeMedicinType) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('settingsexerciseview','help_text_changeExerciseTypes');
+					helpCallOut.settingId = Settings.SettingsHelpTextExerciseViewChangeMedicinType;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(type2,true);
+				} else {
+					helptext1Removed(null);
+				}
 			}
 
 			private function helptext1Removed(event:Event):void  {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 			}
 
 		]]>

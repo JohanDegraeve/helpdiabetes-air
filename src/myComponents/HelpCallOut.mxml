@@ -101,6 +101,6 @@ If settingid = 0, then helptext will always be shown
 
 		]]>
 	</fx:Script>
-	<myComponents:Notification id="helptextNotification" width="100%" notificationText="{helpText}" initialize="{helptextNotification.addEventListener(PickerEvent.PICKER_SET, okClicked);}" textAlign="{ModelLocator.ltr ? 'left':'right'}" >
+	<myComponents:Notification id="helptextNotification" width="100%" notificationText="{helpText}" initialize="{helptextNotification.addEventListener(PickerEvent.PICKER_SET, okClicked);}"  >
 	</myComponents:Notification>
 </s:Callout>

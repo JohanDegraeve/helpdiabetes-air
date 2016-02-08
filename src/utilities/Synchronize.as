@@ -101,7 +101,7 @@ package utilities
 		private static var minimSettingCntrToSync:int = -87;
 		
 		/**
-		 * how many minutes between two synchronisations, normal value
+		 * how many seconds between two synchronisations, normal value
 		 */
 		private static var normalValueForSecondsBetweenTwoSync:int = 30;
 		/**
@@ -110,6 +110,7 @@ package utilities
 		private var secondsBetweenTwoSync:int = normalValueForSecondsBetweenTwoSync;
 		
 		private static var googleError_Invalid_Credentials:String = "Invalid Credentials";
+		private static var googleError_Login_Required:String = "Login Required";
 		
 		/**
 		 * copied from settings at start of sync, timestamp of last synchronisation 
@@ -228,6 +229,7 @@ package utilities
 		private var previousTrackingEventToShow:String;
 		private var timer2:Timer;
 		private var tableCounterForFunctionUpdateGoogleTablesIfNecessary:int;
+		public static var syncErrorList:ArrayList;
 		
 		/**
 		 * tablename, tableid and list of columns with columnname and type <br>
@@ -656,6 +658,7 @@ package utilities
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealkcalamount');
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealproteinamount');
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealfatamount');
+			syncErrorList = new ArrayList();
 		}
 		
 		public static function getInstance():Synchronize {
@@ -673,11 +676,11 @@ package utilities
 		public function startSynchronize(immediateRunNecessary:Boolean = false,onlySyncTheSettings:Boolean = false, event:Event = null):void {
 			if (!globalImmediateRunNecessary && immediateRunNecessary)//we're not going to set here globalimmediatererunnecessary to false, that will only be done after calling nightscoutsync
 				globalImmediateRunNecessary = true;
-			trace("tracepoint 1, globalImmediateRunNecessary = " + globalImmediateRunNecessary);
 			access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-			if (access_token.length == 0  ) {
+			if (access_token && access_token.length == 0  ) {
 				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
+				Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
 				syncFinished(false);
 			} else {
 				if (timer2 != null) {
@@ -1117,7 +1120,7 @@ package utilities
 									if (debugMode)
 										trace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
 									//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
-									NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(l));
+									NightScoutSync.getInstance().addObjectToBeDeleted(trackingList.getItemAt(l));
 									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
 								} else {
 									var medicinArray:Array = (remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][1][0])] as String).split(Database.medicinnamesplitter);
@@ -1468,7 +1471,7 @@ package utilities
 									if (debugMode)
 										trace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
 									//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
-									NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(l));
+									NightScoutSync.getInstance().addObjectToBeDeleted(trackingList.getItemAt(l));
 									(trackingList.getItemAt(l) as ExerciseEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as ExerciseEvent).updateExerciseEvent(
@@ -1644,7 +1647,7 @@ package utilities
 									if (debugMode)
 										trace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
 									//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
-									NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(l));
+									NightScoutSync.getInstance().addObjectToBeDeleted(trackingList.getItemAt(l));
 									(trackingList.getItemAt(l) as MealEvent).deleteEvent();
 								} else {
 									(trackingList.getItemAt(l) as MealEvent).updateMealEvent(
@@ -2564,7 +2567,9 @@ package utilities
 			try {
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				var message:String = eventAsJSONObject.error.message as String;
-				if (message == googleError_Invalid_Credentials) {
+				if (message != googleError_Login_Required)
+					syncErrorList.addItem((new Date()).toLocaleString() + " " + event.target.data);
+				if (message == googleError_Invalid_Credentials /*|| message == googleError_Login_Required*/) {
 					secondAttempt = true;
 					//get a new access_token
 					var request:URLRequest = new URLRequest(googleTokenRefreshUrl);
@@ -2596,8 +2601,10 @@ package utilities
 			loader.removeEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
 			
 			secondAttempt = false;
-			var temp:Object = JSON.parse(event.target.data as String);
-			Settings.getInstance().setSetting(Settings.SettingsAccessToken,temp.access_token);
+			access_token = JSON.parse(event.target.data as String).access_token;
+			if (access_token != null)
+				Settings.getInstance().setSetting(Settings.SettingsAccessToken,access_token);
+		
 			
 			functionToRecall.call();
 		}
@@ -2613,6 +2620,7 @@ package utilities
 					Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");//also nightscoutsync is reset
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);//also nightscoutsync is reset
+					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
 					Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 					//the show stops
 				}
@@ -3796,7 +3804,6 @@ package utilities
 			}
 			
 			NightScoutSync.getInstance().startNightScoutSync(globalImmediateRunNecessary);
-			trace("tracepoint 2, globalImmediateRunNecessary = " + globalImmediateRunNecessary);
 			globalImmediateRunNecessary = false;
 			
 			function getAllEventsAndFillUpMealsFinished(event:Event):void
@@ -3812,7 +3819,7 @@ package utilities
 		}
 		
 		public function addObjectToBeDeleted(object:Object):void {
-			if (access_token.length > 0) {
+			if (access_token && access_token.length > 0) {
 				listOfElementsToBeDeleted.addItem(object);
 				NightScoutSync.getInstance().addObjectToBeDeleted(object);
 			}
@@ -3831,7 +3838,7 @@ package utilities
 		private function eventHasError(event:Event,functionToRecallIfError:Function):Boolean  {
 			var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 			if  (eventAsJSONObject.error) {
-				if (eventAsJSONObject.error.message == googleError_Invalid_Credentials && !secondAttempt) {
+				if ((eventAsJSONObject.error.message == googleError_Invalid_Credentials /*|| eventAsJSONObject.error.message == googleError_Login_Required*/) && !secondAttempt) {
 					secondAttempt = true;
 					functionToRecall = functionToRecallIfError;
 					googleAPICallFailed(event);
@@ -3914,7 +3921,7 @@ package utilities
 			
 			loader.load(request);
 			if (debugMode)
-				trace("Synchronize.as : loader : url = " + request.url + ", request.data = " + request.data); 
+				trace("Synchronize.as : loader : url = " + request.url + ", method = " + request.method + ", request.data = " + request.data); 
 		}
 		
 		public function googleExcelFindAllSpreadSheets(event:Event = null):void  {
@@ -4220,7 +4227,6 @@ package utilities
 				previousTrackingEventToShow = ModelLocator.getInstance().trackingEventToShow;
 				ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
 				ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().infoTrackingList;
-				TrackingView.recalculateActiveInsulin();
 			}			
 		}
 		

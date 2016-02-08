@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -202,26 +202,32 @@ the home screen
 			}
 			
 			private function showSearchTextBoxHelpText():void {
-				if (!(Settings.getInstance().getSetting(Settings.SettingsHelpTextFoodCounterViewSearchText) == 'false')) {
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextFoodCounterViewSearchText) == 'true') {
 					helpCallOut = new HelpCallOut();
 					helpCallOut.helpText = resourceManager.getString('foodcounterview','help_text_searchField');
 					helpCallOut.settingId = Settings.SettingsHelpTextFoodCounterViewSearchText;
 					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 					helpCallOut.open(searchtext,true);
+				} else {
+					helptext1Removed(null);
 				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('foodcounterview','help_text_searchButton');
-				helpCallOut.settingId = Settings.SettingsHelpTextFoodCounterViewSearchButton;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut.open(searchButton,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextFoodCounterViewSearchButton) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('foodcounterview','help_text_searchButton');
+					helpCallOut.settingId = Settings.SettingsHelpTextFoodCounterViewSearchButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.open(searchButton,true);
+				} else {
+					helptext2Removed(null);
+				}
 			}
 			
 			private function helptext2Removed(event:Event):void {
-				
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
 			}
 			
 			public function initiateRetrievalOfFoodItemList(event:Event = null):void {
@@ -423,7 +429,7 @@ the home screen
 	</fx:Script>
 	
 	<s:titleContent>
-		<s:TextInput id="searchtext"  text="@{searchTextCopy}" width="100%" change="searchTextChanged()" textAlign="{ModelLocator.ltr ? 'left':'right'}"/>
+		<s:TextInput id="searchtext"  text="@{searchTextCopy}" width="100%" change="searchTextChanged()" />
 	</s:titleContent>
 	<s:actionContent>
 		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" alpha="{searchActive ? 1:0.25}"/>
@@ -432,7 +438,7 @@ the home screen
 	</s:actionContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.FoodItemListItemRenderer"
 			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem"
-			scrollSnappingMode="leadingEdge" textAlign="{ModelLocator.ltr ? 'left':'right'}">
+			scrollSnappingMode="leadingEdge">
 	</s:List>
 </s:View>
 

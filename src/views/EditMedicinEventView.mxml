@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
-			import mx.events.CollectionEvent;
 			import mx.managers.PopUpManager;
 			import mx.resources.ResourceManager;
 			
@@ -84,6 +83,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var back_label:String;
 			[Bindable]
 			private var stopButtonVisible:Boolean = false;
+			[Bindable]
+			private var bolusTypeModifiable:Boolean = true;
 			
 			private var comment:String;
 			
@@ -122,6 +123,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					else {
 						bolusTypeText = (data as MedicinEvent).bolustype;
 						if (bolusTypeText == resourceManager.getString('editmedicineventview','square')) {
+							bolusTypeModifiable = true;
 							var hoursAsInt:int = (data as MedicinEvent).bolusDurationInMinutes/60;
 							var hoursAsString:String = (new Number(hoursAsInt)).toString();
 							if (hoursAsString.length == 1)
@@ -134,6 +136,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							bolusTypeText += " - " +  hoursAsString + ":" + minutesAsString;
 							if ((data as MedicinEvent).timeStamp + (data as MedicinEvent).bolusDurationInMinutes * 60 * 1000 > (new Date()).valueOf())
 								stopButtonVisible = true;
+						} else {
+							var hashedApiSecret:String = Settings.getInstance().getSetting(Settings.SettingsNightScoutHashedAPISecret);
+							if (hashedApiSecret == "" || hashedApiSecret == "true") {
+								bolusTypeModifiable = true;
+							}  else {
+								bolusTypeModifiable = false;//nightscout active and it's an existing normal bolustype, which means it is already stored @ nightscout
+							}
 						}
 						medicinName = (data as MedicinEvent).medicinName;
 						
@@ -148,43 +157,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						TrashButton.visible = true;
 					}
 				} else {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('editmedicineventview','help_text_OkButton');
-					helpCallOut.settingId = Settings.SettingsHelpTextEditMedicinEventViewOkButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
-					helpCallOut.open(OkButton,true);
+					bolusTypeModifiable = true;
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditMedicinEventViewOkButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('editmedicineventview','help_text_OkButton');
+						helpCallOut.settingId = Settings.SettingsHelpTextEditMedicinEventViewOkButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+						helpCallOut.open(OkButton,true);
+					} else {
+						helptext0Removed(null);
+					}
 				}
 			}
 			
 			private function helptext0Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext0Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editmedicineventview','help_text_selectMedicin');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditMedicinEventViewChangeMedicinType;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(medicinNameTextField,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditMedicinEventViewChangeMedicinType) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editmedicineventview','help_text_selectMedicin');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditMedicinEventViewChangeMedicinType;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(medicinNameTextField,true);
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editmedicineventview','help_text_choseAmount');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditMedicinEventViewChangeAmount;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut.open(amount,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditMedicinEventViewChangeAmount) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editmedicineventview','help_text_choseAmount');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditMedicinEventViewChangeAmount;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.open(amount,true);
+				} else {
+					helptext2Removed(null);
+				}
 			}
 			
 			private function helptext2Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_changeDateAndTime');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
-				helpCallOut.open(timeGroup,true)
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_changeDateAndTime');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+					helpCallOut.open(timeGroup,true)
+				} else {
+					helptext3Removed(null);
+				}
 			}
 			
 			private function helptext3Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
 			}
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -324,6 +350,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function bolusTypeGroupClicked(e:MouseEvent = null):void {
+				if (!bolusTypeModifiable)
+					return;
 				bolusTypeList = new ArrayCollection();
 				bolusTypeList.addItem(resourceManager.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL));
 				bolusTypeList.addItem(resourceManager.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_SQUARE_WAVE));
@@ -676,7 +704,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:SolidColorStroke color="0xADADAD" weight="1"/>
 			</s:stroke>
 		</s:Line>	
-		<s:Group id="bolusTypeGroup" y="0" x="0" width="100%" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}">
+		<s:Group id="bolusTypeGroup" y="0" x="0" width="100%" >
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>
@@ -685,7 +713,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			<s:Button id="bolustype" height="47"  label="@{bolusTypeText}" click="bolusTypeGroupClicked(event)"/>
 			<s:Button id="stopButton" height="47" width="{stopButtonVisible ? 47:0}" icon="@Embed('assets/stopsign.png')" click="stopButtonClicked(event)" visible="{stopButtonVisible}"/>
 		</s:Group>
-		<s:Line width="100%" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}">
+		<s:Line width="100%">
 			<s:stroke>
 				<s:SolidColorStroke color="0xADADAD" weight="1"/>
 			</s:stroke>

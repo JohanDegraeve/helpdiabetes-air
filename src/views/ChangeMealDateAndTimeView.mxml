@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			private var helpCallOut:HelpCallOut;
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 			}
 			
 			private function preInit():void {
@@ -108,11 +108,15 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				previousTimeStamp = (data.meal as Meal).timeStamp ;
 				selectedMealIndex = ModelLocator.getInstance().meals.getItemIndex(data.meal as Meal);
 
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('changemealdateandtimeview','help_text_setdateandtimeoffuturemeal');
-				helpCallOut.settingId = Settings.SettingsHelpTextChangeMealDateAndTimeViewButtons;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(time_button,true)
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextChangeMealDateAndTimeViewButtons) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('changemealdateandtimeview','help_text_setdateandtimeoffuturemeal');
+					helpCallOut.settingId = Settings.SettingsHelpTextChangeMealDateAndTimeViewButtons;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(time_button,true)
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function dateClicked():void {

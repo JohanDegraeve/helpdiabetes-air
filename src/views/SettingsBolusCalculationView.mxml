@@ -80,16 +80,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 			private function onCreationComplete(): void {
 				back_label = resourceManager.getString('general','back');
-				
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('settingsboluscalculationview','help_text_changeCarbRatio');
-				helpCallOut.settingId = Settings.SettingsHelpTextBolusCalculationViewChangeCarbRatio;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(lunchRatio,true);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextBolusCalculationViewChangeCarbRatio) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('settingsboluscalculationview','help_text_changeCarbRatio');
+					helpCallOut.settingId = Settings.SettingsHelpTextBolusCalculationViewChangeCarbRatio;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(lunchRatio,true);
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);	
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);	
 			}
 			
 			private function onBackKeyPressed(event:Event):void {

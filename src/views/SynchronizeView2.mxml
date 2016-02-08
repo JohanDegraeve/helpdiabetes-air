@@ -54,7 +54,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 				ResourceManager.getInstance().getString("synchronizeview","menuitem_exporttracking"),
 				"NightScout",
 				ResourceManager.getInstance().getString("synchronizeview","help"),
-				ResourceManager.getInstance().getString("synchronizeview","removegoogleauthorization")
+				ResourceManager.getInstance().getString("synchronizeview","removegoogleauthorization"),
+				"Show recent Sync Errors"
 			]);	
 
 			private function onInitialize():void {
@@ -102,11 +103,16 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
 						Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");//also nightscoutsync is reset
 						Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);//also nightscoutsync is reset
+						Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
 						Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						alertPopUp.show(this);
 						alertPopUp.setMessage(resourceManager.getString('synchronizeview','googlesyncremoved'));
+						break;
+					case 5 :
+						navigator.pushView(GoogleSyncErrorsView);
+						break;
 				}
 			}
 			

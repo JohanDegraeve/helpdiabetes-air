@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -117,29 +117,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						TrashButton.visible = true;
 					}
 				} else  {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_OkButton');
-					helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewOkButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
-					helpCallOut.open(OkButton,true)
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditBGEventViewOkButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_OkButton');
+						helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewOkButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+						helpCallOut.open(OkButton,true)
+					} else {
+						helptext0Removed(null);
+					}
 				}
 			}
 			
 			private function helptext0Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext0Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_selectChangeBGAmount');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeAmount;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(meteringResult,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditBGEventViewChangeAmount) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_selectChangeBGAmount');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeAmount;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(meteringResult,true);
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_changeDateAndTime');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut.open(timeGroup,true)
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_changeDateAndTime');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.open(timeGroup,true)
+				} else {
+					helptext2Removed(null);
+				}
 			}
 			
 			private function helptext2Removed(event:Event):void {

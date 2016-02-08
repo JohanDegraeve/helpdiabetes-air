@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -103,37 +103,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editdateandtime');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditDateAndTime;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut.verticalPosition = "after";
-				helpCallOut.open(dateTimeAndMealNameGroup,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditMealEventViewEditDateAndTime) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editdateandtime');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditDateAndTime;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.verticalPosition = "after";
+					helpCallOut.open(dateTimeAndMealNameGroup,true);
+				} else {
+					helptext2Removed(null);
+				}
 			}
 			
 			private function helptext2Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_viewboluscalculationdetails');
-				helpCallOut.settingId = Settings.SettingsHelpTextViewBolusCalculationDetails;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
-				helpCallOut.verticalPosition = "after";
-				helpCallOut.open(carbAmountGroup,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextViewBolusCalculationDetails) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_viewboluscalculationdetails');
+					helpCallOut.settingId = Settings.SettingsHelpTextViewBolusCalculationDetails;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+					helpCallOut.verticalPosition = "after";
+					helpCallOut.open(carbAmountGroup,true);
+				} else {
+					helptext3Removed(null);
+				}
 			}
 			
 			private function helptext3Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
 			}
 			
 			private function onCreationComplete():void {
 				if (mealEvent.meal != null) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
-					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-					//helpCallOut.verticalPosition = "before";
-					helpCallOut.open(fooditemlist,true);
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewSelectMealButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
+						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+						//helpCallOut.verticalPosition = "before";
+						helpCallOut.open(fooditemlist,true);
+					} else {
+						helptext1Removed(null);
+					}
 				}
 			}
 			

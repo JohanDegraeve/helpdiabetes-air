@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -269,63 +269,86 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			}
 			
 			private function showHelpText1():void {
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_selectUnitButton');
-				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(addFoodItemGroup.details_button,true)
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_selectUnitButton');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(addFoodItemGroup.details_button,true)
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_changeMeal');
-				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut.open(addFoodItemGroup.meal_button,true);
+				if (helpCallOut != null)
+					helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewSelectMealButton) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_changeMeal');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.open(addFoodItemGroup.meal_button,true);
+				} else {
+					helptext2Removed(null);
+				}
 			}
 			
 			private function helptext2Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut = new HelpCallOut();
-				if (data.foodItem) {
-					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromFoodCounterView');
-					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromFoodCounterView;
-				} else if (data.selectedFoodItem) {
-					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromTrackingView');
-					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromTrackingView;
-				} else
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromFoodCounterView) == 'true'
+				|| Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromTrackingView) == 'true') {
+					helpCallOut = new HelpCallOut();
+					if (data.foodItem) {
+						helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromFoodCounterView');
+						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromFoodCounterView;
+					} else if (data.selectedFoodItem) {
+						helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromTrackingView');
+						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromTrackingView;
+					} else
+						helptext3Removed(null);
+					
+					if (data.foodItem || data.selectedFoodItem) {
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+						helpCallOut.open(addFoodItemGroup.button_5,true);
+					}
+				} else {
 					helptext3Removed(null);
-				
-				if (data.foodItem || data.selectedFoodItem) {
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
-					helpCallOut.open(addFoodItemGroup.button_5,true);
 				}
 			}
 			
 			private function helptext3Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_ok_button');
-				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewOkButton;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext4Removed);
-				helpCallOut.open(OkButton,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewOkButton) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_ok_button');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewOkButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext4Removed);
+					helpCallOut.open(OkButton,true);
+				} else {
+					helptext4Removed(null);
+				}
 			}
 			
 			private function helptext4Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext4Removed);
-				if (TrashButton.visible) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_delete_button');
-					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewTrashButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext5Removed);
-					helpCallOut.open(TrashButton,true);
-				} else
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext4Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewTrashButton) == 'true') {
+					
+					if (TrashButton.visible) {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_delete_button');
+						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewTrashButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext5Removed);
+						helpCallOut.open(TrashButton,true);
+					} else
+						helptext5Removed(null);
+				} else {
 					helptext5Removed(null);
+				}
 			}
 			
 			private function helptext5Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext5Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext5Removed);
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {

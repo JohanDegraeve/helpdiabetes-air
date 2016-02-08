@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -74,15 +74,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			
 			private function onCreationComplete():void {
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('ownitemview','help_text_ownitemview');
-				helpCallOut.settingId = Settings.SettingsHelpTextOwnFoodItemView;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptextRemoved);
-				helpCallOut.open(fooditemdescription,true)
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextOwnFoodItemView) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('ownitemview','help_text_ownitemview');
+					helpCallOut.settingId = Settings.SettingsHelpTextOwnFoodItemView;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptextRemoved);
+					helpCallOut.open(fooditemdescription,true)
+				} else {
+					helptextRemoved(null);
+				}
 			}
 
 			private function helptextRemoved(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptextRemoved);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptextRemoved);
 			}
 
 			private function addHandler():void {

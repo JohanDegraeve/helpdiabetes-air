@@ -37,15 +37,19 @@
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
 			{
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('settingsdatabaseview','help_text_changeDatabaseStorage');
-				helpCallOut.settingId = Settings.SettingsHelpTextDatabaseViewChangeStorage;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(trackingsizeButton,true);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextDatabaseViewChangeStorage) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('settingsdatabaseview','help_text_changeDatabaseStorage');
+					helpCallOut.settingId = Settings.SettingsHelpTextDatabaseViewChangeStorage;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(trackingsizeButton,true);
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void  {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 			}
 			
 			

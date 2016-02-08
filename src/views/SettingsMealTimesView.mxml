@@ -53,15 +53,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var helpCallOut:HelpCallOut;
 
 			private function onCreationComplete(): void {
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('settingsmealtimesview','help_text_changeMealTimes');
-				helpCallOut.settingId = Settings.SettingsHelpTextMealTimesViewChangeMealTimes;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(snackuntilTime,true);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextMealTimesViewChangeMealTimes) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('settingsmealtimesview','help_text_changeMealTimes');
+					helpCallOut.settingId = Settings.SettingsHelpTextMealTimesViewChangeMealTimes;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(snackuntilTime,true);
+				} else {
+					helptext1Removed(null);					
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 			}
 			
 

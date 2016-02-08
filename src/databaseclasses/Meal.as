@@ -108,7 +108,7 @@ package databaseclasses
 			var previousBGlevel:Number = Number.NaN;
 			var insulinRatio:Number;
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			var timeStampAsDate = new Date(_timeStamp);
+			var timeStampAsDate:Date = new Date(_timeStamp);
 			
 			if (_mealEvent == null) {
 				//it's the first selectedfooditem, and if no timestamp was supplied then set _timestamp to current time
@@ -137,7 +137,7 @@ package databaseclasses
 				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
 				var correctionFactorList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
-				_mealEvent = new MealEvent(mealName,insulinRatio, correctionFactorList.getValue(Number.NaN,"",timeStampAsDate),timeStampAsDate,localdispatcher,DateTimeUtilities.createEventId() + "-carbs", "",new Date().valueOf(),true,null,thisMeal);
+				_mealEvent = new MealEvent(mealName,insulinRatio, correctionFactorList.getValue(Number.NaN,"",timeStampAsDate),timeStampAsDate.valueOf(),localdispatcher,DateTimeUtilities.createEventId() + "-carbs", "",new Date().valueOf(),true,null,thisMeal);
 			} else
 				mealEventCreated(null);
 			

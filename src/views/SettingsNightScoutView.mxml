@@ -51,14 +51,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function nightScoutUrlSaveClickHandler(event:MouseEvent):void
 			{
-				Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,usersAPISecret);
-				Settings.getInstance().setSetting(Settings.SettingsNightScoutWebsiteURL,usersNightScoutUrl);
-				//calculate sha-1 for the api-secret
-				var hash:SHA1 = new SHA1();
-				var result:String = Hex.fromArray(hash.hash(Hex.toArray(Hex.fromString(usersAPISecret))));
-				Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,result);
-				navigator.popView();
-				Synchronize.getInstance().startSynchronize(true);
+				if (usersAPISecret.length == 0 || usersAPISecret == Settings.NightScoutDefaultAPISECRET) {
+					Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);
+					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
+					Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
+					navigator.popView();
+				} else {
+					Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,usersAPISecret);
+					Settings.getInstance().setSetting(Settings.SettingsNightScoutWebsiteURL,usersNightScoutUrl);
+					//calculate sha-1 for the api-secret
+					var hash:SHA1 = new SHA1();
+					var result:String = Hex.fromArray(hash.hash(Hex.toArray(Hex.fromString(usersAPISecret))));
+					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,result);
+					Synchronize.getInstance().startSynchronize(true);
+					navigator.popView();
+				}
 			}
 
 			private function showErrorListClickHandler(event:MouseEvent):void {
@@ -88,7 +95,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>	
-
 			<s:Label  y="0" x="0" width="100%" top="35" text="{resourceManager.getString('settingsnightscoutview','yourwebsite')}" height="100%" maxHeight="75" textAlign="left" verticalAlign="middle"/>
 			<s:TextInput width="100%" contentBackgroundColor="0xDCDCDC" id="nightScoutUrlTextInput" text="@{usersNightScoutUrl}" editable="true" borderVisible="true" textAlign="left"/>
 			<s:Line width="100%">
@@ -96,7 +102,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					<s:SolidColorStroke color="0xADADAD" weight="1"/>
 				</s:stroke>
 			</s:Line>	
-
 			<s:Button height="48" width="100%" label="{resourceManager.getString('general','save')}" click="nightScoutUrlSaveClickHandler(event)"/>
 			<s:Button height="48" width="100%" label="Show recent Sync Errors" click="showErrorListClickHandler(event)"/>
 		</s:Group>

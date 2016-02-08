@@ -94,8 +94,6 @@ package model
 		
 		private static var counter:int = 0;
 		
-		public static var ltr:Boolean;
-		
 		/**
 		 * sets searchActive<br>
 		 * set firstmarkeditemeventid and lastmarkeditemeventid to 0, and sets the mark for all trackingevents to false
@@ -302,13 +300,6 @@ package model
 
 		public static var BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES:Number = 0.1;//unit s of insulin
 
-		public  function extendedFunctionsActive():Boolean
-		{
-			return true;
-			//return Settings.getInstance().getSetting(Settings.SettingsExtendedFunctionsActive) == "true" ? true:false;
-		}
-
-		
 		/**
 		 * offset to be used top and bottom of a label itemrenderer, to make sure the text is in the middle
 		 public static function get offSetSoThatTextIsInTheMiddle():Number
@@ -352,13 +343,6 @@ package model
 			
 			trackingList = new ArrayCollection();
 			copyOfTrackingList = trackingList;
-			if (ResourceManager.getInstance().getString("general","textdirection") ==  "ltr")
-				ltr = true;
-			else {
-				//arabic
-				ltr = false;
-			}
-			
 			instance = this;
 			
 			// at initialization, there's no dayline existing in the tracking, so initialize to 0
@@ -783,17 +767,13 @@ package model
 		 * calculates active insulin at given time, if time = null then active insulin now is calculated, time in ms since 1 1 1970
 		 */
 		public function calculateActiveInsulin(time:Number = NaN):Number  {
-			
 			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
 			
-			//trace("in calculateActiveInsulin " + ++counter);
 			if (isNaN(time))
 				time = (new Date()).valueOf();
 
 			var activeInsulin:Number = new Number(0);
 			for (var cntr:int = trackingList.length - 1; cntr >= 0 ; cntr-- ) {
-				//trace("cntr = " + cntr + " date = " + (new Date((copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).timeStamp)).toString());
-				//we go back maximum maxInsulinActivity
 				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp + maxInsulinDurationInSeconds * 1000 < time)
 					break;
 				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp < time) {//we don't include events in the future
@@ -833,11 +813,11 @@ package model
 						if (theEvent.amount < x_value)
 							settingToUse = Settings.SettingsMedicin1_range1_AOBChart + medicincntr * 4;
 						else if (theEvent.amount < y_value)
-							settingToUse = Settings.SettingsMedicin2_range1_AOBChart + medicincntr * 4;
+							settingToUse = Settings.SettingsMedicin1_range2_AOBChart + medicincntr * 4;
 						else if (theEvent.amount < z_value)
-							settingToUse = Settings.SettingsMedicin3_range1_AOBChart + medicincntr * 4;
+							settingToUse = Settings.SettingsMedicin1_range3_AOBChart + medicincntr * 4;
 						else 
-							settingToUse = Settings.SettingsMedicin4_range1_AOBChart + medicincntr * 4;
+							settingToUse = Settings.SettingsMedicin1_range4_AOBChart + medicincntr * 4;
 						var fromTimeAndValueArrayCollection:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(settingToUse));
 						if (ResourceManager.getInstance().getString('editmedicineventview','listofsquarewavebolustypes').indexOf(theEvent.bolustype) > -1) {
 							//split over 0.1 unit per injection

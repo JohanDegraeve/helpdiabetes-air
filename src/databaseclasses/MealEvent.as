@@ -580,14 +580,22 @@ package databaseclasses
 		 * Also insulinAmount is recalculated
 		 */
 		public function updateSelectedFoodItemChosenAmount(selectedFoodItem:SelectedFoodItem,newAmount:Number):void {
-			//find the id
+			selectedFoodItem.chosenAmount = newAmount;
+			//update also the lastmodifiedtimestamp of the mealevent if the selectedfooditem lastmodifiedtimestamp is more recent - which will always be the case here but check it anyway
+			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
+			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
+			if (lastModifiedTimestamp < selectedFoodItem.lastModifiedTimestamp) {
+				lastModifiedTimestamp = selectedFoodItem.lastModifiedTimestamp;
+			}
+/*			//find the id
 			for (var ij:int=0;ij < _selectedFoodItems.length; ij++) {
 				if ((_selectedFoodItems.getItemAt(ij) as SelectedFoodItem) == selectedFoodItem) {
 					(_selectedFoodItems.getItemAt(ij) as SelectedFoodItem).chosenAmount = newAmount;
 					recalculateTotals();
 					ij = _selectedFoodItems.length;
+					
 				}
-			}
+			}*/
 		}
 		
 		/**
@@ -597,6 +605,11 @@ package databaseclasses
 			Database.getInstance().deleteSelectedFoodItem(selectedFoodItemToRemove.eventid,null);
 			_selectedFoodItems.removeItemAt(selectedFoodItems.getItemIndex(selectedFoodItemToRemove));
 			recalculateTotals();
+			//update also the lastmodifiedtimestamp of the mealevent if the selectedfooditem lastmodifiedtimestamp is more recent - which will always be the case here but check it anyway
+			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
+			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
+				lastModifiedTimestamp = (new Date()).valueOf();
+
 		}
 		
 		/**

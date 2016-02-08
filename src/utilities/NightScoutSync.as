@@ -88,7 +88,7 @@
 		 private var asOfTimeStamp:Number
 		 
 		 /**
-		  * how many minutes between two synchronisations, normal value
+		  * how many seconds between two synchronisations, normal value
 		  */
 		 private static var normalValueForSecondsBetweenTwoSync:int = 30;
 		 
@@ -227,6 +227,7 @@
 				 }
 				 
 				 var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > normalValueForSecondsBetweenTwoSync * 1000;
+				 
 				 if ((nightScoutSyncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!nightScoutSyncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
 					 localElementsUpdated  = false;
 					 retrievalCounter = 0;
@@ -257,32 +258,6 @@
 
 		 }
 		 
-		 /**
-		  * TO BE COMPLETED
-		  * checks if there's an error, if yes then <br>
-		  * - calls googleAPICallFailed with event as parameter <br>
-		  * - sets functionToReCall to functionToRecallIfError<br>
-		  * returns true if there's an error, returns false if no error
-		  */
-		 private function eventHasError(event:Event,functionToRecallIfError:Function):Boolean  {
-			 var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-			 if  (eventAsJSONObject.error) {
-				 if (eventAsJSONObject.error.message == nightScoutError_Invalid_Credentials && !secondAttempt) {
-					 secondAttempt = true;
-					 functionToRecall = functionToRecallIfError;
-					 nightScoutAPICallFailed(event);
-					 return true;
-				 } else {
-					 return true;
-				 }
-			 }
-			 else 
-				 return false;
-		 }
-		 
-		 /**
-		  * 
-		  */
 		 private function synchronize():void {
 			 if (debugMode)
 				 trace("NightScoutSync.as : in synchronize");
@@ -336,7 +311,7 @@
 					 if (debugMode)
 						 trace("NightScoutSync.as : in method deleteRemoteItems, there's an alement to be deleted");
 					 //if the lengthe of the eventid is less than 24, then it's an  old element that was 'downloaded' from google sync, we will skip it
-					 if ((elementToBeDeleted as TrackingViewElement).eventid.length < 24) {
+					 if ((elementToBeDeleted as TrackingViewElement).eventid.length < 24 || (elementToBeDeleted as TrackingViewElement).eventid.indexOf("HelpDiabet") > -1) {
 						 listOfElementsToBeDeleted.removeItem(elementToBeDeleted);
 						 deleteRemoteItems();
 					 } else {
@@ -408,12 +383,10 @@
 						 remoteElements.addItem(remoteElement);
 						 if (!remoteElement.helpdiabetes) {
 							 var helpDiabetesObject:Object = new Object();
-							 //helpDiabetesObject["deleted"] = "false"; not really useful because nightscout itself will not take this field into account - better to use google sync for that and to delete the object at NS effectively in stead of marking it as deleted
-							 helpDiabetesObject["lastmodifiedtimestamp"] = DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at).valueOf();
-							 helpDiabetesObject["lastmodifiedatns"] = helpDiabetesObject["lastmodifiedtimestamp"];
+							 helpDiabetesObject["lastmodifiedtimestamp"] = (new Date()).valueOf();
 							 remoteElement["helpdiabetes"] = helpDiabetesObject;
-							 remoteElement["tobeupdatedatns"] = "true";//to check later on, if true we will put it to NS, but remove that attribute first
-							 remoteElement["eventtime"] = DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at).valueOf();
+							 remoteElement["tobeupdatedatns"] = "true";//we added helpdiabetes so it needs to be updated
+							 remoteElement["eventTime"] = DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at).valueOf();
 						 }
 						 // strip off selectedfooditems in the notes, if any
 						 if (remoteElement.notes)
@@ -456,6 +429,7 @@
 									 if (new Number(remoteElement.helpdiabetes.lastmodifiedtimestamp) < (localElement as TrackingViewElement).lastModifiedTimestamp) {
 										 //the local element is updated more recently
 										 remoteElement.eventTime = (localElement as TrackingViewElement).timeStamp;
+										 delete remoteElement['created_at'];//don't need that because not used by ns api
 										 if (localElement is BloodGlucoseEvent) {
 											 //check first if localElement is in list of elements to be deleted, if yes then there's two possibilities :
 											 //or the remote element has no other values, so it needs to be deleted completely, so we keep it in list of elements to be deleted
@@ -469,8 +443,9 @@
 													 //it can also be deleted from listOfElementsToBeDeleted
 													 listOfElementsToBeDeleted.removeItemAt(indexInListOfElementsToBeDeleted);
 												 } else {
-													 if (remoteElement.tobeupdatedatns)
-														 delete remoteElement['tobeupdatedatns'];
+													// if (remoteElement.tobeupdatedatns)
+													//	 delete remoteElement['tobeupdatedatns'];
+													//... removed that because if tobeudpatedatns is true then it's because it needs update
 												 }
 											 } else {
 												 //change the applicable values of the remoteElement
@@ -514,8 +489,8 @@
 													 //it can also be deleted from listOfElementsToBeDeleted
 													 listOfElementsToBeDeleted.removeItemAt(indexInListOfElementsToBeDeleted);
 												 } else {
-													 if (remoteElement.tobeupdatedatns)
-														 delete remoteElement['tobeupdatedatns'];
+													// if (remoteElement.tobeupdatedatns)
+													//	 delete remoteElement['tobeupdatedatns'];
 												 }
 											 } else {
 												 if ((localElement as MedicinEvent).amount == 0)
@@ -550,8 +525,8 @@
 													 //it can also be deleted from listOfElementsToBeDeleted
 													 listOfElementsToBeDeleted.removeItemAt(indexInListOfElementsToBeDeleted);
 												 } else {
-													 if (remoteElement.tobeupdatedatns)
-														 delete remoteElement['tobeupdatedatns'];
+													 //if (remoteElement.tobeupdatedatns)
+													 //	 delete remoteElement['tobeupdatedatns'];
 												 }
 											 } else {
 												 if ((localElement as MealEvent).comment.length > 0) {
@@ -596,8 +571,8 @@
 													 //it can also be deleted from listOfElementsToBeDeleted
 													 listOfElementsToBeDeleted.removeItemAt(indexInListOfElementsToBeDeleted);
 												 } else {
-													 if (remoteElement.tobeupdatedatns)
-														 delete remoteElement['tobeupdatedatns'];
+													 //if (remoteElement.tobeupdatedatns)
+													 //	 delete remoteElement['tobeupdatedatns'];
 												 }
 											 } else {
 												 if ((localElement as ExerciseEvent).comment.length > 0) {
@@ -614,6 +589,7 @@
 										 }
 									 } else {
 										 //the remote element is updated more recently
+										 //delete remoteElement['tobeupdatedatns'];
 										 var newCreationTimeStamp:Number = DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at).valueOf();
 										 var lastModifiedTimeStamp:Number = remoteElement.helpdiabetes.lastmodifiedtimestamp;
 										 var newComment:String = removeBRInNotes(remoteElement.notes);
@@ -720,6 +696,7 @@
 					 //WE NEED TO CHECK HERE IF WE FOUND THE REMOTE ELEMENT IN THE LOCALELEMENTS, IF NOT IT IS ONE TO add
 					 if (!remoteElementFoundLocally) {
 						 var elementIsInDeletionList:Boolean = false;
+						 //delete remoteElement['tobeupdatedatns'];actually if tobeupdatedatns is there, then it's because it needs update, it could be for example that helpdiabetes (with lastmodifiedtimestamp) has been added
 						 if (remoteElement.glucose) {
 							 //check if the element is in list of objects to be deleted, if so no need to re-add it to the local list
 							 for (var i:int = 0; i < listOfElementsToBeDeleted.length; i++) {
@@ -830,7 +807,7 @@
 				 updateRemoteElements();
 			 } else {
 				 //call to nightscout
-				 //we will restrict to all treatments less than 1 day old, because I haven't succeeded yet in filtering on lastmodifiedtimestamp (or lastModifiedAtNS)
+				 //we will restrict to all treatments less than 1 day old, because I haven't succeeded yet in filtering on lastmodifiedtimestamp
 				 //this field is added anyway by the api
 				 var urlVariables:URLVariables = new URLVariables();
 				 urlVariables["find[created_at][$gte]"] = DateTimeUtilities.createNSFormattedDateAndTime(new Date((new Date()).valueOf() - 3600 * 24 * 1000));
@@ -861,8 +838,9 @@
 				 //start preparing the json object and do the put
 				 var newElement:Object = new Object();
 				 var localElement:Object = localElements.getItemAt(0);
-				 if ((localElement as TrackingViewElement).eventid.length < 24) {
+				 if ((localElement as TrackingViewElement).eventid.length < 24 || (localElement as TrackingViewElement).eventid.indexOf("HelpDiabet") > -1) {
 					 //we will not update these , it's been created with older version of helpdiabetes
+					 //events with HelpDiabet in the eventid, should actually not happen, just happened with me because for some time I was using that as eventid
 					 localElements.removeItemAt(0);
 					 updateRemoteElements();
 				 } else {
@@ -878,13 +856,8 @@
 					 var helpDiabetesObject:Object = new Object();
 					 //helpDiabetesObject["deleted"] = "false"; not really useful because nightscout itself will not take this field into account - better to use google sync for that and to delete the object at NS effectively in stead of marking it as deleted
 					 helpDiabetesObject["lastmodifiedtimestamp"] = (new Date((localElement as TrackingViewElement).lastModifiedTimestamp)).valueOf();
-					 var lastModifiedAtNS:String = ((new Date()).valueOf() - (localElement as TrackingViewElement).lastModifiedTimestamp > 10000 
-						 ? 
-						 (new Date()).valueOf().toString() 
-						 :
-						 (localElement as TrackingViewElement).lastModifiedTimestamp.toString());
-					 helpDiabetesObject["lastmodifiedatns"] = lastModifiedAtNS;
 					 newElement["helpdiabetes"] = helpDiabetesObject;
+					 newElement["upload"] = "true";
 					 
 					 
 					 if (localElement is BloodGlucoseEvent) {
@@ -910,6 +883,7 @@
 						 if (medicinEvent.medicinName != Settings.getInstance().getSetting(Settings.SettingsInsulinType1) || 
 							 medicinEvent.bolustype != ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL)) {
 							 //don't upload
+							 newElement["upload"] = "false";
 						 } else {
 							 newElement["eventType"] = "Bolus";
 							 if (medicinEvent.amount == 0)
@@ -932,13 +906,19 @@
 						 }
 						 newElement.carbs = ((Math.round((localElement as MealEvent).totalCarbs * 10))/10);
 					 } 
-					 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.PUT,null,JSON.stringify(newElement),updateRemoteElements,true);
+					 if (newElement.upload == "true") {
+						 delete newElement['upload'];
+						 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.PUT,null,JSON.stringify(newElement),updateRemoteElements,true);
+					 } else {
+						 localElements.removeItemAt(0);
+						 updateRemoteElements();
+					 }
 				 }
 			 } else if (remoteElements.length > 0) {
 				 var remoteElement:Object = remoteElements.getItemAt(0);
 				 if (remoteElement.tobeupdatedatns) {
-					 delete remoteElement['tobeupdatedatns'];
-					 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.PUT,null,JSON.stringify(remoteElement),updateRemoteElements,true);
+						 delete remoteElement['tobeupdatedatns'];
+						 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.PUT,null,JSON.stringify(remoteElement),updateRemoteElements,true);
 				 } else {
 					 //just remove the element, no update needed
 					 remoteElements.removeItemAt(0);
@@ -1010,7 +990,7 @@
 			 
 			 loader.load(request);
 			 if (debugMode)
-				 trace("NightScoutSync.as : loader : url = " + request.url + ", request.data = " + request.data); 
+				 trace("NightScoutSync.as : loader : url = " + request.url + ", method = " + request.method + ", request.data = " + request.data); 
 		 }
 		 
 		 private function copyTrackingListIfNotDoneYet():void {
@@ -1019,7 +999,7 @@
 				 previousTrackingEventToShow = ModelLocator.getInstance().trackingEventToShow;
 				 ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
 				 ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().infoTrackingList;
-				 TrackingView.recalculateActiveInsulin();
+				 //TrackingView.recalculateActiveInsulin();
 			 }			
 		 }
 		 
@@ -1053,6 +1033,7 @@
 				 localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
 				 localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
 				 Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
+				 Synchronize.getInstance().startSynchronize(true);
 			 }
 			 
 			 if (rerunNecessary) {

@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -471,7 +471,8 @@ package databaseclasses
 					//we went through all settings, continue with creating the fooditemstable
 					createFoodItemsTable();
 				} else {
-					if (retrievalResult[id] == null) {
+					if (retrievalResult[id] == null && (id - 100) != Settings.SettingsAccessToken) {
+						trace ("adding setting with id = " + id);
 						sqlStatement.clearParameters();
 						sqlStatement.addEventListener(SQLEvent.RESULT,settingAdded);
 						sqlStatement.addEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
