@@ -100,7 +100,7 @@ package databaseclasses
 		 * when changed then also  database update happens with new value for chosenAmount<br>
 		 * lastmodifiedtimestamp will get current date
 		 */
-		public function set chosenAmount(value:Number):void
+		public function updateChosenAmount(value:Number, parentMealEvent:MealEvent):void
 		{
 			_chosenAmount = value;
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > _lastModifiedTimestamp)
@@ -112,7 +112,6 @@ package databaseclasses
 			//update also the lastmodifiedtimestamp of the parent mealevent if the selectedfooditem lastmodifiedtimestamp is more recent
 			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
-			var parentMealEvent:MealEvent = findParentMealEvent();
 			if (parentMealEvent != null)
 				if (parentMealEvent.lastModifiedTimestamp < lastModifiedTimestamp) {
 					parentMealEvent.updateMealEvent(parentMealEvent.mealName,parentMealEvent.comment,parentMealEvent.insulinRatio,parentMealEvent.correctionFactor,this.lastModifiedTimestamp,parentMealEvent.timeStamp);
@@ -140,7 +139,7 @@ package databaseclasses
 		/**
 		 * if newLastModifiedTimestamp isnan the current timestamp is used 
 		 */
-		public function updateSelectedFoodItem(newDescription:String,newUnit:Unit,newLastModifiedTimeStamp:Number,newChosenAmount:Number):void  {
+		public function updateSelectedFoodItem(newDescription:String,newUnit:Unit,newLastModifiedTimeStamp:Number,newChosenAmount:Number, parentMealEvent:MealEvent):void  {
 			_itemDescription = newDescription;
 			_unit = newUnit;
 			
@@ -156,22 +155,10 @@ package databaseclasses
 			//update also the lastmodifiedtimestamp of the parent mealevent if the selectedfooditem lastmodifiedtimestamp is more recent
 			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
-			var parentMealEvent:MealEvent = findParentMealEvent();
 			if (parentMealEvent != null)
 				if (parentMealEvent.lastModifiedTimestamp < lastModifiedTimestamp) {
 					parentMealEvent.updateMealEvent(parentMealEvent.mealName,parentMealEvent.comment,parentMealEvent.insulinRatio,parentMealEvent.correctionFactor,this.lastModifiedTimestamp,parentMealEvent.timeStamp);
 				}
-		}
-		
-		private function findParentMealEvent():MealEvent {
-			for (var lstctr:int = 0; lstctr < ModelLocator.getInstance().trackingList.length; lstctr++) {
-				if (ModelLocator.getInstance().trackingList.getItemAt(lstctr) is MealEvent) {
-					if ((ModelLocator.getInstance().trackingList.getItemAt(lstctr) as MealEvent).eventid == this.mealEventId)
-						return ModelLocator.getInstance().trackingList.getItemAt(lstctr) as MealEvent;
-					break;
-				}
-			}
-			return null;
 		}
 		
 	}

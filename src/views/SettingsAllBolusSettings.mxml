@@ -41,8 +41,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[ResourceBundle("synchronizeview")]
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
-				ResourceManager.getInstance().getString("settingsallbolussettingsview","bolus_calculation"),
-				ResourceManager.getInstance().getString("settingsview","meal_times")
+				ModelLocator.resourceManagerInstance.getString("settingsallbolussettingsview","bolus_calculation"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","meal_times")
 				
 			]);	
 			
@@ -57,8 +57,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
 				
-				menuList.addItem(ResourceManager.getInstance().getString("settingsallbolussettingsview","correction_factor_settings"));
-				menuList.addItem(ResourceManager.getInstance().getString("synchronizeview","help"));
+				menuList.addItem(ModelLocator.resourceManagerInstance.getString("settingsallbolussettingsview","correction_factor_settings"));
+				menuList.addItem(ModelLocator.resourceManagerInstance.getString("synchronizeview","help"));
 			}
 			
 			/**

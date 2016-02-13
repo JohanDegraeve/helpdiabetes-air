@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2015  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ package model
 	import flash.events.EventDispatcher;
 	
 	import mx.collections.ArrayCollection;
+	import mx.resources.IResourceManager;
 	import mx.resources.ResourceManager;
 	
 	import spark.collections.Sort;
@@ -93,6 +94,8 @@ package model
 		}
 		
 		private static var counter:int = 0;
+		
+		public static var resourceManagerInstance:IResourceManager;
 		
 		/**
 		 * sets searchActive<br>
@@ -318,6 +321,8 @@ package model
 			//
 			if (instance != null) throw new Error('Cannot create a new instance. Must use ');
 			
+			resourceManagerInstance = ResourceManager.getInstance();
+			
 			/**
 			 *  foodTables is an array of an array of strings <br>
 			 * each row consists of array of strings :<br>
@@ -328,17 +333,17 @@ package model
 			 */
 			foodTables = new Array(
 				new Array("nl",
-					ResourceManager.getInstance().getString("general","dutch"),
-					ResourceManager.getInstance().getString("general","DutchTable")),
+					resourceManagerInstance.getString("general","dutch"),
+					resourceManagerInstance.getString("general","DutchTable")),
 				new Array("en",
-					ResourceManager.getInstance().getString("general","english"),
-					ResourceManager.getInstance().getString("general","NorwegianTableInEnglish")),
+					resourceManagerInstance.getString("general","english"),
+					resourceManagerInstance.getString("general","NorwegianTableInEnglish")),
 				new Array("fr",
-					ResourceManager.getInstance().getString("general","french"),
-					ResourceManager.getInstance().getString("general","FrenchAxelle")),
+					resourceManagerInstance.getString("general","french"),
+					resourceManagerInstance.getString("general","FrenchAxelle")),
 				new Array("ro",
-					ResourceManager.getInstance().getString("general","romanian"),
-					ResourceManager.getInstance().getString("general","RomanianOnedenDotCom"))
+					resourceManagerInstance.getString("general","romanian"),
+					resourceManagerInstance.getString("general","RomanianOnedenDotCom"))
 			);
 			
 			trackingList = new ArrayCollection();
@@ -351,8 +356,7 @@ package model
 			_youngestDayLineStoredInTrackingList = 5000000000000;
 			
 			infoTrackingList = new ArrayCollection();
-			infoTrackingList.addItem(new SimpleTextEvent(ResourceManager.getInstance().getString("general","storingnewevents")));
-			
+			infoTrackingList.addItem(new SimpleTextEvent(resourceManagerInstance.getString("general","storingnewevents")));
 		}
 		
 		/** 
@@ -463,10 +467,10 @@ package model
 			var todayHourMinute:Number = todayAsDate.valueOf() - todayAtMidNight;
 			
 			//to avoid having to get the resource each time, we'll do it once here
-			var breakfast:String = ResourceManager.getInstance().getString('general','breakfast');
-			var lunch:String = ResourceManager.getInstance().getString('general','lunch');
-			var snack:String = ResourceManager.getInstance().getString('general','snack');
-			var supper:String = ResourceManager.getInstance().getString('general','supper');
+			var breakfast:String = resourceManagerInstance.getString('general','breakfast');
+			var lunch:String = resourceManagerInstance.getString('general','lunch');
+			var snack:String = resourceManagerInstance.getString('general','snack');
+			var supper:String = resourceManagerInstance.getString('general','supper');
 			
 			//the first meal to add, is the  meal just before the current period
 			//then we'll fill up with all meals from today till 7 days after
@@ -611,10 +615,10 @@ package model
 		 * this function gets the id of the second meal in the _meals, that is a standard meal
 		 */
 		public function getRefreshedSelectedMeal():int {
-			var breakfast:String = ResourceManager.getInstance().getString('general','breakfast');
-			var lunch:String = ResourceManager.getInstance().getString('general','lunch');
-			var snack:String = ResourceManager.getInstance().getString('general','snack');
-			var supper:String = ResourceManager.getInstance().getString('general','supper');
+			var breakfast:String = resourceManagerInstance.getString('general','breakfast');
+			var lunch:String = resourceManagerInstance.getString('general','lunch');
+			var snack:String = resourceManagerInstance.getString('general','snack');
+			var supper:String = resourceManagerInstance.getString('general','supper');
 			
 			var mealCounter:int = 0;
 			
@@ -792,7 +796,7 @@ package model
 		public function calculateActiveInsulinForSpecifiedEvent(theEvent:MedicinEvent, time:Number = NaN):Number {
 			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
 			var additionalMaxDurationInSeconds:Number = 0;
-			if (ResourceManager.getInstance().getString('editmedicineventview','listofsquarewavebolustypes').indexOf((theEvent as MedicinEvent).bolustype) > -1) {
+			if (resourceManagerInstance.getString('editmedicineventview','listofsquarewavebolustypes').indexOf((theEvent as MedicinEvent).bolustype) > -1) {
 				additionalMaxDurationInSeconds = (theEvent as MedicinEvent).bolusDurationInMinutes * 60;
 			}
 			if ((theEvent as TrackingViewElement).timeStamp + (maxInsulinDurationInSeconds  + additionalMaxDurationInSeconds) * 1000 < time)
@@ -819,7 +823,7 @@ package model
 						else 
 							settingToUse = Settings.SettingsMedicin1_range4_AOBChart + medicincntr * 4;
 						var fromTimeAndValueArrayCollection:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(settingToUse));
-						if (ResourceManager.getInstance().getString('editmedicineventview','listofsquarewavebolustypes').indexOf(theEvent.bolustype) > -1) {
+						if (resourceManagerInstance.getString('editmedicineventview','listofsquarewavebolustypes').indexOf(theEvent.bolustype) > -1) {
 							//split over 0.1 unit per injection
 							var amountOfInjections:int = theEvent.amount / BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES;
 							var intervalBetweenInjections:Number = theEvent.bolusDurationInMinutes / amountOfInjections;

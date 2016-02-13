@@ -75,7 +75,7 @@ the home screen
 			private static var thisView:View;
 			public var firstTimeAppIsStartedOnThisDevice:Boolean = false;
 			private static var maxTimeForSplashScreenInSeconds:Number = 4;
-			private static var howManyDaysToShowTheSplashScreenForMaxTime:Number = 10;
+			private static var howManyDaysToShowTheSplashScreenForMaxTime:Number = 50;
 			private var helpCallOut:HelpCallOut;
 			/**
 			 * used for event dispatching, 

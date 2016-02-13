@@ -41,6 +41,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			
 			import databaseclasses.Settings;
 			
+			import model.ModelLocator;
+			
 			import myComponents.AlertPopUp;
 			
 			[Bindable]
@@ -50,12 +52,12 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			
 			[Bindable]
 			private var menuList:ArrayCollection = 	new ArrayCollection([
-				ResourceManager.getInstance().getString("synchronizeview","menuitem_downloadfoodtable"),
-				ResourceManager.getInstance().getString("synchronizeview","menuitem_exporttracking"),
+				ModelLocator.resourceManagerInstance.getString("synchronizeview","menuitem_downloadfoodtable"),
+				ModelLocator.resourceManagerInstance.getString("synchronizeview","menuitem_exporttracking"),
 				"NightScout",
-				ResourceManager.getInstance().getString("synchronizeview","help"),
-				ResourceManager.getInstance().getString("synchronizeview","removegoogleauthorization"),
-				"Show recent Sync Errors"
+				ModelLocator.resourceManagerInstance.getString("synchronizeview","help"),
+				ModelLocator.resourceManagerInstance.getString("synchronizeview","removegoogleauthorization"),
+				"Show recent Google Sync Errors"
 			]);	
 
 			private function onInitialize():void {
@@ -102,8 +104,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						Settings.getInstance().setSetting(Settings.SettingsAccessToken,"");
 						Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
 						Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");//also nightscoutsync is reset
+						trace("night scout api secret reset to blanc, Synchronizeview2");
 						Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);//also nightscoutsync is reset
-						Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
 						Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);

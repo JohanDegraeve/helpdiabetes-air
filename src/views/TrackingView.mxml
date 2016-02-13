@@ -34,8 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
-			import mx.resources.ResourceManager;
-			
 			import databaseclasses.BloodGlucoseEvent;
 			import databaseclasses.ExerciseEvent;
 			import databaseclasses.Meal;
@@ -60,7 +58,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			static private var timerForRecalculateActiveInsulin:Timer;
 			private var timerForRecalculateActiveInsulinForMedicinEvents:Timer;
 			private var timer:Timer;
-			static private var activeInsulinAmount:Number;
+			[Bindable] static private var activeInsulinAmount:Number;
 			
 			[Bindable]
 			private var activeInsulin_text:String;
@@ -346,11 +344,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				//calculate activeInsulin_text
 				activeInsulinAmount = ((Math.round(ModelLocator.getInstance().calculateActiveInsulin((new Date()).valueOf()) * 10))/10);
 				activeInsulin_text = 
-					ResourceManager.getInstance().getString('trackingview','active_insulin')
+					ModelLocator.resourceManagerInstance.getString('trackingview','active_insulin')
 					+ " = " 
 					+ activeInsulinAmount.toString() 
 					+ " " 
-					+ ResourceManager.getInstance().getString('trackingview','internationalunit');
+					+ ModelLocator.resourceManagerInstance.getString('trackingview','internationalunit');
 				
 				timerForRecalculateActiveInsulin = new Timer(30000, 1);
 				timerForRecalculateActiveInsulin.addEventListener(TimerEvent.TIMER,recalculateActiveInsulin);
@@ -417,7 +415,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private function helpText3Removed(event:Event = null):void {
 				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helpText3Removed);
-				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextActiveInsulinInt) == 'true') {
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextActiveInsulinInt) == 'true' && activeInsulinAmount > 0) {
 					var cntr:int;
 					for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
 						if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MedicinEvent) {
@@ -486,16 +484,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" />
 		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
-	<s:Group id="activeInsulin">
+	<s:Group id="activeInsulin" visible="{activeInsulinAmount > 0}">
 		<s:Label left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}"/>
 	</s:Group>
-	<s:Line width="100%" left="0" right="0" top="40">
+	<s:Line width="100%" left="0" right="0" top="40" visible="{activeInsulinAmount > 0}">
 		<s:stroke>
 			<s:SolidColorStroke color="0x3B6999" weight="5"/>
 		</s:stroke>
 	</s:Line>	
 	
-	<s:List id="trackinglist" left="0" right="0" top="45" bottom="0" width="100%" useVirtualLayout="true" 
+	<s:List id="trackinglist" left="0" right="0" top="{activeInsulinAmount > 0 ? 45:0}" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
 			click="onListElementClicked(event)"
 			updateComplete="recalculateActiveInsulin(null)"

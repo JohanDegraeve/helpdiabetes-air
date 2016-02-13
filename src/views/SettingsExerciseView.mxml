@@ -35,6 +35,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import databaseclasses.Settings;
 			
+			import model.ModelLocator;
+			
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
@@ -113,7 +115,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				MyGATracker.getInstance().trackPageview( "SettingsExerciseView-viewOpened");
 
-				title = ResourceManager.getInstance().getString("settingsview","exercise");
+				title = ModelLocator.resourceManagerInstance.getString("settingsview","exercise");
 
 				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextExerciseViewChangeMedicinType) == 'true') {
 					helpCallOut = new HelpCallOut();

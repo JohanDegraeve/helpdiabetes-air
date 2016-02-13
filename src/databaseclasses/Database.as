@@ -32,7 +32,6 @@ package databaseclasses
 	import flash.filesystem.FileStream;
 	
 	import mx.collections.ArrayCollection;
-	import mx.resources.ResourceManager;
 	
 	import model.ModelLocator;
 	
@@ -248,6 +247,8 @@ package databaseclasses
 		{
 			return _newFoodDatabaseStatus;
 		}
+		
+		private var tempId:int;
 		
 		
 		/**
@@ -472,6 +473,7 @@ package databaseclasses
 					createFoodItemsTable();
 				} else {
 					if (retrievalResult[id] == null && (id - 100) != Settings.SettingsAccessToken) {
+						tempId = id as int;
 						trace ("adding setting with id = " + id);
 						sqlStatement.clearParameters();
 						sqlStatement.addEventListener(SQLEvent.RESULT,settingAdded);
@@ -502,10 +504,10 @@ package databaseclasses
 			function addingSettingFailed (se:SQLErrorEvent):void {
 				sqlStatement.removeEventListener(SQLEvent.RESULT,settingAdded);
 				sqlStatement.removeEventListener(SQLErrorEvent.ERROR,addingSettingFailed);
-				trace("Database.as : Failed to add setting. Database:0006");
+				trace("Database.as : Failed to add setting " + tempId + ". Database:0006");
 				if (globalDispatcher != null) {
 					var errorEvent:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
-					errorEvent.data = "Failed to add setting. Database:0006";
+					errorEvent.data = "Failed to add setting " + tempId + ". Database:0006";
 					globalDispatcher.dispatchEvent(errorEvent);
 					globalDispatcher = null;
 				}
@@ -1562,7 +1564,7 @@ package databaseclasses
 			var isSuccess:Boolean = true; 
 			
 			var foodFileName:String;
-			foodFileName = "foodfile-" + ResourceManager.getInstance().getString("general","TableLanguage");
+			foodFileName = "foodfile-" + ModelLocator.resourceManagerInstance.getString("general","TableLanguage");
 			sampleDbFileName = foodFileName + "-sample.db";
 			xmlFileName = foodFileName + ".xml";
 			
@@ -2052,7 +2054,7 @@ package databaseclasses
 				localSqlStatement.parameters[":newbloodglucoseeventid"] = bloodglucoseeventid;
 				localSqlStatement.parameters[":unit"] = unit;
 				localSqlStatement.parameters[":creationtimestamp"] = timeStamp;
-				if (unit  == ResourceManager.getInstance().getString('general','mmoll'))
+				if (unit  == ModelLocator.resourceManagerInstance.getString('general','mmoll'))
 					level = level * 10;
 				localSqlStatement.parameters[":value"] = level;
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
@@ -2337,7 +2339,7 @@ package databaseclasses
 							deleteBloodGlucoseEvent(bloodGlucoseEventId);
 						} else {
 							var tempLevel:Number = o.value as Number;
-							if (o.unit as String  == ResourceManager.getInstance().getString('general','mmoll'))
+							if (o.unit as String  == ModelLocator.resourceManagerInstance.getString('general','mmoll'))
 								tempLevel = tempLevel/10;
 							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(tempLevel as Number,o.unit as String, bloodGlucoseEventId, o.comment_2 as String, o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
 							ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
@@ -2391,7 +2393,7 @@ package databaseclasses
 							if (medicinArray.length > 1)
 								bolusType = medicinArray[1];
 							else 
-								bolusType = ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
+								bolusType = ModelLocator.resourceManagerInstance.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
 							if (medicinArray.length > 2)
 								bolusDuration = new Number(medicinArray[2] as String);
 							else
@@ -2857,7 +2859,7 @@ package databaseclasses
 				localSqlStatement.text = UPDATE_BLOODGLUCOSEEVENT;
 				localSqlStatement.parameters[":id"] = bloodglucoseEventId;
 				localSqlStatement.parameters[":unit"] = unit;
-				if (unit  == ResourceManager.getInstance().getString('general','mmoll'))
+				if (unit  == ModelLocator.resourceManagerInstance.getString('general','mmoll'))
 					bloodGlucoseLevel = bloodGlucoseLevel * 10;
 				localSqlStatement.parameters[":value"] = bloodGlucoseLevel;
 				localSqlStatement.parameters[":creationtimestamp"] = newCreationTimeStamp;

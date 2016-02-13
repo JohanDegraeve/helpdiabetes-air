@@ -18,8 +18,12 @@
 package utilities
 {
 	import com.google.analytics.GATracker;
+	
 	import flash.display.DisplayObject;
+	
 	import mx.resources.ResourceManager;
+	
+	import model.ModelLocator;
 	
 	public class MyGATracker
 	{
@@ -33,7 +37,7 @@ package utilities
 		
 		public function MyGATracker()
 		{
-			trackerId = ResourceManager.getInstance().getString('analytics','trackeraccount');
+			trackerId = ModelLocator.resourceManagerInstance.getString('analytics','trackeraccount');
 			if (instance != null) {
 				throw new Error("MyGATracker class can only be accessed through MyGATracker.getInstance()");	
 			}

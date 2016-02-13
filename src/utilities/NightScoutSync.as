@@ -451,7 +451,7 @@
 												 //change the applicable values of the remoteElement
 												 //we're not changing the units of the remote element but we change the blood glucose value accordingly
 												 newBloodGlucoseLevel = (localElement as BloodGlucoseEvent).bloodGlucoseLevel;
-												 if ((remoteElement.units as String).toUpperCase().indexOf(ResourceManager.getInstance().getString('general','mgperdl').toUpperCase()) > -1) {
+												 if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) > -1) {
 													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mmoll") {
 														 newBloodGlucoseLevel = Math.round((localElement as BloodGlucoseEvent).bloodGlucoseLevel/(new Number(0.0555)));//convert from mgperdlto mmol
 													 } 
@@ -597,12 +597,12 @@
 											 if (remoteElement.glucose) {
 												 //we're not changing the units of the local element but we change the blood glucose value accordingly
 												 newBloodGlucoseLevel = (remoteElement.glucose as Number);
-												 if ((remoteElement.units as String).toUpperCase().indexOf(ResourceManager.getInstance().getString('general','mgperdl').toUpperCase()) > -1) {
-													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == ResourceManager.getInstance().getString('general','mmoll')) {
+												 if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) > -1) {
+													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == ModelLocator.resourceManagerInstance.getString('general','mmoll')) {
 														 newBloodGlucoseLevel = Math.round((remoteElement.glucose as Number)/(new Number(0.0555)));
 													 }
 												 } else {
-													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == ResourceManager.getInstance().getString('general','mgperdl')) {
+													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == ModelLocator.resourceManagerInstance.getString('general','mgperdl')) {
 														 newBloodGlucoseLevel = Math.round((remoteElement.glucose as Number)*(new Number(0.0555))*10)/10;
 													 }
 												 }
@@ -649,7 +649,10 @@
 											 }
 											 localElementsUpdated = true;
 										 } else if (localElement is MealEvent) {
-											 if (remoteElement.carbs) {
+											 // don't update a local mealevent, it seems to be creating conflicts, probably happens when two devices are syncing almost at the same time
+											 // for instance, one device has uploaded un update to nightscout, but almost in parallel another devices syncs with google, but that update was not there on time
+											 // but it sees to update at ns, so it downloads the carbs and creates a "item from ns".
+											 /*if (remoteElement.carbs) {
 												 //we're replacing the carbs, we will not start analyzing the notes field (which may contain a list of selected fooditems) 
 												 //to see which selectedfooditems need to be deleted - we'll just delete them all and add a new one
 												 //let's first add the dummy selecteditem
@@ -672,11 +675,11 @@
 													 newCreationTimeStamp
 												 );
 											 } else {
-												 //there's no insulin
+												 //there's no carbs
 												 //local element should be deleted
 												 //can this happen ?
-											 }
-											 localElementsUpdated = true;
+											 }*/
+											 //localElementsUpdated = true;
 										 }
 									 }
 								 } else {
@@ -709,12 +712,12 @@
 							 }
 							 if (!elementIsInDeletionList) {
 								 var newGlucose:Number = new Number(remoteElement.glucose);
-								 var newUnit:String = ResourceManager.getInstance().getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
-								 if ((remoteElement.units as String).toUpperCase().indexOf(ResourceManager.getInstance().getString('general','mgperdl').toUpperCase()) > -1 && newUnit == 
-									 ResourceManager.getInstance().getString('general','mmoll')) {
+								 var newUnit:String = ModelLocator.resourceManagerInstance.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
+								 if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) > -1 && newUnit == 
+									 ModelLocator.resourceManagerInstance.getString('general','mmoll')) {
 									 newGlucose = Math.round(newGlucose*(new Number(0.0555))*10)/10;
-								 } else if ((remoteElement.units as String).toUpperCase().indexOf(ResourceManager.getInstance().getString('general','mgperdl').toUpperCase()) == -1 && newUnit == 
-									 ResourceManager.getInstance().getString('general','mgperdl')) {
+								 } else if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) == -1 && newUnit == 
+									 ModelLocator.resourceManagerInstance.getString('general','mgperdl')) {
 									 newGlucose = Math.round(newGlucose/(new Number(0.0555)));
 								 }
 								 
@@ -741,11 +744,27 @@
 								 }
 							 }
 							 if (!elementIsInDeletionList) {
+								 
+								 //calculate insulinratio
+								 var timeStampAsDate:Date = DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at);
+								 var insulinRatio:Number;
+								 var nowAsNumber:Number = (timeStampAsDate.hours * 3600 + timeStampAsDate.minutes * 60 + timeStampAsDate.seconds)*1000;
+								 if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingBREAKFAST_UNTIL))) {
+									 insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_BREKFAST));
+								 } else if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingLUNCH_UNTIL))) {
+									 insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_LUNCH));
+								 } else if (nowAsNumber < new Number(Settings.getInstance().getSetting(Settings.SettingSNACK_UNTIL))) {
+									 insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SNACK));
+								 } else {
+									 insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SUPPER));
+								 }
+								 var correctionFactorList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
+
 								 var theMealEvent:MealEvent = new MealEvent(//in contradiction to medicin/bloodglucose and exerciseevents, I must add new mealevents to the trackinglist, because if i don't, the adding of selectedfooditems would fail because I wouldn't find the mealevent
 									 "Meal from NightScout",
-									 0,
-									 0,
-									 DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at).valueOf(),
+									 insulinRatio,
+									 correctionFactorList.getValue(Number.NaN,"",timeStampAsDate),
+									 timeStampAsDate.valueOf(),
 									 null,
 									 remoteElement._id + "-carbs",
 									 removeBRInNotes(remoteElement.notes as String),
@@ -795,7 +814,7 @@
 									 DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at).valueOf(),
 									 new Number(remoteElement.helpdiabetes.lastmodifiedtimestamp),
 									 true,
-									 ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL),
+									 ModelLocator.resourceManagerInstance.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL),
 									 new Number(0));
 								 localElementsUpdated = true;
 							 }
@@ -867,7 +886,7 @@
 						 newElement["glucoseType"] = "Finger";
 						 newElement["notes"] = (localElement as BloodGlucoseEvent).comment;
 						 newElement["units"] = 
-							 (localElement as BloodGlucoseEvent).unit == ResourceManager.getInstance().getString('general','mgperdl') ?
+							 (localElement as BloodGlucoseEvent).unit == ModelLocator.resourceManagerInstance.getString('general','mgperdl') ?
 							 "mg/dl":"mmol";
 					 } else if (localElement is ExerciseEvent) {
 						 newElement["notes"] = "Level = " + (localElement as ExerciseEvent).level;
@@ -881,7 +900,7 @@
 						 //and no lon duration bolusses
 						 var medicinEvent:MedicinEvent = (localElement as MedicinEvent);
 						 if (medicinEvent.medicinName != Settings.getInstance().getSetting(Settings.SettingsInsulinType1) || 
-							 medicinEvent.bolustype != ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL)) {
+							 medicinEvent.bolustype != ModelLocator.resourceManagerInstance.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL)) {
 							 //don't upload
 							 newElement["upload"] = "false";
 						 } else {
@@ -945,7 +964,10 @@
 				 trace("Synchronize.as : in nightscoutapicall failed : event.target.data = " + event.target.data as String);
 			 }
 			 removeEventListeners();
-			 syncErrorList.addItem((new Date()).toLocaleString() + " " + event.target.data);
+			 var syncError:String = event.target.data;
+			 if (syncError.length == 0)
+				 syncError = "You may have to check your nightscout url : " + Settings.getInstance().getSetting(Settings.SettingsNightScoutWebsiteURL);
+			 syncErrorList.addItem((new Date()).toLocaleString() + " " + syncError);
 			 syncFinished(false);
 		 }
 		 
@@ -1006,7 +1028,7 @@
 		 private function createDummySelectedFoodItem(chosenAmount:Number):SelectedFoodItem {
 			 return new SelectedFoodItem(DateTimeUtilities.createEventId(), 
 				 "item from NS", 
-				 new Unit(ResourceManager.getInstance().getString('general','gram_long'),1,0,0,1,0), 
+				 new Unit(ModelLocator.resourceManagerInstance.getString('general','gram_long'),1,0,0,1,0), 
 				 chosenAmount,
 				 (new Date()).valueOf());
 			 

@@ -53,6 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (usersAPISecret.length == 0 || usersAPISecret == Settings.NightScoutDefaultAPISECRET) {
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);
+					trace("night scout api secret reset to blanc, SettingsNightScoutView line 56");
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
 					Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 					navigator.popView();
@@ -103,7 +104,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:stroke>
 			</s:Line>	
 			<s:Button height="48" width="100%" label="{resourceManager.getString('general','save')}" click="nightScoutUrlSaveClickHandler(event)"/>
-			<s:Button height="48" width="100%" label="Show recent Sync Errors" click="showErrorListClickHandler(event)"/>
+			<s:Button height="48" width="100%" label="Show recent NS Sync Errors" click="showErrorListClickHandler(event)"/>
 		</s:Group>
 
 	</s:Group>

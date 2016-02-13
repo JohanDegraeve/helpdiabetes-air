@@ -249,7 +249,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dateText = dateformatter.format(_eventDateAndTime);
 				timeText = timeformatter.format(_eventDateAndTime);
 				medicinName = Settings.getInstance().getSetting(parseInt(Settings.getInstance().getSetting(Settings.SettingsDefaultMedicin)));
-				bolusTypeText = ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
+				bolusTypeText = ModelLocator.resourceManagerInstance.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
 				back_label = resourceManager.getString('general','back');
 				newMedicinEvent = true;
 				TrashButton.visible = false;

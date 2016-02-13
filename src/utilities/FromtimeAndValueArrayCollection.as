@@ -23,6 +23,8 @@ package utilities
 	import spark.collections.Sort;
 	import spark.collections.SortField;
 	
+	import model.ModelLocator;
+	
 	/**
 	 * Will hold a list of FromAndValueElements<br>
 	 * Offers methods to get the Value for a specific timing (between 00:00 and maximum 24:00:00 = 86400 seconds)<br>
@@ -328,7 +330,7 @@ package utilities
 					 fromTimeAndValue = new FromtimeAndValue(fromTimeAndValue.from,newValue,"mgperdl",fromTimeAndValue.editable,fromTimeAndValue.deletable);
 					 setItemAt(fromTimeAndValue,ctr);
 				 }
-				 _unit = ResourceManager.getInstance().getString('general','mgperdl');
+				 _unit = ModelLocator.resourceManagerInstance.getString('general','mgperdl');
 			 }
 			 
 			 if (newUnit == "mmoll") {
@@ -338,7 +340,7 @@ package utilities
 					 fromTimeAndValue = new FromtimeAndValue(fromTimeAndValue.from,newValue,"mmoll",fromTimeAndValue.editable,fromTimeAndValue.deletable);
 					 setItemAt(fromTimeAndValue,ctr);
 				 }
-				 _unit = ResourceManager.getInstance().getString('general','mmoll');
+				 _unit = ModelLocator.resourceManagerInstance.getString('general','mmoll');
 			 }
 		 }
 		 

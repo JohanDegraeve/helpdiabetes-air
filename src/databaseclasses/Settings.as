@@ -512,46 +512,46 @@ package databaseclasses
 			"false",//carbs 3 aob active or not
 			"false",//carbs 4 aob active or not
 			"false",//carbs 5 aob active or not
-			Meal1_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal1_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal1_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal1_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal2_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal2_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal2_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal2_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal3_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal3_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal3_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal3_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal4_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal4_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal4_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal4_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal5_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal5_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal5_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal5_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal6_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal6_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal6_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal6_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal7_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal7_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal7_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal7_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal8_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal8_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal8_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal8_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal9_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal9_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal9_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal9_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal10_range_1_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal10_range_2_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal10_range_3_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
-			Meal10_range_4_AOCChart_FactoryValue.replace("{carbs}",ResourceManager.getInstance().getString('general','gram_of_carbs_short')),
+			Meal1_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal1_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal1_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal1_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal2_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal2_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal2_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal2_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal3_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal3_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal3_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal3_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal4_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal4_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal4_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal4_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal5_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal5_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal5_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal5_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal6_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal6_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal6_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal6_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal7_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal7_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal7_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal7_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal8_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal8_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal8_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal8_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal9_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal9_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal9_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal9_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal10_range_1_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal10_range_2_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal10_range_3_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
+			Meal10_range_4_AOCChart_FactoryValue.replace("{carbs}",ModelLocator.resourceManagerInstance.getString('general','gram_of_carbs_short')),
 			"false",//medicin 1 aob active or not
 			"false",//medicin 2 aob active or not
 			"false",//medicin 3 aob active or not
@@ -718,30 +718,30 @@ package databaseclasses
 			//then the settings array will be reset during database opening.
 			//There's already a database if it's not the first startup
 			// in other words, if this is the first startup, then these are the values
-			settings[100 + SettingsInsulinType1] = ResourceManager.getInstance().getString('editmedicineventview','insulintype1');
-			settings[100 + SettingsInsulinType2] = ResourceManager.getInstance().getString('editmedicineventview','insulintype2');
-			settings[100 + SettingsInsulinType3] = ResourceManager.getInstance().getString('editmedicineventview','insulintype3');
-			settings[100 + SettingsInsulinType4] = ResourceManager.getInstance().getString('editmedicineventview','insulintype4');
-			settings[100 + SettingsInsulinType5] = ResourceManager.getInstance().getString('editmedicineventview','insulintype5');
-			settings[100 + SettingsExerciseType1] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype1');
-			settings[100 + SettingsExerciseType2] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype2');
-			settings[100 + SettingsExerciseType3] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype3');
-			settings[100 + SettingsExerciseType4] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype4');
-			settings[100 + SettingsExerciseType5] = ResourceManager.getInstance().getString('editexerciseeventview','exercisetype5');
+			settings[100 + SettingsInsulinType1] = ModelLocator.resourceManagerInstance.getString('editmedicineventview','insulintype1');
+			settings[100 + SettingsInsulinType2] = ModelLocator.resourceManagerInstance.getString('editmedicineventview','insulintype2');
+			settings[100 + SettingsInsulinType3] = ModelLocator.resourceManagerInstance.getString('editmedicineventview','insulintype3');
+			settings[100 + SettingsInsulinType4] = ModelLocator.resourceManagerInstance.getString('editmedicineventview','insulintype4');
+			settings[100 + SettingsInsulinType5] = ModelLocator.resourceManagerInstance.getString('editmedicineventview','insulintype5');
+			settings[100 + SettingsExerciseType1] = ModelLocator.resourceManagerInstance.getString('editexerciseeventview','exercisetype1');
+			settings[100 + SettingsExerciseType2] = ModelLocator.resourceManagerInstance.getString('editexerciseeventview','exercisetype2');
+			settings[100 + SettingsExerciseType3] = ModelLocator.resourceManagerInstance.getString('editexerciseeventview','exercisetype3');
+			settings[100 + SettingsExerciseType4] = ModelLocator.resourceManagerInstance.getString('editexerciseeventview','exercisetype4');
+			settings[100 + SettingsExerciseType5] = ModelLocator.resourceManagerInstance.getString('editexerciseeventview','exercisetype5');
 			settings[100 + SettingsFirstStartUp] = (new Date()).valueOf().toString();
-			settings[100 + SettingsCorrectionFactor] = "0:0-" /* first values not used in cf */ + ResourceManager.getInstance().getString('general','mgperdl') ; 
+			settings[100 + SettingsCorrectionFactor] = "0:0-" /* first values not used in cf */ + ModelLocator.resourceManagerInstance.getString('general','mgperdl') ; 
 	
-			settings[100 + SettingsMeal1GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype1description');
-			settings[100 + SettingsMeal2GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype2description');
-			settings[100 + SettingsMeal3GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype3description');
-			settings[100 + SettingsMeal4GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype4description');
-			settings[100 + SettingsMeal5GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype5description');
-			settings[100 + SettingsMeal6GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype6description');
-			settings[100 + SettingsMeal7GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype7description');
-			settings[100 + SettingsMeal8GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype8description');
-			settings[100 + SettingsMeal9GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype9description');
-			settings[100 + SettingsMeal10GraphDescription] = ResourceManager.getInstance().getString('settingsmealprofilesview','mealtype10description');
-			settings[100 + SettingsLOCALECHAIN_asString] = ResourceManager.getInstance().getString('general','localechainasstring');
+			settings[100 + SettingsMeal1GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype1description');
+			settings[100 + SettingsMeal2GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype2description');
+			settings[100 + SettingsMeal3GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype3description');
+			settings[100 + SettingsMeal4GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype4description');
+			settings[100 + SettingsMeal5GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype5description');
+			settings[100 + SettingsMeal6GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype6description');
+			settings[100 + SettingsMeal7GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype7description');
+			settings[100 + SettingsMeal8GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype8description');
+			settings[100 + SettingsMeal9GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype9description');
+			settings[100 + SettingsMeal10GraphDescription] = ModelLocator.resourceManagerInstance.getString('settingsmealprofilesview','mealtype10description');
+			settings[100 + SettingsLOCALECHAIN_asString] = ModelLocator.resourceManagerInstance.getString('general','localechainasstring');
 			
 			settingsLastModifiedTimeStamp = new Array(settings.length);
 			for (var i:int = 0;i < settingsLastModifiedTimeStamp.length;i++)

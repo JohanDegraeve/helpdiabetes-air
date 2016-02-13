@@ -492,7 +492,7 @@ package databaseclasses
 						 if ((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as TrackingViewElement).timeStamp < timeStamp)
 							 break;
 						 if (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) is MedicinEvent) {
-							 if (ResourceManager.getInstance().getString('editmedicineventview','listofnormalbolustypes').indexOf((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).bolustype) > -1) {
+							 if (ModelLocator.resourceManagerInstance.getString('editmedicineventview','listofnormalbolustypes').indexOf((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).bolustype) > -1) {
 								 var timeStampOfThatMedicinEvent:Number = (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).timeStamp; 
 								 if (timeStampOfThatMedicinEvent < timeOfLastMealChange ) {
 									 insulinGivenDuringMeal += (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).amount;
@@ -580,13 +580,15 @@ package databaseclasses
 		 * Also insulinAmount is recalculated
 		 */
 		public function updateSelectedFoodItemChosenAmount(selectedFoodItem:SelectedFoodItem,newAmount:Number):void {
-			selectedFoodItem.chosenAmount = newAmount;
+			selectedFoodItem.updateChosenAmount(newAmount, this);
 			//update also the lastmodifiedtimestamp of the mealevent if the selectedfooditem lastmodifiedtimestamp is more recent - which will always be the case here but check it anyway
 			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
 			if (lastModifiedTimestamp < selectedFoodItem.lastModifiedTimestamp) {
 				lastModifiedTimestamp = selectedFoodItem.lastModifiedTimestamp;
+				trace("in updateselectedfooditemchosenamount, setting mealevent lastmodifiedtimetamp to " + lastModifiedTimestamp);
 			}
+			recalculateTotals();
 /*			//find the id
 			for (var ij:int=0;ij < _selectedFoodItems.length; ij++) {
 				if ((_selectedFoodItems.getItemAt(ij) as SelectedFoodItem) == selectedFoodItem) {
@@ -608,6 +610,7 @@ package databaseclasses
 			//update also the lastmodifiedtimestamp of the mealevent if the selectedfooditem lastmodifiedtimestamp is more recent - which will always be the case here but check it anyway
 			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
+			trace(" in removeselectedfooditem, setting mealevent lastmodifiedtimetamp to " + lastModifiedTimestamp);
 				lastModifiedTimestamp = (new Date()).valueOf();
 
 		}
@@ -637,6 +640,7 @@ package databaseclasses
 			
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
 				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
+			trace("in updatemealevent, setting mealevent lastmodifiedtimetamp to " + lastModifiedTimestamp);
 			lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
 			recalculateTotals();

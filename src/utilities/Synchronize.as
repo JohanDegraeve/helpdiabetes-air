@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -642,22 +642,22 @@ package utilities
 			listOfElementsToBeDeleted = new ArrayList();
 			instance = this;
 			currentSyncTimeStamp = 0;
-			googleExcelLogBookColumnNames[foodValueNames_Index_date] = ResourceManager.getInstance().getString('uploadtrackingview','date');
-			googleExcelLogBookColumnNames[foodValueNames_Index_time] = ResourceManager.getInstance().getString('uploadtrackingview','time');
-			googleExcelLogBookColumnNames[foodValueNames_Index_eventtype] = ResourceManager.getInstance().getString('uploadtrackingview','eventtype');
-			googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue] = ResourceManager.getInstance().getString('uploadtrackingview','bloodglucosevalue');
-			googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue] = ResourceManager.getInstance().getString('uploadtrackingview','medicinvalue');
-			googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel] = ResourceManager.getInstance().getString('uploadtrackingview','exerciselevel');
-			googleExcelLogBookColumnNames[foodValueNames_Index_medicintype] = ResourceManager.getInstance().getString('uploadtrackingview','medicintype');
-			googleExcelLogBookColumnNames[foodValueNames_Index_mealtype] = ResourceManager.getInstance().getString('uploadtrackingview','mealtype');
-			googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealcarbamount');
-			googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio] = ResourceManager.getInstance().getString('uploadtrackingview','mealinsulinratio');
-			googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin] = ResourceManager.getInstance().getString('uploadtrackingview','mealcalculatedinsulin');
-			googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems] = ResourceManager.getInstance().getString('uploadtrackingview','mealselecteditems');
-			googleExcelLogBookColumnNames[foodValueNames_Index_comment] = ResourceManager.getInstance().getString('uploadtrackingview','comment');
-			googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealkcalamount');
-			googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealproteinamount');
-			googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealfatamount');
+			googleExcelLogBookColumnNames[foodValueNames_Index_date] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','date');
+			googleExcelLogBookColumnNames[foodValueNames_Index_time] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','time');
+			googleExcelLogBookColumnNames[foodValueNames_Index_eventtype] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventtype');
+			googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','bloodglucosevalue');
+			googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','medicinvalue');
+			googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','exerciselevel');
+			googleExcelLogBookColumnNames[foodValueNames_Index_medicintype] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','medicintype');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealtype] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealtype');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealcarbamount');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealinsulinratio');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealcalculatedinsulin');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealselecteditems');
+			googleExcelLogBookColumnNames[foodValueNames_Index_comment] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','comment');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealkcalamount');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealproteinamount');
+			googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealfatamount');
 			syncErrorList = new ArrayList();
 		}
 		
@@ -1129,7 +1129,7 @@ package utilities
 									if (medicinArray.length > 1)
 										bolusType = medicinArray[1];
 									else 
-										bolusType = ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
+										bolusType = ModelLocator.resourceManagerInstance.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
 									if (medicinArray.length > 2)
 										bolusDuration = new Number(medicinArray[2] as String);
 									else
@@ -1162,7 +1162,7 @@ package utilities
 							if (medicinArray1.length > 1)
 								bolusType1 = medicinArray1[1];
 							else 
-								bolusType1 = ResourceManager.getInstance().getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
+								bolusType1 = ModelLocator.resourceManagerInstance.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL);
 							if (medicinArray1.length > 2)
 								bolusDuration2 = new Number(medicinArray1[2] as String);
 							else
@@ -1821,7 +1821,8 @@ package utilities
 												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitcarbs)],
 												remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unitfat)]),
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)],
-											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_chosenamount)]);
+											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_chosenamount)],
+											theMealEvent2);
 										if (debugMode) trace("Synchronize.as : local element updated, id = " + theSelectedFoodItem.eventid);
 									}
 									break;
@@ -2575,8 +2576,8 @@ package utilities
 					var request:URLRequest = new URLRequest(googleTokenRefreshUrl);
 					request.contentType = "application/x-www-form-urlencoded";
 					request.data = new URLVariables(
-						"client_id=" + ResourceManager.getInstance().getString('client_secret','client_id') + "&" +
-						"client_secret=" + ResourceManager.getInstance().getString('client_secret','client_secret') + "&" +
+						"client_id=" + ModelLocator.resourceManagerInstance.getString('client_secret','client_id') + "&" +
+						"client_secret=" + ModelLocator.resourceManagerInstance.getString('client_secret','client_secret') + "&" +
 						"refresh_token=" + Settings.getInstance().getSetting(Settings.SettingsRefreshToken) + "&" + 
 						"grant_type=refresh_token");
 					request.method = URLRequestMethod.POST;
@@ -2620,7 +2621,7 @@ package utilities
 					Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");//also nightscoutsync is reset
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);//also nightscoutsync is reset
-					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
+					trace("night scout api secret reset to blanc, Synchronize.as");
 					Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 					//the show stops
 				}
@@ -2927,11 +2928,11 @@ package utilities
 				trace("Synchronize.as : start method googleExcelInsertLogBookEvents");
 			this.dispatchEvent(new Event(INSERTING_NEW_EVENTS));
 			var dateFormatter:DateTimeFormatter =  new DateTimeFormatter();
-			dateFormatter.dateTimePattern = ResourceManager.getInstance().getString('uploadtrackingview','datepattern');
+			dateFormatter.dateTimePattern = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','datepattern');
 			dateFormatter.useUTC = false;
 			dateFormatter.setStyle("locale",Capabilities.language.substr(0,2));
 			var timeFormatter:DateTimeFormatter = new DateTimeFormatter();
-			timeFormatter.dateTimePattern = ResourceManager.getInstance().getString('uploadtrackingview','timepattern');
+			timeFormatter.dateTimePattern = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','timepattern');
 			timeFormatter.useUTC = false;
 			timeFormatter.setStyle("locale",Capabilities.language.substr(0,2));
 			
@@ -2943,7 +2944,7 @@ package utilities
 					outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_date],dateFormatter.format(trackElement.timeStamp));
 					outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_time],timeFormatter.format(trackElement.timeStamp));
 					if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is MealEvent) {
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamemeal'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnamemeal'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealtype],(trackElement as MealEvent).mealName).replace('\'','\'\'');
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount],(Math.round((trackElement as MealEvent).totalCarbs)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio],((Math.round((trackElement as MealEvent).insulinRatio*10)/10)).toString().replace('.',','));
@@ -2961,15 +2962,15 @@ package utilities
 						}
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems],selectedItemsString.replace('\'','\'\''));
 					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is BloodGlucoseEvent) {
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamebloodglucose'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnamebloodglucose'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as BloodGlucoseEvent).comment.replace('\'','\'\''));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue],((Math.round((trackElement as BloodGlucoseEvent).bloodGlucoseLevel * 10))/10).toString().replace('.',','));
 					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is ExerciseEvent) {
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnameexercise'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnameexercise'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as ExerciseEvent).comment.replace('\'','\'\''));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel],(trackElement as ExerciseEvent).level.replace('\'','\'\''));
 					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is MedicinEvent) {
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ResourceManager.getInstance().getString('uploadtrackingview','eventnamemedicin'));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnamemedicin'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MedicinEvent).comment.replace('\'','\'\''));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicintype],(trackElement as MedicinEvent).medicinName.replace('\'','\'\''));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue],((Math.round((trackElement as MedicinEvent).amount*10))/10).toString().replace('.',','));
@@ -3114,22 +3115,22 @@ package utilities
 				//bit a waste of time but not really an issue - it will only happen the first time
 				this.dispatchEvent(new Event(CREATING_LOGBOOK_HEADERS));
 				//first reset header names because user may have changed language after launch of app, during laung of app googleExcelLogbookcolumnames is already initialized
-				googleExcelLogBookColumnNames[foodValueNames_Index_date] = ResourceManager.getInstance().getString('uploadtrackingview','date');
-				googleExcelLogBookColumnNames[foodValueNames_Index_time] = ResourceManager.getInstance().getString('uploadtrackingview','time');
-				googleExcelLogBookColumnNames[foodValueNames_Index_eventtype] = ResourceManager.getInstance().getString('uploadtrackingview','eventtype');
-				googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue] = ResourceManager.getInstance().getString('uploadtrackingview','bloodglucosevalue');
-				googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue] = ResourceManager.getInstance().getString('uploadtrackingview','medicinvalue');
-				googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel] = ResourceManager.getInstance().getString('uploadtrackingview','exerciselevel');
-				googleExcelLogBookColumnNames[foodValueNames_Index_medicintype] = ResourceManager.getInstance().getString('uploadtrackingview','medicintype');
-				googleExcelLogBookColumnNames[foodValueNames_Index_mealtype] = ResourceManager.getInstance().getString('uploadtrackingview','mealtype');
-				googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealcarbamount');
-				googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio] = ResourceManager.getInstance().getString('uploadtrackingview','mealinsulinratio');
-				googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin] = ResourceManager.getInstance().getString('uploadtrackingview','mealcalculatedinsulin');
-				googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems] = ResourceManager.getInstance().getString('uploadtrackingview','mealselecteditems');
-				googleExcelLogBookColumnNames[foodValueNames_Index_comment] = ResourceManager.getInstance().getString('uploadtrackingview','comment');
-				googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealkcalamount');
-				googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealproteinamount');
-				googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount] = ResourceManager.getInstance().getString('uploadtrackingview','mealfatamount');
+				googleExcelLogBookColumnNames[foodValueNames_Index_date] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','date');
+				googleExcelLogBookColumnNames[foodValueNames_Index_time] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','time');
+				googleExcelLogBookColumnNames[foodValueNames_Index_eventtype] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventtype');
+				googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','bloodglucosevalue');
+				googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','medicinvalue');
+				googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','exerciselevel');
+				googleExcelLogBookColumnNames[foodValueNames_Index_medicintype] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','medicintype');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealtype] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealtype');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealcarbamount');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealinsulinratio');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealcalculatedinsulin] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealcalculatedinsulin');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealselecteditems');
+				googleExcelLogBookColumnNames[foodValueNames_Index_comment] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','comment');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealkcalamount');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealproteinamount');
+				googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealfatamount');
 				
 				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInLogBook)) + 1;//index starts at 0, but column number at 1
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
@@ -3166,7 +3167,7 @@ package utilities
 			} else {
 				if (debugMode)
 					trace("Synchronize.as : start method googleExcelCreateHeader");
-				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingheaders');
+				_uploadFoodDatabaseStatus = ModelLocator.resourceManagerInstance.getString('synchronizeview','creatingheaders');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 				
 				var nextColumn:int = new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) + 1;//index starts at 0, but column number at 1
@@ -3260,7 +3261,7 @@ package utilities
 				}
 				
 			} else {
-				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingfoodtablespreadsheet');
+				_uploadFoodDatabaseStatus = ModelLocator.resourceManagerInstance.getString('synchronizeview','creatingfoodtablespreadsheet');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 				
 				if (debugMode)
@@ -3393,7 +3394,7 @@ package utilities
 					googleExcelCreateFoodTableHeader(null);
 				}
 			} else {
-				_uploadFoodDatabaseStatus = ResourceManager.getInstance().getString('synchronizeview','creatingfoodtableworksheet');
+				_uploadFoodDatabaseStatus = ModelLocator.resourceManagerInstance.getString('synchronizeview','creatingfoodtableworksheet');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 				
 				if (debugMode)
@@ -4114,7 +4115,7 @@ package utilities
 							unit.description = eventAsJSONObject.feed.entry[entryCtr].gs$cell.$t;
 							entryCtr++;
 						} else  {
-							if (unit ==  null) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','unitmusthaveaname'),row,unitlist.length + 1);return;}
+							if (unit ==  null) {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','unitmusthaveaname'),row,unitlist.length + 1);return;}
 							unit.appendChild(
 								(new XML("<"+foodValueNames[(eventAsJSONObject.feed.entry[entryCtr].gs$cell.col - 2 ) % 6 - 1]+"/>"))
 								.appendChild(eventAsJSONObject.feed.entry[entryCtr].gs$cell.$t)
@@ -4132,8 +4133,8 @@ package utilities
 					for (var unitListCounter:int = 0;unitListCounter < unitlist.unit.length();unitListCounter++) {
 						unit = unitlist.unit[unitListCounter];
 						
-						if (unit.carbs ==  undefined)  {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','unitmusthaveacarbvalue'),row,unitListCounter + 1);return;}
-						if (unit.standardamount ==  undefined)  {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','unitmusthaveastandardamount'),row,unitListCounter + 1);return;}
+						if (unit.carbs ==  undefined)  {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','unitmusthaveacarbvalue'),row,unitListCounter + 1);return;}
+						if (unit.standardamount ==  undefined)  {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','unitmusthaveastandardamount'),row,unitListCounter + 1);return;}
 						//replace , by . and check if parseable to number
 						
 						var standardamount:Number;
@@ -4142,15 +4143,15 @@ package utilities
 						var protein:Number = -1;
 						var fat:Number = -1;
 						
-						if (isNaN(carb = new Number((unit.carbs).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','carbvaluemustbenumeric'),row,unitListCounter + 1,unit.carbs.toString());return;}
-						if (isNaN(standardamount = new Number((unit.standardamount).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','standardamountmustbeinteger'),row,unitListCounter + 1,unit.standardamount.toString());return;}
-						if (unit.kcal != undefined) if (isNaN(kcal = new Number((unit.kcal).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','kcalvaluemustbeinteger'),row,unitListCounter + 1,unit.kcal.toString());return;}
-						if (unit.protein != undefined) if (isNaN(protein = new Number((unit.protein).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','proteinvaluemustbenumeric'),row,unitListCounter + 1,unit.protein.toString());return;}
-						if (unit.fat != undefined) if (isNaN(fat = new Number((unit.fat).toString().replace(",",".")))) {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','fatvaluemustbenumeric'),row,unitListCounter + 1,unit.fat.toString());return;}
+						if (isNaN(carb = new Number((unit.carbs).toString().replace(",",".")))) {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','carbvaluemustbenumeric'),row,unitListCounter + 1,unit.carbs.toString());return;}
+						if (isNaN(standardamount = new Number((unit.standardamount).toString().replace(",",".")))) {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','standardamountmustbeinteger'),row,unitListCounter + 1,unit.standardamount.toString());return;}
+						if (unit.kcal != undefined) if (isNaN(kcal = new Number((unit.kcal).toString().replace(",",".")))) {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','kcalvaluemustbeinteger'),row,unitListCounter + 1,unit.kcal.toString());return;}
+						if (unit.protein != undefined) if (isNaN(protein = new Number((unit.protein).toString().replace(",",".")))) {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','proteinvaluemustbenumeric'),row,unitListCounter + 1,unit.protein.toString());return;}
+						if (unit.fat != undefined) if (isNaN(fat = new Number((unit.fat).toString().replace(",",".")))) {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','fatvaluemustbenumeric'),row,unitListCounter + 1,unit.fat.toString());return;}
 						
 						//check integers if necessary
-						if (standardamount % 1 != 0)  {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','standardamountmustbeinteger'),row,unitListCounter + 1);return}
-						if (kcal != -1) if (kcal % 1 != 0)  {dispatchFunction(ResourceManager.getInstance().getString('synchronizeview','kcalvaluemustbeinteger'),row,unitListCounter + 1);return}
+						if (standardamount % 1 != 0)  {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','standardamountmustbeinteger'),row,unitListCounter + 1);return}
+						if (kcal != -1) if (kcal % 1 != 0)  {dispatchFunction(ModelLocator.resourceManagerInstance.getString('synchronizeview','kcalvaluemustbeinteger'),row,unitListCounter + 1);return}
 						
 					}
 					//////////
@@ -4211,9 +4212,9 @@ package utilities
 			function dispatchFunction(message:String, fooditemctr:int,unitcntr:int = 0,found:String=null):void  {
 				if (callingDispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
-					event.data = message + " " + ResourceManager.getInstance().getString('synchronizeview','checkthefoodtable') + fooditemctr ;
-					if (unitcntr != 0) event.data += ", " + ResourceManager.getInstance().getString('ownitemview','unit') + " " + unitcntr + ". ";
-					if (found != null) event.data +=  ResourceManager.getInstance().getString('synchronizeview','found') + " \"" + found + "\"";
+					event.data = message + " " + ModelLocator.resourceManagerInstance.getString('synchronizeview','checkthefoodtable') + fooditemctr ;
+					if (unitcntr != 0) event.data += ", " + ModelLocator.resourceManagerInstance.getString('ownitemview','unit') + " " + unitcntr + ". ";
+					if (found != null) event.data +=  ModelLocator.resourceManagerInstance.getString('synchronizeview','found') + " \"" + found + "\"";
 					callingDispatcher.dispatchEvent(event);
 				}
 			}
