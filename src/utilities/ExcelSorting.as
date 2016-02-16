@@ -80,8 +80,8 @@ package utilities
 		 */
 		 public function ExcelSorting(newFoodItemList:ArrayCollection = null)
 		{
-			firstIndex = new Array(ModelLocator.getInstance().maximumSearchStringLength);
-			lastIndex = new Array(ModelLocator.getInstance().maximumSearchStringLength);
+			firstIndex = new Array(ModelLocator.maximumSearchStringLength);
+			lastIndex = new Array(ModelLocator.maximumSearchStringLength);
 			firstIndex[0] = 0;
 			if (newFoodItemList == null)
 				_foodItemList = new ArrayCollection();

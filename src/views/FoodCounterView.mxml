@@ -157,13 +157,13 @@ the home screen
 			private function onCreationComplete():void {
 				Database.getInstance().addEventListener(Database.NEW_FOOD_DATABASE_STORED_SUCCESS,initiateRetrievalOfFoodItemList);
 				thisView = this;
-				if (!ModelLocator.getInstance().firstInitOfFoodCounterView)  {
+				if (!ModelLocator.firstInitOfFoodCounterView)  {
 					Synchronize.getInstance().startSynchronize(false,false);
 					ensureIndexIsVisible();
 					showSearchTextBoxHelpText();
 					return;
 				}
-				ModelLocator.getInstance().firstInitOfFoodCounterView = false;
+				ModelLocator.firstInitOfFoodCounterView = false;
 				
 				if (Database.databaseExists()) {
 					firstTimeAppIsStartedOnThisDevice = false;
@@ -240,8 +240,8 @@ the home screen
 				function retrieveFoodItemList(de:DatabaseEvent):void {
 					dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, retrieveFoodItemList);
 					dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, onRetrieveListError);
-					ModelLocator.getInstance().foodItemList = new ArrayCollection();
-					excelSorting = new ExcelSorting(ModelLocator.getInstance().foodItemList);
+					ModelLocator.foodItemList = new ArrayCollection();
+					excelSorting = new ExcelSorting(ModelLocator.foodItemList);
 					
 					if (de.data && de.data is Array) {
 						for each (var o:Object in de.data) {
@@ -284,7 +284,7 @@ the home screen
 				
 				data = new Object();
 				data.searchtext = searchtext.text;//we pass the searchtext to addfooditemview. Addfooditemview will return the searchtext or an empty string when popped
-				data.foodItem = ModelLocator.getInstance().foodItemList.getItemAt(event.newIndex);
+				data.foodItem = ModelLocator.foodItemList.getItemAt(event.newIndex);
 				navigator.pushView(AddFoodItemView,data);
 			}
 			
@@ -327,7 +327,7 @@ the home screen
 								if (searchTextCopy == "") {
 									searchActive = false;
 									setAllShownInList(true);
-									ModelLocator.getInstance().foodItemList.refresh()
+									ModelLocator.foodItemList.refresh()
 									//searchtextchanged will be called after timer expiry so no need to call it here
 								}
 							
@@ -361,9 +361,9 @@ the home screen
 				
 				searchActive = false;
 				setAllShownInList(true);
-				ModelLocator.getInstance().foodItemList.refresh();//the trigger a redraw
+				ModelLocator.foodItemList.refresh();//the trigger a redraw
 				ensureIndexIsVisible();
-				ModelLocator.getInstance().foodItemList.refresh();//the trigger a redraw
+				ModelLocator.foodItemList.refresh();//the trigger a redraw
 			}
 			
 			private function searchClicked(e:MouseEvent = null):void {
@@ -374,16 +374,16 @@ the home screen
 				} 
 				
 				var foundFirstItem:Boolean = false;
-				for (var fooditemctr:int = 0;fooditemctr < ModelLocator.getInstance().foodItemList.length;fooditemctr++) {
-					if (ExcelSorting.stringAhasStringB((ModelLocator.getInstance().foodItemList.getItemAt(fooditemctr) as FoodItem).itemDescription,searchtext.text)) {
+				for (var fooditemctr:int = 0;fooditemctr < ModelLocator.foodItemList.length;fooditemctr++) {
+					if (ExcelSorting.stringAhasStringB((ModelLocator.foodItemList.getItemAt(fooditemctr) as FoodItem).itemDescription,searchtext.text)) {
 						if (!foundFirstItem)
 							setAllShownInList(false);
 						foundFirstItem = true;
-						(ModelLocator.getInstance().foodItemList.getItemAt(fooditemctr) as FoodItem).shownInList = true;
+						(ModelLocator.foodItemList.getItemAt(fooditemctr) as FoodItem).shownInList = true;
 					}
 				}
 				if (foundFirstItem) {
-					ModelLocator.getInstance().foodItemList.refresh();//the trigger a redraw
+					ModelLocator.foodItemList.refresh();//the trigger a redraw
 					searchActive = true;
 					if (!(Settings.getInstance().getSetting(Settings.SettingsHelpTextFoodCounterViewCancelButton) == 'false')) {
 						helpCallOut = new HelpCallOut();
@@ -410,8 +410,8 @@ the home screen
 			}
 			
 			private function setAllShownInList(newValue:Boolean):void  {
-				for (var fooditemctr:int = 0;fooditemctr < ModelLocator.getInstance().foodItemList.length;fooditemctr++) {
-					(ModelLocator.getInstance().foodItemList.getItemAt(fooditemctr) as FoodItem).shownInList = newValue;
+				for (var fooditemctr:int = 0;fooditemctr < ModelLocator.foodItemList.length;fooditemctr++) {
+					(ModelLocator.foodItemList.getItemAt(fooditemctr) as FoodItem).shownInList = newValue;
 				}
 			}
 			
@@ -432,12 +432,12 @@ the home screen
 		<s:TextInput id="searchtext"  text="@{searchTextCopy}" width="100%" change="searchTextChanged()" />
 	</s:titleContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" alpha="{searchActive ? 1:0.25}"/>
-		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"  alpha="{searchActive ? 0.25:1}"/>
-		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
+		<s:Button icon="{ModelLocator.ic_menu_close_clear_cancelImage}" id="cancelButton" click="cancelClicked(event)" alpha="{searchActive ? 1:0.25}"/>
+		<s:Button icon="{ModelLocator.searchImage_48x48}" id="searchButton" click="searchClicked(event)"  alpha="{searchActive ? 0.25:1}"/>
+		<s:Button icon="{ModelLocator.addImage48x48}" click="addButtonClicked(event)"/>
 	</s:actionContent>
 	<s:List id="fooditemlist" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.FoodItemListItemRenderer"
-			dataProvider="{ModelLocator.getInstance().foodItemList}" labelFunction="displayFoodItem"
+			dataProvider="{ModelLocator.foodItemList}" labelFunction="displayFoodItem"
 			scrollSnappingMode="leadingEdge">
 	</s:List>
 </s:View>

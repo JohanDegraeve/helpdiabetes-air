@@ -25,6 +25,8 @@ package myComponents
 	import spark.components.Image;
 	import spark.components.LabelItemRenderer;
 	
+	import model.ModelLocator;
+	
 	import utilities.FromtimeAndValue;
 	
 	/**
@@ -33,19 +35,19 @@ package myComponents
 	public class FromtimeAndValueItemRenderer extends LabelItemRenderer
 	{
 		private var editImage:Image;//Pencil-icon48x48
-		[Embed(source="assets/edit48x48.png")]
-		[Bindable]
-		public var editIcon:Class;
+		//[Embed(source="assets/edit48x48.png")]
+		//[Bindable]
+		//public var editIcon:Class;
 
 		private var deleteImage:Image;
-		[Embed(source="assets/Trash_48x48.png")]
-		[Bindable]
-		public var deleteIcon:Class;
+		//[Embed(source="assets/Trash_48x48.png")]
+		//[Bindable]
+		//public var deleteIcon:Class;
 		
 		private var addImage:Image;
-		[Embed(source="assets/add48x48.png")]
-		[Bindable]
-		public var addIcon:Class;
+		//[Embed(source="assets/add48x48.png")]
+		//[Bindable]
+		//public var addIcon:Class;
 		
 		/**
 		 * to dispatch event data delete button as clicked
@@ -72,7 +74,8 @@ package myComponents
 			if (!editImage && _editable) {
 				editImage = new Image();
 				editImage.fillMode = BitmapFillMode.CLIP;
-				editImage.source = editIcon;
+				editImage.contentLoader = ModelLocator.iconCache;
+				editImage.source = "assets/edit48x48.png";
 				editImage.addEventListener(MouseEvent.CLICK,editClicked);
 				addChild(editImage);
 			}
@@ -91,7 +94,8 @@ package myComponents
 			if (!deleteImage && _deletable) {
 				deleteImage = new Image();
 				deleteImage.fillMode = BitmapFillMode.CLIP;
-				deleteImage.source = deleteIcon;
+				deleteImage.contentLoader = ModelLocator.iconCache;
+				deleteImage.source = "assets/Trash_48x48.png";
 				deleteImage.addEventListener(MouseEvent.CLICK,deleteClicked);
 				addChild(deleteImage);
 			}
@@ -110,7 +114,8 @@ package myComponents
 			if (!addImage && _elementCanBeAdded) {
 				addImage = new Image();
 				addImage.fillMode = BitmapFillMode.CLIP;
-				addImage.source = addIcon;
+				addImage.contentLoader = ModelLocator.iconCache;
+				addImage.source = "assets/add48x48.png";
 				addImage.addEventListener(MouseEvent.CLICK,addClicked);
 				addChild(addImage);
 			}

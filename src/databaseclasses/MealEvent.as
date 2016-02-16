@@ -414,24 +414,24 @@ package databaseclasses
 					 this._calculatedInsulinAmount = this._totalCarbs/this._insulinRatio;
 					 if (_correctionFactor > 0) {
 						 //find previous bloodglucoseevent
-						 var indexOfpreviousBGEvent:int = ModelLocator.getInstance().trackingList.getItemIndex(this);
+						 var indexOfpreviousBGEvent:int = ModelLocator.trackingList.getItemIndex(this);
 						 if (indexOfpreviousBGEvent == -1)
 							 //this mealevent is not yet added in the trackinglist, 
-							 indexOfpreviousBGEvent = ModelLocator.getInstance().trackingList.length - 1;
+							 indexOfpreviousBGEvent = ModelLocator.trackingList.length - 1;
 						 else
 							 indexOfpreviousBGEvent--;
 						 
 						 while (indexOfpreviousBGEvent > -1) {
-							 if (ModelLocator.getInstance().trackingList.getItemAt(indexOfpreviousBGEvent) is BloodGlucoseEvent) {
-								 if (timeStamp > (ModelLocator.getInstance().trackingList.getItemAt(indexOfpreviousBGEvent) as BloodGlucoseEvent).timeStamp)
+							 if (ModelLocator.trackingList.getItemAt(indexOfpreviousBGEvent) is BloodGlucoseEvent) {
+								 if (timeStamp > (ModelLocator.trackingList.getItemAt(indexOfpreviousBGEvent) as BloodGlucoseEvent).timeStamp)
 									 break;
 							 }
 							 indexOfpreviousBGEvent--;
 						 }
 						 
 						 if (indexOfpreviousBGEvent > -1) {
-							 if (ModelLocator.getInstance().trackingList.getItemAt(indexOfpreviousBGEvent) is BloodGlucoseEvent) {
-								 previousBGEvent = ModelLocator.getInstance().trackingList.getItemAt(indexOfpreviousBGEvent) as BloodGlucoseEvent;
+							 if (ModelLocator.trackingList.getItemAt(indexOfpreviousBGEvent) is BloodGlucoseEvent) {
+								 previousBGEvent = ModelLocator.trackingList.getItemAt(indexOfpreviousBGEvent) as BloodGlucoseEvent;
 								 if (timeStamp - previousBGEvent.timeStamp < (new Number(Settings.getInstance().getSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL))) * 1000) {
 									 diff = previousBGEvent.bloodGlucoseLevel - new Number(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL));
 									 correctionUnits = diff/correctionFactor;
@@ -470,7 +470,7 @@ package databaseclasses
 						 ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
 					 
 					 //now substract the active insulin
-					 activeInsulin = ModelLocator.getInstance().calculateActiveInsulin(timeStamp);
+					 activeInsulin = ModelLocator.calculateActiveInsulin(timeStamp);
 					 
 					 if (activeInsulin > 0) {
 						 returnValue += "{active_insulin}* = " + ((Math.round(activeInsulin * 10))/10).toString() + "\n";
@@ -488,14 +488,14 @@ package databaseclasses
 					 }
 					 //calculate how much was given during the meal
 					 var insulinGivenDuringMeal:Number = 0;
-					 for (var trackcntr:int = ModelLocator.getInstance().trackingList.length - 1 ;trackcntr >= 0 ;trackcntr--) {
-						 if ((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as TrackingViewElement).timeStamp < timeStamp)
+					 for (var trackcntr:int = ModelLocator.trackingList.length - 1 ;trackcntr >= 0 ;trackcntr--) {
+						 if ((ModelLocator.trackingList.getItemAt(trackcntr) as TrackingViewElement).timeStamp < timeStamp)
 							 break;
-						 if (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) is MedicinEvent) {
-							 if (ModelLocator.resourceManagerInstance.getString('editmedicineventview','listofnormalbolustypes').indexOf((ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).bolustype) > -1) {
-								 var timeStampOfThatMedicinEvent:Number = (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).timeStamp; 
+						 if (ModelLocator.trackingList.getItemAt(trackcntr) is MedicinEvent) {
+							 if (ModelLocator.resourceManagerInstance.getString('editmedicineventview','listofnormalbolustypes').indexOf((ModelLocator.trackingList.getItemAt(trackcntr) as MedicinEvent).bolustype) > -1) {
+								 var timeStampOfThatMedicinEvent:Number = (ModelLocator.trackingList.getItemAt(trackcntr) as MedicinEvent).timeStamp; 
 								 if (timeStampOfThatMedicinEvent < timeOfLastMealChange ) {
-									 insulinGivenDuringMeal += (ModelLocator.getInstance().trackingList.getItemAt(trackcntr) as MedicinEvent).amount;
+									 insulinGivenDuringMeal += (ModelLocator.trackingList.getItemAt(trackcntr) as MedicinEvent).amount;
 								 }
 							 }
 						 }
@@ -649,7 +649,7 @@ package databaseclasses
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
 			if (oldTimeStamp != newCreationTimeStamp)//if timestamp has changed, recalculate for all events as of the oldest itmestamp of the two
-				ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(Math.min(oldTimeStamp,newCreationTimeStamp));
+				ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(Math.min(oldTimeStamp,newCreationTimeStamp));
 			
 			
 			Database.getInstance().updateMealEvent(this.eventid,newMealName,newInsulinRatio,newCorrectionFactor,newLastModifiedTimeStamp,newCreationTimeStamp,_comment,null);

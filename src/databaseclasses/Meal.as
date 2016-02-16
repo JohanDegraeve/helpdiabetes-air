@@ -151,8 +151,8 @@ package databaseclasses
 				//if de not null, then mealEventCreated was called after having created a new mealevent, that needs to be 
 				//added in the trackinglist.
 				if (de != null) {
-					ModelLocator.getInstance().trackingList.addItem(_mealEvent);
-					ModelLocator.getInstance().trackingList.refresh();
+					ModelLocator.trackingList.addItem(_mealEvent);
+					ModelLocator.trackingList.refresh();
 				}
 				Settings.getInstance().setSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION, (new Date()).valueOf().toString());
 				Settings.getInstance().setSetting(Settings.SettingLAST_MEAL_ID,_mealEvent.eventid.toString());
@@ -199,8 +199,8 @@ package databaseclasses
 				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventDeletedFromDB);
 				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventDeletionFromDBFailed);
 				Database.getInstance().deleteMealEvent(_mealEvent.eventid,localdispatcher);
-				ModelLocator.getInstance().trackingList.removeItemAt(ModelLocator.getInstance().trackingList.getItemIndex(_mealEvent));
-				ModelLocator.getInstance().trackingList.refresh();
+				ModelLocator.trackingList.removeItemAt(ModelLocator.trackingList.getItemIndex(_mealEvent));
+				ModelLocator.trackingList.refresh();
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);

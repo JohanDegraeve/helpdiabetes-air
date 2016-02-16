@@ -66,7 +66,7 @@
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					maxTimeButton.label = (event.newValue as Number).toString();
 					Settings.getInstance().setSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL,((event.newValue as Number) * 60).toString());
-					ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(0);
+					ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(0);
 					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}

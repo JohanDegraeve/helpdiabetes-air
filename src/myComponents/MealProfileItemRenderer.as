@@ -11,9 +11,9 @@ package myComponents
 	public class MealProfileItemRenderer extends LabelItemRenderer
 	{
 		private var graphImage:Image;
-		[Embed(source="assets/ic_tab_tracking_selected.png")]
-		[Bindable]
-		public var graphIcon:Class;
+		//[Embed(source="assets/ic_tab_tracking_selected.png")]
+		//[Bindable]
+		//public var graphIcon:Class;
 
 		static private var ITEM_HEIGHT:int = 48;
 		static private var ICON_WIDTH:int = 48;
@@ -95,7 +95,8 @@ package myComponents
 			if (!graphImage) {
 				graphImage = new Image();
 				graphImage.fillMode = BitmapFillMode.CLIP;
-				graphImage.source = graphIcon;
+				graphImage.contentLoader = ModelLocator.iconCache;
+				graphImage.source = "assets/ic_tab_tracking_selected.png";
 				graphImage.addEventListener(MouseEvent.CLICK,graphClicked);
 				addChild(graphImage);
 			}

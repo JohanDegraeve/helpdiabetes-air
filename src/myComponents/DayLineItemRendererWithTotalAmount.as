@@ -107,22 +107,22 @@ package myComponents
 			var endOfDay:Number = (value as DayLine).timeStamp + (86400000 - 1);
 			var totalAmountAsNumber:Number = 0;
 			var foundAMealEventInTheSameDay:Boolean = false;
-			for (var i:int = ModelLocator.getInstance().trackingList.length - 1;i >= 0 ;i--) {
-				if (ModelLocator.getInstance().trackingList.getItemAt(i) is MealEvent) 
-					if ((ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).timeStamp >= (value as DayLine).timeStamp) { 
-						if ((ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).timeStamp < endOfDay) {
+			for (var i:int = ModelLocator.trackingList.length - 1;i >= 0 ;i--) {
+				if (ModelLocator.trackingList.getItemAt(i) is MealEvent) 
+					if ((ModelLocator.trackingList.getItemAt(i) as MealEvent).timeStamp >= (value as DayLine).timeStamp) { 
+						if ((ModelLocator.trackingList.getItemAt(i) as MealEvent).timeStamp < endOfDay) {
 							foundAMealEventInTheSameDay = true;
 							if (Settings.getInstance().getSetting(Settings.SettingsIMPORTANT_VALUE_FOR_USER) == "carbs") 
-								totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).totalCarbs;
+								totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.trackingList.getItemAt(i) as MealEvent).totalCarbs;
 							else
 								if (Settings.getInstance().getSetting(Settings.SettingsIMPORTANT_VALUE_FOR_USER) == "protein")
-									totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).totalProtein;
+									totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.trackingList.getItemAt(i) as MealEvent).totalProtein;
 								else
 									if (Settings.getInstance().getSetting(Settings.SettingsIMPORTANT_VALUE_FOR_USER) == "fat")
-										totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).totalFat;
+										totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.trackingList.getItemAt(i) as MealEvent).totalFat;
 									else
 										if (Settings.getInstance().getSetting(Settings.SettingsIMPORTANT_VALUE_FOR_USER) == "kilocalories")
-											totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.getInstance().trackingList.getItemAt(i) as MealEvent).totalKilocalories;
+											totalAmountAsNumber = totalAmountAsNumber + (ModelLocator.trackingList.getItemAt(i) as MealEvent).totalKilocalories;
 						} else {
 							if (foundAMealEventInTheSameDay) //stop searching
 								i = -1;

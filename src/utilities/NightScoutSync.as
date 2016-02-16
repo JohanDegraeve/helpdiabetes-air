@@ -231,7 +231,7 @@
 				 if ((nightScoutSyncRunning && (timeSinceLastSyncMoreThanXMinutes))  || (!nightScoutSyncRunning && (immediateRunNecessary || timeSinceLastSyncMoreThanXMinutes))) {
 					 localElementsUpdated  = false;
 					 retrievalCounter = 0;
-					 trackingList = ModelLocator.getInstance().trackingList;
+					 trackingList = ModelLocator.trackingList;
 					 currentSyncTimeStamp = new Date().valueOf();
 					 lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastNightScoutSyncTimeStamp));
 					 if (debugMode) 
@@ -1018,9 +1018,9 @@
 		 private function copyTrackingListIfNotDoneYet():void {
 			 if (!trackingListAlreadyModified) {
 				 trackingListAlreadyModified = true;
-				 previousTrackingEventToShow = ModelLocator.getInstance().trackingEventToShow;
-				 ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
-				 ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().infoTrackingList;
+				 previousTrackingEventToShow = ModelLocator.trackingEventToShow;
+				 ModelLocator.trackingEventToShow = (ModelLocator.infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
+				// ModelLocator.copyOfTrackingList = ModelLocator.infoTrackingList;
 				 //TrackingView.recalculateActiveInsulin();
 			 }			
 		 }
@@ -1051,7 +1051,7 @@
 			 if (localElementsUpdated) {
 				 localElementsUpdated = false;
 				 copyTrackingListIfNotDoneYet();//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
-				 ModelLocator.getInstance().trackingList = new ArrayCollection();
+				 ModelLocator.trackingList = new ArrayCollection();
 				 localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
 				 localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
 				 Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
@@ -1072,11 +1072,11 @@
 			 {
 				 localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, getAllEventsAndFillUpMealsFinished);
 				 localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, getAllEventsAndFillUpMealsFinished);
-				 ModelLocator.getInstance().trackingList.refresh();
+				 ModelLocator.trackingList.refresh();
 				 
-				 ModelLocator.getInstance().refreshMeals();
-				 ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
-				 ModelLocator.getInstance().trackingEventToShow = previousTrackingEventToShow;//could be a problem if that previous event was just deleted
+				 ModelLocator.refreshMeals();
+				// ModelLocator.copyOfTrackingList = ModelLocator.trackingList;
+				 ModelLocator.trackingEventToShow = previousTrackingEventToShow;//could be a problem if that previous event was just deleted
 			 }
 			 
 		 }

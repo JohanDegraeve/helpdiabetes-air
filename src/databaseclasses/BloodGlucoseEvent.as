@@ -76,7 +76,7 @@ package databaseclasses
 
 			if (storeInDatabase)
 				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,lastModifiedTimestamp,unit,bloodglucoseEventId,_comment,null);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		
@@ -107,7 +107,7 @@ package databaseclasses
 				timeStamp = newCreationTimeStamp;
 			}
 			Database.getInstance().updateBloodGlucoseEvent(this.eventid,_unit,_bloodGlucoseLevel, timeStamp,lastModifiedTimestamp,_comment);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -121,7 +121,7 @@ package databaseclasses
 		 */
 		override public function deleteEvent():void {
 			Database.getInstance().deleteBloodGlucoseEvent(this.eventid);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		public function toString():String {

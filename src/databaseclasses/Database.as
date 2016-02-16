@@ -2298,18 +2298,18 @@ package databaseclasses
 								o.lastmodifiedtimestamp  as Number,
 								false,
 								new ArrayCollection(selectedFoodItems.toArray()));
-							ModelLocator.getInstance().trackingList.addItem(newMealEvent);
+							ModelLocator.trackingList.addItem(newMealEvent);
 							var creationTimeStampAsDate:Date = new Date(newMealEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
-							if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-								if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-									ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (creationTimeStampAtMidNight < ModelLocator.youngestDayLineStoredInTrackingList) {
+								ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+									ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 							} 
-							if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-								if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-									ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (creationTimeStampAtMidNight > ModelLocator.oldestDayLineStoredInTrackingList) {
+								ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+									ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 							}
 						}
 					}
@@ -2342,18 +2342,18 @@ package databaseclasses
 							if (o.unit as String  == ModelLocator.resourceManagerInstance.getString('general','mmoll'))
 								tempLevel = tempLevel/10;
 							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(tempLevel as Number,o.unit as String, bloodGlucoseEventId, o.comment_2 as String, o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
-							ModelLocator.getInstance().trackingList.addItem(newBloodGlucoseEvent);
+							ModelLocator.trackingList.addItem(newBloodGlucoseEvent);
 							var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
-							if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-								if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-									ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (creationTimeStampAtMidNight < ModelLocator.youngestDayLineStoredInTrackingList) {
+								ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+									ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 							} 
-							if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-								if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-									ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (creationTimeStampAtMidNight > ModelLocator.oldestDayLineStoredInTrackingList) {
+								ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+									ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 							}
 						}
 					}
@@ -2402,18 +2402,18 @@ package databaseclasses
 							var medicinName:String = medicinArray[0];
 							
 							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number, medicinName, medicinEventId, o.comment_2 as String, o.creationtimestamp as Number, o.lastmodifiedtimestamp as Number, false, bolusType, bolusDuration);
-							ModelLocator.getInstance().trackingList.addItem(newMedicinEvent);
+							ModelLocator.trackingList.addItem(newMedicinEvent);
 							var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
-							if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-								if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-									ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (creationTimeStampAtMidNight < ModelLocator.youngestDayLineStoredInTrackingList) {
+								ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+									ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 							} 
-							if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-								if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-									ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (creationTimeStampAtMidNight > ModelLocator.oldestDayLineStoredInTrackingList) {
+								ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+									ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 							}
 						}
 					}
@@ -2445,41 +2445,41 @@ package databaseclasses
 							deleteExerciseEvent(exerciseEventId);
 						} else {
 							var newExerciseEvent:ExerciseEvent = new ExerciseEvent(o.level as String,o.comment_2 as String,exerciseEventId,o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
-							ModelLocator.getInstance().trackingList.addItem(newExerciseEvent);
+							ModelLocator.trackingList.addItem(newExerciseEvent);
 							var creationTimeStampAsDate:Date = new Date(newExerciseEvent.timeStamp);
 							creationTimeStampAtMidNight = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
-							if (creationTimeStampAtMidNight < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-								ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-								if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-									ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (creationTimeStampAtMidNight < ModelLocator.youngestDayLineStoredInTrackingList) {
+								ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+									ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 							} 
-							if (creationTimeStampAtMidNight > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-								ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
-								if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-									ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+							if (creationTimeStampAtMidNight > ModelLocator.oldestDayLineStoredInTrackingList) {
+								ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
+								if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+									ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAtMidNight;
 							}
 						}
 					}
 				}
 				
-				var oldest:Number = (new Date(ModelLocator.getInstance().oldestDayLineStoredInTrackingList)).valueOf();
-				var youngest :Number = (new Date(ModelLocator.getInstance().youngestDayLineStoredInTrackingList)).valueOf();
+				var oldest:Number = (new Date(ModelLocator.oldestDayLineStoredInTrackingList)).valueOf();
+				var youngest :Number = (new Date(ModelLocator.youngestDayLineStoredInTrackingList)).valueOf();
 				
 				//Now add list of daylines 
 				for (var counter:Number = youngest;counter<= oldest + 3600000;counter = counter + 86400000) {
 					//why counter <= oldest + 360000 ? because i noticed when switching from wintertime to summertime, if oldest was winter, and youngest was summer, there's a difference of an hour
-					ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(counter));
+					ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(counter));
 				}
 				
-				ModelLocator.getInstance().trackingList.refresh();
+				ModelLocator.trackingList.refresh();
 				
-				// now populate ModelLocator.getInstance().meals
-				ModelLocator.getInstance().refreshMeals();
+				// now populate ModelLocator.meals
+				ModelLocator.refreshMeals();
 				
 				//for all mealevents, we will recalculate insulinamount
-				for (var eventcntr:Number = 0;eventcntr < ModelLocator.getInstance().trackingList.length;eventcntr++) {
-					if (ModelLocator.getInstance().trackingList.getItemAt(eventcntr) is MealEvent) {
-						(ModelLocator.getInstance().trackingList.getItemAt(eventcntr) as MealEvent).recalculateInsulinAmount();
+				for (var eventcntr:Number = 0;eventcntr < ModelLocator.trackingList.length;eventcntr++) {
+					if (ModelLocator.trackingList.getItemAt(eventcntr) is MealEvent) {
+						(ModelLocator.trackingList.getItemAt(eventcntr) as MealEvent).recalculateInsulinAmount();
 					}
 				}
 				
@@ -2748,7 +2748,6 @@ package databaseclasses
 				localSqlStatement.parameters[":lastmodifiedtimestamp"] = isNaN(newLastModifiedTimeStamp) ? (new Date()).valueOf() : newLastModifiedTimeStamp;
 				localSqlStatement.parameters[":exerciseeventid"] = new Date().valueOf() + DateTimeUtilities.randomRange(1000,10000);//legacy, adding random because sometimes on pc this was getting called within the same millisecond, generating duplicate keys
 				localSqlStatement.parameters[":newexerciseeventid"] = exerciseeventid;
-				trace("Database.as : creating sql statement with exerciseeventid = " + localSqlStatement.parameters[":exerciseeventid"] + " and newexerciseeventid = " + exerciseeventid);
 				localSqlStatement.addEventListener(SQLEvent.RESULT, exerciseEventCreated);
 				localSqlStatement.addEventListener(SQLErrorEvent.ERROR, exerciseEventCreationFailed);
 				localSqlStatement.execute();

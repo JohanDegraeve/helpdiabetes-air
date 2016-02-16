@@ -209,9 +209,9 @@ package myComponents
 				} else {
 					var firstEventToShow:String;
 					try {
-						firstEventToShow = ModelLocator.getInstance().trackingEventToShow;
-						for (var trackingCounter:int = ModelLocator.getInstance().trackingList.length - 1; trackingCounter >= 0;trackingCounter--) {
-								if ((ModelLocator.getInstance().trackingList.getItemAt(trackingCounter) as TrackingViewElement).eventid == firstEventToShow) {
+						firstEventToShow = ModelLocator.trackingEventToShow;
+						for (var trackingCounter:int = ModelLocator.trackingList.length - 1; trackingCounter >= 0;trackingCounter--) {
+								if ((ModelLocator.trackingList.getItemAt(trackingCounter) as TrackingViewElement).eventid == firstEventToShow) {
 									_firstIndexInView = trackingCounter;
 									trackingCounter = -1;
 								}
@@ -219,10 +219,10 @@ package myComponents
 					} catch (erObject:TypeError) {
 						//this happens when mealEvent is null, which can be eg when going the tracking a mealtime after having created the latest meal, in this case, we'll simply set the _firstindex to lastelement
 						//so the tracking list will show the last element
-						_firstIndexInView = ModelLocator.getInstance().trackingList.length - 1;
+						_firstIndexInView = ModelLocator.trackingList.length - 1;
 					} catch (erObject2:RangeError) {
 						//this happens when for instance user has selected last element, so firstEventToShow points to last element, but user deletes that element and returns to trackingview, then firstEventToShow points to far ..
-						_firstIndexInView = ModelLocator.getInstance().trackingList.length - 1;
+						_firstIndexInView = ModelLocator.trackingList.length - 1;
 					}
 					if (_firstIndexInView) {//firstindex found, so we can set the scrollrect
 						if (_indexToY[_indexToY.length - 1] - _indexToY[_firstIndexInView] < containerHeight) {

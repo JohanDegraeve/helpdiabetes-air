@@ -17,22 +17,24 @@
  */
 package myComponents
 {
-	import databaseclasses.ExerciseEvent;
-	
 	import mx.graphics.BitmapFillMode;
 	
 	import spark.components.Image;
 	import spark.components.supportClasses.StyleableTextField;
 	
+	import databaseclasses.ExerciseEvent;
+	
+	import model.ModelLocator;
+	
 	public class ExerciseEventItemRenderer extends TrackingViewElementItemRenderer
 	{
 		private var eventTypeImage:Image;
-		[Embed(source = "assets/ic_tab_exercise_selected_35x35.png")]
-		public static var eventTypeIcon:Class;
+		//[Embed(source = "assets/ic_tab_exercise_selected_35x35.png")]
+		//public static var eventTypeIcon:Class;
 		
 		private var notesImage:Image;
-		[Embed(source = "assets/Notes_16x16.png")]
-		public static var notesIcon:Class;
+		//[Embed(source = "assets/Notes_16x16.png")]
+		//public static var notesIcon:Class;
 		
 		static private var itemHeight:int;
 		static private var offsetToPutTextInTheMiddle:int;
@@ -61,7 +63,8 @@ package myComponents
 			if (!notesImage) {
 				notesImage = new Image();
 				notesImage.fillMode = BitmapFillMode.CLIP;
-				notesImage.source = notesIcon;
+				notesImage.contentLoader = ModelLocator.iconCache;
+				notesImage.source = "assets/Notes_16x16.png";
 				addChild(notesImage);
 			}
 		}
@@ -134,7 +137,8 @@ package myComponents
 				//image.smooth = true;
 				//image.scaleMode = BitmapScaleMode.ZOOM;
 				eventTypeImage.fillMode = BitmapFillMode.CLIP;
-				eventTypeImage.source = eventTypeIcon;
+				eventTypeImage.contentLoader = ModelLocator.iconCache;
+				eventTypeImage.source = "assets/ic_tab_exercise_selected_35x35.png";
 				addChild(eventTypeImage);
 			}
 			
@@ -152,7 +156,8 @@ package myComponents
 					if (!notesImage) {
 						notesImage = new Image();
 						notesImage.fillMode = BitmapFillMode.CLIP;
-						notesImage.source = notesIcon;
+						notesImage.contentLoader = ModelLocator.iconCache;
+						notesImage.source = "assets/Notes_16x16.png";
 						addChild(notesImage);
 					}
 				}

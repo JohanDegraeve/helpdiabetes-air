@@ -30,6 +30,8 @@ package model
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
+	import spark.components.Image;
+	import spark.core.ContentCache;
 	
 	import databaseclasses.Meal;
 	import databaseclasses.MealEvent;
@@ -50,12 +52,10 @@ package model
 		
 		
 	{
-		[ResourceBundle("general")]
-		
 		/**
 		 * one and only instance of ModelLocator
 		 */
-		private static var instance:ModelLocator = new ModelLocator();
+		private static var instance:ModelLocator;
 		
 		/**
 		 *  foodTables is an array of an array of strings <br>
@@ -66,29 +66,30 @@ package model
 		 * The table is read via some public functions <br>
 		 * It is initialized in the constructor <br>
 		 */
-		private var foodTables:Array;
+		private static var foodTables:Array;
 		
-		public var maximumSearchStringLength:int = 25;
+		public static var maximumSearchStringLength:int = 25;
 		
 		/**
 		 * if searchActive, then this is eventid of the lastmarked item , 0 means there's no item marked
 		 */
-		public var lastMarkedItemEventId:String;
+		public static var lastMarkedItemEventId:String;
 		/**
 		 * if searchActive, then this is eventid of the firstmarked item, 0 means there's no item marked 
 		 */
-		public var firstMarkedItemEventId:String;
+		public static var firstMarkedItemEventId:String;
 		
-		private  var _searchActive:Boolean = false;
+		private  static var _searchActive:Boolean = false;
 		/**
 		 * used for event dispatching, when searchactive changes
-		 */public static const SEARCHACTIVE_CHANGED:String="searchactive_changed";
+		 */
+		public static const SEARCHACTIVE_CHANGED:String="searchactive_changed";
 		
 		[Bindable]
 		/**
 		 * used in tracking view, true means a search has been made, some elements in the tracking list are marked 
 		 */
-		public function get searchActive():Boolean
+		public static function get searchActive():Boolean
 		{
 			return _searchActive;
 		}
@@ -97,11 +98,20 @@ package model
 		
 		public static var resourceManagerInstance:IResourceManager;
 		
+		public static var trashImage_48x48:Image;
+		public static var doneImage_48x48:Image;
+		public static var notesImage_48x48:Image;
+		public static var ic_menu_close_clear_cancelImage:Image;
+		public static var searchImage_48x48:Image;
+		public static var addImage48x48:Image;
+		public static var ic_upImage:Image;
+		public static var ic_downImage:Image;
+		
 		/**
 		 * sets searchActive<br>
 		 * set firstmarkeditemeventid and lastmarkeditemeventid to 0, and sets the mark for all trackingevents to false
 		 */
-		public function set searchActive(value:Boolean):void
+		public static function set searchActive(value:Boolean):void
 		{
 			if (_searchActive == value)
 				return;
@@ -113,19 +123,18 @@ package model
 					(trackingList.getItemAt(trackingcntr) as TrackingViewElement).mark = false;
 				}
 			}
-			this.dispatchEvent(new Event(ModelLocator.SEARCHACTIVE_CHANGED));
+			getInstance().dispatchEvent(new Event(ModelLocator.SEARCHACTIVE_CHANGED));
 		}
 		
 		
-		/**** Add bindable application data here ***/
-		private var _foodItemList:ArrayCollection = new ArrayCollection(); 
+		private static var _foodItemList:ArrayCollection = new ArrayCollection(); 
 		
 		[Bindable]
 		/**
 		 * list of fooditems used throughout the application<br>
 		 * in the first place used in foodcounterview 
 		 */
-		public function get foodItemList():ArrayCollection
+		public static function get foodItemList():ArrayCollection
 			
 		{
 			return _foodItemList;
@@ -135,7 +144,7 @@ package model
 		 * @private
 		 */
 		
-		public function set foodItemList(value:ArrayCollection):void
+		public static function set foodItemList(value:ArrayCollection):void
 			
 		{
 			_foodItemList = value;
@@ -145,22 +154,22 @@ package model
 		/**
 		 * list of meals, mainly used in addfooditem, and also somewhere else, being reset each time addfooditem is opened
 		 */
-		private var _meals:ArrayCollection;
+		private static var _meals:ArrayCollection;
 		
 		/**
 		 * index to the currently selected meal in meals<br>
 		 * initialized to -1 which means invalid value
 		 */
-		private var _selectedMeal:int = -1;
+		private static var _selectedMeal:int = -1;
 		
-		private var _trackingEventToShow:String = "-1";
+		private static var _trackingEventToShow:String = "-1";
 		
 		/**
 		 * eventid of to the tracking event to show when going to trackingview<br>
 		 * initially set to -1, in the get trackingeventToShow, when still on -1 it will be set to the event id of the last event in the _trackingList, except when 
 		 * there are no elements in the _trackingList, then it stays -1
 		 */
-		public function get trackingEventToShow():String
+		public static function get trackingEventToShow():String
 			
 		{
 			if (_trackingEventToShow == "-1")
@@ -172,7 +181,7 @@ package model
 		/**
 		 * @private
 		 */
-		public function set trackingEventToShow(value:String):void
+		public static function set trackingEventToShow(value:String):void
 			
 		{
 			_trackingEventToShow = value;
@@ -191,19 +200,13 @@ package model
 		/**
 		 * no comment 
 		 */
-		private var _oldestDayLineStoredInTrackingList:Number;
+		private static var _oldestDayLineStoredInTrackingList:Number;
 		/**
 		 * no comment 
 		 */
-		private var _youngestDayLineStoredInTrackingList:Number;
+		private static var _youngestDayLineStoredInTrackingList:Number;
 		
-		/** 
-		 * just a variable used when opening the untilist 
-		 */
-		[Bindable]
-		public var width:int = 300;
-		
-		private var _trackingList:ArrayCollection;
+		private static var _trackingList:ArrayCollection;
 		
 		
 		[Bindable]
@@ -217,7 +220,7 @@ package model
 		 * The _trackingList contains all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents and also DayLine objects are stored here. Sorted by timestamp.<br>
 		 * any item in the _trackingList must be of a class extended from TrackingViewElement
 		 */
-		public function get trackingList():ArrayCollection
+		public static function get trackingList():ArrayCollection
 			
 		{
 			return _trackingList;
@@ -227,7 +230,7 @@ package model
 		 * @private
 		 */
 		
-		public function set trackingList(value:ArrayCollection):void
+		public static function set trackingList(value:ArrayCollection):void
 			
 		{
 			_trackingList = value;
@@ -238,9 +241,9 @@ package model
 			_trackingList.sort = dataSort;
 		}
 		
-		private var _copyOfTrackingList:ArrayCollection;
+		//private var _copyOfTrackingList:ArrayCollection;
 		
-		[Bindable]
+		//[Bindable]
 		/**
 		 * copyOfTrackingList is the arraycollection used as list in the trackingview<br>
 		 * trackingList is the list that will be maintained, copy is simply set equal to trackinglist, but when doing lots of changes
@@ -251,23 +254,23 @@ package model
 		 * The _trackingList contains all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents and also DayLine objects are stored here. Sorted by timestamp.<br>
 		 * any item in the _trackingList must be of a class extended from TrackingViewElement
 		 */
-		public function get copyOfTrackingList():ArrayCollection
+		/*public static function get copyOfTrackingList():ArrayCollection
 			
 		{
 			return _copyOfTrackingList;
 		}
 		
-		public function set copyOfTrackingList(value:ArrayCollection):void
+		public static function set copyOfTrackingList(value:ArrayCollection):void
 			
 		{
 			_copyOfTrackingList = value;
-		}
+		}*/
 		
 		/**
 		 * an array collection that has a message saying that sync is busy<br>
 		 * copyoftrackinglist can be assigned to this list temporarily. 
 		 */
-		public var infoTrackingList:ArrayCollection;
+		public static var infoTrackingList:ArrayCollection;
 		
 		
 		/**
@@ -278,11 +281,11 @@ package model
 		/**
 		 * dateSortField and dataSort are used for sorting an arraycollection by timeStamp
 		 */
-		private var dataSortField:SortField = new SortField();
+		private static var dataSortField:SortField = new SortField();
 		/**
 		 * dateSortField and dataSort are used for sorting an arraycollection by timeStamp
 		 */
-		private var dataSort:Sort = new Sort();
+		private static var dataSort:Sort = new Sort();
 		
 		/**
 		 * the calculated height that a styleabletextfield would normally have, calculated somewhere during startup 
@@ -297,21 +300,13 @@ package model
 		/**
 		 * application just started ?
 		 */
-		public var firstInitOfFoodCounterView:Boolean = true;
+		public static var firstInitOfFoodCounterView:Boolean = true;
 		
 		public static var debugMode:Boolean = true;
 
 		public static var BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES:Number = 0.1;//unit s of insulin
 
-		/**
-		 * offset to be used top and bottom of a label itemrenderer, to make sure the text is in the middle
-		 public static function get offSetSoThatTextIsInTheMiddle():Number
-		 
-		 {
-		 if (_offSetSoThatTextIsInTheMiddle == 0)
-		 _offSetSoThatTextIsInTheMiddle = (StyleableTextFieldCalculatedHeight - StyleableTextFieldPreferredHeight)/2;
-		 return _offSetSoThatTextIsInTheMiddle;
-		 }*/
+		public static var iconCache:ContentCache;
 		
 		/**
 		 * constructor
@@ -347,7 +342,7 @@ package model
 			);
 			
 			trackingList = new ArrayCollection();
-			copyOfTrackingList = trackingList;
+			//copyOfTrackingList = trackingList;
 			instance = this;
 			
 			// at initialization, there's no dayline existing in the tracking, so initialize to 0
@@ -357,6 +352,35 @@ package model
 			
 			infoTrackingList = new ArrayCollection();
 			infoTrackingList.addItem(new SimpleTextEvent(resourceManagerInstance.getString("general","storingnewevents")));
+			
+			iconCache = new ContentCache();
+			iconCache.enableCaching = true;
+			iconCache.enableQueueing = true;
+			
+			trashImage_48x48 = new Image();
+			trashImage_48x48.contentLoader = iconCache;
+			trashImage_48x48.source='../assets/Trash_48x48.png';
+			doneImage_48x48 = new Image();
+			doneImage_48x48.contentLoader = iconCache;
+			doneImage_48x48.source='../assets/Done_48x48.png';
+			notesImage_48x48 = new Image();
+			notesImage_48x48.contentLoader = iconCache;
+			notesImage_48x48.source='../assets/Notes_48x48.png';
+			ic_menu_close_clear_cancelImage = new Image();
+			ic_menu_close_clear_cancelImage.contentLoader = iconCache;
+			ic_menu_close_clear_cancelImage.source='../assets/ic_menu_close_clear_cancel.png';
+			searchImage_48x48 = new Image();
+			searchImage_48x48.contentLoader = iconCache;
+			searchImage_48x48.source='../assets/search48x48.png';
+			addImage48x48 = new Image();
+			addImage48x48.contentLoader = iconCache;
+			addImage48x48.source='../assets/add48x48.png';
+			ic_upImage = new Image();
+			ic_upImage.contentLoader = iconCache;
+			ic_upImage.source='../assets/ic_up.png';
+			ic_downImage = new Image();
+			ic_downImage.contentLoader = iconCache;
+			ic_downImage.source='../assets/ic_down.png';
 		}
 		
 		/** 
@@ -367,7 +391,7 @@ package model
 			return instance;
 		}
 		
-		public function getListOfFoodTableLanguages():Array {
+		public static function getListOfFoodTableLanguages():Array {
 			
 			var returnvalue:Array = new Array();
 			for (var i:int = 0;i < foodTables.length;i++) {
@@ -380,7 +404,7 @@ package model
 		 * gets the food table language and description in an array of a string, for a specified language indicator
 		 * Returns an empty array if language indicator not found
 		 */
-		public function getFoodTableLanguageAndDescription(language:String):Array {
+		public static function getFoodTableLanguageAndDescription(language:String):Array {
 			var returnValue:Array = new Array();
 			for (var i:int = 0;i < foodTables.length;i++) {
 				if (foodTables[i][0].toString().toLowerCase() == language.toLowerCase()) {
@@ -396,7 +420,7 @@ package model
 		 * reads from the _trackingList the mealevent with identified mealeventid<br>
 		 * returns null if not found
 		 */
-		public function getMealEventFromTrackingList(mealEventId:String):MealEvent {
+		public static function getMealEventFromTrackingList(mealEventId:String):MealEvent {
 			for (var i:int = _trackingList.length - 1;i >= 0; i--) {
 				if (_trackingList.getItemAt(i) is MealEvent)
 					if (((_trackingList.getItemAt(i)) as MealEvent).eventid == mealEventId)
@@ -409,12 +433,9 @@ package model
 		 * index to the currently selected meal in meals<br>
 		 * initialized to -1 which means invalid value, it's the database initialization that will set it to a valid value
 		 */
-		public function get selectedMeal():int
-			
+		public static function get selectedMeal():int
 		{
-			
 			return _selectedMeal;
-			
 		}
 		
 		/**
@@ -424,15 +445,15 @@ package model
 		 * When the value is changed (ie change from value different from -1), then an event will be dispatched ModelLocator.SELECTEDMEAL_CHANGED<br>
 		 * When selectedMeal is changed, then also tarckingEventToShow gets the new value
 		 */
-		public function set selectedMeal(value:int):void
+		public static function set selectedMeal(value:int):void
 			
 		{
 			if (_selectedMeal == -1) {
 				_selectedMeal = value;
-				this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_INITIALIZED));
+				getInstance().dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_INITIALIZED));
 			} else {
 				_selectedMeal = value;
-				this.dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_CHANGED));
+				getInstance().dispatchEvent(new Event(ModelLocator.SELECTEDMEAL_CHANGED));
 			}
 			if ((meals.getItemAt(_selectedMeal) as Meal).mealEvent)
 				trackingEventToShow = ((meals.getItemAt(_selectedMeal) as Meal).mealEvent).eventid;
@@ -447,7 +468,7 @@ package model
 		 * <br>
 		 * Comment added later on - 20/07/2011: probably never used with updateSelectedMeal = false, I had to change something in AddFoodItemView.mxlm, in the creationComplete method, see comment over there
 		 */
-		public function refreshMeals(updateSelectedMeal:Boolean = true):void {
+		public static function refreshMeals(updateSelectedMeal:Boolean = true):void {
 			meals = new ArrayCollection();
 			
 			/**
@@ -601,20 +622,20 @@ package model
 		 * sets selectedMeal to the second meal that is one of the standards meals<br>
 		 * returns the new value
 		 */
-		public function resetSelectedMeal():int {
+		public static function resetSelectedMeal():int {
 			//initiailize selectedMeal to the second meal that is one of the standards meal
 			selectedMeal = getRefreshedSelectedMeal();
 			return selectedMeal;
 		}
 		
-		public function getCurrentlySelectedMeal():Meal {
+		public static function getCurrentlySelectedMeal():Meal {
 			return _meals.getItemAt(selectedMeal) as Meal;
 		}
 		
 		/**
 		 * this function gets the id of the second meal in the _meals, that is a standard meal
 		 */
-		public function getRefreshedSelectedMeal():int {
+		public static function getRefreshedSelectedMeal():int {
 			var breakfast:String = resourceManagerInstance.getString('general','breakfast');
 			var lunch:String = resourceManagerInstance.getString('general','lunch');
 			var snack:String = resourceManagerInstance.getString('general','snack');
@@ -646,7 +667,7 @@ package model
 		 * if it's here in Belgium 10:03, then this value = (10*3600 + 3*60)*1000, no matter what the utc time is.<br>
 		 * Also database will be updated.<br>
 		 */
-		public function updateInsulinRatiosInTrackingList(asOfDateAndTime:Number,newInsulinRatio:Number,fromTime:Number,toTime:Number):void {
+		public static function updateInsulinRatiosInTrackingList(asOfDateAndTime:Number,newInsulinRatio:Number,fromTime:Number,toTime:Number):void {
 			for (var i:int = 0; i <  _trackingList.length	;i++)  {
 				if (_trackingList.getItemAt(i) is MealEvent) {
 					var mealEvent:MealEvent = _trackingList.getItemAt(i) as MealEvent;
@@ -668,7 +689,7 @@ package model
 		 * list of meals, initialized by database initiation<br>
 		 * to be used when selecting a meal in addfooditemview.
 		 */
-		public function get meals():ArrayCollection
+		public static function get meals():ArrayCollection
 			
 		{
 			
@@ -680,7 +701,7 @@ package model
 		 * @private
 		 */
 		
-		private function set meals(value:ArrayCollection):void
+		private static function set meals(value:ArrayCollection):void
 			
 		{
 			
@@ -692,7 +713,7 @@ package model
 		/**
 		 * adds a meal and returns the index of the newly stored meal, after refreshing 
 		 */
-		public function addMeal(newMeal:Meal):int {
+		public static function addMeal(newMeal:Meal):int {
 			_meals.addItem(newMeal);
 			_meals.refresh();
 			return _meals.getItemIndex(newMeal);
@@ -701,7 +722,7 @@ package model
 		/**
 		 * the oldest dayline in the tracking list represented as Number, this is the UTC time  in ms, since 1970...
 		 */
-		public function get oldestDayLineStoredInTrackingList():Number
+		public static function get oldestDayLineStoredInTrackingList():Number
 			
 		{
 			return _oldestDayLineStoredInTrackingList;
@@ -711,7 +732,7 @@ package model
 		 * @private
 		 */
 		
-		public function set oldestDayLineStoredInTrackingList(value:Number):void
+		public static function set oldestDayLineStoredInTrackingList(value:Number):void
 			
 		{
 			_oldestDayLineStoredInTrackingList = value;
@@ -720,7 +741,7 @@ package model
 		/**
 		 * the youngest dayline in the tracking list represented as Number, this is the UTC time  in ms, since 1970...
 		 */
-		public function get youngestDayLineStoredInTrackingList():Number
+		public static function get youngestDayLineStoredInTrackingList():Number
 			
 		{
 			return _youngestDayLineStoredInTrackingList;
@@ -729,7 +750,7 @@ package model
 		/**
 		 * @private
 		 */
-		public function set youngestDayLineStoredInTrackingList(value:Number):void
+		public static function set youngestDayLineStoredInTrackingList(value:Number):void
 		{
 			_youngestDayLineStoredInTrackingList = value;
 		}
@@ -738,7 +759,7 @@ package model
 		 * recalculates the insulinamounts in all mealevents in the trackinglist, with a timestamp younger then specified asof<br>
 		 * but going one day earlier, because the event might have been used in calculation of the insulin for older events<br>
 		 */
-		public function recalculateInsulinAmoutInAllYoungerMealEvents(asOf:Number):void {
+		public static function recalculateInsulinAmoutInAllYoungerMealEvents(asOf:Number):void {
 			var newAsOf:Number = asOf - 24 * 3600 * 1000;
 			for (var cntr:int = trackingList.length - 1;cntr >= 0;cntr--) {
 				if (trackingList.getItemAt(cntr) is MealEvent) {
@@ -754,7 +775,7 @@ package model
 		/**
 		 * updates correctionfactors in all existing mealevents, according to correction factor stored in the setting<br>
 		 */
-		public function resetCorrectionFactorsInMeals(asOf:Date):void {
+		public static function resetCorrectionFactorsInMeals(asOf:Date):void {
 			var  CFList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
 			for (var cntr:int = trackingList.length - 1;cntr >= 0;cntr--) {
 				if (trackingList.getItemAt(cntr) is MealEvent) {
@@ -770,7 +791,9 @@ package model
 		/**
 		 * calculates active insulin at given time, if time = null then active insulin now is calculated, time in ms since 1 1 1970
 		 */
-		public function calculateActiveInsulin(time:Number = NaN):Number  {
+		private static var counter4:int = 0;
+		public static function calculateActiveInsulin(time:Number = NaN):Number  {
+
 			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
 			
 			if (isNaN(time))
@@ -793,7 +816,8 @@ package model
 		/**
 		 * For a specific medicin event, calculates active insulin at the specified time, time in milliseconds<br>
 		 */
-		public function calculateActiveInsulinForSpecifiedEvent(theEvent:MedicinEvent, time:Number = NaN):Number {
+		private static var counter1:int=0;
+		public static function calculateActiveInsulinForSpecifiedEvent(theEvent:MedicinEvent, time:Number = NaN):Number {
 			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
 			var additionalMaxDurationInSeconds:Number = 0;
 			if (resourceManagerInstance.getString('editmedicineventview','listofsquarewavebolustypes').indexOf((theEvent as MedicinEvent).bolustype) > -1) {
@@ -801,7 +825,7 @@ package model
 			}
 			if ((theEvent as TrackingViewElement).timeStamp + (maxInsulinDurationInSeconds  + additionalMaxDurationInSeconds) * 1000 < time)
 				return new Number(0);
-			//let's find if the name of the medicinevent matches one of the medicins in the settings
+			//let's find if the name of the medicinevent that matches one of the medicins in the settings
 			var activeInsulin:Number = new Number(0);
 			for (var medicincntr:int = 0;medicincntr <  5;medicincntr++) {
 				if (Settings.getInstance().getSetting( Settings.SettingsInsulinType1 + medicincntr) == theEvent.medicinName)  {

@@ -241,8 +241,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
 						localdispatcher = new EventDispatcher();
-						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-						ModelLocator.getInstance().trackingList = new ArrayCollection();
+						//ModelLocator.copyOfTrackingList = new ArrayCollection();
+						ModelLocator.trackingList = new ArrayCollection();
 						localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
 						localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
 						Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
@@ -255,10 +255,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				{
 					localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, getAllEventsAndFillUpMealsFinished);
 					localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, getAllEventsAndFillUpMealsFinished);
-					ModelLocator.getInstance().trackingList.refresh();
+					ModelLocator.trackingList.refresh();
 					
-					ModelLocator.getInstance().refreshMeals();
-					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
+					ModelLocator.refreshMeals();
+					//ModelLocator.copyOfTrackingList = ModelLocator.trackingList;
 				}
 			}
 			
@@ -319,7 +319,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/Notes_48x48.png')" id="NotesButton" click="editNote(event)"/>
+		<s:Button icon="{ModelLocator.notesImage_48x48}" id="NotesButton" click="editNote(event)"/>
 	</s:actionContent>
 	
 	<s:Group width="100%" >

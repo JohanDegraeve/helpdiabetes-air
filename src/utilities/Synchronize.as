@@ -679,7 +679,7 @@ package utilities
 			access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
 			if (access_token && access_token.length == 0  ) {
 				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
-				//ModelLocator.getInstance().logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
+				//ModelLocator.logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
 				Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
 				syncFinished(false);
 			} else {
@@ -720,7 +720,7 @@ package utilities
 					retrievalCounter = 0;
 					helpDiabetesFoodTableWorkSheetId = "";//not really necessary to reset it each time to empty string, but you never know it could be that user deletes the foodtable worksheet in between to syncs,
 					helpDiabetesFoodTableSpreadSheetKey = "";//same comment
-					trackingList = ModelLocator.getInstance().trackingList;
+					trackingList = ModelLocator.trackingList;
 					currentSyncTimeStamp = new Date().valueOf();
 					lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp));
 					if (debugMode)
@@ -854,7 +854,7 @@ package utilities
 			
 			if (retrievalCounter > 100)  {
 				//stop it, we seem to be in an endless loop
-				//ModelLocator.getInstance().logString += "error 2 : " + event.target.data;
+				//ModelLocator.logString += "error 2 : " + event.target.data;
 				syncFinished(false);
 			} else {
 				var i:int=0;
@@ -1006,7 +1006,7 @@ package utilities
 			
 			if (debugMode)
 				trace("Synchronize.as : start method getTheMedicinEvents");
-			//ModelLocator.getInstance().logString += "start method getthemedicinevents"+ "\n";;
+			//ModelLocator.logString += "start method getthemedicinevents"+ "\n";;
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -1575,21 +1575,21 @@ package utilities
 				//we go through each list, for elements with matching id, any element that is found in the other list with the same modifiedtimestamp is removed from both lists
 				try {
 					for (var j:int = 0; j < localElements.length; j++) {
-						//ModelLocator.getInstance().logString += "1\n";
-						//ModelLocator.getInstance().logString += "remoteElements.length = " + remoteElements.length + "\n";
+						//ModelLocator.logString += "1\n";
+						//ModelLocator.logString += "remoteElements.length = " + remoteElements.length + "\n";
 						if (localElements.getItemAt(j) is MealEvent) {
 							for (var k:int = 0; k < remoteElements.length; k++) {
-								//ModelLocator.getInstance().logString += "2"  + "\n";
+								//ModelLocator.logString += "2"  + "\n";
 								if ((remoteElements.getItemAt(k) as Array)[positionId] == (localElements.getItemAt(j) as MealEvent).eventid) {
-									//ModelLocator.getInstance().logString += "3" + "\n";
+									//ModelLocator.logString += "3" + "\n";
 									
 									//got a matching element, let's see if we need to remove it from both lists
 									if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) != (localElements.getItemAt(j) as MealEvent).lastModifiedTimestamp) {
-										//ModelLocator.getInstance().logString += "4" + "\n";
+										//ModelLocator.logString += "4" + "\n";
 										//no lastmodifiedtimestamps are not equal, we need to see which one is most recent
 										//but first let's see if the remoteelement has the deleted flag set
 										if (((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
-											//ModelLocator.getInstance().logString += "5" + "\n";
+											//ModelLocator.logString += "5" + "\n";
 											//its a deleted item remove it from both lists
 											remoteElements.removeItemAt(k);
 											//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
@@ -1601,20 +1601,20 @@ package utilities
 											j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 											break;
 										} else {
-											//ModelLocator.getInstance().logString += "6" + "\n";
+											//ModelLocator.logString += "6" + "\n";
 											if (new Number((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]) < (localElements.getItemAt(j) as MealEvent).lastModifiedTimestamp) {
-												//ModelLocator.getInstance().logString += "7" + "\n";
+												//ModelLocator.logString += "7" + "\n";
 												remoteElements.removeItemAt(k);
 												break;
 											} else {
-												//ModelLocator.getInstance().logString += "8" + "\n";
+												//ModelLocator.logString += "8" + "\n";
 												localElements.removeItemAt(j);
 												j--;
 												break;
 											}
 										}
 									} else {
-										//ModelLocator.getInstance().logString += "9" + "\n";
+										//ModelLocator.logString += "9" + "\n";
 										//yes lastmodifiedtimestamps are equal, so let's remove them from both lists
 										remoteElements.removeItemAt(k);
 										//remoteElementIds.removeItemAt(k);
@@ -1626,13 +1626,13 @@ package utilities
 							}
 							//j could be -1 now, and there might not be anymore elements inlocalemenets so
 							if (j + 1 == localElements.length) {
-								//ModelLocator.getInstance().logString += "j + 1 = localElements.length\n";
+								//ModelLocator.logString += "j + 1 = localElements.length\n";
 								break;
 							}
 						}
 					}
 				} catch (error:Error) {
-					//ModelLocator.getInstance().logString += "exception 1 = " + error.toString() + " stacktrace = " + error.getStackTrace() + "\n";
+					//ModelLocator.logString += "exception 1 = " + error.toString() + " stacktrace = " + error.getStackTrace() + "\n";
 					syncFinished(false);
 				}
 				//we've got to start updating
@@ -1933,7 +1933,7 @@ package utilities
 		private function getRowIdsOfLocalElements(event:Event = null):void {
 			if (debugMode)
 				trace ("in method getrowids");
-			//ModelLocator.getInstance().logString += "in method getrowids" + "\n";
+			//ModelLocator.logString += "in method getrowids" + "\n";
 			if (event != null) {
 				removeEventListeners();
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -2936,14 +2936,14 @@ package utilities
 			timeFormatter.useUTC = false;
 			timeFormatter.setStyle("locale",Capabilities.language.substr(0,2));
 			
-			for (var trackinglistcntr:int = 0;trackinglistcntr < ModelLocator.getInstance().trackingList.length;trackinglistcntr++) {
-				var trackElement:IListElement = ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) as IListElement;
+			for (var trackinglistcntr:int = 0;trackinglistcntr < ModelLocator.trackingList.length;trackinglistcntr++) {
+				var trackElement:IListElement = ModelLocator.trackingList.getItemAt(trackinglistcntr) as IListElement;
 				if (trackElement.timeStamp > new Number(Settings.getInstance().getSetting(Settings.SettingLastUploadedEventTimeStamp))) {
 					var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 					outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gsx=\"http://schemas.google.com/spreadsheets/2006/extended">\n';
 					outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_date],dateFormatter.format(trackElement.timeStamp));
 					outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_time],timeFormatter.format(trackElement.timeStamp));
-					if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is MealEvent) {
+					if (ModelLocator.trackingList.getItemAt(trackinglistcntr) is MealEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnamemeal'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealtype],(trackElement as MealEvent).mealName).replace('\'','\'\'');
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount],(Math.round((trackElement as MealEvent).totalCarbs)).toString());
@@ -2961,15 +2961,15 @@ package utilities
 								selectedItemsString += "\n";
 						}
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems],selectedItemsString.replace('\'','\'\''));
-					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is BloodGlucoseEvent) {
+					} else if (ModelLocator.trackingList.getItemAt(trackinglistcntr) is BloodGlucoseEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnamebloodglucose'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as BloodGlucoseEvent).comment.replace('\'','\'\''));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue],((Math.round((trackElement as BloodGlucoseEvent).bloodGlucoseLevel * 10))/10).toString().replace('.',','));
-					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is ExerciseEvent) {
+					} else if (ModelLocator.trackingList.getItemAt(trackinglistcntr) is ExerciseEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnameexercise'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as ExerciseEvent).comment.replace('\'','\'\''));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel],(trackElement as ExerciseEvent).level.replace('\'','\'\''));
-					} else if (ModelLocator.getInstance().trackingList.getItemAt(trackinglistcntr) is MedicinEvent) {
+					} else if (ModelLocator.trackingList.getItemAt(trackinglistcntr) is MedicinEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnamemedicin'));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MedicinEvent).comment.replace('\'','\'\''));
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicintype],(trackElement as MedicinEvent).medicinName.replace('\'','\'\''));
@@ -2999,7 +2999,7 @@ package utilities
 					break;
 				}
 			}
-			if (trackinglistcntr == ModelLocator.getInstance().trackingList.length) {
+			if (trackinglistcntr == ModelLocator.trackingList.length) {
 				this.dispatchEvent(new Event(EVENTS_UPLOADED_NOW_SYNCING_THE_SETTINGS));
 				MyGATracker.getInstance().trackPageview( "LogBookUploaded" );
 				
@@ -3020,7 +3020,7 @@ package utilities
 			if (event != null) {
 				removeEventListeners();
 				//not checking if there's an error in event, if we get here it should mean there wasn't an error - let's hope so
-				if (foodItemIdBeingTreated == ModelLocator.getInstance().foodItemList.length - 1) {
+				if (foodItemIdBeingTreated == ModelLocator.foodItemList.length - 1) {
 					Settings.getInstance().setSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel,"true");
 					syncFinished(true);
 					return;
@@ -3028,7 +3028,7 @@ package utilities
 				Settings.getInstance().setSetting(Settings.SettingsNextRowToAddInFoodTable,new Number(foodItemIdBeingTreated + 1).toString());
 				
 				//let anyone who is interested know that a new item is uploaded
-				_uploadFoodDatabaseStatus = foodItemIdBeingTreated + " {outof} " + ModelLocator.getInstance().foodItemList.length  + " {elementsuploaded} ";
+				_uploadFoodDatabaseStatus = foodItemIdBeingTreated + " {outof} " + ModelLocator.foodItemList.length  + " {elementsuploaded} ";
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 			} else  {//first time we come here, we need to initialize foodItemIdBeingTreated
 				foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAddInFoodTable));
@@ -3041,7 +3041,7 @@ package utilities
 			dispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 			dispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 			foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAddInFoodTable));
-			Database.getInstance().getUnitList((ModelLocator.getInstance().foodItemList.getItemAt(foodItemIdBeingTreated) as FoodItem) ,dispatcher);
+			Database.getInstance().getUnitList((ModelLocator.foodItemList.getItemAt(foodItemIdBeingTreated) as FoodItem) ,dispatcher);
 			
 			function unitListRetrieved (event:DatabaseEvent):void {
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
@@ -3049,7 +3049,7 @@ package utilities
 				
 				//retrieved fooditem does not have a valid itemid, meaning it can not be used to manage the database
 				//(comment copied from AddFoodItemView, not sure why and what
-				retrievedFoodItem = new FoodItem((ModelLocator.getInstance().foodItemList.getItemAt(foodItemIdBeingTreated) as FoodItem).itemDescription,event.data as ArrayCollection,0);
+				retrievedFoodItem = new FoodItem((ModelLocator.foodItemList.getItemAt(foodItemIdBeingTreated) as FoodItem).itemDescription,event.data as ArrayCollection,0);
 				
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gsx=\"http://schemas.google.com/spreadsheets/2006/extended">\n';
@@ -3402,7 +3402,7 @@ package utilities
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
 				outputString += '    <title>foodtable</title>\n';
-				outputString += '        <gs:rowCount>' + ModelLocator.getInstance().foodItemList.length + '</gs:rowCount>';
+				outputString += '        <gs:rowCount>' + ModelLocator.foodItemList.length + '</gs:rowCount>';
 				outputString += '        <gs:colCount>' + googleExcelFoodTableColumnNames.length + '</gs:colCount>';
 				outputString += '</entry>\n';
 				outputString = outputString.replace(/\n/g, File.lineEnding);
@@ -3757,7 +3757,7 @@ package utilities
 				if (localElementsUpdated) {
 					localElementsUpdated = false;
 					copyTrackingListIfNotDoneYet();//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
-					ModelLocator.getInstance().trackingList = new ArrayCollection();
+					ModelLocator.trackingList = new ArrayCollection();
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
 					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
@@ -3811,11 +3811,11 @@ package utilities
 			{
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, getAllEventsAndFillUpMealsFinished);
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, getAllEventsAndFillUpMealsFinished);
-				ModelLocator.getInstance().trackingList.refresh();
+				ModelLocator.trackingList.refresh();
 				
-				ModelLocator.getInstance().refreshMeals();
-				ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
-				ModelLocator.getInstance().trackingEventToShow = previousTrackingEventToShow;//could be a problem if that previous event was just deleted
+				ModelLocator.refreshMeals();
+			//	ModelLocator.copyOfTrackingList = ModelLocator.trackingList;
+				ModelLocator.trackingEventToShow = previousTrackingEventToShow;//could be a problem if that previous event was just deleted
 			}
 		}
 		
@@ -4225,9 +4225,9 @@ package utilities
 		private function copyTrackingListIfNotDoneYet():void {
 			if (!trackingListAlreadyModified) {
 				trackingListAlreadyModified = true;
-				previousTrackingEventToShow = ModelLocator.getInstance().trackingEventToShow;
-				ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
-				ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().infoTrackingList;
+				previousTrackingEventToShow = ModelLocator.trackingEventToShow;
+				ModelLocator.trackingEventToShow = (ModelLocator.infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
+			//	ModelLocator.copyOfTrackingList = ModelLocator.infoTrackingList;
 			}			
 		}
 		

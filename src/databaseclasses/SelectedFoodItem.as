@@ -151,7 +151,7 @@ package databaseclasses
 			_chosenAmount = newChosenAmount;
 			
 			Database.getInstance().updateSelectedFoodItem(_eventid,_mealEventId,_itemDescription,_chosenAmount,unit,_lastModifiedTimestamp,null);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(newLastModifiedTimeStamp);
+			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(newLastModifiedTimeStamp);
 			//update also the lastmodifiedtimestamp of the parent mealevent if the selectedfooditem lastmodifiedtimestamp is more recent
 			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed

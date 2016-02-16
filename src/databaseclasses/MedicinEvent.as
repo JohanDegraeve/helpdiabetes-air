@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -101,8 +101,7 @@ package databaseclasses
 		 public function bolusDurationInMilliSeconds():Number {
 			 return _bolusDurationInMinutes * 60 * 1000;
 		 }
-
-		
+		 
 		/**
 		 * creates a medicin event and stores it immediately in the database if storeInDatabase = true<br>
 		 * if creationTimeStamp = null, then current date and time is used<br>
@@ -129,7 +128,7 @@ package databaseclasses
 			
 			if (storeInDatabase)
 				Database.getInstance().createNewMedicinEvent(bolusType,bolusDuration, amount, medicin, _timeStamp,lastModifiedTimestamp,medicineventid, _comment, null);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -153,7 +152,7 @@ package databaseclasses
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
 			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDurationInMinutes, this.eventid,_amount,_medicinName,timeStamp,lastModifiedTimestamp, _comment);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		/**
@@ -162,7 +161,7 @@ package databaseclasses
 		 */
 		override public function deleteEvent():void {
 			Database.getInstance().deleteMedicinEvent(this.eventid);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 	}
 }

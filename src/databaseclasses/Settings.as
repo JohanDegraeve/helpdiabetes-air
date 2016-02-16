@@ -820,7 +820,7 @@ package databaseclasses
 				
 				//update all mealevents
 				//	 NOG AANPASSEN, ENKEL IN DIEN SETTING IS CORRECTIONFACTORSETTING
-				ModelLocator.getInstance().resetCorrectionFactorsInMeals(new Date());
+				ModelLocator.resetCorrectionFactorsInMeals(new Date());
 				
 				//if it's a medicinprofile then update maxium duration
 				if (settingId >= SettingsMedicin1_range1_AOBChart + 100 && settingId <= SettingsMedicin5_range4_AOBChart + 100) {

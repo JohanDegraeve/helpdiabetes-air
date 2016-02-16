@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 
 -->
 <!---
-view to show ModelLocator.getInstance().meals in a list
+view to show ModelLocator.meals in a list
 
 -->
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
@@ -64,7 +64,7 @@ view to show ModelLocator.getInstance().meals in a list
 			private function onCreationComplete():void {
 				back_label = resourceManager.getString('general','back');
 				meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
-				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
+				meallist.ensureIndexIsVisible(ModelLocator.selectedMeal);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 				ModelLocator.getInstance().addEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
 				meallist.addEventListener(Event.CHANGE,mealselected);
@@ -73,16 +73,16 @@ view to show ModelLocator.getInstance().meals in a list
 			private function mealselected(event:IndexChangeEvent):void {
 				MyGATracker.getInstance().trackPageview( "SelectMealView-mealSelectedFromList" );
 				
-				if (ModelLocator.getInstance().meals.getItemAt(event.newIndex)  is Meal) {
+				if (ModelLocator.meals.getItemAt(event.newIndex)  is Meal) {
 					//should we not do that also when ui is closed via back key ?
 					ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_CHANGED,onSelectedMealChanged);
 					ModelLocator.getInstance().removeEventListener(ModelLocator.SELECTEDMEAL_INITIALIZED,onSelectedMealChanged);
 					meallist.removeEventListener(Event.CHANGE,mealselected);
 					
 					//if it's a meal without mealevent, we'll ask to user to enter start date and time of the meal
-					var theMeal:Meal = ModelLocator.getInstance().meals.getItemAt(event.newIndex) as Meal;
+					var theMeal:Meal = ModelLocator.meals.getItemAt(event.newIndex) as Meal;
 					if (theMeal.hasMealEvent()) {
-						ModelLocator.getInstance().selectedMeal = event.newIndex;
+						ModelLocator.selectedMeal = event.newIndex;
 						navigator.popView();
 					} else {
 						navigator.pushView(ChangeMealDateAndTimeView,{
@@ -99,7 +99,7 @@ view to show ModelLocator.getInstance().meals in a list
 					trace("exception thrown in SelectedMealView.onSelectedMeall Changed - not important");
 					;
 				}
-				meallist.ensureIndexIsVisible(ModelLocator.getInstance().selectedMeal);
+				meallist.ensureIndexIsVisible(ModelLocator.selectedMeal);
 			}
 			
 			/**
@@ -110,7 +110,7 @@ view to show ModelLocator.getInstance().meals in a list
 				if (navigator.poppedViewReturnedObject != null) {
 					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME || navigator.poppedViewReturnedObject.context == ADD_NEW_MEAL) {
 						if (navigator.poppedViewReturnedObject.object != null) {
-							ModelLocator.getInstance().selectedMeal = navigator.poppedViewReturnedObject.object as Number;
+							ModelLocator.selectedMeal = navigator.poppedViewReturnedObject.object as Number;
 							navigator.popView();
 						}
 					} 
@@ -139,10 +139,10 @@ view to show ModelLocator.getInstance().meals in a list
 	</s:navigationContent>
 
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/add48x48.png')" click="addButtonClicked(event)"/>
+		<s:Button icon="{ModelLocator.addImage48x48.png')" click="addButtonClicked(event)"/>
 	</s:actionContent>
 	<s:List id="meallist" left="0" right="0" top="0" bottom="0" width="100%"
-			dataProvider="{ModelLocator.getInstance().meals}" 
+			dataProvider="{ModelLocator.meals}" 
 			itemRendererFunction="getItemRenderer">
 	</s:List>
 </s:View>

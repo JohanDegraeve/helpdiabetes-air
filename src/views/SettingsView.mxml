@@ -192,9 +192,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							Settings.getInstance().setSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL,
 								((Math.round((new Number(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)))/(new Number(0.0555))))).toString());
 							//change the bloodglucoseevents that area in tracking database
-							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
-								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
-									var theEvent:BloodGlucoseEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as BloodGlucoseEvent;
+							for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
+								if (ModelLocator.trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
+									var theEvent:BloodGlucoseEvent = ModelLocator.trackingList.getItemAt(cntr) as BloodGlucoseEvent;
 									if (theEvent.unit == ModelLocator.resourceManagerInstance.getString("general","mmoll")) {
 										theEvent.updateBloodGlucoseEvent(ModelLocator.resourceManagerInstance.getString("general","mgperdl"),Math.round(theEvent.bloodGlucoseLevel/(new Number(0.0555))),theEvent.timeStamp,theEvent.comment,new Date().valueOf());
 									}
@@ -202,9 +202,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 								}
 							}
 							//change the correctionfactor in mealevents
-							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
-								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is MealEvent) {
-									var theMealEvent:MealEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent;
+							for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
+								if (ModelLocator.trackingList.getItemAt(cntr) is MealEvent) {
+									var theMealEvent:MealEvent = ModelLocator.trackingList.getItemAt(cntr) as MealEvent;
 									if (!isNaN(theMealEvent.correctionFactor)) {
 										if (theMealEvent.correctionFactor > 0) {
 											theMealEvent.updateMealEvent(theMealEvent.mealName,theMealEvent.comment,theMealEvent.insulinRatio,Math.round(theMealEvent.correctionFactor/(new Number(0.0555))),(new Date()).valueOf(),theMealEvent.timeStamp);	
@@ -226,9 +226,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							Settings.getInstance().setSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL,
 								((Math.round((new Number(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)))*(new Number(0.0555))*10))/10).toString());
 							//change the bloodglucoseevents that area in tracking database
-							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
-								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
-									var theEvent:BloodGlucoseEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as BloodGlucoseEvent;
+							for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
+								if (ModelLocator.trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
+									var theEvent:BloodGlucoseEvent = ModelLocator.trackingList.getItemAt(cntr) as BloodGlucoseEvent;
 									if (theEvent.unit == ModelLocator.resourceManagerInstance.getString("general","mgperdl")) {
 										theEvent.updateBloodGlucoseEvent(ModelLocator.resourceManagerInstance.getString("general","mmoll"),(Math.round(theEvent.bloodGlucoseLevel*(new Number(0.0555))*10))/10,theEvent.timeStamp,theEvent.comment,new Date().valueOf());
 									}
@@ -236,9 +236,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 								}
 							}
 							//change the correctionfactor in mealevents
-							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
-								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is MealEvent) {
-									var theMealEvent:MealEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent;
+							for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
+								if (ModelLocator.trackingList.getItemAt(cntr) is MealEvent) {
+									var theMealEvent:MealEvent = ModelLocator.trackingList.getItemAt(cntr) as MealEvent;
 									if (!isNaN(theMealEvent.correctionFactor)) {
 										if (theMealEvent.correctionFactor > 0) {
 											theMealEvent.updateMealEvent(theMealEvent.mealName,theMealEvent.comment,theMealEvent.insulinRatio,(Math.round(theMealEvent.correctionFactor*(new Number(0.0555))*10))/10,(new Date()).valueOf(),theMealEvent.timeStamp);	

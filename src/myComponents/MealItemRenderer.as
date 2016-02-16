@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -23,34 +23,10 @@ package myComponents
 	
 	public class MealItemRenderer extends LabelItemRenderer
 	{
-		/**
-		 * to display the date 
-		 */
-		//not necessary because it already has a styleabletextfield named labeldisplay -- private var dayLineDisplay:StyleableTextField;
-		
 		public function MealItemRenderer()
 		{
 			super();
 		}
-		
-		/**
-		 * override createChildren to create the StyleableTextfield control
-		 */
-		/*override protected function createChildren():void {
-		super.createChildren();
-		
-		//make sure it does not already exist
-		if (!labelDisplay) {
-		dayLineDisplay = new StyleableTextField();
-		
-		//add the child as a child of the item renderer
-		
-		addChild(dayLineDisplay);
-		label
-		}
-		}*/
-		
-		
 		
 		/**
 		 * override the data property to initialize dayLineDisplay

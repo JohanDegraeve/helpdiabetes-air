@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -97,9 +97,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			/**
 			 * just here to make sure an instance off the modellocator is held throughout the existance of the application, so it's intialized only once<br>
-			 * It doesn't necessarily need to be used, you can also use modelLocator.getInstance()
+			 * It doesn't necessarily need to be used, you can also use ModelLocator.getInstance
 			 */
-			public var modelLocator:ModelLocator = ModelLocator.getInstance();
+			private var modelLocator:ModelLocator = ModelLocator.getInstance();
 			
 			private function addedToStageHandler(event:Event):void {
 				deviceScreenHeight = height;
