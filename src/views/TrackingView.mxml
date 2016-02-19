@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		creationComplete="creationCompleteHandler(event)"
 		add="addHandler()"
 		initialize="onInitialize()"
-		activate="launchRecalculateActiveInsulin(event)"
 		>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -56,13 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private static var lastClickOnTrackingView:Number;
 			private var helpCallOut:HelpCallOut;
-			static private var timerForRecalculateActiveInsulin:Timer;
-			private var timerForRecalculateActiveInsulinForMedicinEvents:Timer;
 			private var timer:Timer;
-			[Bindable] static private var activeInsulinAmount:Number;
-			
-			[Bindable]
-			private var activeInsulin_text:String;
 			
 			private function addHandler():void {
 				if (!navigator.poppedViewReturnedObject) return; 
@@ -76,6 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				title = resourceManager.getString('trackingview','logbook');
 				lastClickOnTrackingView = (new Date()).valueOf();
 				ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
+				ModelLocator.recalculateActiveInsulin();
 			}
 			
 			private function reDrawActionButtons(event:Event = null):void {
@@ -324,75 +318,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				} /*else
 				helptext0Removed();*/
-				//launchRecalculateActiveInsulin();
 				Synchronize.getInstance().startSynchronize(false,false);
 			}
-			
-			private function launchRecalculateActiveInsulin(event:Event = null):void {
-				
-				recalculateActiveInsulin();
-				recalculateActiveInsulinPerMedicinItem();
-			}
-			
-			public function recalculateActiveInsulin(event:Event = null):void  {
-				if (ModelLocator.debugMode)
-				if (timerForRecalculateActiveInsulin != null) {
-					if (timerForRecalculateActiveInsulin.hasEventListener(TimerEvent.TIMER))
-						timerForRecalculateActiveInsulin.removeEventListener(TimerEvent.TIMER,recalculateActiveInsulin );
-					timerForRecalculateActiveInsulin.stop();					
-				}
-				
-				//calculate activeInsulin_text
-				activeInsulinAmount = ((Math.round(ModelLocator.calculateActiveInsulin((new Date()).valueOf()) * 10))/10);
-				activeInsulin_text = 
-					ModelLocator.resourceManagerInstance.getString('trackingview','active_insulin')
-					+ " = " 
-					+ activeInsulinAmount.toString() 
-					+ " " 
-					+ ModelLocator.resourceManagerInstance.getString('trackingview','internationalunit');
-				
-				timerForRecalculateActiveInsulin = new Timer(30000, 1);
-				timerForRecalculateActiveInsulin.addEventListener(TimerEvent.TIMER,recalculateActiveInsulin);
-				timerForRecalculateActiveInsulin.start();
-			}
-			
-			private function recalculateActiveInsulinPerMedicinItem(event:Event = null):void {
-				if (timerForRecalculateActiveInsulinForMedicinEvents != null) {
-					if (timerForRecalculateActiveInsulinForMedicinEvents.hasEventListener(TimerEvent.TIMER))
-						timerForRecalculateActiveInsulinForMedicinEvents.removeEventListener(TimerEvent.TIMER,recalculateActiveInsulinPerMedicinItem );
-				}
-				
-				//if total active insulin > 0, then we'll also try to update the active insulin amounts of the individual
-				//medicin events in the tracking list
-				//
-				//so we first get the list of items that are currently visible (mostly this will be the last items, hence the once that might have some active insulin
-				//for each of those medicinevents, we check if it younger than the maximum duration of insulin
-				//if yes, then redrawing is necessary, either by doing refresh, or by removing/adding this specific item
-				if (activeInsulinAmount == 0) 
-					return;
-				var indices:Vector.<int> = trackinglist.dataGroup.getItemIndicesInView();
-				var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
-				for (var cntr:int = 0;cntr < indices.length;cntr++) {
-					var itemid:int = indices[cntr];
-					//very strange but in some situation the last index points to an itemid with value > size of trackingList
-					//this happens when an element is delete remotely (on another device), a sync happens
-					// .. then the screen is refreshed locally, then this indices vector is created
-					//so to avoid an exception, before trying getitemat with value itemid, check here if itemid < length
-					if (itemid < ModelLocator.trackingList.length) {
-						var theEvent:Object = ModelLocator.trackingList.getItemAt(itemid);
-						if (theEvent is MedicinEvent) {
-							if ((theEvent as TrackingViewElement).timeStamp + maxInsulinDurationInSeconds * 1000 > (new Date()).valueOf()) {
-								ModelLocator.trackingList.removeItemAt(itemid);
-								ModelLocator.trackingList.addItem(theEvent);//this will force recalculation and redraw of the active insulin for that item
-							}
-						}	
-					}
-				}
-				timerForRecalculateActiveInsulinForMedicinEvents = new Timer(300000, 1);
-				timerForRecalculateActiveInsulinForMedicinEvents.addEventListener(TimerEvent.TIMER,recalculateActiveInsulinPerMedicinItem);
-				timerForRecalculateActiveInsulinForMedicinEvents.start();
-			}
-			
 			
 			/**
 			 * helptext for tracking list 
@@ -416,7 +343,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private function helpText3Removed(event:Event = null):void {
 				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helpText3Removed);
-				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextActiveInsulinInt) == 'true' && activeInsulinAmount > 0) {
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextActiveInsulinInt) == 'true' && ModelLocator.activeInsulinAmount > 0) {
 					var cntr:int;
 					for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
 						if (ModelLocator.trackingList.getItemAt(cntr) is MedicinEvent) {
@@ -485,19 +412,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button icon="{ModelLocator.ic_menu_close_clear_cancelImage}" id="cancelButton" click="cancelClicked(event)" />
 		<s:Button icon="{ModelLocator.searchImage_48x48}" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
-	<s:Group id="activeInsulin" visible="{activeInsulinAmount > 0}">
-		<s:Label left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}"/>
+	<s:Group id="activeInsulin" visible="{ModelLocator.activeInsulinAmount > 0}">
+		<s:Label left="10" right="0" top="10" bottom="0" width="100%" 
+				 text="{ModelLocator.resourceManagerInstance.getString('trackingview','active_insulin') + '=' + ModelLocator.activeInsulinAmount.toString()
+				 + ' ' +  ModelLocator.resourceManagerInstance.getString('trackingview','internationalunit')}"/>
 	</s:Group>
-	<s:Line width="100%" left="0" right="0" top="40" visible="{activeInsulinAmount > 0}">
+	<s:Line width="100%" left="0" right="0" top="40" visible="{ModelLocator.activeInsulinAmount > 0}">
 		<s:stroke>
 			<s:SolidColorStroke color="0x3B6999" weight="5"/>
 		</s:stroke>
 	</s:Line>	
 	
-	<s:List id="trackinglist" left="0" right="0" top="{activeInsulinAmount > 0 ? 45:0}" bottom="0" width="100%" useVirtualLayout="true" 
+	<s:List id="trackinglist" left="0" right="0" top="{ModelLocator.activeInsulinAmount > 0 ? 45:0}" bottom="0" width="100%" useVirtualLayout="true" 
 			dataProvider="{ModelLocator.trackingList}"
 			click="onListElementClicked(event)"
-			updateComplete="recalculateActiveInsulin(null)"
 			itemRendererFunction="getItemRenderer">
 		<s:layout>
 			<myComponents:TrackingViewLayout useVirtualLayout="true" id="trackinglistlayout"/>

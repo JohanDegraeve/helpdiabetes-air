@@ -212,8 +212,7 @@ package myComponents
 			comment = (value as MedicinEvent).comment;
 			bolusType = (value as MedicinEvent).bolustype;
 			var now:Number = (new Date()).valueOf();
-			trace("in MedicineventItemrender.set data, callling nr " + counter2++);
-			var activeInsulin:Number = ModelLocator.calculateActiveInsulinForSpecifiedEvent((value as MedicinEvent),now);
+			var activeInsulin:Number = (value as MedicinEvent).activeInsulinAmount;
 			if (activeInsulin > 0) {
 				var activeInsulinText:String = resourceManager.getString('editmedicineventview','active') 
 					+ " = " + ((Math.round(activeInsulin * 10))/10).toString()
@@ -280,8 +279,7 @@ package myComponents
 		private static var counter1:int = 0;
 		override public function getHeight(item:TrackingViewElement = null):Number {
 			var now:Number = (new Date()).valueOf();
-			trace("in MedicineventItemrender.getHeight, callling nr " + counter1++);
-			var activeInsulin:Number = ModelLocator.calculateActiveInsulinForSpecifiedEvent((item as MedicinEvent),now);
+			var activeInsulin:Number = (item as MedicinEvent).calculateActiveInsulinAmount(now);
 			return itemHeight + (activeInsulin == 0  ? 0 : activeInsulinAmountHeight);
 		}
 

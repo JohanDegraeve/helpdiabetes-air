@@ -183,6 +183,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			protected function activateHandler(event:Event):void
 			{
 				Synchronize.getInstance().startSynchronize(false,false,null);
+				trace("framerate = " + stage.frameRate);
+
 			}
 			
 		]]>

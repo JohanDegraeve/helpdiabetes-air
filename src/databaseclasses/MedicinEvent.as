@@ -25,6 +25,8 @@ package databaseclasses
 	import myComponents.MedicinEventItemRenderer;
 	import myComponents.TrackingViewElement;
 	
+	import utilities.FromtimeAndValueArrayCollection;
+	
 	public class MedicinEvent extends TrackingViewElement implements IListElement
 	{
 		/**
@@ -102,6 +104,14 @@ package databaseclasses
 			 return _bolusDurationInMinutes * 60 * 1000;
 		 }
 		 
+		 private var _activeInsulinAmount:Number;
+
+		 public function get activeInsulinAmount():Number
+		 {
+			 return _activeInsulinAmount;
+		 }
+
+		 
 		/**
 		 * creates a medicin event and stores it immediately in the database if storeInDatabase = true<br>
 		 * if creationTimeStamp = null, then current date and time is used<br>
@@ -128,6 +138,7 @@ package databaseclasses
 			
 			if (storeInDatabase)
 				Database.getInstance().createNewMedicinEvent(bolusType,bolusDuration, amount, medicin, _timeStamp,lastModifiedTimestamp,medicineventid, _comment, null);
+			_activeInsulinAmount = calculateActiveInsulinAmount();
 			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
@@ -152,6 +163,7 @@ package databaseclasses
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
 			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDurationInMinutes, this.eventid,_amount,_medicinName,timeStamp,lastModifiedTimestamp, _comment);
+			_activeInsulinAmount = calculateActiveInsulinAmount();
 			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
@@ -162,6 +174,70 @@ package databaseclasses
 		override public function deleteEvent():void {
 			Database.getInstance().deleteMedicinEvent(this.eventid);
 			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+		}
+		
+		/**
+		 * For a specific medicin event, calculates active insulin at the specified time, time in milliseconds<br>
+		 * If time = NaN then now is used
+		 */
+		public function calculateActiveInsulinAmount(time:Number = NaN):Number {
+			if (isNaN(time))
+				time = (new Date()).valueOf();
+			
+			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
+			var additionalMaxDurationInSeconds:Number = 0;
+			if (ModelLocator.resourceManagerInstance.getString('editmedicineventview','listofsquarewavebolustypes').indexOf(_bolustype) > -1) {
+				additionalMaxDurationInSeconds = _bolusDurationInMinutes * 60;
+			}
+			if (timeStamp + (maxInsulinDurationInSeconds  + additionalMaxDurationInSeconds) * 1000 < time)
+				return new Number(0);
+			//let's find if the name of the medicinevent that matches one of the medicins in the settings
+			var activeInsulin:Number = new Number(0);
+			for (var medicincntr:int = 0;medicincntr <  5;medicincntr++) {
+				if (Settings.getInstance().getSetting( Settings.SettingsInsulinType1 + medicincntr) == medicinName)  {
+					if (Settings.getInstance().getSetting(Settings.SettingsMedicin1_AOBActive + medicincntr) == "true")  {
+						//..zien welke range we moeten nemen
+						var x_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range1_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
+						var y_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range2_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
+						var z_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range3_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
+						var x_value:Number = Number(x_valueasString);
+						var y_value:Number = Number(y_valueasString);
+						var z_value:Number = Number(z_valueasString);
+						var settingToUse:int;	
+						if (amount < x_value)
+							settingToUse = Settings.SettingsMedicin1_range1_AOBChart + medicincntr * 4;
+						else if (amount < y_value)
+							settingToUse = Settings.SettingsMedicin1_range2_AOBChart + medicincntr * 4;
+						else if (amount < z_value)
+							settingToUse = Settings.SettingsMedicin1_range3_AOBChart + medicincntr * 4;
+						else 
+							settingToUse = Settings.SettingsMedicin1_range4_AOBChart + medicincntr * 4;
+						var fromTimeAndValueArrayCollection:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(settingToUse));
+						if (ModelLocator.resourceManagerInstance.getString('editmedicineventview','listofsquarewavebolustypes').indexOf(_bolustype) > -1) {
+							//split over 0.1 unit per injection
+							var amountOfInjections:int = amount / ModelLocator.BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES;
+							var intervalBetweenInjections:Number = _bolusDurationInMinutes / amountOfInjections;
+							var injectionsCntr:int;
+							var timeStampOfInjection:Number;
+							for (injectionsCntr = 0;injectionsCntr < amountOfInjections;injectionsCntr++) {
+								timeStampOfInjection = (timeStamp + injectionsCntr * intervalBetweenInjections * 60 * 1000);
+								if (timeStampOfInjection < time) {
+									var percentage:Number = fromTimeAndValueArrayCollection.getValue((time - timeStampOfInjection)/1000);
+									activeInsulin += ModelLocator.BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES *  percentage / 100;
+								} else 
+									break;
+							}
+						} else {
+							activeInsulin = amount * fromTimeAndValueArrayCollection.getValue((time - timeStamp)/1000) / 100;
+						}
+					} else {
+						//there's a medicinevent found with type of insulin that has a not-enbled profile
+					}
+					medicincntr = 5;
+				}
+			}
+			return activeInsulin;
+
 		}
 	}
 }

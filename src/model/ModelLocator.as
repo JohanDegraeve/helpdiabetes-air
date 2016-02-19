@@ -21,8 +21,11 @@
  */
 package model
 {
+	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
 	import mx.resources.IResourceManager;
@@ -208,6 +211,7 @@ package model
 		
 		private static var _trackingList:ArrayCollection;
 		
+		private static var timerForRecalculateActiveInsulin:Timer;
 		
 		[Bindable]
 		
@@ -302,11 +306,13 @@ package model
 		 */
 		public static var firstInitOfFoodCounterView:Boolean = true;
 		
-		public static var debugMode:Boolean = true;
+		public static var debugMode:Boolean = false;
 
 		public static var BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES:Number = 0.1;//unit s of insulin
 
 		public static var iconCache:ContentCache;
+		
+		[Bindable] static public var activeInsulinAmount:Number;
 		
 		/**
 		 * constructor
@@ -791,7 +797,6 @@ package model
 		/**
 		 * calculates active insulin at given time, if time = null then active insulin now is calculated, time in ms since 1 1 1970
 		 */
-		private static var counter4:int = 0;
 		public static function calculateActiveInsulin(time:Number = NaN):Number  {
 
 			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
@@ -806,71 +811,33 @@ package model
 				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp < time) {//we don't include events in the future
 					if (trackingList.getItemAt(cntr) is MedicinEvent) {
 						var theEvent:MedicinEvent = trackingList.getItemAt(cntr) as MedicinEvent;
-						activeInsulin += calculateActiveInsulinForSpecifiedEvent(theEvent, time);						
+						var start:Date = new Date();
+						activeInsulin += theEvent.calculateActiveInsulinAmount(time);	
+						trace("time needed in  activeinsulinamountcalculatin = " + ((new Date()).valueOf() - start.valueOf()).toString());
 					}
 				}
 			}
 			return activeInsulin;
 		}
 		
-		/**
-		 * For a specific medicin event, calculates active insulin at the specified time, time in milliseconds<br>
-		 */
-		private static var counter1:int=0;
-		public static function calculateActiveInsulinForSpecifiedEvent(theEvent:MedicinEvent, time:Number = NaN):Number {
-			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
-			var additionalMaxDurationInSeconds:Number = 0;
-			if (resourceManagerInstance.getString('editmedicineventview','listofsquarewavebolustypes').indexOf((theEvent as MedicinEvent).bolustype) > -1) {
-				additionalMaxDurationInSeconds = (theEvent as MedicinEvent).bolusDurationInMinutes * 60;
+		static public function recalculateActiveInsulin(event:Event = null):void  {
+			//if (ModelLocator.debugMode)
+			trace("in recalculateactiveinsulin");
+			if (timerForRecalculateActiveInsulin != null) {
+				if (timerForRecalculateActiveInsulin.hasEventListener(TimerEvent.TIMER))
+					timerForRecalculateActiveInsulin.removeEventListener(TimerEvent.TIMER,recalculateActiveInsulin );
+				timerForRecalculateActiveInsulin.stop();					
 			}
-			if ((theEvent as TrackingViewElement).timeStamp + (maxInsulinDurationInSeconds  + additionalMaxDurationInSeconds) * 1000 < time)
-				return new Number(0);
-			//let's find if the name of the medicinevent that matches one of the medicins in the settings
-			var activeInsulin:Number = new Number(0);
-			for (var medicincntr:int = 0;medicincntr <  5;medicincntr++) {
-				if (Settings.getInstance().getSetting( Settings.SettingsInsulinType1 + medicincntr) == theEvent.medicinName)  {
-					if (Settings.getInstance().getSetting(Settings.SettingsMedicin1_AOBActive + medicincntr) == "true")  {
-						//..zien welke range we moeten nemen
-						var x_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range1_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
-						var y_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range2_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
-						var z_valueasString:String = (Settings.getInstance().getSetting(Settings.SettingsMedicin1_range3_AOBChart + medicincntr * 4).split("-")[0] as String).split(":")[1];
-						var x_value:Number = Number(x_valueasString);
-						var y_value:Number = Number(y_valueasString);
-						var z_value:Number = Number(z_valueasString);
-						var settingToUse:int;	
-						if (theEvent.amount < x_value)
-							settingToUse = Settings.SettingsMedicin1_range1_AOBChart + medicincntr * 4;
-						else if (theEvent.amount < y_value)
-							settingToUse = Settings.SettingsMedicin1_range2_AOBChart + medicincntr * 4;
-						else if (theEvent.amount < z_value)
-							settingToUse = Settings.SettingsMedicin1_range3_AOBChart + medicincntr * 4;
-						else 
-							settingToUse = Settings.SettingsMedicin1_range4_AOBChart + medicincntr * 4;
-						var fromTimeAndValueArrayCollection:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(settingToUse));
-						if (resourceManagerInstance.getString('editmedicineventview','listofsquarewavebolustypes').indexOf(theEvent.bolustype) > -1) {
-							//split over 0.1 unit per injection
-							var amountOfInjections:int = theEvent.amount / BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES;
-							var intervalBetweenInjections:Number = theEvent.bolusDurationInMinutes / amountOfInjections;
-							var injectionsCntr:int;
-							var timeStampOfInjection:Number;
-							for (injectionsCntr = 0;injectionsCntr < amountOfInjections;injectionsCntr++) {
-								timeStampOfInjection = ((theEvent as TrackingViewElement).timeStamp + injectionsCntr * intervalBetweenInjections * 60 * 1000);
-								if (timeStampOfInjection < time) {
-									var percentage:Number = fromTimeAndValueArrayCollection.getValue((time - timeStampOfInjection)/1000);
-									activeInsulin += BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES *  percentage / 100;
-								} else 
-									break;
-							}
-						} else {
-							activeInsulin = theEvent.amount * fromTimeAndValueArrayCollection.getValue((time - (theEvent as TrackingViewElement).timeStamp)/1000) / 100;
-						}
-					} else {
-						//there's a medicinevent found with type of insulin that has a not-enbled profile
-					}
-					medicincntr = 5;
-				}
-			}
-			return activeInsulin;
+			
+			//calculate activeInsulin_text
+			var start:Date = new Date();
+			activeInsulinAmount = ((Math.round(calculateActiveInsulin() * 10))/10);
+			trace("time needed in  activeinsulinamountcalculatin = " + ((new Date()).valueOf() - start.valueOf()).toString());
+			
+			timerForRecalculateActiveInsulin = new Timer(300000, 1);
+			timerForRecalculateActiveInsulin.addEventListener(TimerEvent.TIMER,recalculateActiveInsulin);
+			timerForRecalculateActiveInsulin.start();
 		}
+		
 	}
 }
