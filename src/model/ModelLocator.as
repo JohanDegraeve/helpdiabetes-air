@@ -218,16 +218,6 @@ package model
 		private static var timerForRecalculateActiveInsulin:Timer;
 		
 		[Bindable]
-		
-		/**
-		 * copyOfTrackingList is the arraycollection used as list in the trackingview<br>
-		 * trackingList is the list that will be maintained, copy is simply set equal to trackinglist, but when doing lots of changes
-		 * then copy can be set to null temporarily, do the changes on trackinglist, and then reassign copy to trackinglist<br><br>
-		 * the arraycollection used as list in trackingview<br>
-		 * It is declared here because it will be used in other classes as well, eg during intialization of the application it will already be created and initialized<br>
-		 * The _trackingList contains all events : mealevents, bloodglucoseevents, exerciseevents and medicinevents and also DayLine objects are stored here. Sorted by timestamp.<br>
-		 * any item in the _trackingList must be of a class extended from TrackingViewElement
-		 */
 		public static function get trackingList():ArrayCollection
 			
 		{

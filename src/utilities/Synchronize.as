@@ -1078,7 +1078,7 @@ package utilities
 								if (((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][5][0])] as String) == "true") {
 									//its a deleted item remove it from both lists
 									remoteElements.removeItemAt(k);
-									copyTrackingListIfNotDoneYet();
+									//copyTrackingListIfNotDoneYet();
 									//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
 									NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(j));
 									(localElements.getItemAt(j) as MedicinEvent).deleteEvent();//delete from local database
@@ -1268,7 +1268,7 @@ package utilities
 									if (((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 										//its a deleted item remove it from both lists
 										remoteElements.removeItemAt(k);
-										copyTrackingListIfNotDoneYet();
+										//copyTrackingListIfNotDoneYet();
 										//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
 										NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(j));
 										(localElements.getItemAt(j) as BloodGlucoseEvent).deleteEvent();//delete from local database
@@ -1427,7 +1427,7 @@ package utilities
 									if (((remoteElements.getItemAt(k) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 										//its a deleted item remove it from both lists
 										remoteElements.removeItemAt(k);
-										copyTrackingListIfNotDoneYet();
+										//copyTrackingListIfNotDoneYet();
 										localElementsUpdated = true;//as we deleted one from local database, 
 										//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
 										NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(j));
@@ -1597,7 +1597,7 @@ package utilities
 											NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(j));
 											(localElements.getItemAt(j) as MealEvent).deleteEvent();//delete from local database
 											localElementsUpdated = true;//as we deleted one from local database,
-											copyTrackingListIfNotDoneYet();
+											//copyTrackingListIfNotDoneYet();
 											localElements.removeItemAt(j);//remove also from list used here
 											j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 											break;
@@ -1669,7 +1669,7 @@ package utilities
 						//but only if deleted is false
 						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "false") {
 							localElementsUpdated = true;
-							copyTrackingListIfNotDoneYet();							
+							//copyTrackingListIfNotDoneYet();							
 							trackingList.addItem(new MealEvent(//in contradiction to medicin/bloodglucose and exerciseevents, I must add new mealevents to the trackinglist, because if i don't, the adding of selectedfooditems would fail because I wouldn't find the mealevent
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_mealname)],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_insulinratio)],
@@ -1767,7 +1767,7 @@ package utilities
 										//NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(j)); - don't because we don't seperately add selectedfooditems in NS
 										(localElements.getItemAt(j) as SelectedFoodItem).deleteEvent();//delete from local database
 										localElementsUpdated = true;//as we deleted one from local database,
-										copyTrackingListIfNotDoneYet();
+										//copyTrackingListIfNotDoneYet();
 										localElements.removeItemAt(j);//remove also from list used here
 										j--;//j is going to be incrased and will point to the next element, as we've just deleted one
 										break;
@@ -3755,14 +3755,14 @@ package utilities
 				} else
 					currentSyncTimeStamp = currentSyncTimeStamp - (secondsBetweenTwoSync * 1000 + 1);
 				
-				if (localElementsUpdated) {
+				/*if (localElementsUpdated) {
 					localElementsUpdated = false;
-					copyTrackingListIfNotDoneYet();//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
+					//copyTrackingListIfNotDoneYet();//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
 					ModelLocator.trackingList = new ArrayCollection();
 					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
 					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
-				}
+				}*/
 				
 				if (rerunNecessary) {
 					currentSyncTimeStamp = new Date().valueOf();
@@ -3808,7 +3808,7 @@ package utilities
 			NightScoutSync.getInstance().startNightScoutSync(globalImmediateRunNecessary);
 			globalImmediateRunNecessary = false;
 			
-			function getAllEventsAndFillUpMealsFinished(event:Event):void
+			/*function getAllEventsAndFillUpMealsFinished(event:Event):void
 			{
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, getAllEventsAndFillUpMealsFinished);
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, getAllEventsAndFillUpMealsFinished);
@@ -3817,7 +3817,7 @@ package utilities
 				ModelLocator.refreshMeals();
 			//	ModelLocator.copyOfTrackingList = ModelLocator.trackingList;
 				ModelLocator.trackingEventToShow = previousTrackingEventToShow;//could be a problem if that previous event was just deleted
-			}
+			}*/
 		}
 		
 		public function addObjectToBeDeleted(object:Object):void {
@@ -4223,14 +4223,14 @@ package utilities
 			
 		}
 		
-		private function copyTrackingListIfNotDoneYet():void {
+		/*private function copyTrackingListIfNotDoneYet():void {
 			if (!trackingListAlreadyModified) {
 				trackingListAlreadyModified = true;
 				previousTrackingEventToShow = ModelLocator.trackingEventToShow;
 				ModelLocator.trackingEventToShow = (ModelLocator.infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
 			//	ModelLocator.copyOfTrackingList = ModelLocator.infoTrackingList;
 			}			
-		}
+		}*/
 		
 		public static function compareFoodItemDescriptions(a:Object,b:Object):int {
 			//trace("Synchronize.as : in compare a = " + (a as XML).description.text() + ", b = " + (b as XML).description.text());

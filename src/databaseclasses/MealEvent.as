@@ -67,7 +67,7 @@ package databaseclasses
 		
 		private static var recalculateInsulinAmountRunning:Boolean = false;
 		private static var rerunrecalculateInsulinAmountNecessary:Boolean = false;
-		private static var trackingListCounter:int = 0;
+		private static var trackingListCounter:int = -1;
 		
 		/**
 		 * the meal that will hod this mealEvent<br> 
@@ -689,9 +689,11 @@ package databaseclasses
 				rerunrecalculateInsulinAmountNecessary = true;
 				return;
 			}
+			if (!recalculateInsulinAmountRunning && trackingListCounter == -1) {
+				trackingListCounter = ModelLocator.trackingList.length - 1;
+			}
 			recalculateInsulinAmountRunning = true;
-			if (trackingListCounter == ModelLocator.trackingList.length) {//stop calculation
-				trackingListCounter = 0;
+			if (trackingListCounter == -1) {//stop calculation
 				recalculateInsulinAmountRunning = false;
 				startTimeStamp = 0;
 				if (rerunrecalculateInsulinAmountNecessary) {
@@ -705,14 +707,13 @@ package databaseclasses
 					startTimeStamp = (new Date()).valueOf();
 					maxCalculationDurationInms = (1 / ModelLocator.frameRate * 1000 / 3);//taking maximum one third of the frame period per block of recalculations 
 				} 
-				if (ModelLocator.trackingList.getItemAt(trackingListCounter) is MealEvent) {
-					(ModelLocator.trackingList.getItemAt(trackingListCounter) as MealEvent).recalculateInsulinAmount();
+				if (ModelLocator.trackingList.length > trackingListCounter) {
+					if (ModelLocator.trackingList.getItemAt(trackingListCounter) is MealEvent) {
+						(ModelLocator.trackingList.getItemAt(trackingListCounter) as MealEvent).recalculateInsulinAmount();
+					}
+					trace("processed one trackingviewelement");
 				}
-				trace("processed one trackingviewelement");
-				trackingListCounter++;
-				//trace("startTimeStamp = " + startTimeStamp);
-				//trace("maxCalculationDurationInms = " + maxCalculationDurationInms);
-				//trace("(new Date()).valueOf()) = " + (new Date()).valueOf().valueOf());
+				trackingListCounter--;
 				if (((startTimeStamp + maxCalculationDurationInms) < (new Date()).valueOf())) {
 					trace("took too long, restarting timer");
 					startTimeStamp = 0;
@@ -724,6 +725,5 @@ package databaseclasses
 				}
 			}
 		}
-		
 	}
 }
