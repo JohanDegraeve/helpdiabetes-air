@@ -155,10 +155,12 @@ package databaseclasses
 			//update also the lastmodifiedtimestamp of the parent mealevent if the selectedfooditem lastmodifiedtimestamp is more recent
 			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
+			var newParentMealEventLastModifiedTimeStamp = parentMealEvent.lastModifiedTimestamp;
 			if (parentMealEvent != null)
 				if (parentMealEvent.lastModifiedTimestamp < lastModifiedTimestamp) {
-					parentMealEvent.updateMealEvent(parentMealEvent.mealName,parentMealEvent.comment,parentMealEvent.insulinRatio,parentMealEvent.correctionFactor,this.lastModifiedTimestamp,parentMealEvent.timeStamp);
+					newParentMealEventLastModifiedTimeStamp = this.lastModifiedTimestamp
 				}
+			parentMealEvent.updateMealEvent(parentMealEvent.mealName,parentMealEvent.comment,parentMealEvent.insulinRatio,parentMealEvent.correctionFactor,newParentMealEventLastModifiedTimeStamp,parentMealEvent.timeStamp);
 		}
 		
 	}
