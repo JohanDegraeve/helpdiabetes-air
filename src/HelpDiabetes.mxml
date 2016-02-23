@@ -106,6 +106,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				deviceScreenWidth = width;
 				minimumDeviceSize = Math.min(deviceScreenHeight,deviceScreenWidth);
 
+				this.stage.frameRate = 12;
+
 				//it's also time to check Settings.SettingsSelectedOrientation
 				if (Settings.getInstance().getSetting(Settings.SettingsSelectedOrientation) == "0") {//portrait
 					this.stage.setAspectRatio(StageAspectRatio.PORTRAIT);
@@ -183,8 +185,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			protected function activateHandler(event:Event):void
 			{
 				Synchronize.getInstance().startSynchronize(false,false,null);
-				trace("framerate = " + stage.frameRate);
-
+				ModelLocator.frameRate = stage.frameRate;
 			}
 			
 		]]>

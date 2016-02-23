@@ -212,9 +212,8 @@
 					 timer2 = null;
 				 }
 				 
-				 trace("NightScoutSync.as : in startNightScoutSync");
-				 //to make sure there's at least one complete resync per day
-				 if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteNightScoutSync))) {
+				 
+				 if (Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteNightScoutSync) == "-1") {
 					 Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,
 						 ( (
 							 (new Date()).valueOf() 
@@ -223,7 +222,21 @@
 						 ).toString()
 						 )
 					 );
-					 Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteNightScoutSync,(new Date()).date.toString());
+					 Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteNightScoutSync,(new Date()).date.toString());//not correct in case the sync fails
+				 } else {
+					 //to make sure there's at least one complete resync per day
+					 if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteNightScoutSync))) {
+						 Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,
+							 ( (
+								 (new Date()).valueOf() 
+								 - 
+								 2 * 24 * 3600 * 1000 // resyncing only the last two days because nightscoutsync has the bad behaviour of putting all objects back to ns, even if it already exists up there
+								 //that's a consequence of not being able to use lastmodifiedtimestamp
+							 ).toString()
+							 )
+						 );
+						 Settings.getInstance().setSetting(Settings.SettingsDayOfLastCompleteNightScoutSync,(new Date()).date.toString());//not correct in case the sync fails
+					 }
 				 }
 				 
 				 var timeSinceLastSyncMoreThanXMinutes:Boolean = (new Date().valueOf() - currentSyncTimeStamp) > normalValueForSecondsBetweenTwoSync * 1000;
@@ -242,6 +255,7 @@
 					 currentSyncTimeStamp = new Date().valueOf();
 					 asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 					 
+					 trace("NightScoutSync.as : starting startNightScoutSync");
 					 synchronize();
 				 } else {
 					 if (immediateRunNecessary) {
@@ -255,7 +269,7 @@
 					 timer2.start();
 				 }
 			 }
-
+			 
 		 }
 		 
 		 private function synchronize():void {
@@ -443,9 +457,9 @@
 													 //it can also be deleted from listOfElementsToBeDeleted
 													 listOfElementsToBeDeleted.removeItemAt(indexInListOfElementsToBeDeleted);
 												 } else {
-													// if (remoteElement.tobeupdatedatns)
-													//	 delete remoteElement['tobeupdatedatns'];
-													//... removed that because if tobeudpatedatns is true then it's because it needs update
+													 // if (remoteElement.tobeupdatedatns)
+													 //	 delete remoteElement['tobeupdatedatns'];
+													 //... removed that because if tobeudpatedatns is true then it's because it needs update
 												 }
 											 } else {
 												 //change the applicable values of the remoteElement
@@ -489,8 +503,8 @@
 													 //it can also be deleted from listOfElementsToBeDeleted
 													 listOfElementsToBeDeleted.removeItemAt(indexInListOfElementsToBeDeleted);
 												 } else {
-													// if (remoteElement.tobeupdatedatns)
-													//	 delete remoteElement['tobeupdatedatns'];
+													 // if (remoteElement.tobeupdatedatns)
+													 //	 delete remoteElement['tobeupdatedatns'];
 												 }
 											 } else {
 												 if ((localElement as MedicinEvent).amount == 0)
@@ -653,31 +667,31 @@
 											 // for instance, one device has uploaded un update to nightscout, but almost in parallel another devices syncs with google, but that update was not there on time
 											 // but it sees to update at ns, so it downloads the carbs and creates a "item from ns".
 											 /*if (remoteElement.carbs) {
-												 //we're replacing the carbs, we will not start analyzing the notes field (which may contain a list of selected fooditems) 
-												 //to see which selectedfooditems need to be deleted - we'll just delete them all and add a new one
-												 //let's first add the dummy selecteditem
-												 var dummySelectedItem:SelectedFoodItem = createDummySelectedFoodItem(new Number(remoteElement.carbs));
-												 var theMealEvent:MealEvent = (localElement as MealEvent);
-												 theMealEvent.addSelectedFoodItem(dummySelectedItem);
-												 for (var selfooditemctr:int = 0; selfooditemctr < theMealEvent.selectedFoodItems.length; selfooditemctr++) {
-													 var selectedFoodItemToCheck = theMealEvent.selectedFoodItems.getItemAt(selfooditemctr) as SelectedFoodItem;
-													 if (! (selectedFoodItemToCheck.eventid == dummySelectedItem.eventid)) {
-														 Synchronize.getInstance().addObjectToBeDeleted(selectedFoodItemToCheck);
-														 theMealEvent.removeSelectedFoodItem(selectedFoodItemToCheck);
-													 }
-												 }
-												 theMealEvent.updateMealEvent(
-													 (localElement as MealEvent).mealName, 
-													 newComment,
-													 (localElement as MealEvent).insulinRatio,
-													 (localElement as MealEvent).correctionFactor,
-													 lastModifiedTimeStamp,
-													 newCreationTimeStamp
-												 );
+											 //we're replacing the carbs, we will not start analyzing the notes field (which may contain a list of selected fooditems) 
+											 //to see which selectedfooditems need to be deleted - we'll just delete them all and add a new one
+											 //let's first add the dummy selecteditem
+											 var dummySelectedItem:SelectedFoodItem = createDummySelectedFoodItem(new Number(remoteElement.carbs));
+											 var theMealEvent:MealEvent = (localElement as MealEvent);
+											 theMealEvent.addSelectedFoodItem(dummySelectedItem);
+											 for (var selfooditemctr:int = 0; selfooditemctr < theMealEvent.selectedFoodItems.length; selfooditemctr++) {
+											 var selectedFoodItemToCheck = theMealEvent.selectedFoodItems.getItemAt(selfooditemctr) as SelectedFoodItem;
+											 if (! (selectedFoodItemToCheck.eventid == dummySelectedItem.eventid)) {
+											 Synchronize.getInstance().addObjectToBeDeleted(selectedFoodItemToCheck);
+											 theMealEvent.removeSelectedFoodItem(selectedFoodItemToCheck);
+											 }
+											 }
+											 theMealEvent.updateMealEvent(
+											 (localElement as MealEvent).mealName, 
+											 newComment,
+											 (localElement as MealEvent).insulinRatio,
+											 (localElement as MealEvent).correctionFactor,
+											 lastModifiedTimeStamp,
+											 newCreationTimeStamp
+											 );
 											 } else {
-												 //there's no carbs
-												 //local element should be deleted
-												 //can this happen ?
+											 //there's no carbs
+											 //local element should be deleted
+											 //can this happen ?
 											 }*/
 											 //localElementsUpdated = true;
 										 }
@@ -728,6 +742,7 @@
 									 removeBRInNotes(remoteElement.notes as String),
 									 DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at).valueOf(),
 									 new Number(remoteElement.helpdiabetes.lastmodifiedtimestamp),
+									 true,
 									 true
 								 ); 
 								 localElementsUpdated = true;
@@ -759,7 +774,7 @@
 									 insulinRatio = new Number(Settings.getInstance().getSetting(Settings.SettingINSULIN_RATIO_SUPPER));
 								 }
 								 var correctionFactorList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
-
+								 
 								 var theMealEvent:MealEvent = new MealEvent(//in contradiction to medicin/bloodglucose and exerciseevents, I must add new mealevents to the trackinglist, because if i don't, the adding of selectedfooditems would fail because I wouldn't find the mealevent
 									 "Meal from NightScout",
 									 insulinRatio,
@@ -871,7 +886,6 @@
 					 }
 					 newElement["_id"] = eventId;
 					 newElement["eventTime"] = (localElement as TrackingViewElement).timeStamp;
-					 newElement["enteredBy"] = "helpdiabetes";
 					 var helpDiabetesObject:Object = new Object();
 					 //helpDiabetesObject["deleted"] = "false"; not really useful because nightscout itself will not take this field into account - better to use google sync for that and to delete the object at NS effectively in stead of marking it as deleted
 					 helpDiabetesObject["lastmodifiedtimestamp"] = (new Date((localElement as TrackingViewElement).lastModifiedTimestamp)).valueOf();
@@ -936,8 +950,8 @@
 			 } else if (remoteElements.length > 0) {
 				 var remoteElement:Object = remoteElements.getItemAt(0);
 				 if (remoteElement.tobeupdatedatns) {
-						 delete remoteElement['tobeupdatedatns'];
-						 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.PUT,null,JSON.stringify(remoteElement),updateRemoteElements,true);
+					 delete remoteElement['tobeupdatedatns'];
+					 createAndLoadURLRequest(nightScoutTreatmentsUrl, URLRequestMethod.PUT,null,JSON.stringify(remoteElement),updateRemoteElements,true);
 				 } else {
 					 //just remove the element, no update needed
 					 remoteElements.removeItemAt(0);
@@ -1020,7 +1034,7 @@
 				 trackingListAlreadyModified = true;
 				 previousTrackingEventToShow = ModelLocator.trackingEventToShow;
 				 ModelLocator.trackingEventToShow = (ModelLocator.infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
-				// ModelLocator.copyOfTrackingList = ModelLocator.infoTrackingList;
+				 // ModelLocator.copyOfTrackingList = ModelLocator.infoTrackingList;
 				 //TrackingView.recalculateActiveInsulin();
 			 }			
 		 }
@@ -1075,7 +1089,7 @@
 				 ModelLocator.trackingList.refresh();
 				 
 				 ModelLocator.refreshMeals();
-				// ModelLocator.copyOfTrackingList = ModelLocator.trackingList;
+				 // ModelLocator.copyOfTrackingList = ModelLocator.trackingList;
 				 ModelLocator.trackingEventToShow = previousTrackingEventToShow;//could be a problem if that previous event was just deleted
 			 }
 			 

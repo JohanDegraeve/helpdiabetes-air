@@ -2258,8 +2258,8 @@ package databaseclasses
 			}
 			
 			function failedGettingSelectedFoodItems(error:SQLErrorEvent):void {
-				localSqlStatement.removeEventListener(SQLEvent.RESULT,mealEventsRetrieved);
-				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,mealEventRetrievalFailed);
+				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
+				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
 				trace("Database.as : Failed to get all selectedFoodItems. Database0061");
 				if (globalDispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
@@ -2288,6 +2288,7 @@ package databaseclasses
 						} else {
 							currentMealEventID = mealEventId;
 							selectedFoodItems.refresh();
+
 							var newMealEvent:MealEvent = new MealEvent(o.mealname as String,
 								o.insulinratio as Number,
 								o.correctionfactor as Number,
@@ -2314,11 +2315,12 @@ package databaseclasses
 						}
 					}
 				}
-				localSqlStatement.addEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
+				localSqlStatement.addEventListener(SQLEvent.RESULT,exerciseEventsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,exerciseEventsRetrievalFailed);
 				localSqlStatement.sqlConnection = aConn;
-				localSqlStatement.text = GET_ALLMEDICINEVENTS;
+				localSqlStatement.text = GET_ALLEXERCISEEVENTS;
 				localSqlStatement.execute();
+
 			}
 			
 			function bloodGlucoseEventsRetrieved(result:SQLEvent):void {
@@ -2341,7 +2343,7 @@ package databaseclasses
 							var tempLevel:Number = o.value as Number;
 							if (o.unit as String  == ModelLocator.resourceManagerInstance.getString('general','mmoll'))
 								tempLevel = tempLevel/10;
-							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(tempLevel as Number,o.unit as String, bloodGlucoseEventId, o.comment_2 as String, o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false);
+							var newBloodGlucoseEvent:BloodGlucoseEvent = new BloodGlucoseEvent(tempLevel as Number,o.unit as String, bloodGlucoseEventId, o.comment_2 as String, o.creationtimestamp as Number,o.lastmodifiedtimestamp as Number,false, false);
 							ModelLocator.trackingList.addItem(newBloodGlucoseEvent);
 							var creationTimeStampAsDate:Date = new Date(newBloodGlucoseEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2359,11 +2361,10 @@ package databaseclasses
 					}
 				}
 				
-				
-				localSqlStatement.addEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
+				localSqlStatement.addEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
 				localSqlStatement.sqlConnection = aConn;
-				localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
+				localSqlStatement.text = GET_ALLMEDICINEVENTS;
 				localSqlStatement.execute();
 				
 			}
@@ -2401,7 +2402,7 @@ package databaseclasses
 							
 							var medicinName:String = medicinArray[0];
 							
-							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number, medicinName, medicinEventId, o.comment_2 as String, o.creationtimestamp as Number, o.lastmodifiedtimestamp as Number, false, bolusType, bolusDuration);
+							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number, medicinName, medicinEventId, o.comment_2 as String, o.creationtimestamp as Number, o.lastmodifiedtimestamp as Number, false, bolusType, bolusDuration, false);
 							ModelLocator.trackingList.addItem(newMedicinEvent);
 							var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2418,12 +2419,12 @@ package databaseclasses
 						}
 					}
 				}
-				
-				localSqlStatement.addEventListener(SQLEvent.RESULT,exerciseEventsRetrieved);
-				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,exerciseEventsRetrievalFailed);
+				localSqlStatement.addEventListener(SQLEvent.RESULT,selectedFoodItemsRetrieved);
+				localSqlStatement.addEventListener(SQLErrorEvent.ERROR,failedGettingSelectedFoodItems);
 				localSqlStatement.sqlConnection = aConn;
-				localSqlStatement.text = GET_ALLEXERCISEEVENTS;
+				localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
 				localSqlStatement.execute();
+
 			}
 			
 			function exerciseEventsRetrieved(result:SQLEvent):void {
@@ -2476,13 +2477,11 @@ package databaseclasses
 				// now populate ModelLocator.meals
 				ModelLocator.refreshMeals();
 				
-				//for all mealevents, we will recalculate insulinamount
-				for (var eventcntr:Number = 0;eventcntr < ModelLocator.trackingList.length;eventcntr++) {
-					if (ModelLocator.trackingList.getItemAt(eventcntr) is MealEvent) {
-						(ModelLocator.trackingList.getItemAt(eventcntr) as MealEvent).recalculateInsulinAmount();
-					}
-				}
-				
+				var start:Number = (new Date()).valueOf();
+				trace ("in database.as starting to go through the mealevents");
+				MealEvent.asyncRecalculateInsulinAmountForAllMealEvents(null, true);
+				trace("duration in database.as to go through the mealevents = " + ((new Date()).valueOf() - start)/1000 + " s");
+
 				if (globalDispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					globalDispatcher.dispatchEvent(event);
@@ -2494,10 +2493,10 @@ package databaseclasses
 			function exerciseEventsRetrievalFailed(error:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,exerciseEventsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,exerciseEventsRetrievalFailed);
-				trace("Database.as : Failed to get all mealevents. Database0095");
+				trace("Database.as : Failed to get all exerciseevents. Database0095");
 				if (globalDispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
-					event.data = "Failed to get all mealevents. Database0095";
+					event.data = "Failed to get all exerciseevents. Database0095";
 					globalDispatcher.dispatchEvent(event);
 					globalDispatcher =  null;
 				}
@@ -2506,10 +2505,10 @@ package databaseclasses
 			function medicinEventsRetrievalFailed(error:SQLErrorEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,medicinEventsRetrieved);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,medicinEventsRetrievalFailed);
-				trace("Database.as : Failed to get all mealevents. Database0094");
+				trace("Database.as : Failed to get all medicinevents. Database0094");
 				if (globalDispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
-					event.data = "Failed to get all mealevents. Database0094";
+					event.data = "Failed to get all medicinevents. Database0094";
 					globalDispatcher.dispatchEvent(event);
 					globalDispatcher =  null;
 				}

@@ -42,6 +42,7 @@ package model
 	import databaseclasses.Settings;
 	
 	import myComponents.DayLine;
+	import myComponents.MealEventItemRenderer;
 	import myComponents.SimpleTextEvent;
 	import myComponents.TrackingViewElement;
 	
@@ -109,6 +110,9 @@ package model
 		public static var addImage48x48:Image;
 		public static var ic_upImage:Image;
 		public static var ic_downImage:Image;
+		/**
+		 * should only be used when determining maximum duration for calculations (like insulinrecalculation).
+		 */public static var frameRate:int = 24;
 		
 		/**
 		 * sets searchActive<br>
@@ -306,7 +310,7 @@ package model
 		 */
 		public static var firstInitOfFoodCounterView:Boolean = true;
 		
-		public static var debugMode:Boolean = false;
+		public static var debugMode:Boolean = true;
 
 		public static var BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES:Number = 0.1;//unit s of insulin
 
@@ -813,7 +817,6 @@ package model
 						var theEvent:MedicinEvent = trackingList.getItemAt(cntr) as MedicinEvent;
 						var start:Date = new Date();
 						activeInsulin += theEvent.calculateActiveInsulinAmount(time);	
-						trace("time needed in  activeinsulinamountcalculatin = " + ((new Date()).valueOf() - start.valueOf()).toString());
 					}
 				}
 			}
@@ -832,7 +835,6 @@ package model
 			//calculate activeInsulin_text
 			var start:Date = new Date();
 			activeInsulinAmount = ((Math.round(calculateActiveInsulin() * 10))/10);
-			trace("time needed in  activeinsulinamountcalculatin = " + ((new Date()).valueOf() - start.valueOf()).toString());
 			
 			timerForRecalculateActiveInsulin = new Timer(300000, 1);
 			timerForRecalculateActiveInsulin.addEventListener(TimerEvent.TIMER,recalculateActiveInsulin);

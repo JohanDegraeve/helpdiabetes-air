@@ -265,7 +265,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						unit,
 						DateTimeUtilities.createEventId() + "-glucose",
 						comment,//comment
-						eventDateAndTime.valueOf());
+						eventDateAndTime.valueOf(),
+						Number.NaN,
+						true,
+						true);
 					ModelLocator.trackingList.addItem(theBloodGlucoseEvent);
 				} else {
 					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText), eventDateAndTime.valueOf(), comment,new Date().valueOf());

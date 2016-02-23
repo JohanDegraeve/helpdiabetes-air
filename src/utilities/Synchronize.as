@@ -690,7 +690,6 @@ package utilities
 					timer2 = null;
 				}
 				
-				trace("Synchronize.as : in startsynchronize");
 				//to make sure there's at least one complete resync per day
 				if ((new Date()).date != new Number(Settings.getInstance().getSetting(Settings.SettingsDayOfLastCompleteGoogleSync))) {
 					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,
@@ -743,8 +742,10 @@ package utilities
 					
 					if (onlySyncTheSettings)
 						getTheSettings();
-					else
+					else {
 						synchronize();
+						trace("Synchronize.as : starting startsynchronize");						
+					}
 				} else {
 					if (immediateRunNecessary) {
 						rerunNecessary = true;
@@ -1340,7 +1341,7 @@ package utilities
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
-								true));
+								true, true));
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)]);
 						}
 					}

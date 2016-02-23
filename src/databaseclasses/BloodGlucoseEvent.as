@@ -58,7 +58,7 @@ package databaseclasses
 		 * if creationTimeStamp = null, then current date and time is used<br>
 		 * if newLastModifiedTimestamp = null, then current date and time is used
 		 */
-		public function BloodGlucoseEvent(glucoseLevel:Number, unit:String, bloodglucoseEventId:String, newcomment:String, creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true )
+		public function BloodGlucoseEvent(glucoseLevel:Number, unit:String, bloodglucoseEventId:String, newcomment:String, creationTimeStamp:Number, newLastModifiedTimeStamp:Number, storeInDatabase:Boolean, recalculateInsulinAmount:Boolean )
 		{
 			this._bloodGlucoseLevel = glucoseLevel;	
 			this._unit = unit;
@@ -76,7 +76,8 @@ package databaseclasses
 
 			if (storeInDatabase)
 				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,lastModifiedTimestamp,unit,bloodglucoseEventId,_comment,null);
-			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			if (recalculateInsulinAmount)
+				ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		

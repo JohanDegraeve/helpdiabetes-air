@@ -17,11 +17,18 @@
  */
 package databaseclasses
 {
+	import flash.display.Stage;
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
-	import mx.resources.ResourceManager;
+	
+	import spark.components.Application;
+	import spark.containers.Navigator;
+	import spark.effects.CallAction;
 	
 	import model.ModelLocator;
 	
@@ -58,6 +65,10 @@ package databaseclasses
 		
 		private var _meal:Meal;
 		
+		private static var recalculateInsulinAmountRunning:Boolean = false;
+		private static var rerunrecalculateInsulinAmountNecessary:Boolean = false;
+		private static var trackingListCounter:int = 0;
+		
 		/**
 		 * the meal that will hod this mealEvent<br> 
 		 */
@@ -86,6 +97,8 @@ package databaseclasses
 			return _selectedFoodItems;
 		}
 		
+		private static var temp:Number = 0;
+		private static var amountoftimesactiveinsuliniscalcualted:int = 0;
 		
 		/**
 		 * the calculated amount, in fact a redundant value because it can be derived from other values here<br>
@@ -470,7 +483,11 @@ package databaseclasses
 						 ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
 					 
 					 //now substract the active insulin
+					 var start:Number = (new Date()).valueOf();
 					 activeInsulin = ModelLocator.calculateActiveInsulin(timeStamp);
+					 temp += ((new Date()).valueOf() - start)/1000;
+					 amountoftimesactiveinsuliniscalcualted++;
+					 trace("duration to calculate activeinsulion = " + ((new Date()).valueOf() - start)/1000 + " s, total duration = " + temp + " s, amount = " + amountoftimesactiveinsuliniscalcualted);
 					 
 					 if (activeInsulin > 0) {
 						 returnValue += "{active_insulin}* = " + ((Math.round(activeInsulin * 10))/10).toString() + "\n";
@@ -589,14 +606,14 @@ package databaseclasses
 				trace("in updateselectedfooditemchosenamount, setting mealevent lastmodifiedtimetamp to " + lastModifiedTimestamp);
 			}
 			recalculateTotals();
-/*			//find the id
+			/*			//find the id
 			for (var ij:int=0;ij < _selectedFoodItems.length; ij++) {
-				if ((_selectedFoodItems.getItemAt(ij) as SelectedFoodItem) == selectedFoodItem) {
-					(_selectedFoodItems.getItemAt(ij) as SelectedFoodItem).chosenAmount = newAmount;
-					recalculateTotals();
-					ij = _selectedFoodItems.length;
-					
-				}
+			if ((_selectedFoodItems.getItemAt(ij) as SelectedFoodItem) == selectedFoodItem) {
+			(_selectedFoodItems.getItemAt(ij) as SelectedFoodItem).chosenAmount = newAmount;
+			recalculateTotals();
+			ij = _selectedFoodItems.length;
+			
+			}
 			}*/
 		}
 		
@@ -611,8 +628,8 @@ package databaseclasses
 			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
 			trace(" in removeselectedfooditem, setting mealevent lastmodifiedtimetamp to " + lastModifiedTimestamp);
-				lastModifiedTimestamp = (new Date()).valueOf();
-
+			lastModifiedTimestamp = (new Date()).valueOf();
+			
 		}
 		
 		/**
@@ -654,5 +671,59 @@ package databaseclasses
 			
 			Database.getInstance().updateMealEvent(this.eventid,newMealName,newInsulinRatio,newCorrectionFactor,newLastModifiedTimeStamp,newCreationTimeStamp,_comment,null);
 		}
+		
+		/**
+		 * to be used in asyncRecalculateInsulinAmountForAllMealEvents only
+		 */
+		private static var startTimeStamp:Number = 0;
+		/**
+		 * to be used in asyncRecalculateInsulinAmountForAllMealEvents only
+		 */
+		private static var maxCalculationDurationInms:Number;
+		/**
+		 * to be used in asyncRecalculateInsulinAmountForAllMealEvents only
+		 */
+		private static var timerForAsyncRecalculateTimerFunction:Timer;
+		public static function asyncRecalculateInsulinAmountForAllMealEvents(event:Event,newstart:Boolean = false):void {
+			if (recalculateInsulinAmountRunning && newstart) {
+				rerunrecalculateInsulinAmountNecessary = true;
+				return;
+			}
+			recalculateInsulinAmountRunning = true;
+			if (trackingListCounter == ModelLocator.trackingList.length) {//stop calculation
+				trackingListCounter = 0;
+				recalculateInsulinAmountRunning = false;
+				startTimeStamp = 0;
+				if (rerunrecalculateInsulinAmountNecessary) {
+					rerunrecalculateInsulinAmountNecessary = false;
+					asyncRecalculateInsulinAmountForAllMealEvents(null,false);
+				}
+			} else {
+				//here we run the actual recalculation
+				//but if startTimeStamp = 0 it means asyncRecalculateInsulinAmountForAllMealEvents was called by another function, timer still needs to be set
+				if (startTimeStamp == 0) {
+					startTimeStamp = (new Date()).valueOf();
+					maxCalculationDurationInms = (1 / ModelLocator.frameRate * 1000 / 3);//taking maximum one third of the frame period per block of recalculations 
+				} 
+				if (ModelLocator.trackingList.getItemAt(trackingListCounter) is MealEvent) {
+					(ModelLocator.trackingList.getItemAt(trackingListCounter) as MealEvent).recalculateInsulinAmount();
+				}
+				trace("processed one trackingviewelement");
+				trackingListCounter++;
+				//trace("startTimeStamp = " + startTimeStamp);
+				//trace("maxCalculationDurationInms = " + maxCalculationDurationInms);
+				//trace("(new Date()).valueOf()) = " + (new Date()).valueOf().valueOf());
+				if (((startTimeStamp + maxCalculationDurationInms) < (new Date()).valueOf())) {
+					trace("took too long, restarting timer");
+					startTimeStamp = 0;
+					timerForAsyncRecalculateTimerFunction = new Timer(1 / ModelLocator.frameRate * 1000, 1);
+					timerForAsyncRecalculateTimerFunction.addEventListener(TimerEvent.TIMER,asyncRecalculateInsulinAmountForAllMealEvents);
+					timerForAsyncRecalculateTimerFunction.start();
+				} else {
+					asyncRecalculateInsulinAmountForAllMealEvents(null, false);						
+				}
+			}
+		}
+		
 	}
 }

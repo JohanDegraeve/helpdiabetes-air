@@ -118,7 +118,7 @@ package databaseclasses
 		 * if newLastModifiedTimestamp = null, then current date and time is used<br>
 		 * 
 		 */
-		public function MedicinEvent(amount:Number, medicin:String, medicineventid:String, newcomment:String, creationTimeStamp:Number, newLastModifiedTimeStamp:Number,storeInDatabase:Boolean, bolusType:String, bolusDuration:Number )
+		public function MedicinEvent(amount:Number, medicin:String, medicineventid:String, newcomment:String, creationTimeStamp:Number, newLastModifiedTimeStamp:Number,storeInDatabase:Boolean, bolusType:String, bolusDuration:Number, recalculateInsulinAmount:Boolean = true)
 		{
 			this._medicinName = medicin;
 			this._bolustype = bolusType;
@@ -139,7 +139,8 @@ package databaseclasses
 			if (storeInDatabase)
 				Database.getInstance().createNewMedicinEvent(bolusType,bolusDuration, amount, medicin, _timeStamp,lastModifiedTimestamp,medicineventid, _comment, null);
 			_activeInsulinAmount = calculateActiveInsulinAmount();
-			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			if (recalculateInsulinAmount)
+				ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -150,7 +151,7 @@ package databaseclasses
 		/**
 		 * will update the medicinevent in the database with the new values for medicinName and amount<br>
 		 */
-		public function updateMedicinEvent(bolusType:String, bolusDuration:Number, newMedicinName:String,newAmount:Number, newComment:String, newCreationTimeStamp:Number , newLastModifiedTimeStamp:Number):void {
+		public function updateMedicinEvent(bolusType:String, bolusDuration:Number, newMedicinName:String,newAmount:Number, newComment:String, newCreationTimeStamp:Number , newLastModifiedTimeStamp:Number, recalculateInsulinAmount:Boolean = true):void {
 			_bolustype = bolusType;
 			_amount = newAmount;
 			_medicinName = newMedicinName;
@@ -164,7 +165,8 @@ package databaseclasses
 				_timeStamp = newCreationTimeStamp;
 			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDurationInMinutes, this.eventid,_amount,_medicinName,timeStamp,lastModifiedTimestamp, _comment);
 			_activeInsulinAmount = calculateActiveInsulinAmount();
-			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			if (recalculateInsulinAmount)
+				ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
 		}
 		
 		/**
