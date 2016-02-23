@@ -414,7 +414,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</s:actionContent>
 	<s:Group id="activeInsulin" visible="{ModelLocator.activeInsulinAmount > 0}">
 		<s:Label left="10" right="0" top="10" bottom="0" width="100%" 
-				 text="{ModelLocator.resourceManagerInstance.getString('trackingview','active_insulin') + '=' + ModelLocator.activeInsulinAmount.toString()
+				 text="{ModelLocator.resourceManagerInstance.getString('trackingview','active_insulin') + ' = ' + ModelLocator.activeInsulinAmount.toString()
 				 + ' ' +  ModelLocator.resourceManagerInstance.getString('trackingview','internationalunit')}"/>
 	</s:Group>
 	<s:Line width="100%" left="0" right="0" top="40" visible="{ModelLocator.activeInsulinAmount > 0}">
