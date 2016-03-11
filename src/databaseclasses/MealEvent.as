@@ -17,7 +17,6 @@
  */
 package databaseclasses
 {
-	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
@@ -25,10 +24,6 @@ package databaseclasses
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
-	
-	import spark.components.Application;
-	import spark.containers.Navigator;
-	import spark.effects.CallAction;
 	
 	import model.ModelLocator;
 	
@@ -97,9 +92,6 @@ package databaseclasses
 			return _selectedFoodItems;
 		}
 		
-		private static var temp:Number = 0;
-		private static var amountoftimesactiveinsuliniscalcualted:int = 0;
-		
 		/**
 		 * the calculated amount, in fact a redundant value because it can be derived from other values here<br>
 		 * null if no calculation is possible eg because no insulinratio defined
@@ -144,7 +136,7 @@ package databaseclasses
 		 * if databaseStorage = false then creationTimeStamp must be not null<br>
 		 * new mealEventId is created if databaseStorage = true.
 		 */
-		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,timeStamp:Number,dispatcher:EventDispatcher, mealEventId:String, newcomment:String, newLastModifiedTimeStamp:Number, databaseStorage:Boolean = true, selectedFoodItems:ArrayCollection = null,mealThatHoldsThisMealEvent:Meal = null) {
+		public function MealEvent(mealName:String, insulinRatio:Number, correctionFactor:Number,timeStamp:Number,dispatcher:EventDispatcher, mealEventId:String, newcomment:String, newLastModifiedTimeStamp:Number, databaseStorage:Boolean, selectedFoodItems:ArrayCollection,mealThatHoldsThisMealEvent:Meal, recalculateInsulinAmountNecessary) {
 			this._mealName = mealName;
 			if (isNaN(insulinRatio))
 				this._insulinRatio = 0;
@@ -174,7 +166,7 @@ package databaseclasses
 			
 			if (!databaseStorage) {
 				this._selectedFoodItems = selectedFoodItems;
-				recalculateTotals();
+				recalculateTotals(recalculateInsulinAmountNecessary);
 			}
 			else  {				
 				_selectedFoodItems = new ArrayCollection();
@@ -244,7 +236,7 @@ package databaseclasses
 			function selectedItemCreated(event:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
-				recalculateTotals();
+				recalculateTotals(true);
 			}
 			
 			function selectedItemCreationFailed (errorEvent:DatabaseEvent):void {
@@ -414,14 +406,14 @@ package databaseclasses
 		 * {targetbglevel} = ...<br>
 		 * {active_insulin} = ... <br>
 		 * 
-		 */public function recalculateInsulinAmount():String {
+		 */public function recalculateInsulinAmount(trackingViewRedrawNecessary:Boolean = true):String {
+			 var previousCalculatedInsulinAmount:Number = this._calculatedInsulinAmount; 
 			 this._calculatedInsulinAmount = Number.NaN;
 			 var diff:Number = Number.NaN;
 			 var activeInsulin:Number = Number.NaN;
 			 var correctionUnits:Number = Number.NaN;
 			 var previousBGEvent:BloodGlucoseEvent = null;
 			 var returnValue:String = "";
-			 
 			 if (!isNaN(_insulinRatio)) {
 				 if (!(_insulinRatio == 0)) {
 					 this._calculatedInsulinAmount = this._totalCarbs/this._insulinRatio;
@@ -435,10 +427,12 @@ package databaseclasses
 							 indexOfpreviousBGEvent--;
 						 
 						 while (indexOfpreviousBGEvent > -1) {
-							 if (ModelLocator.trackingList.getItemAt(indexOfpreviousBGEvent) is BloodGlucoseEvent) {
-								 if (timeStamp > (ModelLocator.trackingList.getItemAt(indexOfpreviousBGEvent) as BloodGlucoseEvent).timeStamp)
+							 if (timeStamp > (ModelLocator.trackingList.getItemAt(indexOfpreviousBGEvent) as TrackingViewElement).timeStamp)
+								 if (ModelLocator.trackingList.getItemAt(indexOfpreviousBGEvent) is BloodGlucoseEvent) {
 									 break;
-							 }
+								 }
+							 if (!(timeStamp - (ModelLocator.trackingList.getItemAt(indexOfpreviousBGEvent) as TrackingViewElement).timeStamp < (new Number(Settings.getInstance().getSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL))) * 1000))
+								 break;
 							 indexOfpreviousBGEvent--;
 						 }
 						 
@@ -483,11 +477,7 @@ package databaseclasses
 						 ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
 					 
 					 //now substract the active insulin
-					 var start:Number = (new Date()).valueOf();
 					 activeInsulin = ModelLocator.calculateActiveInsulin(timeStamp);
-					 temp += ((new Date()).valueOf() - start)/1000;
-					 amountoftimesactiveinsuliniscalcualted++;
-					 trace("duration to calculate activeinsulion = " + ((new Date()).valueOf() - start)/1000 + " s, total duration = " + temp + " s, amount = " + amountoftimesactiveinsuliniscalcualted);
 					 
 					 if (activeInsulin > 0) {
 						 returnValue += "{active_insulin}* = " + ((Math.round(activeInsulin * 10))/10).toString() + "\n";
@@ -540,11 +530,14 @@ package databaseclasses
 					 
 				 } else {
 					 returnValue = "{calculated_insulinamount} = ...\n";
-					 return returnValue;
+					 //return returnValue;
 				 }
 			 } else {
 				 returnValue = "{calculated_insulinamount} = ...\n";
-				 return returnValue;
+				 //return returnValue;
+			 }
+			 if (previousCalculatedInsulinAmount != this._calculatedInsulinAmount && trackingViewRedrawNecessary) {
+				 ModelLocator.trackingViewRedrawNecessary = true;
 			 }
 			 return returnValue; 
 		 }
@@ -560,12 +553,12 @@ package databaseclasses
 		
 		/**
 		 * recalculates total carbs, kilocalories, protein and fat<br>
-		 * also recalculates insulinamount <br>
+		 * also recalculates insulinamount if recalculateInsulinAmountNecessary is true<br>
 		 * <br>
 		 * if one of the selectedmeals has a kilocalorie, protein or fat value equal to -1, then the corresponding totals will be set to -1<br>
 		 * Carb value should never be -1
 		 */
-		private function recalculateTotals():void {
+		private function recalculateTotals(recalculateInsulinAmountNecessary:Boolean):void {
 			_totalCarbs = 0;
 			_totalKilocalories = 0;
 			_totalProtein = 0;
@@ -589,7 +582,8 @@ package databaseclasses
 				else 
 					_totalFat += selectedFoodItem.unit.fat/selectedFoodItem.unit.standardAmount*selectedFoodItem.chosenAmount;
 			}
-			recalculateInsulinAmount();
+			if (recalculateInsulinAmountNecessary)
+				recalculateInsulinAmount();
 		}
 		
 		/**
@@ -603,9 +597,8 @@ package databaseclasses
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
 			if (lastModifiedTimestamp < selectedFoodItem.lastModifiedTimestamp) {
 				lastModifiedTimestamp = selectedFoodItem.lastModifiedTimestamp;
-				trace("in updateselectedfooditemchosenamount, setting mealevent lastmodifiedtimetamp to " + lastModifiedTimestamp);
 			}
-			recalculateTotals();
+			recalculateTotals(true);
 			/*			//find the id
 			for (var ij:int=0;ij < _selectedFoodItems.length; ij++) {
 			if ((_selectedFoodItems.getItemAt(ij) as SelectedFoodItem) == selectedFoodItem) {
@@ -620,16 +613,17 @@ package databaseclasses
 		/**
 		 * deletes the selectedFoodItem, also deletes from database<br>
 		 */
-		public function removeSelectedFoodItem(selectedFoodItemToRemove:SelectedFoodItem):void {
+		public function removeSelectedFoodItem(selectedFoodItemToRemove:SelectedFoodItem, newLastModifiedTimestamp:Number = Number.NaN):void {
 			Database.getInstance().deleteSelectedFoodItem(selectedFoodItemToRemove.eventid,null);
-			_selectedFoodItems.removeItemAt(selectedFoodItems.getItemIndex(selectedFoodItemToRemove));
-			recalculateTotals();
+			_selectedFoodItems.removeItem(selectedFoodItemToRemove);
+			recalculateTotals(true);
 			//update also the lastmodifiedtimestamp of the mealevent if the selectedfooditem lastmodifiedtimestamp is more recent - which will always be the case here but check it anyway
 			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
-			trace(" in removeselectedfooditem, setting mealevent lastmodifiedtimetamp to " + lastModifiedTimestamp);
-			lastModifiedTimestamp = (new Date()).valueOf();
-			
+			if (isNaN(newLastModifiedTimestamp)) {
+				newLastModifiedTimestamp = (new Date()).valueOf()
+			}
+			lastModifiedTimestamp = newLastModifiedTimestamp;
 		}
 		
 		/**
@@ -637,12 +631,17 @@ package databaseclasses
 		 * There's no call to synchronize from here, because this function should only get called from database.as (during startup) or from synchronize itself 
 		 * (when a local event needs to be deleted)
 		 */
-		override public function deleteEvent():void {
+		override public function deleteEvent(trackingListPointer:Number = Number.NaN):void {
+			if (isNaN(trackingListPointer))
+				trackingListPointer = ModelLocator.trackingList.getItemIndex(this);
+			
 			while (_selectedFoodItems.length > 0) {
 				Database.getInstance().deleteSelectedFoodItem((_selectedFoodItems.getItemAt(0) as SelectedFoodItem).eventid,null);
 				_selectedFoodItems.removeItemAt(0);
 			}
 			Database.getInstance().deleteMealEvent(eventid,null);
+			
+			ModelLocator.trackingList.removeItemAt(trackingListPointer);
 		}
 		
 		/**
@@ -657,10 +656,9 @@ package databaseclasses
 			
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
 				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
-			trace("in updatemealevent, setting mealevent lastmodifiedtimetamp to " + lastModifiedTimestamp);
 			lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
-			recalculateTotals();
+			recalculateTotals(true);
 			
 			var oldTimeStamp:Number = new Number(_timeStamp);
 			if (!isNaN(newCreationTimeStamp))
@@ -699,6 +697,8 @@ package databaseclasses
 				if (rerunrecalculateInsulinAmountNecessary) {
 					rerunrecalculateInsulinAmountNecessary = false;
 					asyncRecalculateInsulinAmountForAllMealEvents(null,false);
+				} else {
+					ModelLocator.trackingViewRedrawNecessary = true;
 				}
 			} else {
 				//here we run the actual recalculation
@@ -709,13 +709,11 @@ package databaseclasses
 				} 
 				if (ModelLocator.trackingList.length > trackingListCounter) {
 					if (ModelLocator.trackingList.getItemAt(trackingListCounter) is MealEvent) {
-						(ModelLocator.trackingList.getItemAt(trackingListCounter) as MealEvent).recalculateInsulinAmount();
+						(ModelLocator.trackingList.getItemAt(trackingListCounter) as MealEvent).recalculateInsulinAmount(false);
 					}
-					trace("processed one trackingviewelement");
 				}
 				trackingListCounter--;
 				if (((startTimeStamp + maxCalculationDurationInms) < (new Date()).valueOf())) {
-					trace("took too long, restarting timer");
 					startTimeStamp = 0;
 					timerForAsyncRecalculateTimerFunction = new Timer(1 / ModelLocator.frameRate * 1000, 1);
 					timerForAsyncRecalculateTimerFunction.addEventListener(TimerEvent.TIMER,asyncRecalculateInsulinAmountForAllMealEvents);

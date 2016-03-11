@@ -506,12 +506,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					Synchronize.getInstance().addObjectToBeDeleted(theMedicinEvent);
 					Synchronize.getInstance().startSynchronize(true,false);
 					
-					theMedicinEvent.deleteEvent();
-					//we need to make sure the previous tracking event is visible so we store the itemindex
 					var trackinglistPointer:Number = ModelLocator.trackingList.getItemIndex(theMedicinEvent);
-					//now delete it
-					ModelLocator.trackingList.removeItemAt(trackinglistPointer);
-					ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(theMedicinEvent.timeStamp);					
+					theMedicinEvent.deleteEvent(trackinglistPointer);
+					//we need to make sure the previous tracking event is visible so we store the itemindex
+					//ModelLocator.trackingList.removeItemAt(trackinglistPointer); - added this in theMedicinEvent.deleteEvent();
+					//ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(theMedicinEvent.timeStamp); - we already do this in theMedicinEvent.deleteEvent					
 					//and now make sure the previous item is visible
 					if (trackinglistPointer > 0)
 						ModelLocator.trackingEventToShow = 

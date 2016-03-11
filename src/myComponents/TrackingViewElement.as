@@ -80,9 +80,10 @@ package myComponents
 		}
 
 		/**
-		 * to be overriden for objects that require this functionality
+		 * to be overriden for objects that require this functionality<br>
+		 * trackingListPointer points to Modellocator.trackinglist where this element is
 		 */
-		public function deleteEvent():void {
+		public function deleteEvent(trackingListPointer:Number = Number.NaN):void {
 		}
 
 	}

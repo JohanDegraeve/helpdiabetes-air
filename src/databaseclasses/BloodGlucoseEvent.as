@@ -120,9 +120,13 @@ package databaseclasses
 		 * delete the event from the database<br>
 		 * once delted this event should not be used anymore
 		 */
-		override public function deleteEvent():void {
+		override public function deleteEvent(trackingListPointer:Number = Number.NaN):void {
+			if (isNaN(trackingListPointer))
+				trackingListPointer = ModelLocator.trackingList.getItemIndex(this);
+			ModelLocator.trackingList.removeItemAt(trackingListPointer);
 			Database.getInstance().deleteBloodGlucoseEvent(this.eventid);
 			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.recalculateActiveInsulin();
 		}
 		
 		public function toString():String {

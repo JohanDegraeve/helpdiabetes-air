@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016 hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -139,7 +139,7 @@ package databaseclasses
 		/**
 		 * if newLastModifiedTimestamp isnan the current timestamp is used 
 		 */
-		public function updateSelectedFoodItem(newDescription:String,newUnit:Unit,newLastModifiedTimeStamp:Number,newChosenAmount:Number, parentMealEvent:MealEvent):void  {
+		public function updateSelectedFoodItem(newDescription:String,newUnit:Unit,newLastModifiedTimeStamp:Number,newChosenAmount:Number, parentMealEvent:MealEvent):void {
 			_itemDescription = newDescription;
 			_unit = newUnit;
 			
@@ -155,7 +155,7 @@ package databaseclasses
 			//update also the lastmodifiedtimestamp of the parent mealevent if the selectedfooditem lastmodifiedtimestamp is more recent
 			//this for nightscoutsync.as, because that one only gets a list of modified mealevents, not modified selectedfooditems
 			//if we update the lastmodifiedtimestamp, then it will cause an update at nightscout also if needed
-			var newParentMealEventLastModifiedTimeStamp = parentMealEvent.lastModifiedTimestamp;
+			var newParentMealEventLastModifiedTimeStamp:Number = parentMealEvent.lastModifiedTimestamp;
 			if (parentMealEvent != null)
 				if (parentMealEvent.lastModifiedTimestamp < lastModifiedTimestamp) {
 					newParentMealEventLastModifiedTimeStamp = this.lastModifiedTimestamp

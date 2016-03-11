@@ -55,7 +55,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private static var lastClickOnTrackingView:Number;
 			private var helpCallOut:HelpCallOut;
-			private var timer:Timer;
+			private var redrawActionButtonTimer:Timer;
+			private static var redrawTrackingViewTimer:Timer;
 			
 			private function addHandler():void {
 				if (!navigator.poppedViewReturnedObject) return; 
@@ -70,6 +71,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				lastClickOnTrackingView = (new Date()).valueOf();
 				ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
 				ModelLocator.recalculateActiveInsulin();
+			}
+			
+			private function checkRedrawTrackingView(event:Event = null):void {
+				if (redrawTrackingViewTimer) {
+					if (redrawTrackingViewTimer.running) {
+						redrawTrackingViewTimer.removeEventListener(TimerEvent.TIMER,checkRedrawTrackingView);
+						redrawTrackingViewTimer.stop();
+					}
+				}
+				
+				if (ModelLocator.trackingViewRedrawNecessary) {
+					ModelLocator.trackingViewRedrawNecessary = false;
+					trace("setting modellocator.trackingviewdredrawnecessary to false");
+					(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
+					ModelLocator.trackingList.refresh();
+				}
+				
+				redrawTrackingViewTimer = new Timer(1000, 1);
+				redrawTrackingViewTimer.addEventListener(TimerEvent.TIMER,checkRedrawTrackingView);
+				redrawTrackingViewTimer.start();
 			}
 			
 			private function reDrawActionButtons(event:Event = null):void {
@@ -108,14 +129,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 						openHelpTexts();
 					} else {
-						timer = new Timer(100, 1);
-						timer.addEventListener(TimerEvent.TIMER,timerEnd);
-						timer.start();
+						redrawActionButtonTimer = new Timer(100, 1);
+						redrawActionButtonTimer.addEventListener(TimerEvent.TIMER,timerEnd);
+						redrawActionButtonTimer.start();
 					}
 				} else {
-					timer = new Timer(100, 1);
-					timer.addEventListener(TimerEvent.TIMER,timerEnd);
-					timer.start();
+					redrawActionButtonTimer = new Timer(100, 1);
+					redrawActionButtonTimer.addEventListener(TimerEvent.TIMER,timerEnd);
+					redrawActionButtonTimer.start();
 				}
 				
 				function timerEnd():void {
@@ -150,6 +171,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onListElementClicked(event:MouseEvent):void {
+				if ((event.currentTarget as List).selectedIndex == -1)
+					return;
 				ModelLocator.trackingEventToShow = (ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex) as TrackingViewElement).eventid;
 				if (ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
 					MyGATracker.getInstance().trackPageview( "TrackingView-MealEventClicked" );
@@ -319,6 +342,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				} /*else
 				helptext0Removed();*/
 				Synchronize.getInstance().startSynchronize(false,false);
+				checkRedrawTrackingView();
 			}
 			
 			/**

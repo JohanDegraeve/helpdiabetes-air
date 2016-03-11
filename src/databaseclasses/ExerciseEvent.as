@@ -19,6 +19,8 @@ package databaseclasses
 {
 	import mx.core.ClassFactory;
 	
+	import model.ModelLocator;
+	
 	import myComponents.ExerciseEventItemRenderer;
 	import myComponents.IListElement;
 	import myComponents.TrackingViewElement;
@@ -87,9 +89,12 @@ package databaseclasses
 		
 		/**
 		 * delete the event from the database<br>
-		 * once delted this event should not be used anymore
+		 * once deleted this event should not be used anymore
 		 */
-		override public function deleteEvent():void {
+		override public function deleteEvent(trackingListPointer:Number = Number.NaN):void {
+			if (isNaN(trackingListPointer))
+				trackingListPointer = ModelLocator.trackingList.getItemIndex(this);
+			ModelLocator.trackingList.removeItemAt(trackingListPointer);
 			Database.getInstance().deleteExerciseEvent(this.eventid);
 		}
 	}

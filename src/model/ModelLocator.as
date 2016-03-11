@@ -42,7 +42,6 @@ package model
 	import databaseclasses.Settings;
 	
 	import myComponents.DayLine;
-	import myComponents.MealEventItemRenderer;
 	import myComponents.SimpleTextEvent;
 	import myComponents.TrackingViewElement;
 	
@@ -113,6 +112,8 @@ package model
 		/**
 		 * should only be used when determining maximum duration for calculations (like insulinrecalculation).
 		 */public static var frameRate:int = 24;
+		
+		public static var trackingViewRedrawNecessary:Boolean = false;
 		
 		/**
 		 * sets searchActive<br>
@@ -761,15 +762,18 @@ package model
 		 */
 		public static function recalculateInsulinAmoutInAllYoungerMealEvents(asOf:Number):void {
 			var newAsOf:Number = asOf - 24 * 3600 * 1000;
-			for (var cntr:int = trackingList.length - 1;cntr >= 0;cntr--) {
-				if (trackingList.getItemAt(cntr) is MealEvent) {
-					if ((trackingList.getItemAt(cntr) as MealEvent).timeStamp > newAsOf) {
+			var cntr:int;
+			for (cntr = trackingList.length - 1;cntr >= 0;cntr--) {
+				trace("starting recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr);
+				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp > newAsOf) {
+					if (trackingList.getItemAt(cntr) is MealEvent) {
 						(trackingList.getItemAt(cntr) as MealEvent).recalculateInsulinAmount();
-					} else {
-						break;
 					}
+				} else {
+					break;
 				}
 			}
+			trace("stopping recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr);
 		}
 
 		/**
@@ -791,21 +795,21 @@ package model
 		/**
 		 * calculates active insulin at given time, if time = null then active insulin now is calculated, time in ms since 1 1 1970
 		 */
-		public static function calculateActiveInsulin(time:Number = NaN):Number  {
+		public static function calculateActiveInsulin(time:Number = Number.NaN):Number  {
 
+			var tempTime:Number = time;
+			if (isNaN(tempTime))
+				tempTime = (new Date()).valueOf();
 			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
 			
-			if (isNaN(time))
-				time = (new Date()).valueOf();
-
 			var activeInsulin:Number = new Number(0);
 			for (var cntr:int = trackingList.length - 1; cntr >= 0 ; cntr-- ) {
-				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp + maxInsulinDurationInSeconds * 1000 < time)
+				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp + maxInsulinDurationInSeconds * 1000 < tempTime) {
 					break;
-				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp < time) {//we don't include events in the future
+				}
+				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp < tempTime) {//we don't include events in the future
 					if (trackingList.getItemAt(cntr) is MedicinEvent) {
 						var theEvent:MedicinEvent = trackingList.getItemAt(cntr) as MedicinEvent;
-						var start:Date = new Date();
 						activeInsulin += theEvent.calculateActiveInsulinAmount(time);	
 					}
 				}
@@ -815,7 +819,6 @@ package model
 		
 		static public function recalculateActiveInsulin(event:Event = null):void  {
 			//if (ModelLocator.debugMode)
-			trace("in recalculateactiveinsulin");
 			if (timerForRecalculateActiveInsulin != null) {
 				if (timerForRecalculateActiveInsulin.hasEventListener(TimerEvent.TIMER))
 					timerForRecalculateActiveInsulin.removeEventListener(TimerEvent.TIMER,recalculateActiveInsulin );
@@ -823,7 +826,6 @@ package model
 			}
 			
 			//calculate activeInsulin_text
-			var start:Date = new Date();
 			activeInsulinAmount = ((Math.round(calculateActiveInsulin() * 10))/10);
 			
 			timerForRecalculateActiveInsulin = new Timer(300000, 1);

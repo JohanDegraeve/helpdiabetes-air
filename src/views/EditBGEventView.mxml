@@ -303,15 +303,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				if (ModelLocator.trackingList.refresh())
 					finishOkClicked();
-				else
+				else {
+					trace("in editbgeventview, setting timeout in finishokclicked");
 					setTimeout(finishOkClicked,1000);
-				
+				}
 			}
 			
 			private function finishOkClicked(event:Event = null):void {
 				//if there's a mealevent after this event within "maximum time difference" for correction factor settings,
 				//then trigger a recalculateinsulinamount for that mealevent
-				//switch to the tracking view and set trackingeventtoshow to this event
 				var indexOfThisEvent:Number = ModelLocator.trackingList.getItemIndex(theBloodGlucoseEvent);
 				for (var i2:Number = indexOfThisEvent + 1; i2 < ModelLocator.trackingList.length;i2++) {
 					var theEventAti2:TrackingViewElement = ModelLocator.trackingList.getItemAt(i2) as TrackingViewElement;
@@ -320,6 +320,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				}
 				
+				//switch to the tracking view and set trackingeventtoshow to this event
 				ModelLocator.trackingEventToShow = theBloodGlucoseEvent.eventid;
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
@@ -354,11 +355,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					Synchronize.getInstance().addObjectToBeDeleted(theBloodGlucoseEvent);
 					Synchronize.getInstance().startSynchronize(true,false);
-					theBloodGlucoseEvent.deleteEvent();
-					//we need to make sure the previous tracking event is visible so we store the itemindex
 					var trackinglistPointer:Number = ModelLocator.trackingList.getItemIndex(theBloodGlucoseEvent);
-					//now delete it
-					ModelLocator.trackingList.removeItemAt(trackinglistPointer);
+					theBloodGlucoseEvent.deleteEvent(trackinglistPointer);
+					
 					ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(theBloodGlucoseEvent.timeStamp);					
 					//and now make sure the previous item is visible
 					if (trackinglistPointer > 0)

@@ -1146,6 +1146,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]));
+									ModelLocator.trackingViewRedrawNecessary = true;
 									if (debugMode) trace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
 								}
 								break;
@@ -1171,16 +1172,20 @@ package utilities
 							
 							var medicinName1:String = medicinArray1[0];
 							
+							//trace(" in synchronize.as, creating a newMedicinEvent with timestamp = " + (new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]))).toString() + " and eventid = " + remoteElements.getItemAt(m)[positionId]);
+							ModelLocator.trackingList.addItem(
 							(new MedicinEvent(
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
 								medicinName1,
 								remoteElements.getItemAt(m)[positionId],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
-								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
+								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),//creationtimestamp
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]),
 								true,
 								bolusType1,
-								bolusDuration2));
+								bolusDuration2))
+							);
+							ModelLocator.recalculateActiveInsulin();
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
@@ -1322,6 +1327,7 @@ package utilities
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]));
+									ModelLocator.trackingViewRedrawNecessary = true;
 									if (debugMode) trace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
 								}
 								break;
@@ -1334,6 +1340,7 @@ package utilities
 						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "false") {
 							localElementsUpdated = true;
 							
+							ModelLocator.trackingList.addItem(
 							(new BloodGlucoseEvent(
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_value)],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unit)],
@@ -1341,7 +1348,8 @@ package utilities
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
-								true, true));
+								true, true))
+							);
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)]);
 						}
 					}
@@ -1480,6 +1488,7 @@ package utilities
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)]);
+									ModelLocator.trackingViewRedrawNecessary = true;
 									if (debugMode) trace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
 								}
 								break;
@@ -1492,13 +1501,15 @@ package utilities
 						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "false") {
 							localElementsUpdated = true;
 							
+							ModelLocator.trackingList.addItem(
 							(new ExerciseEvent(
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_level)],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								remoteElements.getItemAt(m)[positionId],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
-								true));
+								true))
+							);
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
@@ -1658,6 +1669,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_correctionfactor)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]));
+									ModelLocator.trackingViewRedrawNecessary = true;
 									if (debugMode) trace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
 								}
 								break;
@@ -1679,7 +1691,7 @@ package utilities
 								remoteElements.getItemAt(m)[positionId],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
-								true));
+								true, null, null, false));
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
@@ -1766,6 +1778,7 @@ package utilities
 										remoteElements.removeItemAt(k);
 										//NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(j)); - don't because we don't seperately add selectedfooditems in NS
 										(localElements.getItemAt(j) as SelectedFoodItem).deleteEvent();//delete from local database
+																				
 										localElementsUpdated = true;//as we deleted one from local database,
 										//copyTrackingListIfNotDoneYet();
 										localElements.removeItemAt(j);//remove also from list used here
@@ -1798,9 +1811,9 @@ package utilities
 				//we've got to start updating
 				for (var m:int = 0; m < remoteElements.length; m++) {
 					//we have to find the selectedfooditem in the trackinglist that has the same id
-					var l:int=0;
+					var l:int;
 					var selectedFoodItemFound:Boolean = false;
-					for (l = 0; l < trackingList.length;l++) {
+					for (l = trackingList.length - 1; l > -1;l--) {
 						if (trackingList.getItemAt(l) is MealEvent) {
 							var theMealEvent2:MealEvent = trackingList.getItemAt(l) as MealEvent;
 							for (var selctr2:int = 0;selctr2 < theMealEvent2.selectedFoodItems.length; selctr2++) {
@@ -1809,8 +1822,7 @@ package utilities
 									localElementsUpdated = true;
 									selectedFoodItemFound = true;
 									if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
-										//NightScoutSync.getInstance().addObjectToBeDeleted(theSelectedFoodItem);
-										theSelectedFoodItem.deleteEvent();
+										theMealEvent2.removeSelectedFoodItem(theSelectedFoodItem, theMealEvent2.lastModifiedTimestamp);
 									} else {
 										theSelectedFoodItem.updateSelectedFoodItem(
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_description)],
@@ -1824,6 +1836,7 @@ package utilities
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)],
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_chosenamount)],
 											theMealEvent2);
+										ModelLocator.trackingViewRedrawNecessary = true;
 										if (debugMode) trace("Synchronize.as : local element updated, id = " + theSelectedFoodItem.eventid);
 									}
 									break;
@@ -1834,7 +1847,7 @@ package utilities
 						if (selectedFoodItemFound)
 							break;
 					}
-					if (l == trackingList.length) {
+					if (l == -1) {
 						//it means we didn't find the remotelement in the trackinglist, so we need to create it
 						//but only if deleted is false
 						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "false") {
@@ -3755,14 +3768,10 @@ package utilities
 				} else
 					currentSyncTimeStamp = currentSyncTimeStamp - (secondsBetweenTwoSync * 1000 + 1);
 				
-				/*if (localElementsUpdated) {
+				if (localElementsUpdated) {
 					localElementsUpdated = false;
-					//copyTrackingListIfNotDoneYet();//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
-					ModelLocator.trackingList = new ArrayCollection();
-					localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
-					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-					Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
-				}*/
+					ModelLocator.recalculateActiveInsulin()
+				}
 				
 				if (rerunNecessary) {
 					currentSyncTimeStamp = new Date().valueOf();
@@ -3808,16 +3817,6 @@ package utilities
 			NightScoutSync.getInstance().startNightScoutSync(globalImmediateRunNecessary);
 			globalImmediateRunNecessary = false;
 			
-			/*function getAllEventsAndFillUpMealsFinished(event:Event):void
-			{
-				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, getAllEventsAndFillUpMealsFinished);
-				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, getAllEventsAndFillUpMealsFinished);
-				ModelLocator.trackingList.refresh();
-				
-				ModelLocator.refreshMeals();
-			//	ModelLocator.copyOfTrackingList = ModelLocator.trackingList;
-				ModelLocator.trackingEventToShow = previousTrackingEventToShow;//could be a problem if that previous event was just deleted
-			}*/
 		}
 		
 		public function addObjectToBeDeleted(object:Object):void {
@@ -4222,15 +4221,6 @@ package utilities
 			
 			
 		}
-		
-		/*private function copyTrackingListIfNotDoneYet():void {
-			if (!trackingListAlreadyModified) {
-				trackingListAlreadyModified = true;
-				previousTrackingEventToShow = ModelLocator.trackingEventToShow;
-				ModelLocator.trackingEventToShow = (ModelLocator.infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
-			//	ModelLocator.copyOfTrackingList = ModelLocator.infoTrackingList;
-			}			
-		}*/
 		
 		public static function compareFoodItemDescriptions(a:Object,b:Object):int {
 			//trace("Synchronize.as : in compare a = " + (a as XML).description.text() + ", b = " + (b as XML).description.text());

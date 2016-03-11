@@ -111,7 +111,6 @@ package databaseclasses
 			 return _activeInsulinAmount;
 		 }
 
-		 
 		/**
 		 * creates a medicin event and stores it immediately in the database if storeInDatabase = true<br>
 		 * if creationTimeStamp = null, then current date and time is used<br>
@@ -136,11 +135,19 @@ package databaseclasses
 			else
 				lastModifiedTimestamp = (new Date()).valueOf();
 			
-			if (storeInDatabase)
+			if (storeInDatabase) {
 				Database.getInstance().createNewMedicinEvent(bolusType,bolusDuration, amount, medicin, _timeStamp,lastModifiedTimestamp,medicineventid, _comment, null);
-			_activeInsulinAmount = calculateActiveInsulinAmount();
-			if (recalculateInsulinAmount)
+				_activeInsulinAmount = calculateActiveInsulinAmount(Number.NaN, true);
+			} else {
+				//it's tricky : if storeInDatabase is false, it means this is actually being called while openening the database (initial startup)
+				//so there's no need to do a calculateactiveinsulinamount each time
+				_activeInsulinAmount = calculateActiveInsulinAmount(Number.NaN, false);
+			}
+			if (recalculateInsulinAmount) {
 				ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+				trace("in medicinevent.as constructor, launching modellocator.recalculateinsulin");
+				ModelLocator.recalculateActiveInsulin();
+			}
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -152,39 +159,67 @@ package databaseclasses
 		 * will update the medicinevent in the database with the new values for medicinName and amount<br>
 		 */
 		public function updateMedicinEvent(bolusType:String, bolusDuration:Number, newMedicinName:String,newAmount:Number, newComment:String, newCreationTimeStamp:Number , newLastModifiedTimeStamp:Number, recalculateInsulinAmount:Boolean = true):void {
-			_bolustype = bolusType;
-			_amount = newAmount;
-			_medicinName = newMedicinName;
+			var recalculateActiveInsulinNecessary:Boolean = false;
+			if (_bolustype != bolusType) {
+				_bolustype = bolusType;
+				recalculateActiveInsulinNecessary  = true
+			}
+			if (_amount != newAmount) {
+				recalculateActiveInsulinNecessary  = true
+				_amount = newAmount;
+			}
+			if (_medicinName != medicinName) {
+				_medicinName = newMedicinName;
+				recalculateActiveInsulinNecessary  = true
+			}
 			_comment = newComment;
-			_bolusDurationInMinutes = bolusDuration;
+			if (_bolusDurationInMinutes != bolusDuration) {
+				_bolusDurationInMinutes = bolusDuration;
+				recalculateActiveInsulinNecessary  = true
+			}
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
 				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
 			lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
-			if (!isNaN(newCreationTimeStamp))
-				_timeStamp = newCreationTimeStamp;
+			if (!isNaN(newCreationTimeStamp)) {
+				if (newCreationTimeStamp != _timeStamp) {
+					_timeStamp = newCreationTimeStamp;
+					recalculateActiveInsulinNecessary  = true
+				}
+			}
 			Database.getInstance().updateMedicinEvent(this._bolustype, this._bolusDurationInMinutes, this.eventid,_amount,_medicinName,timeStamp,lastModifiedTimestamp, _comment);
-			_activeInsulinAmount = calculateActiveInsulinAmount();
+			_activeInsulinAmount = calculateActiveInsulinAmount(Number.NaN, true);
 			if (recalculateInsulinAmount)
 				ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			if (recalculateActiveInsulinNecessary)
+				ModelLocator.recalculateActiveInsulin();
 		}
 		
 		/**
 		 * delete the event from the database<br>
-		 * once deleted this event should not be used anymore
+		 * once deleted this event should not be used anymore<br>
+		 * if trackingListPointer then it points to the position in the trackinglist, if it's null then we still need to search it
 		 */
-		override public function deleteEvent():void {
+		override public function deleteEvent(trackingListPointer:Number = Number.NaN):void {
+			if (isNaN(trackingListPointer))
+				trackingListPointer = ModelLocator.trackingList.getItemIndex(this);
+			ModelLocator.trackingList.removeItemAt(trackingListPointer);
 			Database.getInstance().deleteMedicinEvent(this.eventid);
 			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.recalculateActiveInsulin();
 		}
 		
 		/**
 		 * For a specific medicin event, calculates active insulin at the specified time, time in milliseconds<br>
-		 * If time = NaN then now is used
+		 * If time = NaN then now is used and also then the calculated result will be stored in _activeInsulinAmount
 		 */
-		public function calculateActiveInsulinAmount(time:Number = NaN):Number {
-			if (isNaN(time))
+		public function calculateActiveInsulinAmount(time:Number = Number.NaN, trackingViewRedrawNecessary:Boolean = true):Number {
+			var previousActiveInsulin:Number = (Math.round(_activeInsulinAmount * 10))/10;
+			var updatePreviousActiveInsulin:Boolean = false;
+			if (isNaN(time)) {
+				updatePreviousActiveInsulin = true;				
 				time = (new Date()).valueOf();
+			}
 			
 			var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
 			var additionalMaxDurationInSeconds:Number = 0;
@@ -194,7 +229,7 @@ package databaseclasses
 			if (timeStamp + (maxInsulinDurationInSeconds  + additionalMaxDurationInSeconds) * 1000 < time)
 				return new Number(0);
 			//let's find if the name of the medicinevent that matches one of the medicins in the settings
-			var activeInsulin:Number = new Number(0);
+			var tempActiveInsulin:Number = new Number(0);
 			for (var medicincntr:int = 0;medicincntr <  5;medicincntr++) {
 				if (Settings.getInstance().getSetting( Settings.SettingsInsulinType1 + medicincntr) == medicinName)  {
 					if (Settings.getInstance().getSetting(Settings.SettingsMedicin1_AOBActive + medicincntr) == "true")  {
@@ -225,12 +260,12 @@ package databaseclasses
 								timeStampOfInjection = (timeStamp + injectionsCntr * intervalBetweenInjections * 60 * 1000);
 								if (timeStampOfInjection < time) {
 									var percentage:Number = fromTimeAndValueArrayCollection.getValue((time - timeStampOfInjection)/1000);
-									activeInsulin += ModelLocator.BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES *  percentage / 100;
+									tempActiveInsulin += ModelLocator.BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES *  percentage / 100;
 								} else 
 									break;
 							}
 						} else {
-							activeInsulin = amount * fromTimeAndValueArrayCollection.getValue((time - timeStamp)/1000) / 100;
+							tempActiveInsulin = amount * fromTimeAndValueArrayCollection.getValue((time - timeStamp)/1000) / 100;
 						}
 					} else {
 						//there's a medicinevent found with type of insulin that has a not-enbled profile
@@ -238,8 +273,13 @@ package databaseclasses
 					medicincntr = 5;
 				}
 			}
-			return activeInsulin;
-
+			if (updatePreviousActiveInsulin) {
+				_activeInsulinAmount = tempActiveInsulin;
+				if (previousActiveInsulin != (Math.round(tempActiveInsulin * 10))/10 && trackingViewRedrawNecessary) {
+					ModelLocator.trackingViewRedrawNecessary = true;
+				}
+			}
+			return tempActiveInsulin;
 		}
 	}
 }

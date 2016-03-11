@@ -279,7 +279,7 @@ package myComponents
 		private static var counter1:int = 0;
 		override public function getHeight(item:TrackingViewElement = null):Number {
 			var now:Number = (new Date()).valueOf();
-			var activeInsulin:Number = (item as MedicinEvent).calculateActiveInsulinAmount(now);
+			var activeInsulin:Number = (item as MedicinEvent).activeInsulinAmount;
 			return itemHeight + (activeInsulin == 0  ? 0 : activeInsulinAmountHeight);
 		}
 

@@ -626,6 +626,7 @@
 													 newCreationTimeStamp,
 													 newComment,
 													 lastModifiedTimeStamp);
+												 ModelLocator.trackingViewRedrawNecessary = true;
 											 } else {
 												 //there's no glucose
 												 //local element should be deleted
@@ -639,6 +640,7 @@
 													 newCreationTimeStamp,
 													 lastModifiedTimeStamp,
 													 newComment);
+												 ModelLocator.trackingViewRedrawNecessary = true;
 											 } else {
 												 //there's no duration
 												 //local element should be deleted
@@ -656,6 +658,7 @@
 													 newCreationTimeStamp,
 													 lastModifiedTimeStamp
 												 );
+												 ModelLocator.trackingViewRedrawNecessary = true;
 											 } else {
 												 //there's no insulin
 												 //local element should be deleted
@@ -735,6 +738,7 @@
 									 newGlucose = Math.round(newGlucose/(new Number(0.0555)));
 								 }
 								 
+								 ModelLocator.trackingList.addItem(
 								 new BloodGlucoseEvent(
 									 newGlucose,
 									 newUnit,
@@ -744,7 +748,7 @@
 									 new Number(remoteElement.helpdiabetes.lastmodifiedtimestamp),
 									 true,
 									 true
-								 ); 
+								 )); 
 								 localElementsUpdated = true;
 							 }
 						 } 
@@ -784,9 +788,9 @@
 									 remoteElement._id + "-carbs",
 									 removeBRInNotes(remoteElement.notes as String),
 									 new Number(remoteElement.helpdiabetes.lastmodifiedtimestamp),
-									 true);
+									 true, null, null, false);
 								 theMealEvent.addSelectedFoodItem(createDummySelectedFoodItem(new Number((remoteElement.carbs))));
-								 //trackingList.addItem(theMealEvent);
+								 ModelLocator.trackingList.addItem(theMealEvent);
 								 localElementsUpdated = true;
 							 }
 						 } 
@@ -802,12 +806,14 @@
 							 }
 							 
 							 if (!elementIsInDeletionList) {
+								 ModelLocator.trackingList.addItem(
 								 new ExerciseEvent(remoteElement.duration,
 									 removeBRInNotes(remoteElement.notes as String),
 									 remoteElement._id + "-exercise",
 									 DateTimeUtilities.createDateFromNSCreatedAt(remoteElement.created_at).valueOf(),
 									 new Number(remoteElement.helpdiabetes.lastmodifiedtimestamp),
-									 true);
+									 true)
+								 );
 								 localElementsUpdated = true;
 							 }
 						 }
@@ -822,6 +828,7 @@
 								 }
 							 }
 							 if (!elementIsInDeletionList) {
+								 ModelLocator.trackingList.addItem(
 								 new MedicinEvent(new Number(remoteElement.insulin),
 									 Settings.getInstance().getSetting(Settings.SettingsInsulinType1),
 									 remoteElement._id + "-medicin",
@@ -830,7 +837,9 @@
 									 new Number(remoteElement.helpdiabetes.lastmodifiedtimestamp),
 									 true,
 									 ModelLocator.resourceManagerInstance.getString('editmedicineventview',MedicinEvent.BOLUS_TYPE_NORMAL),
-									 new Number(0));
+									 new Number(0))
+								 );
+								 ModelLocator.recalculateActiveInsulin();
 								 localElementsUpdated = true;
 							 }
 						 }
@@ -1029,16 +1038,6 @@
 				 trace("NightScoutSync.as : loader : url = " + request.url + ", method = " + request.method + ", request.data = " + request.data); 
 		 }
 		 
-		 private function copyTrackingListIfNotDoneYet():void {
-			 if (!trackingListAlreadyModified) {
-				 trackingListAlreadyModified = true;
-				 previousTrackingEventToShow = ModelLocator.trackingEventToShow;
-				 ModelLocator.trackingEventToShow = (ModelLocator.infoTrackingList.getItemAt(0) as TrackingViewElement).eventid;
-				 // ModelLocator.copyOfTrackingList = ModelLocator.infoTrackingList;
-				 //TrackingView.recalculateActiveInsulin();
-			 }			
-		 }
-		 
 		 private function createDummySelectedFoodItem(chosenAmount:Number):SelectedFoodItem {
 			 return new SelectedFoodItem(DateTimeUtilities.createEventId(), 
 				 "item from NS", 
@@ -1064,11 +1063,6 @@
 			 
 			 if (localElementsUpdated) {
 				 localElementsUpdated = false;
-				 copyTrackingListIfNotDoneYet();//this may be the case, eg when adding remote elements to local database, we don't update the trackinglist, but still elementsupdated = true
-				 ModelLocator.trackingList = new ArrayCollection();
-				 localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
-				 localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
-				 Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
 				 Synchronize.getInstance().startSynchronize(true);
 			 }
 			 
@@ -1081,18 +1075,6 @@
 			 } else {
 				 nightScoutSyncRunning = false;
 			 }
-			 
-			 function getAllEventsAndFillUpMealsFinished(event:Event):void
-			 {
-				 localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, getAllEventsAndFillUpMealsFinished);
-				 localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, getAllEventsAndFillUpMealsFinished);
-				 ModelLocator.trackingList.refresh();
-				 
-				 ModelLocator.refreshMeals();
-				 // ModelLocator.copyOfTrackingList = ModelLocator.trackingList;
-				 ModelLocator.trackingEventToShow = previousTrackingEventToShow;//could be a problem if that previous event was just deleted
-			 }
-			 
 		 }
 		 
 		 private function removeBRInNotes(notes:String):String {

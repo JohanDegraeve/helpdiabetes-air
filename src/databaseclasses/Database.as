@@ -2298,7 +2298,9 @@ package databaseclasses
 								o.comment_2 as String,
 								o.lastmodifiedtimestamp  as Number,
 								false,
-								new ArrayCollection(selectedFoodItems.toArray()));
+								new ArrayCollection(selectedFoodItems.toArray()),
+								null,
+								false);
 							ModelLocator.trackingList.addItem(newMealEvent);
 							var creationTimeStampAsDate:Date = new Date(newMealEvent.timeStamp);
 							var creationTimeStampAtMidNight:Number = (new Date(creationTimeStampAsDate.fullYearUTC,creationTimeStampAsDate.monthUTC,creationTimeStampAsDate.dateUTC,0,0,0,0)).valueOf();
@@ -2402,6 +2404,7 @@ package databaseclasses
 							
 							var medicinName:String = medicinArray[0];
 							
+							//trace(" in database.as, creating a newMedicinEvent with timestamp = " + (new Date(o.creationtimestamp as Number)).toString() + " and eventid = " + medicinEventId);
 							var newMedicinEvent:MedicinEvent = new MedicinEvent( o.amount as Number, medicinName, medicinEventId, o.comment_2 as String, o.creationtimestamp as Number, o.lastmodifiedtimestamp as Number, false, bolusType, bolusDuration, false);
 							ModelLocator.trackingList.addItem(newMedicinEvent);
 							var creationTimeStampAsDate:Date = new Date(newMedicinEvent.timeStamp);
@@ -2424,7 +2427,7 @@ package databaseclasses
 				localSqlStatement.sqlConnection = aConn;
 				localSqlStatement.text = GET_ALLSELECTEDFOODITEMS;
 				localSqlStatement.execute();
-
+				ModelLocator.recalculateActiveInsulin();
 			}
 			
 			function exerciseEventsRetrieved(result:SQLEvent):void {
@@ -2477,10 +2480,7 @@ package databaseclasses
 				// now populate ModelLocator.meals
 				ModelLocator.refreshMeals();
 				
-				var start:Number = (new Date()).valueOf();
-				trace ("in database.as starting to go through the mealevents");
 				MealEvent.asyncRecalculateInsulinAmountForAllMealEvents(null, true);
-				trace("duration in database.as to go through the mealevents = " + ((new Date()).valueOf() - start)/1000 + " s");
 
 				if (globalDispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
