@@ -43,6 +43,7 @@ package utilities
 	import databaseclasses.DatabaseEvent;
 	import databaseclasses.ExerciseEvent;
 	import databaseclasses.FoodItem;
+	import databaseclasses.Meal;
 	import databaseclasses.MealEvent;
 	import databaseclasses.MedicinEvent;
 	import databaseclasses.SelectedFoodItem;
@@ -1681,8 +1682,7 @@ package utilities
 						//but only if deleted is false
 						if (((remoteElements.getItemAt(m) as Array)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "false") {
 							localElementsUpdated = true;
-							//copyTrackingListIfNotDoneYet();							
-							trackingList.addItem(new MealEvent(//in contradiction to medicin/bloodglucose and exerciseevents, I must add new mealevents to the trackinglist, because if i don't, the adding of selectedfooditems would fail because I wouldn't find the mealevent
+							var newMealEvent:MealEvent = new MealEvent(//in contradiction to medicin/bloodglucose and exerciseevents, I must add new mealevents to the trackinglist, because if i don't, the adding of selectedfooditems would fail because I wouldn't find the mealevent
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_mealname)],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_insulinratio)],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_correctionfactor)],
@@ -1691,7 +1691,9 @@ package utilities
 								remoteElements.getItemAt(m)[positionId],
 								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
-								true, null, null, false));
+								true, null, null, false);
+							ModelLocator.addMeal(new Meal(null,newMealEvent,Number.NaN));
+							trackingList.addItem(newMealEvent);
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}

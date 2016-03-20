@@ -658,9 +658,11 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					if (length == 1) {
 						//it was the last selectedfooditem which was being deleted, so we need to pop also the view editmealeventview
 						//but make sure the previous item is visible
-						if (trackinglistPointer > 0)
+						if (trackinglistPointer > 0) {
 							ModelLocator.trackingEventToShow = 
-								(ModelLocator.trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;						
+								(ModelLocator.trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;
+							trace("setting rackingeventtoshow to " + ModelLocator.trackingEventToShow);
+						}
 						
 						navigator.popView();
 					}

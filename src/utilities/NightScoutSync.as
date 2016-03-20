@@ -37,6 +37,7 @@
 	 import databaseclasses.Database;
 	 import databaseclasses.DatabaseEvent;
 	 import databaseclasses.ExerciseEvent;
+	 import databaseclasses.Meal;
 	 import databaseclasses.MealEvent;
 	 import databaseclasses.MedicinEvent;
 	 import databaseclasses.SelectedFoodItem;
@@ -779,7 +780,7 @@
 								 }
 								 var correctionFactorList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
 								 
-								 var theMealEvent:MealEvent = new MealEvent(//in contradiction to medicin/bloodglucose and exerciseevents, I must add new mealevents to the trackinglist, because if i don't, the adding of selectedfooditems would fail because I wouldn't find the mealevent
+								 var newMealEvent:MealEvent = new MealEvent(//in contradiction to medicin/bloodglucose and exerciseevents, I must add new mealevents to the trackinglist, because if i don't, the adding of selectedfooditems would fail because I wouldn't find the mealevent
 									 "Meal from NightScout",
 									 insulinRatio,
 									 correctionFactorList.getValue(Number.NaN,"",timeStampAsDate),
@@ -789,8 +790,9 @@
 									 removeBRInNotes(remoteElement.notes as String),
 									 new Number(remoteElement.helpdiabetes.lastmodifiedtimestamp),
 									 true, null, null, false);
-								 theMealEvent.addSelectedFoodItem(createDummySelectedFoodItem(new Number((remoteElement.carbs))));
-								 ModelLocator.trackingList.addItem(theMealEvent);
+								 newMealEvent.addSelectedFoodItem(createDummySelectedFoodItem(new Number((remoteElement.carbs))));
+								 ModelLocator.addMeal(new Meal(null,newMealEvent,Number.NaN));
+								 ModelLocator.trackingList.addItem(newMealEvent);
 								 localElementsUpdated = true;
 							 }
 						 } 
