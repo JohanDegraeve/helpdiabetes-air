@@ -186,6 +186,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				Synchronize.getInstance().startSynchronize(false,false,null);
 				ModelLocator.frameRate = stage.frameRate;
+				ModelLocator.recalculateActiveInsulin(null);
 			}
 			
 		]]>
