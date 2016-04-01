@@ -664,7 +664,7 @@ package databaseclasses
 			if (!isNaN(newCreationTimeStamp))
 				_timeStamp = newCreationTimeStamp;
 			if (oldTimeStamp != newCreationTimeStamp)//if timestamp has changed, recalculate for all events as of the oldest itmestamp of the two
-				ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(Math.min(oldTimeStamp,newCreationTimeStamp));
+				ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(Math.max(oldTimeStamp,newCreationTimeStamp), true);
 			
 			
 			Database.getInstance().updateMealEvent(this.eventid,newMealName,newInsulinRatio,newCorrectionFactor,newLastModifiedTimeStamp,newCreationTimeStamp,_comment,null);

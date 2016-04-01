@@ -77,7 +77,7 @@ package databaseclasses
 			if (storeInDatabase)
 				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,lastModifiedTimestamp,unit,bloodglucoseEventId,_comment,null);
 			if (recalculateInsulinAmount)
-				ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+				ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp, true);
 		}
 		
 		
@@ -104,11 +104,12 @@ package databaseclasses
 					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
 				lastModifiedTimestamp = newLastModifiedTimeStamp;
 
+			var previousTimeStamp:Number = timeStamp;
 			if (!isNaN(newCreationTimeStamp)) {
 				timeStamp = newCreationTimeStamp;
 			}
 			Database.getInstance().updateBloodGlucoseEvent(this.eventid,_unit,_bloodGlucoseLevel, timeStamp,lastModifiedTimestamp,_comment);
-			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(Math.max(_timeStamp, previousTimeStamp), true);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -125,7 +126,7 @@ package databaseclasses
 				trackingListPointer = ModelLocator.trackingList.getItemIndex(this);
 			ModelLocator.trackingList.removeItemAt(trackingListPointer);
 			Database.getInstance().deleteBloodGlucoseEvent(this.eventid);
-			ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp, true);
 			ModelLocator.recalculateActiveInsulin();
 		}
 		

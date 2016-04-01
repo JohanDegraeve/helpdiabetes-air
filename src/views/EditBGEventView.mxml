@@ -358,7 +358,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					var trackinglistPointer:Number = ModelLocator.trackingList.getItemIndex(theBloodGlucoseEvent);
 					theBloodGlucoseEvent.deleteEvent(trackinglistPointer);
 					
-					ModelLocator.recalculateInsulinAmoutInAllYoungerMealEvents(theBloodGlucoseEvent.timeStamp);					
+					ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(theBloodGlucoseEvent.timeStamp, true);					
 					//and now make sure the previous item is visible
 					if (trackinglistPointer > 0)
 						ModelLocator.trackingEventToShow = 

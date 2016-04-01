@@ -21,7 +21,6 @@
  */
 package model
 {
-	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
@@ -301,7 +300,7 @@ package model
 		 */
 		public static var firstInitOfFoodCounterView:Boolean = true;
 		
-		public static var debugMode:Boolean = true;
+		public static var debugMode:Boolean = false;
 
 		public static var BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES:Number = 0.1;//unit s of insulin
 
@@ -757,26 +756,6 @@ package model
 		}
 		
 		/**
-		 * recalculates the insulinamounts in all mealevents in the trackinglist, with a timestamp younger then specified asof<br>
-		 * but going one day earlier, because the event might have been used in calculation of the insulin for older events<br>
-		 */
-		public static function recalculateInsulinAmoutInAllYoungerMealEvents(asOf:Number):void {
-			var newAsOf:Number = asOf - 24 * 3600 * 1000;
-			var cntr:int;
-			for (cntr = trackingList.length - 1;cntr >= 0;cntr--) {
-				trace("starting recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
-				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp > newAsOf) {
-					if (trackingList.getItemAt(cntr) is MealEvent) {
-						(trackingList.getItemAt(cntr) as MealEvent).recalculateInsulinAmount();
-					}
-				} else {
-					break;
-				}
-			}
-			trace("stopping recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
-		}
-
-		/**
 		 * updates correctionfactors in all existing mealevents, according to correction factor stored in the setting<br>
 		 */
 		public static function resetCorrectionFactorsInMeals(asOf:Date):void {
@@ -832,6 +811,86 @@ package model
 			timerForRecalculateActiveInsulin.addEventListener(TimerEvent.TIMER,recalculateActiveInsulin);
 			timerForRecalculateActiveInsulin.start();
 		}
+		
+/*		public static function recalculateInsulinAmoutInAllYoungerMealEvents(asOf:Number):void {
+			var newAsOf:Number = asOf - 24 * 3600 * 1000;
+			var cntr:int;
+			for (cntr = trackingList.length - 1;cntr >= 0;cntr--) {
+				trace("starting recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
+				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp > newAsOf) {
+					if (trackingList.getItemAt(cntr) is MealEvent) {
+						(trackingList.getItemAt(cntr) as MealEvent).recalculateInsulinAmount();
+					}
+				} else {
+					break;
+				}
+			}
+			trace("stopping recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
+		}*/
+
+		private static var recalculateInsulinAmountRunning:Boolean = false;
+		private static var rerunrecalculateInsulinAmountNecessary:Boolean = false;
+		private static var trackingListCounter:int = -1;
+		private static var startTimeStamp:Number = 0;
+		private static var maxCalculationDurationInms:Number;
+		private static var timerForAsyncRecalculateTimerFunction:Timer;
+		private static var maximumUntil:Number;//to go maximum 1 day younger, doesn't make much sense to go further back in history
+		private static var realAsOf:Number;
+		/**
+		 * recalculates the insulinamounts in all mealevents in the trackinglist, with a timestamp younger then specified asof<br>
+		 * but going one day earlier, because the event might have been used in calculation of the insulin for older events<br>
+		 */
+		public static function asyncrecalculateInsulinAmoutInAllYoungerMealEvents(asOf:Number = Number.NaN, newstart:Boolean = false):void {
+			if (recalculateInsulinAmountRunning && newstart) {
+				rerunrecalculateInsulinAmountNecessary = true;
+				realAsOf = Math.max(isNaN(asOf) ? 0:asOf, realAsOf) + 24 * 3600 * 1000;//will be rerun but new as of might be larger 
+				return;
+			}
+			if (!isNaN(asOf)) {// in case the function is being recalled from within the function itself, the paramater asOf will be Number.NaN
+				realAsOf = asOf + 24 * 3600 * 1000;
+				maximumUntil = asOf - 24 * 3600 * 1000;
+			}
+			if (!recalculateInsulinAmountRunning && trackingListCounter == -1) {
+				trackingListCounter = ModelLocator.trackingList.length - 1;
+			}
+			recalculateInsulinAmountRunning = true;
+			if (trackingListCounter == -1) {//stop calculation
+				recalculateInsulinAmountRunning = false;
+				startTimeStamp = 0;
+				if (rerunrecalculateInsulinAmountNecessary) {
+					rerunrecalculateInsulinAmountNecessary = false;
+					asyncrecalculateInsulinAmoutInAllYoungerMealEvents();
+				} else {
+					//trackingViewRedrawNecessary = true; -- alread handled by mealevent.recalculateInsulinAmount
+				}
+			} else {
+				//here we run the actual recalculation
+				//but if startTimeStamp = 0 it means asyncRecalculateInsulinAmountForAllMealEvents was called by another function, timer still needs to be set
+				if (startTimeStamp == 0) {
+					startTimeStamp = (new Date()).valueOf();
+					maxCalculationDurationInms = (1 / frameRate * 1000 / 3);//taking maximum one third of the frame period per block of recalculations 
+				} 
+				if (trackingList.length > trackingListCounter) {
+					if (trackingList.getItemAt(trackingListCounter) is MealEvent) {
+						if ((trackingList.getItemAt(trackingListCounter) as MealEvent).timeStamp < realAsOf) {
+							(trackingList.getItemAt(trackingListCounter) as MealEvent).recalculateInsulinAmount(true);
+						}
+					}
+				}
+				if ((trackingList.getItemAt(trackingListCounter) as TrackingViewElement).timeStamp < maximumUntil)
+					trackingListCounter = 0;
+				trackingListCounter--;
+				if (((startTimeStamp + maxCalculationDurationInms) < (new Date()).valueOf())) {
+					startTimeStamp = 0;
+					timerForAsyncRecalculateTimerFunction = new Timer(1 / frameRate * 1000, 1);
+					timerForAsyncRecalculateTimerFunction.addEventListener(TimerEvent.TIMER,asyncrecalculateInsulinAmoutInAllYoungerMealEvents);
+					timerForAsyncRecalculateTimerFunction.start();
+				} else {
+					asyncrecalculateInsulinAmoutInAllYoungerMealEvents(Number.NaN, false);
+				}
+			}
+		}
+
 		
 	}
 }

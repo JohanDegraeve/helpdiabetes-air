@@ -661,7 +661,6 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 						if (trackinglistPointer > 0) {
 							ModelLocator.trackingEventToShow = 
 								(ModelLocator.trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;
-							trace("setting rackingeventtoshow to " + ModelLocator.trackingEventToShow);
 						}
 						
 						navigator.popView();

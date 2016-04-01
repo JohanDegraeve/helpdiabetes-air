@@ -2154,7 +2154,7 @@ package databaseclasses
 			function selectedItemCreated(se:SQLEvent):void {
 				localSqlStatement.removeEventListener(SQLEvent.RESULT,selectedItemCreated);
 				localSqlStatement.removeEventListener(SQLErrorEvent.ERROR,selectedItemCreationFailed);
-				trace("Database.as : newSelectedItem successfully stored");
+				//trace("Database.as : newSelectedItem successfully stored");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);
