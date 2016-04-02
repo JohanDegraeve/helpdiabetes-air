@@ -139,7 +139,7 @@ view to show ModelLocator.meals in a list
 	</s:navigationContent>
 
 	<s:actionContent>
-		<s:Button icon="{ModelLocator.addImage48x48.png')" click="addButtonClicked(event)"/>
+		<s:Button icon="{ModelLocator.addImage48x48}" click="addButtonClicked(event)"/>
 	</s:actionContent>
 	<s:List id="meallist" left="0" right="0" top="0" bottom="0" width="100%"
 			dataProvider="{ModelLocator.meals}" 

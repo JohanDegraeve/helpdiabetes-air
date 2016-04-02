@@ -115,7 +115,7 @@ package myComponents
 				addImage = new Image();
 				addImage.fillMode = BitmapFillMode.CLIP;
 				addImage.contentLoader = ModelLocator.iconCache;
-				addImage.source = "assets/add48x48.png";
+				addImage.source = "assets/add48x48Copie.png";
 				addImage.addEventListener(MouseEvent.CLICK,addClicked);
 				addChild(addImage);
 			}

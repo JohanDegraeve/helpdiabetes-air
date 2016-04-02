@@ -283,8 +283,6 @@ package utilities
 		  * mg/dl-00:00>1.5-08:00>2.3-20:00>1.5 betekent 1.5 tussen 00:00 en 08:00 en 2.3 tussen 8 en 20 en vanaf 20 1.5
 		  */
 		 public static function createList(correctionFactorListAsString:String):FromtimeAndValueArrayCollection {
-			 trace("in FromtimeAndValueArrayCollection.createList");
-
 			 var splittedByDash:Array = correctionFactorListAsString.split("-");
 			 var unit:String;
 			 
