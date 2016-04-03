@@ -60,6 +60,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				} else {
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,usersAPISecret);
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutWebsiteURL,usersNightScoutUrl);
+					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");//not sure anymore why
 					//calculate sha-1 for the api-secret
 					var hash:SHA1 = new SHA1();
 					var result:String = Hex.fromArray(hash.hash(Hex.toArray(Hex.fromString(usersAPISecret))));
