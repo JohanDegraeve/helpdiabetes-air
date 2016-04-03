@@ -83,7 +83,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				if (ModelLocator.trackingViewRedrawNecessary) {
 					ModelLocator.trackingViewRedrawNecessary = false;
-					trace("setting modellocator.trackingviewdredrawnecessary to false");
 					(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
 					ModelLocator.trackingList.refresh();
 				}
