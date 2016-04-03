@@ -450,6 +450,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						bolusTypeTextSplitted[0],
 						bolusDuration);
 					ModelLocator.trackingList.addItem(theMedicinEvent);
+					ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(theMedicinEvent.timeStamp, true);
 				} else {
 					theMedicinEvent.updateMedicinEvent(bolusTypeTextSplitted[0], bolusDuration, medicinName,new Number(amountText),comment,eventDateAndTime.valueOf(),new Date().valueOf());
 				}
