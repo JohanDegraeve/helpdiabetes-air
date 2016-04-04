@@ -35,7 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			import mx.managers.PopUpManager;
-			import mx.resources.ResourceManager;
 			
 			import spark.components.TabbedViewNavigator;
 			import spark.components.ViewNavigator;
