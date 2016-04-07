@@ -191,6 +191,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
                 </array>
                 <key>UIStatusBarStyle</key>
                 <string>UIStatusBarStyleBlackOpaque</string>
+                <key>MinimumOSVersion</key>
+                <string>5.0</string>
             ]]>
         </InfoAdditions>
         <Entitlements>
