@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Google Sync Errors"
+		initialize="onInitialize()">
+	<fx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			
+			import spark.events.PopUpEvent;
+			
+			import myComponents.AlertPopUp;
+			
+			import utilities.Synchronize;
+			[Bindable] private var back_label:String;
+			private var alertPopUp:AlertPopUp;
+			
+			private function onInitialize():void {
+				back_label = resourceManager.getString('general','back');
+			}
+			
+			private function onListElementClicked(event:MouseEvent):void {
+				if (alertPopUp != null)	{
+					alertPopUp.setMessage(Synchronize.syncErrorList.getItemAt((event.currentTarget as List).selectedIndex) as String);				
+				} else  {
+					alertPopUp = new AlertPopUp();
+					alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
+					alertPopUp.show(this);
+					alertPopUp.setMessage(Synchronize.syncErrorList.getItemAt((event.currentTarget as List).selectedIndex) as String);
+				}
+			}
+			private function okClicked(event: PopUpEvent):void {
+				if (alertPopUp != null) {
+					PopUpManager.removePopUp(alertPopUp);
+					if (alertPopUp.hasEventListener(PopUpEvent.CLOSE)) {
+						alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
+					}
+					alertPopUp = null;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<s:navigationContent>
+		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
+	</s:navigationContent>
+	<s:Label  y="0" x="0" width="100%"  text="Click for details" height="100%" maxHeight="75" textAlign="left" verticalAlign="middle"/>
+	<s:List id="errorList" left="0" right="0" top="45" bottom="0" width="100%" useVirtualLayout="true" fontSize="10"
+			dataProvider="{Synchronize.syncErrorList}" click="onListElementClicked(event)">
+	</s:List>
+	
+</s:View>

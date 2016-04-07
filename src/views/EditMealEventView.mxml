@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -103,37 +103,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editdateandtime');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditDateAndTime;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut.verticalPosition = "after";
-				helpCallOut.open(dateTimeAndMealNameGroup,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditMealEventViewEditDateAndTime) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editdateandtime');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditMealEventViewEditDateAndTime;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.verticalPosition = "after";
+					helpCallOut.open(dateTimeAndMealNameGroup,true);
+				} else {
+					helptext2Removed(null);
+				}
 			}
 			
 			private function helptext2Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_viewboluscalculationdetails');
-				helpCallOut.settingId = Settings.SettingsHelpTextViewBolusCalculationDetails;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
-				helpCallOut.verticalPosition = "after";
-				helpCallOut.open(carbAmountGroup,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextViewBolusCalculationDetails) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_viewboluscalculationdetails');
+					helpCallOut.settingId = Settings.SettingsHelpTextViewBolusCalculationDetails;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+					helpCallOut.verticalPosition = "after";
+					helpCallOut.open(carbAmountGroup,true);
+				} else {
+					helptext3Removed(null);
+				}
 			}
 			
 			private function helptext3Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
 			}
 			
 			private function onCreationComplete():void {
 				if (mealEvent.meal != null) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
-					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-					//helpCallOut.verticalPosition = "before";
-					helpCallOut.open(fooditemlist,true);
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewSelectMealButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('editmealeventview','help_text_editSelectedItem');
+						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+						//helpCallOut.verticalPosition = "before";
+						helpCallOut.open(fooditemlist,true);
+					} else {
+						helptext1Removed(null);
+					}
 				}
 			}
 			
@@ -229,8 +241,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 					if (navigator.poppedViewReturnedObject.context == CHANGE_MEAL_DATE_AND_TIME) {
 						localdispatcher = new EventDispatcher();
-						ModelLocator.getInstance().copyOfTrackingList = new ArrayCollection();
-						ModelLocator.getInstance().trackingList = new ArrayCollection();
+						//ModelLocator.copyOfTrackingList = new ArrayCollection();
+						ModelLocator.trackingList = new ArrayCollection();
 						localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,getAllEventsAndFillUpMealsFinished);
 						localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,getAllEventsAndFillUpMealsFinished);//don't see what to do in case of error
 						Database.getInstance().getAllEventsAndFillUpMeals(localdispatcher);
@@ -243,10 +255,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				{
 					localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT, getAllEventsAndFillUpMealsFinished);
 					localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT, getAllEventsAndFillUpMealsFinished);
-					ModelLocator.getInstance().trackingList.refresh();
+					ModelLocator.trackingList.refresh();
 					
-					ModelLocator.getInstance().refreshMeals();
-					ModelLocator.getInstance().copyOfTrackingList = ModelLocator.getInstance().trackingList;
+					ModelLocator.refreshMeals();
+					//ModelLocator.copyOfTrackingList = ModelLocator.trackingList;
 				}
 			}
 			
@@ -307,10 +319,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/Notes_48x48.png')" id="NotesButton" click="editNote(event)"/>
+		<s:Button icon="{ModelLocator.notesImage_48x48}" id="NotesButton" click="editNote(event)"/>
 	</s:actionContent>
 	
-	<s:Group width="100%" >
+	<s:Group width="100%" id="globalGroup">
 		<s:layout >
 			<s:VerticalLayout gap="0">
 			</s:VerticalLayout>
@@ -380,7 +392,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			</s:stroke>
 		</s:Line>
 		
-		<s:List id="fooditemlist" width="100%"  height="100%" useVirtualLayout="false" dataProvider="{selectedFoodItems}" contentBackgroundAlpha="0" 
-				labelFunction="displaySelectedItem" itemRendererFunction="itemRendererFunction" />
 	</s:Group>
+	<s:List id="fooditemlist" width="100%" height="100%" top="{dateTimeAndMealNameGroup.height + 1 + carbAmountGroup.height + 1}" useVirtualLayout="false" dataProvider="{selectedFoodItems}" contentBackgroundAlpha="0" 
+			labelFunction="displaySelectedItem" itemRendererFunction="itemRendererFunction" />
 </s:View>

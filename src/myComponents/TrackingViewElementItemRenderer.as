@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,8 @@
  */
 package myComponents
 {
-	import mx.core.LayoutDirection;
-	
 	import spark.components.LabelItemRenderer;
-	
 	import databaseclasses.Settings;
-	
-	
 	import model.ModelLocator;
 
 	/**
@@ -59,7 +54,7 @@ package myComponents
 				graphics.beginFill(0xC0EDFF, 0.75);
 				graphics.drawRect(0, 0, unscaledWidth, unscaledHeight);
 				graphics.endFill();
-				if ((data as TrackingViewElement).eventid == ModelLocator.getInstance().trackingEventToShow) {
+				if ((data as TrackingViewElement).eventid == ModelLocator.trackingEventToShow) {
 					graphics.lineStyle(unscaledHeight/20, 0xFF0000, 0.5);
 					graphics.lineTo(0, unscaledHeight);
 					graphics.lineTo(unscaledWidth,unscaledHeight);
@@ -86,14 +81,5 @@ package myComponents
 				graphics.endFill();
 			}
 		}
-
-		
-		/**
-		 * the goal is that the real itemrenderers extend from TrackingViewElementItemRenderer and override getHeight and getWidth and calculate the 
-		 * height and width for the parameter item.<br>
-		 
-		public function getWidth(item:TrackingViewElement = null):Number {
-			return 0;			
-		}*/
 	}
 }

@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ package databaseclasses
 			var previousBGlevel:Number = Number.NaN;
 			var insulinRatio:Number;
 			var localdispatcher:EventDispatcher = new EventDispatcher();
-			var timeStampAsDate = new Date(_timeStamp);
+			var timeStampAsDate:Date = new Date(_timeStamp);
 			
 			if (_mealEvent == null) {
 				//it's the first selectedfooditem, and if no timestamp was supplied then set _timestamp to current time
@@ -137,7 +137,7 @@ package databaseclasses
 				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
 				var correctionFactorList:FromtimeAndValueArrayCollection = FromtimeAndValueArrayCollection.createList(Settings.getInstance().getSetting(Settings.SettingsCorrectionFactor));
-				_mealEvent = new MealEvent(mealName,insulinRatio, correctionFactorList.getValue(Number.NaN,"",timeStampAsDate),timeStampAsDate,localdispatcher,DateTimeUtilities.createEventId(), "",new Date().valueOf(),true,null,thisMeal);
+				_mealEvent = new MealEvent(mealName,insulinRatio, correctionFactorList.getValue(Number.NaN,"",timeStampAsDate),timeStampAsDate.valueOf(),localdispatcher,DateTimeUtilities.createEventId() + "-carbs", "",new Date().valueOf(),true,null,thisMeal, true);
 			} else
 				mealEventCreated(null);
 			
@@ -151,8 +151,8 @@ package databaseclasses
 				//if de not null, then mealEventCreated was called after having created a new mealevent, that needs to be 
 				//added in the trackinglist.
 				if (de != null) {
-					ModelLocator.getInstance().trackingList.addItem(_mealEvent);
-					ModelLocator.getInstance().trackingList.refresh();
+					ModelLocator.trackingList.addItem(_mealEvent);
+					ModelLocator.trackingList.refresh();
 				}
 				Settings.getInstance().setSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION, (new Date()).valueOf().toString());
 				Settings.getInstance().setSetting(Settings.SettingLAST_MEAL_ID,_mealEvent.eventid.toString());
@@ -199,8 +199,8 @@ package databaseclasses
 				localdispatcher.addEventListener(DatabaseEvent.RESULT_EVENT,mealEventDeletedFromDB);
 				localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,mealEventDeletionFromDBFailed);
 				Database.getInstance().deleteMealEvent(_mealEvent.eventid,localdispatcher);
-				ModelLocator.getInstance().trackingList.removeItemAt(ModelLocator.getInstance().trackingList.getItemIndex(_mealEvent));
-				ModelLocator.getInstance().trackingList.refresh();
+				ModelLocator.trackingList.removeItemAt(ModelLocator.trackingList.getItemIndex(_mealEvent));
+				ModelLocator.trackingList.refresh();
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.RESULT_EVENT);
 					dispatcher.dispatchEvent(event);

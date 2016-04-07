@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2014  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -243,6 +243,8 @@ initial setup of sync settings
 				Settings.getInstance().setSetting(Settings.SettingsAccessToken,temp.access_token);
 				Settings.getInstance().setSetting(Settings.SettingsRefreshToken,temp.refresh_token);
 				Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
+				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
+				Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 				Synchronize.getInstance().startSynchronize(true,false);
 			}
 			

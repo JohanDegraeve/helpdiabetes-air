@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -80,16 +80,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 			private function onCreationComplete(): void {
 				back_label = resourceManager.getString('general','back');
-				
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('settingsboluscalculationview','help_text_changeCarbRatio');
-				helpCallOut.settingId = Settings.SettingsHelpTextBolusCalculationViewChangeCarbRatio;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(lunchRatio,true);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextBolusCalculationViewChangeCarbRatio) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('settingsboluscalculationview','help_text_changeCarbRatio');
+					helpCallOut.settingId = Settings.SettingsHelpTextBolusCalculationViewChangeCarbRatio;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(lunchRatio,true);
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);	
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);	
 			}
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -157,12 +160,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					//selectedmeal might still point to a previous meal which is finished by now,
 					//check if it's more than 15 minutes ago that a fooditem has been added, if so reset selectedmeal
 					if (((new Date()).valueOf() - new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION))) > 15*60*1000) {
-						ModelLocator.getInstance().resetSelectedMeal();
+						ModelLocator.resetSelectedMeal();
 					}
 					
 					//now it could also be that the meal where the last addition was done, is one  in the future, and it's less than 15 minutes ago
 					//so we need to assure we'll update also as of the current meal which is..
-					secondMeal = ModelLocator.getInstance().getRefreshedSelectedMeal();
+					secondMeal = ModelLocator.getRefreshedSelectedMeal();
 					
 					//get from and totime
 					if (settingId == Settings.SettingINSULIN_RATIO_BREKFAST) {
@@ -182,8 +185,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					//added 3/06/2012
 					//before we start, check if the user wants to change also the current meal, if it already has a mealevent, otherwise we don't care
 					alreadyAskedToChangeRatioInCurrentMeal = false;
-					if ((ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).mealEvent) {
-						var theMealevent:MealEvent = (ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).mealEvent;
+					if ((ModelLocator.meals.getItemAt(secondMeal) as Meal).mealEvent) {
+						var theMealevent:MealEvent = (ModelLocator.meals.getItemAt(secondMeal) as Meal).mealEvent;
 						var mealEventTimeStamp:Date = new Date(theMealevent.timeStamp);
 						var mealEventTimeStampHourMinute:Number =  (mealEventTimeStamp.hours * 3600 + mealEventTimeStamp.minutes * 60 + mealEventTimeStamp.seconds)*1000;
 						if ((fromTime <= mealEventTimeStampHourMinute) && (mealEventTimeStampHourMinute < toTime)) {
@@ -214,9 +217,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					}
 					//now update all mealevents in trackinglist						
-					ModelLocator.getInstance().updateInsulinRatiosInTrackingList(
-						(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp < ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp ? 
-						(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp : ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp,
+					ModelLocator.updateInsulinRatiosInTrackingList(
+						(ModelLocator.meals.getItemAt(secondMeal) as Meal).timeStamp < ModelLocator.getCurrentlySelectedMeal().timeStamp ? 
+						(ModelLocator.meals.getItemAt(secondMeal) as Meal).timeStamp : ModelLocator.getCurrentlySelectedMeal().timeStamp,
 						newAmount,
 						fromTime,
 						toTime);
@@ -226,8 +229,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						Synchronize.getInstance().startSynchronize(true,false);
 					} else {
 						checkOtherSettings(newAmount,
-							(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp < ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp ? 
-							(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp : ModelLocator.getInstance().getCurrentlySelectedMeal().timeStamp
+							(ModelLocator.meals.getItemAt(secondMeal) as Meal).timeStamp < ModelLocator.getCurrentlySelectedMeal().timeStamp ? 
+							(ModelLocator.meals.getItemAt(secondMeal) as Meal).timeStamp : ModelLocator.getCurrentlySelectedMeal().timeStamp
 							);
 					}
 				}
@@ -238,8 +241,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesClicked);
 						confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					}//now update all mealevents in trackinglist						
-					ModelLocator.getInstance().updateInsulinRatiosInTrackingList(
-						(ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp + 1,//it's getting a bit strange here, if the user choses no, then we'll update as of secondmeal + 1 ms
+					ModelLocator.updateInsulinRatiosInTrackingList(
+						(ModelLocator.meals.getItemAt(secondMeal) as Meal).timeStamp + 1,//it's getting a bit strange here, if the user choses no, then we'll update as of secondmeal + 1 ms
 						newAmount,
 						fromTime,
 						toTime);
@@ -248,7 +251,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					if (!firstTime) {
 						Synchronize.getInstance().startSynchronize(true,false);
 					} else {
-						checkOtherSettings(newAmount, (ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).timeStamp + 1);
+						checkOtherSettings(newAmount, (ModelLocator.meals.getItemAt(secondMeal) as Meal).timeStamp + 1);
 					}
 				}
 
@@ -283,13 +286,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					//do almost the same as already done above , but no for all meals from 00:00 till 23:59
 					//it could also be that the meal where the last addition was done, is one  in the future, and it's less than 15 minutes ago
 					//so we need to assure we'll update also as of the current meal which is..
-					secondMeal = ModelLocator.getInstance().getRefreshedSelectedMeal();
+					secondMeal = ModelLocator.getRefreshedSelectedMeal();
 
 					//added 3/06/2012
 					//before we start, check if the user wants to change also the current meal, if it already has a mealevent, otherwise we don't care
 					if (!alreadyAskedToChangeRatioInCurrentMeal) {
-						if ((ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).mealEvent) {
-								var theMealevent:MealEvent = (ModelLocator.getInstance().meals.getItemAt(secondMeal) as Meal).mealEvent;
+						if ((ModelLocator.meals.getItemAt(secondMeal) as Meal).mealEvent) {
+								var theMealevent:MealEvent = (ModelLocator.meals.getItemAt(secondMeal) as Meal).mealEvent;
 								confirmationPicker = new RequestConfirmation();
 								confirmationPicker.labelText1 = resourceManager.getString('settingsboluscalculationview','change_also_mealevent_part_1');
 
@@ -325,7 +328,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesYesClicked);
 						confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoNoClicked);
 					}
-					ModelLocator.getInstance().updateInsulinRatiosInTrackingList(
+					ModelLocator.updateInsulinRatiosInTrackingList(
 						asofDateAndTime,
 						newValue,
 						0,
@@ -338,7 +341,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						confirmationPicker.removeEventListener(PickerEvent.PICKER_SET, onYesYesClicked);
 						confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoNoClicked);
 					}
-					ModelLocator.getInstance().updateInsulinRatiosInTrackingList(
+					ModelLocator.updateInsulinRatiosInTrackingList(
 						asofDateAndTime + 1,
 						newValue,
 						0,

@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -29,16 +29,16 @@ package myComponents
 	public class MedicinEventItemRenderer extends TrackingViewElementItemRenderer
 	{
 		private var eventTypeImage:Image;
-		[Embed(source = "assets/ic_tab_medicine_selected_35x35.png")]
-		public static var eventTypeIcon:Class;
+		//[Embed(source = "assets/ic_tab_medicine_selected_35x35.png")]
+		//public static var eventTypeIcon:Class;
 		
 		private var notesImage:Image;
-		[Embed(source = "assets/Notes_16x16.png")]
-		public static var notesIcon:Class;
+		//[Embed(source = "assets/Notes_16x16.png")]
+		//public static var notesIcon:Class;
 
 		private var squareWaveBolusImage:Image;
-		[Embed(source = "assets/squarewavebolus.png")]
-		public static var squareWaveBolusIcon:Class;
+		//[Embed(source = "assets/squarewavebolus.png")]
+		//public static var squareWaveBolusIcon:Class;
 
 		static private var itemHeight:int;
 		static private var offsetToPutTextInTheMiddle:int;
@@ -94,7 +94,8 @@ package myComponents
 			if (!notesImage) {
 				notesImage = new Image();
 				notesImage.fillMode = BitmapFillMode.CLIP;
-				notesImage.source = notesIcon;
+				notesImage.contentLoader = ModelLocator.iconCache;
+				notesImage.source = "assets/Notes_16x16.png";
 				addChild(notesImage);
 			}
 		}
@@ -148,7 +149,7 @@ package myComponents
 				if (!squareWaveBolusImage) {
 					squareWaveBolusImage  = new Image();
 					squareWaveBolusImage.fillMode = BitmapFillMode.CLIP;
-					squareWaveBolusImage.source = squareWaveBolusIcon;
+					squareWaveBolusImage.source = "assets/squarewavebolus.png";
 					addChild(squareWaveBolusImage)
 				}
 			} else
@@ -192,12 +193,13 @@ package myComponents
 
 			}
 		}
+		
+		private static var counter2:int = 0;
 
 		override public function set data(value:Object):void {
 			super.data = value;
-			
-			
-			if (!data) return;//did this because I found it in an example 
+
+			if (!data) return;//did this because I found it in an example
 			
 			var date:Date = new Date(((value as MedicinEvent).timeStamp));
 			label = 
@@ -210,7 +212,7 @@ package myComponents
 			comment = (value as MedicinEvent).comment;
 			bolusType = (value as MedicinEvent).bolustype;
 			var now:Number = (new Date()).valueOf();
-			var activeInsulin:Number = ModelLocator.getInstance().calculateActiveInsulinForSpecifiedEvent((value as MedicinEvent),now);
+			var activeInsulin:Number = (value as MedicinEvent).activeInsulinAmount;
 			if (activeInsulin > 0) {
 				var activeInsulinText:String = resourceManager.getString('editmedicineventview','active') 
 					+ " = " + ((Math.round(activeInsulin * 10))/10).toString()
@@ -240,7 +242,8 @@ package myComponents
 				//image.smooth = true;
 				//image.scaleMode = BitmapScaleMode.ZOOM;
 				eventTypeImage.fillMode = BitmapFillMode.CLIP;
-				eventTypeImage.source = eventTypeIcon;
+				eventTypeImage.contentLoader = ModelLocator.iconCache;
+				eventTypeImage.source = "assets/ic_tab_medicine_selected_35x35.png";
 				addChild(eventTypeImage);
 			}
 			
@@ -257,7 +260,8 @@ package myComponents
 					if (!notesImage) {
 						notesImage = new Image();
 						notesImage.fillMode = BitmapFillMode.CLIP;
-						notesImage.source = notesIcon;
+						notesImage.contentLoader = ModelLocator.iconCache;
+						notesImage.source = "assets/Notes_16x16.png";
 						addChild(notesImage);
 					}
 				}
@@ -266,15 +270,16 @@ package myComponents
 				if (!squareWaveBolusImage) {
 					squareWaveBolusImage  = new Image();
 					squareWaveBolusImage.fillMode = BitmapFillMode.CLIP;
-					squareWaveBolusImage.source = squareWaveBolusIcon;
+					squareWaveBolusImage.source = "assets/squarewavebolus.png";
 					addChild(squareWaveBolusImage)
 				}
 			} 
 		}
 
+		private static var counter1:int = 0;
 		override public function getHeight(item:TrackingViewElement = null):Number {
 			var now:Number = (new Date()).valueOf();
-			var activeInsulin:Number = ModelLocator.getInstance().calculateActiveInsulinForSpecifiedEvent((item as MedicinEvent),now);
+			var activeInsulin:Number = (item as MedicinEvent).activeInsulinAmount;
 			return itemHeight + (activeInsulin == 0  ? 0 : activeInsulinAmountHeight);
 		}
 

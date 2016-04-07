@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		creationComplete="creationCompleteHandler(event)"
 		add="addHandler()"
 		initialize="onInitialize()"
-		activate="launchRecalculateActiveInsulin(event)"
 		>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
@@ -34,7 +33,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
-			import mx.resources.ResourceManager;
 			
 			import databaseclasses.BloodGlucoseEvent;
 			import databaseclasses.ExerciseEvent;
@@ -57,13 +55,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private static var lastClickOnTrackingView:Number;
 			private var helpCallOut:HelpCallOut;
-			static private var timerForRecalculateActiveInsulin:Timer;
-			private var timerForRecalculateActiveInsulinForMedicinEvents:Timer;
-			private var timer:Timer;
-			static private var activeInsulinAmount:Number;
-			
-			[Bindable]
-			static private var activeInsulin_text:String;
+			private var redrawActionButtonTimer:Timer;
+			private static var redrawTrackingViewTimer:Timer;
 			
 			private function addHandler():void {
 				if (!navigator.poppedViewReturnedObject) return; 
@@ -77,21 +70,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				title = resourceManager.getString('trackingview','logbook');
 				lastClickOnTrackingView = (new Date()).valueOf();
 				ModelLocator.getInstance().addEventListener(ModelLocator.SEARCHACTIVE_CHANGED,reDrawActionButtons);
+				ModelLocator.recalculateActiveInsulin();
+			}
+			
+			private function checkRedrawTrackingView(event:Event = null):void {
+				if (redrawTrackingViewTimer) {
+					if (redrawTrackingViewTimer.running) {
+						redrawTrackingViewTimer.removeEventListener(TimerEvent.TIMER,checkRedrawTrackingView);
+						redrawTrackingViewTimer.stop();
+					}
+				}
+				
+				if (ModelLocator.trackingViewRedrawNecessary) {
+					ModelLocator.trackingViewRedrawNecessary = false;
+					(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
+					ModelLocator.trackingList.refresh();
+				}
+				
+				redrawTrackingViewTimer = new Timer(1000, 1);
+				redrawTrackingViewTimer.addEventListener(TimerEvent.TIMER,checkRedrawTrackingView);
+				redrawTrackingViewTimer.start();
 			}
 			
 			private function reDrawActionButtons(event:Event = null):void {
 				if (navigator) {
 					if (navigator.actionBar.actionContent) {
-						if (ModelLocator.getInstance().searchActive) {
+						if (ModelLocator.searchActive) {
 							if (navigator.actionBar.actionContent.indexOf(searchButton) != -1)
 								navigator.actionBar.actionGroup.removeElement(searchButton);
-							if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().lastMarkedItemEventId) {
+							if (ModelLocator.firstMarkedItemEventId == ModelLocator.lastMarkedItemEventId) {
 								upButton.alpha = 0.25;
 								downButton.alpha = 0.25
-							} else if (ModelLocator.getInstance().lastMarkedItemEventId == ModelLocator.getInstance().trackingEventToShow) {
+							} else if (ModelLocator.lastMarkedItemEventId == ModelLocator.trackingEventToShow) {
 								downButton.alpha = 0.25;
 								upButton.alpha = 1;
-							} else if (ModelLocator.getInstance().firstMarkedItemEventId == ModelLocator.getInstance().trackingEventToShow) {
+							} else if (ModelLocator.firstMarkedItemEventId == ModelLocator.trackingEventToShow) {
 								upButton.alpha = 0.25;
 								downButton.alpha = 1;
 							} else  {
@@ -115,14 +128,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 						openHelpTexts();
 					} else {
-						timer = new Timer(100, 1);
-						timer.addEventListener(TimerEvent.TIMER,timerEnd);
-						timer.start();
+						redrawActionButtonTimer = new Timer(100, 1);
+						redrawActionButtonTimer.addEventListener(TimerEvent.TIMER,timerEnd);
+						redrawActionButtonTimer.start();
 					}
 				} else {
-					timer = new Timer(100, 1);
-					timer.addEventListener(TimerEvent.TIMER,timerEnd);
-					timer.start();
+					redrawActionButtonTimer = new Timer(100, 1);
+					redrawActionButtonTimer.addEventListener(TimerEvent.TIMER,timerEnd);
+					redrawActionButtonTimer.start();
 				}
 				
 				function timerEnd():void {
@@ -157,20 +170,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onListElementClicked(event:MouseEvent):void {
-				ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) as TrackingViewElement).eventid;
-				if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
+				if ((event.currentTarget as List).selectedIndex == -1)
+					return;
+				ModelLocator.trackingEventToShow = (ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex) as TrackingViewElement).eventid;
+				if (ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MealEvent) {//be aware that the mealeventitemrenderer will stop propagation of this mouseevent if it was not extended before the item was clicked
 					MyGATracker.getInstance().trackPageview( "TrackingView-MealEventClicked" );
 					
-					navigator.pushView(EditMealEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex)); 					
-				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MedicinEvent) {
+					navigator.pushView(EditMealEventView,ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex)); 					
+				} else if (ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex) is MedicinEvent) {
 					MyGATracker.getInstance().trackPageview( "TrackingView-MedicinEventClicked" );
-					navigator.pushView(EditMedicinEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex));
-				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is ExerciseEvent) {
+					navigator.pushView(EditMedicinEventView,ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex));
+				} else if (ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex) is ExerciseEvent) {
 					MyGATracker.getInstance().trackPageview( "TrackingView-ExerciseEventClicked" );
-					navigator.pushView(EditExerciseEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex));
-				} else if (ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex) is BloodGlucoseEvent) {
+					navigator.pushView(EditExerciseEventView,ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex));
+				} else if (ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex) is BloodGlucoseEvent) {
 					MyGATracker.getInstance().trackPageview( "TrackingView-BGEventClicked" );
-					navigator.pushView(EditBGEventView,ModelLocator.getInstance().trackingList.getItemAt((event.currentTarget as List).selectedIndex));
+					navigator.pushView(EditBGEventView,ModelLocator.trackingList.getItemAt((event.currentTarget as List).selectedIndex));
 				}
 			}
 			
@@ -187,9 +202,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				var cntr:int = 0;
 				var selitemctr:int = 0;
-				ModelLocator.getInstance().searchActive = false;
-				ModelLocator.getInstance().firstMarkedItemEventId = "0";
-				ModelLocator.getInstance().lastMarkedItemEventId = "0";
+				ModelLocator.searchActive = false;
+				ModelLocator.firstMarkedItemEventId = "0";
+				ModelLocator.lastMarkedItemEventId = "0";
 				
 				if (textSet == "")
 					return;
@@ -206,22 +221,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				
 				//start with the first substring
 				
-				for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
+				for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
 					var allTextInOneString:String = "";
-					if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MealEvent) {
-						var mealEvent:MealEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MealEvent;
+					if (ModelLocator.trackingList.getItemAt(cntr) is MealEvent) {
+						var mealEvent:MealEvent = ModelLocator.trackingList.getItemAt(cntr) as MealEvent;
 						for (selitemctr = 0;selitemctr < mealEvent.selectedFoodItems.length;selitemctr++) {
 							allTextInOneString += " " + (mealEvent.selectedFoodItems.getItemAt(selitemctr) as SelectedFoodItem).itemDescription;
 						}
 						allTextInOneString += " " + mealEvent.comment;
-					} else if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is ExerciseEvent) {
-						var exerciseEvent:ExerciseEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as ExerciseEvent;
+					} else if (ModelLocator.trackingList.getItemAt(cntr) is ExerciseEvent) {
+						var exerciseEvent:ExerciseEvent = ModelLocator.trackingList.getItemAt(cntr) as ExerciseEvent;
 						allTextInOneString += " " + exerciseEvent.level;
 						allTextInOneString += " " + exerciseEvent.comment;
-					} else if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is BloodGlucoseEvent) {
-						allTextInOneString += " " + (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as BloodGlucoseEvent).comment;
-					} else if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MedicinEvent) {
-						var medicinEvent:MedicinEvent = ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as MedicinEvent;
+					} else if (ModelLocator.trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
+						allTextInOneString += " " + (ModelLocator.trackingList.getItemAt(cntr) as BloodGlucoseEvent).comment;
+					} else if (ModelLocator.trackingList.getItemAt(cntr) is MedicinEvent) {
+						var medicinEvent:MedicinEvent = ModelLocator.trackingList.getItemAt(cntr) as MedicinEvent;
 						allTextInOneString += " " + medicinEvent.medicinName;
 						allTextInOneString += " " + medicinEvent.comment;
 					} 
@@ -232,41 +247,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					else
 					break;
 					if (splittedTextCntr == splittedText.length) {
-						(ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).mark = true;
-						ModelLocator.getInstance().lastMarkedItemEventId = (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) as TrackingViewElement).eventid;
-						if (ModelLocator.getInstance().firstMarkedItemEventId == "0")
-							ModelLocator.getInstance().firstMarkedItemEventId = ModelLocator.getInstance().lastMarkedItemEventId;
+						(ModelLocator.trackingList.getItemAt(cntr) as TrackingViewElement).mark = true;
+						ModelLocator.lastMarkedItemEventId = (ModelLocator.trackingList.getItemAt(cntr) as TrackingViewElement).eventid;
+						if (ModelLocator.firstMarkedItemEventId == "0")
+							ModelLocator.firstMarkedItemEventId = ModelLocator.lastMarkedItemEventId;
 						elementsFound = true;
 					}
 				}
 				
 				(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
-				ModelLocator.getInstance().trackingList.refresh();//forces a redraw
+				ModelLocator.trackingList.refresh();//forces a redraw
 				
 				if (elementsFound) {
-					ModelLocator.getInstance().trackingEventToShow = ModelLocator.getInstance().lastMarkedItemEventId;
-					ModelLocator.getInstance().searchActive = true;
+					ModelLocator.trackingEventToShow = ModelLocator.lastMarkedItemEventId;
+					ModelLocator.searchActive = true;
 				}
 			}
 			
 			private function upClicked(e:MouseEvent = null):void {
-				if (!ModelLocator.getInstance().searchActive)
+				if (!ModelLocator.searchActive)
 					return;
-				if (ModelLocator.getInstance().trackingEventToShow == ModelLocator.getInstance().firstMarkedItemEventId)
+				if (ModelLocator.trackingEventToShow == ModelLocator.firstMarkedItemEventId)
 					return;
 				//first find the location of the current eventtoshow
 				var listctr:int = 0;
-				for (listctr = 0;listctr < ModelLocator.getInstance().trackingList.length;listctr++) {
-					if ((ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).eventid == ModelLocator.getInstance().trackingEventToShow)
+				for (listctr = 0;listctr < ModelLocator.trackingList.length;listctr++) {
+					if ((ModelLocator.trackingList.getItemAt(listctr) as TrackingViewElement).eventid == ModelLocator.trackingEventToShow)
 						break;
 				}
 				//now go up again to find the next marked element
 				listctr--;
 				for (;listctr >= 0;listctr--) {
-					if ((ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).mark) {
-						ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).eventid;
+					if ((ModelLocator.trackingList.getItemAt(listctr) as TrackingViewElement).mark) {
+						ModelLocator.trackingEventToShow = (ModelLocator.trackingList.getItemAt(listctr) as TrackingViewElement).eventid;
 						(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
-						ModelLocator.getInstance().trackingList.refresh();//forces a redraw of the list
+						ModelLocator.trackingList.refresh();//forces a redraw of the list
 						reDrawActionButtons();
 						break;
 					}
@@ -274,23 +289,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function downClicked(e:MouseEvent = null):void {
-				if (!ModelLocator.getInstance().searchActive)
+				if (!ModelLocator.searchActive)
 					return;
-				if (ModelLocator.getInstance().trackingEventToShow == ModelLocator.getInstance().lastMarkedItemEventId)
+				if (ModelLocator.trackingEventToShow == ModelLocator.lastMarkedItemEventId)
 					return;
 				//first find the location of the current eventtoshow
 				var listctr:int = 0;
-				for (listctr = 0;listctr < ModelLocator.getInstance().trackingList.length;listctr++) {
-					if ((ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).eventid == ModelLocator.getInstance().trackingEventToShow)
+				for (listctr = 0;listctr < ModelLocator.trackingList.length;listctr++) {
+					if ((ModelLocator.trackingList.getItemAt(listctr) as TrackingViewElement).eventid == ModelLocator.trackingEventToShow)
 						break;
 				}
 				//now go further down to find the next marked element
 				listctr++;
 				for (;listctr >= 0;listctr++) {
-					if ((ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).mark) {
-						ModelLocator.getInstance().trackingEventToShow = (ModelLocator.getInstance().trackingList.getItemAt(listctr) as TrackingViewElement).eventid;
+					if ((ModelLocator.trackingList.getItemAt(listctr) as TrackingViewElement).mark) {
+						ModelLocator.trackingEventToShow = (ModelLocator.trackingList.getItemAt(listctr) as TrackingViewElement).eventid;
 						(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
-						ModelLocator.getInstance().trackingList.refresh();//forces a redraw of the list
+						ModelLocator.trackingList.refresh();//forces a redraw of the list
 						reDrawActionButtons();
 						break;
 					}
@@ -298,14 +313,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function cancelClicked(e:MouseEvent = null):void {
-				ModelLocator.getInstance().searchActive = false;
-				ModelLocator.getInstance().firstMarkedItemEventId = "0";
-				ModelLocator.getInstance().lastMarkedItemEventId = "0";
-				ModelLocator.getInstance().trackingEventToShow = 
-					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null ? "-1" :
-					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.eventid;
+				ModelLocator.searchActive = false;
+				ModelLocator.firstMarkedItemEventId = "0";
+				ModelLocator.lastMarkedItemEventId = "0";
+				ModelLocator.trackingEventToShow = 
+					(ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealEvent == null ? "-1" :
+					(ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealEvent.eventid;
 				(trackinglist.layout as TrackingViewLayout).firstUpdateDisplayList = true;
-				ModelLocator.getInstance().trackingList.refresh();
+				ModelLocator.trackingList.refresh();
 			}
 			
 			protected function creationCompleteHandler(event:FlexEvent):void
@@ -314,93 +329,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (!navigator) return;
 				if (!navigator.actionBar.actionContent) return;
 				if (navigator.actionBar.actionContent.indexOf(searchButton) != -1) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_searchbutton');
-					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewSearchButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
-					helpCallOut.open(searchButton,true)
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextTrackingViewSearchButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_searchbutton');
+						helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewSearchButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+						helpCallOut.open(searchButton,true)
+					} else {
+						helptext0Removed(null);
+					}
 				} /*else
 				helptext0Removed();*/
-				recalculateActiveInsulin();
 				Synchronize.getInstance().startSynchronize(false,false);
+				checkRedrawTrackingView();
 			}
-			
-			private function launchRecalculateActiveInsulin(event:Event = null):void {
-				recalculateActiveInsulinPerMedicinItem();
-				recalculateActiveInsulin();
-			}
-			
-			static public function recalculateActiveInsulin(event:Event = null):void  {
-				//if (ModelLocator.debugMode)
-				trace("in recalculateactiveinsulin");
-				if (timerForRecalculateActiveInsulin != null) {
-					if (timerForRecalculateActiveInsulin.hasEventListener(TimerEvent.TIMER))
-						timerForRecalculateActiveInsulin.removeEventListener(TimerEvent.TIMER,recalculateActiveInsulin );
-					timerForRecalculateActiveInsulin.stop();					
-				}
-				
-				//calculate activeInsulin_text
-				activeInsulinAmount = ((Math.round(ModelLocator.getInstance().calculateActiveInsulin((new Date()).valueOf()) * 10))/10);
-				activeInsulin_text = 
-					ResourceManager.getInstance().getString('trackingview','active_insulin')
-					+ " = " 
-					+ activeInsulinAmount.toString() 
-					+ " " 
-					+ ResourceManager.getInstance().getString('trackingview','internationalunit');
-				
-				timerForRecalculateActiveInsulin = new Timer(300000, 1);
-				timerForRecalculateActiveInsulin.addEventListener(TimerEvent.TIMER,recalculateActiveInsulin);
-				timerForRecalculateActiveInsulin.start();
-			}
-			
-			private function recalculateActiveInsulinPerMedicinItem(event:Event = null):void {
-				if (timerForRecalculateActiveInsulinForMedicinEvents != null) {
-					if (timerForRecalculateActiveInsulinForMedicinEvents.hasEventListener(TimerEvent.TIMER))
-						timerForRecalculateActiveInsulinForMedicinEvents.removeEventListener(TimerEvent.TIMER,recalculateActiveInsulinPerMedicinItem );
-				}
-				
-				//if total active insulin > 0, then we'll also try to update the active insulin amounts of the individual
-				//medicin events in the tracking list
-				//
-				//so we first get the list of items that are currently visible (mostly this will be the last items, hence the once that might have some active insulin
-				//for each of those medicinevents, we check if it younger than the maximum duration of insulin
-				//if yes, then redrawing is necessary, either by doing refresh, or by removing/adding this specific item
-				if (activeInsulinAmount == 0) 
-					return;
-				var indices:Vector.<int> = trackinglist.dataGroup.getItemIndicesInView();
-				var maxInsulinDurationInSeconds:Number = new Number(Settings.getInstance().getSetting(Settings.SettingsMaximumInsulinDurationInSeconds));
-				for (var cntr:int = 0;cntr < indices.length;cntr++) {
-					var itemid:int = indices[cntr];
-					//very strange but in some situation the last index points to an itemid with value > size of copyoftrackinglist
-					//this happens when an element is delete remotely (on another device), a sync happens
-					// .. then the screen is refreshed locally, then this indices vector is created
-					//so to avoid an exception, before trying getitemat with value itemid, check here if itemid < length
-					if (itemid < ModelLocator.getInstance().copyOfTrackingList.length) {
-						var theEvent:Object = ModelLocator.getInstance().copyOfTrackingList.getItemAt(itemid);
-						if (theEvent is MedicinEvent) {
-							if ((theEvent as TrackingViewElement).timeStamp + maxInsulinDurationInSeconds * 1000 > (new Date()).valueOf()) {
-								ModelLocator.getInstance().copyOfTrackingList.removeItemAt(itemid);
-								ModelLocator.getInstance().copyOfTrackingList.addItem(theEvent);//this will force recalculation and redraw of the active insulin for that item
-							}
-						}	
-					}
-				}
-				timerForRecalculateActiveInsulinForMedicinEvents = new Timer(300000, 1);
-				timerForRecalculateActiveInsulinForMedicinEvents.addEventListener(TimerEvent.TIMER,recalculateActiveInsulinPerMedicinItem);
-				timerForRecalculateActiveInsulinForMedicinEvents.start();
-			}
-			
 			
 			/**
 			 * helptext for tracking list 
 			 */
 			private function helptext0Removed(event:Event = null):void {
 				if (trackinglist.dataProvider.length > 0) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_editevent');
-					helpCallOut.settingId = Settings.SettingsHelpTextEditTrackingEvent;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helpText3Removed);
-					helpCallOut.open(trackinglist,true);
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditTrackingEvent) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_editevent');
+						helpCallOut.settingId = Settings.SettingsHelpTextEditTrackingEvent;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helpText3Removed);
+						helpCallOut.open(trackinglist,true);
+					} else {
+						helpText3Removed(null);
+					}
 				}
 			}
 			
@@ -408,18 +365,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 * helptext for active insulin 
 			 */
 			private function helpText3Removed(event:Event = null):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helpText3Removed);
-				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextActiveInsulinInt) == 'true') {
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helpText3Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextActiveInsulinInt) == 'true' && ModelLocator.activeInsulinAmount > 0) {
 					var cntr:int;
-					for (cntr = 0;cntr < ModelLocator.getInstance().copyOfTrackingList.length;cntr++) {
-						if (ModelLocator.getInstance().copyOfTrackingList.getItemAt(cntr) is MedicinEvent) {
+					for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
+						if (ModelLocator.trackingList.getItemAt(cntr) is MedicinEvent) {
 							helpCallOut = new HelpCallOut();
 							helpCallOut.helpText = resourceManager.getString('trackingview','help_text_activeinsulin');
 							helpCallOut.settingId = Settings.SettingsHelpTextActiveInsulinInt;
 							//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 							helpCallOut.verticalPosition = "after";
 							helpCallOut.open(activeInsulin,true);
-							cntr = ModelLocator.getInstance().copyOfTrackingList.length;
+							cntr = ModelLocator.trackingList.length;
 						}  
 					}
 				}
@@ -430,57 +387,68 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private function openHelpTexts():void {
 				if (navigator.actionBar.actionContent.indexOf(upButton) != -1) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_upbutton');
-					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewUpButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-					helpCallOut.open(upButton,true)
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextTrackingViewUpButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_upbutton');
+						helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewUpButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+						helpCallOut.open(upButton,true)
+					} else {
+						helptext1Removed(null);
+					}
 				} else
 					helptext1Removed();
 			}
 			
 			private function helptext1Removed(event:Event = null):void  {
 				if (navigator.actionBar.actionContent.indexOf(downButton) != -1) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_downbutton');
-					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewDownButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-					helpCallOut.open(downButton,true)
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextTrackingViewDownButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_downbutton');
+						helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewDownButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+						helpCallOut.open(downButton,true)
+					} else {
+						helptext2Removed(null);
+					}
 				} else
 					helptext2Removed();
 			}
 			
 			private function helptext2Removed(event:Event = null):void  {
 				if (navigator.actionBar.actionContent.indexOf(cancelButton) != -1) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('trackingview','help_text_cancelbutton');
-					helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewCancelButton;
-					//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-					helpCallOut.open(cancelButton,true)
-				} /*else
-				helptext2Removed();*/
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextTrackingViewCancelButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('trackingview','help_text_cancelbutton');
+						helpCallOut.settingId = Settings.SettingsHelpTextTrackingViewCancelButton;
+						helpCallOut.open(cancelButton,true)
+					} else {
+						
+					}
+				}
 			}
 		]]>
 	</fx:Script>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/ic_up.png')" id="upButton" click="upClicked(event)"/>
-		<s:Button icon="@Embed(source='../assets/ic_down.png')" id="downButton" click="downClicked(event)"/>
-		<s:Button icon="@Embed(source='../assets/ic_menu_close_clear_cancel.png')" id="cancelButton" click="cancelClicked(event)" />
-		<s:Button icon="@Embed(source='../assets/search48x48.png')" id="searchButton" click="searchClicked(event)"/>
+		<s:Button icon="{ModelLocator.ic_upImage}" id="upButton" click="upClicked(event)"/>
+		<s:Button icon="{ModelLocator.ic_downImage}" id="downButton" click="downClicked(event)"/>
+		<s:Button icon="{ModelLocator.ic_menu_close_clear_cancelImage}" id="cancelButton" click="cancelClicked(event)" />
+		<s:Button icon="{ModelLocator.searchImage_48x48}" id="searchButton" click="searchClicked(event)"/>
 	</s:actionContent>
-	<s:Group id="activeInsulin">
-		<s:Label left="10" right="0" top="10" bottom="0" width="100%" text="{activeInsulin_text}" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}" textAlign="{ModelLocator.ltr ? 'left':'right'}"/>
+	<s:Group id="activeInsulin" visible="{ModelLocator.activeInsulinAmount > 0}">
+		<s:Label left="10" right="0" top="10" bottom="0" width="100%" 
+				 text="{ModelLocator.resourceManagerInstance.getString('trackingview','active_insulin') + ' = ' + ModelLocator.activeInsulinAmount.toString()
+				 + ' ' +  ModelLocator.resourceManagerInstance.getString('trackingview','internationalunit')}"/>
 	</s:Group>
-	<s:Line width="100%" left="0" right="0" top="40">
+	<s:Line width="100%" left="0" right="0" top="40" visible="{ModelLocator.activeInsulinAmount > 0}">
 		<s:stroke>
 			<s:SolidColorStroke color="0x3B6999" weight="5"/>
 		</s:stroke>
 	</s:Line>	
 	
-	<s:List id="trackinglist" left="0" right="0" top="45" bottom="0" width="100%" useVirtualLayout="true" 
-			dataProvider="{ModelLocator.getInstance().copyOfTrackingList}"
+	<s:List id="trackinglist" left="0" right="0" top="{ModelLocator.activeInsulinAmount > 0 ? 45:0}" bottom="0" width="100%" useVirtualLayout="true" 
+			dataProvider="{ModelLocator.trackingList}"
 			click="onListElementClicked(event)"
-			change="recalculateActiveInsulin(null)"
 			itemRendererFunction="getItemRenderer">
 		<s:layout>
 			<myComponents:TrackingViewLayout useVirtualLayout="true" id="trackinglistlayout"/>

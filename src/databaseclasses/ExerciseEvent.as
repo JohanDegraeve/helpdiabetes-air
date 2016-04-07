@@ -19,6 +19,8 @@ package databaseclasses
 {
 	import mx.core.ClassFactory;
 	
+	import model.ModelLocator;
+	
 	import myComponents.ExerciseEventItemRenderer;
 	import myComponents.IListElement;
 	import myComponents.TrackingViewElement;
@@ -55,24 +57,12 @@ package databaseclasses
 				_timeStamp = (new Date()).valueOf();
 			
 			if (!isNaN(newLastModifiedTimeStamp))
-				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+				lastModifiedTimestamp = newLastModifiedTimeStamp;
 			else
-				_lastModifiedTimestamp = (new Date()).valueOf();
+				lastModifiedTimestamp = (new Date()).valueOf();
 			
 			if (storeInDatabase)
-				Database.getInstance().createNewExerciseEvent(level,_comment,_timeStamp,_lastModifiedTimestamp,exerciseeventid,null);
-		}
-		
-		private var _lastModifiedTimestamp:Number;
-		
-		public function get lastModifiedTimestamp():Number
-		{
-			return _lastModifiedTimestamp;
-		}
-		
-		internal function set lastModifiedTimestamp(value:Number):void
-		{
-			_lastModifiedTimestamp = value;
+				Database.getInstance().createNewExerciseEvent(level,_comment,_timeStamp,lastModifiedTimestamp,exerciseeventid,null);
 		}
 		
 		/**
@@ -83,13 +73,13 @@ package databaseclasses
 			_level = newLevel;
 			_comment = newComment;
 
-				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
-					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
-				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
+					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
+				lastModifiedTimestamp = newLastModifiedTimeStamp;
 			
 			if (!isNaN(newCreationTimeStamp))
 				timeStamp = newCreationTimeStamp;
-			Database.getInstance().updateExerciseEvent(this.eventid,newLevel,_comment, timeStamp,_lastModifiedTimestamp);
+			Database.getInstance().updateExerciseEvent(this.eventid,newLevel,_comment, timeStamp,lastModifiedTimestamp);
 		}
 
 		public function listElementRendererFunction():ClassFactory
@@ -99,9 +89,12 @@ package databaseclasses
 		
 		/**
 		 * delete the event from the database<br>
-		 * once delted this event should not be used anymore
+		 * once deleted this event should not be used anymore
 		 */
-		public function deleteEvent():void {
+		override public function deleteEvent(trackingListPointer:Number = Number.NaN):void {
+			if (isNaN(trackingListPointer))
+				trackingListPointer = ModelLocator.trackingList.getItemIndex(this);
+			ModelLocator.trackingList.removeItemAt(trackingListPointer);
 			Database.getInstance().deleteExerciseEvent(this.eventid);
 		}
 	}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ view to add a new meal
 				MyGATracker.getInstance().trackPageview( "AddMealView-newMealCreated" );
 
 				var newMeal:Meal = new Meal(mealname_textarea_text,null,currentDateAndTime.valueOf());
-				newMealIndex = ModelLocator.getInstance().addMeal(newMeal);
+				newMealIndex = ModelLocator.addMeal(newMeal);
 				mealAdded = true;
 				navigator.popView();
 			}
@@ -182,7 +182,7 @@ view to add a new meal
 		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked()"/>
+		<s:Button icon="{ModelLocator.doneImage_48x48}" id="OkButton" click="okClicked()"/>
 	</s:actionContent>
 
 	<s:Group y="0" x="0" width="100%" height = "100%" >

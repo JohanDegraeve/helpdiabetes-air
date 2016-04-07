@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,12 +32,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
 			import databaseclasses.FoodItem;
 			import databaseclasses.Settings;
 			import databaseclasses.Unit;
 			
-			import mx.collections.ArrayCollection;
-			import mx.events.FlexEvent;
+			import model.ModelLocator;
 			
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
@@ -74,15 +76,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			
 			private function onCreationComplete():void {
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('ownitemview','help_text_ownitemview');
-				helpCallOut.settingId = Settings.SettingsHelpTextOwnFoodItemView;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptextRemoved);
-				helpCallOut.open(fooditemdescription,true)
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextOwnFoodItemView) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('ownitemview','help_text_ownitemview');
+					helpCallOut.settingId = Settings.SettingsHelpTextOwnFoodItemView;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptextRemoved);
+					helpCallOut.open(fooditemdescription,true)
+				} else {
+					helptextRemoved(null);
+				}
 			}
 
 			private function helptextRemoved(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptextRemoved);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptextRemoved);
 			}
 
 			private function addHandler():void {
@@ -146,7 +152,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button   label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked(event)"/>
+		<s:Button icon="{ModelLocator.doneImage_48x48}" id="OkButton" click="okClicked(event)"/>
 	</s:actionContent>
 	<s:Group y="0" x="0" width="100%" height = "100%"  left="5" top="5" right="5">
 		<s:layout>

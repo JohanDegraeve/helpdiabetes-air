@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -117,29 +117,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						TrashButton.visible = true;
 					}
 				} else  {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_OkButton');
-					helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewOkButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
-					helpCallOut.open(OkButton,true)
+					if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditBGEventViewOkButton) == 'true') {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_OkButton');
+						helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewOkButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+						helpCallOut.open(OkButton,true)
+					} else {
+						helptext0Removed(null);
+					}
 				}
 			}
 			
 			private function helptext0Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext0Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_selectChangeBGAmount');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeAmount;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(meteringResult,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext0Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditBGEventViewChangeAmount) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_selectChangeBGAmount');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeAmount;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(meteringResult,true);
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_changeDateAndTime');
-				helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut.open(timeGroup,true)
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('editbgeventview','help_text_changeDateAndTime');
+					helpCallOut.settingId = Settings.SettingsHelpTextEditBGEventViewChangeDateAndTime;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.open(timeGroup,true)
+				} else {
+					helptext2Removed(null);
+				}
 			}
 			
 			private function helptext2Removed(event:Event):void {
@@ -251,61 +263,65 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theBloodGlucoseEvent = new BloodGlucoseEvent(
 						new Number(meteringResultText),
 						unit,
-						DateTimeUtilities.createEventId(),
+						DateTimeUtilities.createEventId() + "-glucose",
 						comment,//comment
-						eventDateAndTime.valueOf());
-					ModelLocator.getInstance().trackingList.addItem(theBloodGlucoseEvent);
+						eventDateAndTime.valueOf(),
+						Number.NaN,
+						true,
+						true);
+					ModelLocator.trackingList.addItem(theBloodGlucoseEvent);
 				} else {
 					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText), eventDateAndTime.valueOf(), comment,new Date().valueOf());
 				}
 				
 				var creationTimeStampAsDate:Date = new Date(theBloodGlucoseEvent.timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);
-				if (creationTimeStampAsDate.valueOf() > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.getInstance().oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
-						ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(i));
-						if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-							i =  ModelLocator.getInstance().oldestDayLineStoredInTrackingList;//we don't need to do that 
+				if (creationTimeStampAsDate.valueOf() > ModelLocator.oldestDayLineStoredInTrackingList) {
+					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
+						ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(i));
+						if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+							i =  ModelLocator.oldestDayLineStoredInTrackingList;//we don't need to do that 
 					}
-					ModelLocator.getInstance().trackingList.refresh();
-					ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-					if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+					ModelLocator.trackingList.refresh();
+					ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+					if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+						ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 				}
 				else
-					if (creationTimeStampAsDate.valueOf() < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-						for (var j:Number = creationTimeStampAsDate.valueOf(); j <  ModelLocator.getInstance().youngestDayLineStoredInTrackingList;j = j + 86400000) {
-							ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(j));
-							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-								j = ModelLocator.getInstance().youngestDayLineStoredInTrackingList;
+					if (creationTimeStampAsDate.valueOf() < ModelLocator.youngestDayLineStoredInTrackingList) {
+						for (var j:Number = creationTimeStampAsDate.valueOf(); j <  ModelLocator.youngestDayLineStoredInTrackingList;j = j + 86400000) {
+							ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(j));
+							if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+								j = ModelLocator.youngestDayLineStoredInTrackingList;
 						}
-						ModelLocator.getInstance().trackingList.refresh();
-						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-						if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+						ModelLocator.trackingList.refresh();
+						ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+						if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+							ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 					}
 				
 				
-				if (ModelLocator.getInstance().trackingList.refresh())
+				if (ModelLocator.trackingList.refresh())
 					finishOkClicked();
-				else
+				else {
+					trace("in editbgeventview, setting timeout in finishokclicked");
 					setTimeout(finishOkClicked,1000);
-				
+				}
 			}
 			
 			private function finishOkClicked(event:Event = null):void {
 				//if there's a mealevent after this event within "maximum time difference" for correction factor settings,
 				//then trigger a recalculateinsulinamount for that mealevent
-				//switch to the tracking view and set trackingeventtoshow to this event
-				var indexOfThisEvent:Number = ModelLocator.getInstance().trackingList.getItemIndex(theBloodGlucoseEvent);
-				for (var i2:Number = indexOfThisEvent + 1; i2 < ModelLocator.getInstance().trackingList.length;i2++) {
-					var theEventAti2:TrackingViewElement = ModelLocator.getInstance().trackingList.getItemAt(i2) as TrackingViewElement;
+				var indexOfThisEvent:Number = ModelLocator.trackingList.getItemIndex(theBloodGlucoseEvent);
+				for (var i2:Number = indexOfThisEvent + 1; i2 < ModelLocator.trackingList.length;i2++) {
+					var theEventAti2:TrackingViewElement = ModelLocator.trackingList.getItemAt(i2) as TrackingViewElement;
 					if (theEventAti2 is MealEvent) {
 						(theEventAti2 as MealEvent).recalculateInsulinAmount();
 					}
 				}
 				
-				ModelLocator.getInstance().trackingEventToShow = theBloodGlucoseEvent.eventid;
+				//switch to the tracking view and set trackingeventtoshow to this event
+				ModelLocator.trackingEventToShow = theBloodGlucoseEvent.eventid;
 				(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 				((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
 				Synchronize.getInstance().startSynchronize(true,false);
@@ -327,9 +343,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					//if there's a mealevent after this event within "maximum time difference" for correction factor settings,
 					//then trigger a recalculateinsulinamount for that mealevent
 					//switch to the tracking view and set trackingeventtoshow to this event
-					var indexOfThisEvent:Number = ModelLocator.getInstance().trackingList.getItemIndex(theBloodGlucoseEvent);
-					for (var i2:Number = indexOfThisEvent + 1; i2 < ModelLocator.getInstance().trackingList.length;i2++) {
-						var theEventAti2:TrackingViewElement = ModelLocator.getInstance().trackingList.getItemAt(i2) as TrackingViewElement;
+					var indexOfThisEvent:Number = ModelLocator.trackingList.getItemIndex(theBloodGlucoseEvent);
+					for (var i2:Number = indexOfThisEvent + 1; i2 < ModelLocator.trackingList.length;i2++) {
+						var theEventAti2:TrackingViewElement = ModelLocator.trackingList.getItemAt(i2) as TrackingViewElement;
 						if (theEventAti2 is MealEvent) {
 							(theEventAti2 as MealEvent).recalculateInsulinAmount();
 						}
@@ -339,16 +355,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					confirmationPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onNoClicked);
 					Synchronize.getInstance().addObjectToBeDeleted(theBloodGlucoseEvent);
 					Synchronize.getInstance().startSynchronize(true,false);
-					theBloodGlucoseEvent.deleteEvent();
-					//we need to make sure the previous tracking event is visible so we store the itemindex
-					var trackinglistPointer:Number = ModelLocator.getInstance().trackingList.getItemIndex(theBloodGlucoseEvent);
-					//now delete it
-					ModelLocator.getInstance().trackingList.removeItemAt(trackinglistPointer);
-					ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(theBloodGlucoseEvent.timeStamp);					
+					var trackinglistPointer:Number = ModelLocator.trackingList.getItemIndex(theBloodGlucoseEvent);
+					theBloodGlucoseEvent.deleteEvent(trackinglistPointer);
+					
+					ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(theBloodGlucoseEvent.timeStamp, true);					
 					//and now make sure the previous item is visible
 					if (trackinglistPointer > 0)
-						ModelLocator.getInstance().trackingEventToShow = 
-							(ModelLocator.getInstance().trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;						
+						ModelLocator.trackingEventToShow = 
+							(ModelLocator.trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;						
 					//switch to the tracking view
 					(navigator.parentNavigator as TabbedViewNavigator).selectedIndex = 1;
 					((navigator.parentNavigator as TabbedViewNavigator).navigators[1] as ViewNavigator).popToFirstView();
@@ -423,9 +437,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button  visible="false" label="{back_label}" id="backButton" click="navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>
-		<s:Button icon="@Embed(source='../assets/Notes_48x48.png')" id="NotesButton" click="editNote(event)"/>
-		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked(event)"/>
+		<s:Button icon="{ModelLocator.trashImage_48x48}" id="TrashButton" click="deleteEvent(event)"/>
+		<s:Button icon="{ModelLocator.notesImage_48x48}" id="NotesButton" click="editNote(event)"/>
+		<s:Button icon="{ModelLocator.doneImage_48x48}" id="OkButton" click="okClicked(event)"/>
 	</s:actionContent>
 	
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">

@@ -52,26 +52,13 @@ package databaseclasses
 			_unit = value;
 		}
 
-		private var _lastModifiedTimestamp:Number;
-		
-		public function get lastModifiedTimestamp():Number
-		{
-			return _lastModifiedTimestamp;
-		}
-		
-		internal function set lastModifiedTimestamp(value:Number):void
-		{
-			_lastModifiedTimestamp = value;
-		}
-		
-		
 		/**
 		 * creates a bloodglucose event and stores it immediately in the database if storeInDatabase = true<br>
 		 * unit is a textstring denoting the unit used, mgperdl, or ... <br>
 		 * if creationTimeStamp = null, then current date and time is used<br>
 		 * if newLastModifiedTimestamp = null, then current date and time is used
 		 */
-		public function BloodGlucoseEvent(glucoseLevel:Number, unit:String, bloodglucoseEventId:String, newcomment:String, creationTimeStamp:Number = Number.NaN, newLastModifiedTimeStamp:Number = Number.NaN, storeInDatabase:Boolean = true )
+		public function BloodGlucoseEvent(glucoseLevel:Number, unit:String, bloodglucoseEventId:String, newcomment:String, creationTimeStamp:Number, newLastModifiedTimeStamp:Number, storeInDatabase:Boolean, recalculateInsulinAmount:Boolean )
 		{
 			this._bloodGlucoseLevel = glucoseLevel;	
 			this._unit = unit;
@@ -83,13 +70,14 @@ package databaseclasses
 				_timeStamp = (new Date()).valueOf();
 
 			if (!isNaN(newLastModifiedTimeStamp))
-				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+				lastModifiedTimestamp = newLastModifiedTimeStamp;
 			else
-				_lastModifiedTimestamp = (new Date()).valueOf();
+				lastModifiedTimestamp = (new Date()).valueOf();
 
 			if (storeInDatabase)
-				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,_lastModifiedTimestamp,unit,bloodglucoseEventId,_comment,null);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+				Database.getInstance().createNewBloodGlucoseEvent(glucoseLevel,_timeStamp,lastModifiedTimestamp,unit,bloodglucoseEventId,_comment,null);
+			if (recalculateInsulinAmount)
+				ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp, true);
 		}
 		
 		
@@ -112,15 +100,16 @@ package databaseclasses
 			_bloodGlucoseLevel = newBloodGlucoseLevel;
 			_comment = newcomment;
 
-				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastSyncTimeStamp)) > _lastModifiedTimestamp)
-					Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,_lastModifiedTimestamp.toString());
-				_lastModifiedTimestamp = newLastModifiedTimeStamp;
+				if (new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp)) > lastModifiedTimestamp)
+					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,lastModifiedTimestamp.toString());
+				lastModifiedTimestamp = newLastModifiedTimeStamp;
 
+			var previousTimeStamp:Number = timeStamp;
 			if (!isNaN(newCreationTimeStamp)) {
 				timeStamp = newCreationTimeStamp;
 			}
-			Database.getInstance().updateBloodGlucoseEvent(this.eventid,_unit,_bloodGlucoseLevel, timeStamp,_lastModifiedTimestamp,_comment);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			Database.getInstance().updateBloodGlucoseEvent(this.eventid,_unit,_bloodGlucoseLevel, timeStamp,lastModifiedTimestamp,_comment);
+			ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(Math.max(_timeStamp, previousTimeStamp), true);
 		}
 		
 		public function listElementRendererFunction():ClassFactory
@@ -132,16 +121,20 @@ package databaseclasses
 		 * delete the event from the database<br>
 		 * once delted this event should not be used anymore
 		 */
-		public function deleteEvent():void {
+		override public function deleteEvent(trackingListPointer:Number = Number.NaN):void {
+			if (isNaN(trackingListPointer))
+				trackingListPointer = ModelLocator.trackingList.getItemIndex(this);
+			ModelLocator.trackingList.removeItemAt(trackingListPointer);
 			Database.getInstance().deleteBloodGlucoseEvent(this.eventid);
-			ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp);
+			ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents(_timeStamp, true);
+			ModelLocator.recalculateActiveInsulin();
 		}
 		
 		public function toString():String {
 			var returnValue:String;
 			returnValue += "eventid = " + eventid + "\n";
 			returnValue = "timeStamp = " + timeStamp+ "\n";
-			returnValue += "ladmodifiedtimestamp = " + _lastModifiedTimestamp+ "\n";
+			returnValue += "ladmodifiedtimestamp = " + lastModifiedTimestamp+ "\n";
 			returnValue += "bloodglucoselevel = " + _bloodGlucoseLevel.toString() + "\n";
 			returnValue += "unit = " + _unit + "\n";
 			returnValue += "comment = " + _comment + "\n";

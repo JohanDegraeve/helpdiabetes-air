@@ -32,15 +32,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import databaseclasses.Settings;
 			
+			import model.ModelLocator;
+			
 			[Bindable]
 			private var back_label:String;
 			
 			[ResourceBundle("settingsallcorrectionfactorsettingsview")]
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
-				ResourceManager.getInstance().getString("settingsallcorrectionfactorsettingsview","targetvalue"),
-				ResourceManager.getInstance().getString("settingsallcorrectionfactorsettingsview","correction_factor_settings"),
-				ResourceManager.getInstance().getString("settingsallcorrectionfactorsettingsview","max_time_difference")
+				ModelLocator.resourceManagerInstance.getString("settingsallcorrectionfactorsettingsview","targetvalue"),
+				ModelLocator.resourceManagerInstance.getString("settingsallcorrectionfactorsettingsview","correction_factor_settings"),
+				ModelLocator.resourceManagerInstance.getString("settingsallcorrectionfactorsettingsview","max_time_difference")
 			]);	
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -65,8 +67,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						break;
 					case 1:
 						var dataToSend:Object = new Object();
-						dataToSend.title = ResourceManager.getInstance().getString("settingsallbolussettingsview","correction_factor_settings");
-						dataToSend.topText = ResourceManager.getInstance().getString("settingsallbolussettingsview","topText");
+						dataToSend.title = ModelLocator.resourceManagerInstance.getString("settingsallbolussettingsview","correction_factor_settings");
+						dataToSend.topText = ModelLocator.resourceManagerInstance.getString("settingsallbolussettingsview","topText");
 						dataToSend.settingid = Settings.SettingsCorrectionFactor;
 						dataToSend.titleforFromtimeAndValueElementView = resourceManager.getString('settingsallbolussettingsview','correction_factor_settings');
 						dataToSend.topTextforFromtimeAndValueElementView = resourceManager.getString('fromtimeandvalueelementview','editcorrectionfactor');

@@ -20,7 +20,6 @@
 			import databaseclasses.Settings;
 			
 			import myComponents.AmountPicker;
-			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
 			import utilities.Synchronize;
@@ -33,8 +32,6 @@
 			private var back_label:String;
 			[Bindable]
 			private var unit_label:String;
-			
-			private var helpCallOut:HelpCallOut;
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
 			{

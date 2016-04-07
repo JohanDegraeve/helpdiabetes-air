@@ -37,15 +37,19 @@
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
 			{
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('settingsdatabaseview','help_text_changeDatabaseStorage');
-				helpCallOut.settingId = Settings.SettingsHelpTextDatabaseViewChangeStorage;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(trackingsizeButton,true);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextDatabaseViewChangeStorage) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('settingsdatabaseview','help_text_changeDatabaseStorage');
+					helpCallOut.settingId = Settings.SettingsHelpTextDatabaseViewChangeStorage;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(trackingsizeButton,true);
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void  {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 			}
 			
 			
@@ -80,7 +84,7 @@
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					trackingsizeButton.label = (event.newValue as Number).toString();
 					if (new Number(trackingsizeButton.label) > new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE))) {
-						Settings.getInstance().setSetting(Settings.SettingsLastSyncTimeStamp,((new Date()).valueOf() - new Number(trackingsizeButton.label) * 24 * 3600 * 1000).toString());
+						Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,((new Date()).valueOf() - new Number(trackingsizeButton.label) * 24 * 3600 * 1000).toString());
 						Settings.getInstance().setSetting(Settings.SettingsMAXTRACKINGSIZE,trackingsizeButton.label );
 						Synchronize.getInstance().startSynchronize(true,false);
 					} else

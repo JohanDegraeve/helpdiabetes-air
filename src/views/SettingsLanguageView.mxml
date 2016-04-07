@@ -20,6 +20,8 @@
 			import databaseclasses.Settings;
 			import databaseclasses.UnitChangedEvent;
 			
+			import model.ModelLocator;
+			
 			import myComponents.AlertPopUp;
 			import myComponents.MenuElementItemRenderer;
 			import myComponents.elementFromListPicker;
@@ -37,8 +39,8 @@
 			[ResourceBundle("settingslanguageview")]
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
-				ResourceManager.getInstance().getString("settingslanguageview","applicationlanguage"),
-				ResourceManager.getInstance().getString("settingslanguageview","foodtablelanguage")
+				ModelLocator.resourceManagerInstance.getString("settingslanguageview","applicationlanguage"),
+				ModelLocator.resourceManagerInstance.getString("settingslanguageview","foodtablelanguage")
 			]);	
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -54,7 +56,7 @@
 			private function init():void {
 				back_label = resourceManager.getString('general','back');
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
-				title =  ResourceManager.getInstance().getString("settingslanguageview","titlesettings");
+				title =  ModelLocator.resourceManagerInstance.getString("settingslanguageview","titlesettings");
 				thisView = this;
 			}
 			

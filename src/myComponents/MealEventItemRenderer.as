@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -48,12 +48,12 @@ package myComponents
 	{
 		
 		private var eventTypeImage:Image;
-		[Embed(source = "assets/ic_tab_meal_selected_35x35.png")]
-		public static var eventTypeIcon:Class;
+		//[Embed(source = "assets/ic_tab_meal_selected_35x35.png")]
+		//public static var eventTypeIcon:Class;
 		
 		private var notesImage:Image;
-		[Embed(source = "assets/Notes_16x16.png")]
-		public static var notesIcon:Class;
+		//[Embed(source = "assets/Notes_16x16.png")]
+		//public static var notesIcon:Class;
 
 		static private var itemHeight:int;
 		static private var selectedMealHeight:int;
@@ -81,7 +81,8 @@ package myComponents
 			if (!notesImage) {
 				notesImage = new Image();
 				notesImage.fillMode = BitmapFillMode.CLIP;
-				notesImage.source = notesIcon;
+				notesImage.contentLoader = ModelLocator.iconCache;
+				notesImage.source = "assets/Notes_16x16.png";
 				addChild(notesImage);
 			}
 		}
@@ -325,7 +326,8 @@ package myComponents
 				//image.smooth = true;
 				//image.scaleMode = BitmapScaleMode.ZOOM;
 				eventTypeImage.fillMode = BitmapFillMode.CLIP;
-				eventTypeImage.source = eventTypeIcon;
+				eventTypeImage.contentLoader = ModelLocator.iconCache;
+				eventTypeImage.source = "assets/ic_tab_meal_selected_35x35.png";
 				addChild(eventTypeImage);
 			}
 			
@@ -354,7 +356,7 @@ package myComponents
 					if (!notesImage) {
 						notesImage = new Image();
 						notesImage.fillMode = BitmapFillMode.CLIP;
-						notesImage.source = notesIcon;
+						notesImage.source = "assets/Notes_16x16.png";
 						addChild(notesImage);
 					}
 				}
@@ -380,12 +382,7 @@ package myComponents
 			previousY = measuredHeight;
 		}
 		
-		// Override layoutContents() to lay out the item renderer.
 		override protected function layoutContents(unscaledWidth:Number, unscaledHeight:Number):void {
-			// Because you are handling the layout of both the 
-			// predefined labelDisplay component and the new 
-			// carbAmount component, you do not have to call
-			// super.layoutContents().
 
 			if (MINIMUM_CARB_AMOUNT_WIDTH_LARGE_FONT == 100) {
 				//most probably it's not yet been calculated
@@ -577,8 +574,8 @@ package myComponents
 				return true;
 			var returnValue:Boolean = false;
 			
-			if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent != null) {
-				if (mealEvent.eventid == (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.eventid) {
+			if ((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealEvent != null) {
+				if (mealEvent.eventid == (ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealEvent.eventid) {
 					returnValue = true;
 					mealEvent.extendedInTrackingView = true;
 				}

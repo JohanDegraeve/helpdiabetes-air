@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2013  hippoandfriends
+ Copyright (C) 2016  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -18,10 +18,11 @@
 package utilities
 {
 	import mx.collections.ArrayCollection;
-	import mx.resources.ResourceManager;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
+	
+	import model.ModelLocator;
 	
 	/**
 	 * Will hold a list of FromAndValueElements<br>
@@ -328,7 +329,7 @@ package utilities
 					 fromTimeAndValue = new FromtimeAndValue(fromTimeAndValue.from,newValue,"mgperdl",fromTimeAndValue.editable,fromTimeAndValue.deletable);
 					 setItemAt(fromTimeAndValue,ctr);
 				 }
-				 _unit = ResourceManager.getInstance().getString('general','mgperdl');
+				 _unit = ModelLocator.resourceManagerInstance.getString('general','mgperdl');
 			 }
 			 
 			 if (newUnit == "mmoll") {
@@ -338,7 +339,7 @@ package utilities
 					 fromTimeAndValue = new FromtimeAndValue(fromTimeAndValue.from,newValue,"mmoll",fromTimeAndValue.editable,fromTimeAndValue.deletable);
 					 setItemAt(fromTimeAndValue,ctr);
 				 }
-				 _unit = ResourceManager.getInstance().getString('general','mmoll');
+				 _unit = ModelLocator.resourceManagerInstance.getString('general','mmoll');
 			 }
 		 }
 		 

@@ -125,29 +125,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				MyGATracker.getInstance().trackPageview( "SettingsMedicinView-viewOpened" );
 				
-				title = ResourceManager.getInstance().getString("settingsview","medicin");
+				title = ModelLocator.resourceManagerInstance.getString("settingsview","medicin");
 
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('settingsmedicinview','help_text_changeMedicinTypes');
-				helpCallOut.settingId = Settings.SettingsHelpTextMedicinViewChangeMedicinType;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(type2,true);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextMedicinViewChangeMedicinType) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('settingsmedicinview','help_text_changeMedicinTypes');
+					helpCallOut.settingId = Settings.SettingsHelpTextMedicinViewChangeMedicinType;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(type2,true);
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void  {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('settingsmedicinview','help_text_enableInsulinProfile');
-				helpCallOut.settingId = Settings.SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView;
-				//helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut.open(buttontype1,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextMedicinViewChangeMedicinType) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('settingsmedicinview','help_text_enableInsulinProfile');
+					helpCallOut.settingId = Settings.SettingsHelpTextEnableActiveInsulinCalculationInInsulinSettingsView;
+					helpCallOut.open(buttontype1,true);
+				} else {
+					
+				}
 			}
 			
 			protected function button1_clickHandler(event:MouseEvent):void
 			{
 				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
-				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
+				dataToSend.title = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText1;
 				dataToSend.settingid1 = Settings.SettingsMedicin1_range1_AOBChart;
 				dataToSend.settingid2 = Settings.SettingsMedicin1_range2_AOBChart;
@@ -155,7 +162,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToSend.settingid4 = Settings.SettingsMedicin1_range4_AOBChart;
 				dataToSend.settingidActive = Settings.SettingsMedicin1_AOBActive;
 				dataToSend.titleforFromtimeAndValueElementView = medicinText1;
-				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
+				dataToSend.topTextforFromtimeAndValueElementView = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","addOrEditAtionProfile");
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
 			
@@ -163,7 +170,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
-				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
+				dataToSend.title = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText2;
 				dataToSend.settingid1 = Settings.SettingsMedicin2_range1_AOBChart;
 				dataToSend.settingid2 = Settings.SettingsMedicin2_range2_AOBChart;
@@ -171,7 +178,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToSend.settingid4 = Settings.SettingsMedicin2_range4_AOBChart;
 				dataToSend.settingidActive = Settings.SettingsMedicin2_AOBActive;
 				dataToSend.titleforFromtimeAndValueElementView = medicinText2;
-				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
+				dataToSend.topTextforFromtimeAndValueElementView = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","addOrEditAtionProfile");
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
 			
@@ -179,7 +186,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
-				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
+				dataToSend.title = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText3;
 				dataToSend.settingid1 = Settings.SettingsMedicin3_range1_AOBChart;
 				dataToSend.settingid2 = Settings.SettingsMedicin3_range2_AOBChart;
@@ -187,7 +194,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToSend.settingid4 = Settings.SettingsMedicin3_range4_AOBChart;
 				dataToSend.settingidActive = Settings.SettingsMedicin3_AOBActive;
 				dataToSend.titleforFromtimeAndValueElementView = medicinText3;
-				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
+				dataToSend.topTextforFromtimeAndValueElementView = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","addOrEditAtionProfile");
 
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
@@ -196,7 +203,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
-				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
+				dataToSend.title = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText4;
 				dataToSend.settingid1 = Settings.SettingsMedicin4_range1_AOBChart;
 				dataToSend.settingid2 = Settings.SettingsMedicin4_range2_AOBChart;
@@ -204,7 +211,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				dataToSend.settingid4 = Settings.SettingsMedicin4_range4_AOBChart;
 				dataToSend.settingidActive = Settings.SettingsMedicin4_AOBActive;
 				dataToSend.titleforFromtimeAndValueElementView = medicinText4;
-				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
+				dataToSend.topTextforFromtimeAndValueElementView = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","addOrEditAtionProfile");
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
 			
@@ -212,14 +219,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				showAlertNavigateToHelp();
 				var dataToSend:Object = new Object();
-				dataToSend.title = ResourceManager.getInstance().getString("settingsmedicinview","medicin_profile");
+				dataToSend.title = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","medicin_profile");
 				dataToSend.topText = medicinText5;
 				dataToSend.settingid1 = Settings.SettingsMedicin5_range1_AOBChart;
 				dataToSend.settingid2 = Settings.SettingsMedicin5_range2_AOBChart;
 				dataToSend.settingid3 = Settings.SettingsMedicin5_range3_AOBChart;
 				dataToSend.settingid4 = Settings.SettingsMedicin5_range4_AOBChart;
 				dataToSend.titleforFromtimeAndValueElementView = medicinText5;
-				dataToSend.topTextforFromtimeAndValueElementView = ResourceManager.getInstance().getString("settingsmedicinview","addOrEditAtionProfile");
+				dataToSend.topTextforFromtimeAndValueElementView = ModelLocator.resourceManagerInstance.getString("settingsmedicinview","addOrEditAtionProfile");
 				dataToSend.settingidActive = Settings.SettingsMedicin5_AOBActive;
 				navigator.pushView(FromtimeAndValueOverviewView,dataToSend);
 			}
@@ -267,7 +274,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type1" text="@{medicinText1}" editable="true" borderVisible="true" textAlign="left" change="type1_changeHandler(event)" />
-		 	<s:Button id="buttontype1" height="48" width="48" icon="@Embed('assets/graph3.png')" click="button1_clickHandler(event)" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+		 	<s:Button id="buttontype1" height="48" width="48" icon="@Embed('assets/graph3.png')" click="button1_clickHandler(event)"/>
 		</s:Group>
 		
 		<s:Group y="0" x="0" width="100%">
@@ -276,7 +283,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type2" text="@{medicinText2}" editable="true" borderVisible="true" textAlign="left" change="type2_changeHandler(event)"/>
-			<s:Button height="48" width="48" icon="@Embed('assets/graph3.png')" click="button2_clickHandler(event)" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/graph3.png')" click="button2_clickHandler(event)"/>
 		</s:Group>
 		
 		<s:Group y="0" x="0" width="100%">
@@ -285,7 +292,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextInput width="80%" contentBackgroundColor="0xDCDCDC" id="type3" text="@{medicinText3}" editable="true" borderVisible="true" textAlign="left" change="type3_changeHandler(event)"/>
-			<s:Button height="48" width="48" icon="@Embed('assets/graph3.png')" click="button3_clickHandler(event)" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/graph3.png')" click="button3_clickHandler(event)"/>
 		</s:Group>
 		
 		<s:Group y="0" x="0" width="100%">
@@ -294,7 +301,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:TextInput  width="80%" contentBackgroundColor="0xDCDCDC" id="type4" text="@{medicinText4}" editable="true" borderVisible="true" textAlign="left" change="type4_changeHandler(event)"/>
-			<s:Button height="48" width="48" icon="@Embed('assets/graph3.png')" click="button4_clickHandler(event)" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/graph3.png')" click="button4_clickHandler(event)"/>
 		</s:Group>
 		
 		<s:Group y="0" x="0" width="100%">
@@ -303,7 +310,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				</s:HorizontalLayout>
 			</s:layout>			
 			<s:TextInput width="80%" contentBackgroundColor="0xDCDCDC" id="type5" text="@{medicinText5}" editable="true" borderVisible="true" textAlign="left" change="type5_changeHandler(event)"/>
-			<s:Button height="48" width="48" icon="@Embed('assets/graph3.png')" click="button5_clickHandler(event)" includeInLayout="{ModelLocator.getInstance().extendedFunctionsActive()}" visible="{ModelLocator.getInstance().extendedFunctionsActive()}"/>
+			<s:Button height="48" width="48" icon="@Embed('assets/graph3.png')" click="button5_clickHandler(event)"/>
 		</s:Group>
 		<s:Group y="0" x="0" width="100%">
 			<s:layout>

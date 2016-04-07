@@ -61,18 +61,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			[ResourceBundle("settingsview")]
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
-				ResourceManager.getInstance().getString("settingsview","bolussettings"),
-				//ResourceManager.getInstance().getString("settingsview","meal_times"), - moved to SettingsAllBolusSettingsView
-				ResourceManager.getInstance().getString("settingsview","bloodglucoseunit"),
-				ResourceManager.getInstance().getString("settingsview","medicin"),
-				ResourceManager.getInstance().getString("settingsview","exercise"),
-				ResourceManager.getInstance().getString("settingsview","database"),
-				ResourceManager.getInstance().getString("settingsview","language"),
-				ResourceManager.getInstance().getString("settingsview","portraitorlandscape"),
-				ResourceManager.getInstance().getString("settingsview","resethelptext"),
-				ResourceManager.getInstance().getString("settingsview","googlesync"),
-				ResourceManager.getInstance().getString("settingsview","aboutexperit"),
-				ResourceManager.getInstance().getString("settingsview","infoabout")
+				ModelLocator.resourceManagerInstance.getString("settingsview","bolussettings"),
+				//ModelLocator.resourceManagerInstance.getString("settingsview","meal_times"), - moved to SettingsAllBolusSettingsView
+				ModelLocator.resourceManagerInstance.getString("settingsview","bloodglucoseunit"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","medicin"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","exercise"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","database"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","language"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","portraitorlandscape"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","resethelptext"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","googlesync"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","aboutexperit"),
+				ModelLocator.resourceManagerInstance.getString("settingsview","infoabout")
 			]);	
 			
 			private function onBackKeyPressed(event:Event):void {
@@ -88,7 +88,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function init():void {
 				/* add event listener for clicking item */
 				settingsList.addEventListener(Event.CHANGE,selectedElementChanged);
-				title =  ResourceManager.getInstance().getString("settingsview","titlesettings");
+				title =  ModelLocator.resourceManagerInstance.getString("settingsview","titlesettings");
 				thisView = this;
 				if (debugging) 
 					menuList.addItem("debug info");
@@ -97,10 +97,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function selectOrientation():void {
 				var orientationOptionList:ArrayCollection = new ArrayCollection();
-				orientationOptionList.addItem(ResourceManager.getInstance().getString("settingsview","portrait"));
-				orientationOptionList.addItem(ResourceManager.getInstance().getString("settingsview","landscape"));
-				orientationOptionList.addItem(ResourceManager.getInstance().getString("settingsview","automaticorientation"));
-				orientationOptionList.addItem(ResourceManager.getInstance().getString("settingsview","letappdecide"));
+				orientationOptionList.addItem(ModelLocator.resourceManagerInstance.getString("settingsview","portrait"));
+				orientationOptionList.addItem(ModelLocator.resourceManagerInstance.getString("settingsview","landscape"));
+				orientationOptionList.addItem(ModelLocator.resourceManagerInstance.getString("settingsview","automaticorientation"));
+				orientationOptionList.addItem(ModelLocator.resourceManagerInstance.getString("settingsview","letappdecide"));
 				
 				elementPicker = new elementFromListPicker();
 				elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, selectedOrientationOptionChanged);//using unitchanged but it's not a unit
@@ -157,8 +157,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function selectBloodGlucoseUnit():void {
 				var unitList:ArrayCollection = new ArrayCollection();
-				unitList .addItem(ResourceManager.getInstance().getString("general","mgperdl"));
-				unitList .addItem(ResourceManager.getInstance().getString("general","mmoll"));
+				unitList .addItem(ModelLocator.resourceManagerInstance.getString("general","mgperdl"));
+				unitList .addItem(ModelLocator.resourceManagerInstance.getString("general","mmoll"));
 				
 				elementPicker = new elementFromListPicker();
 				elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, selectedUnitChanged);
@@ -192,19 +192,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							Settings.getInstance().setSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL,
 								((Math.round((new Number(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)))/(new Number(0.0555))))).toString());
 							//change the bloodglucoseevents that area in tracking database
-							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
-								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
-									var theEvent:BloodGlucoseEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as BloodGlucoseEvent;
-									if (theEvent.unit == ResourceManager.getInstance().getString("general","mmoll")) {
-										theEvent.updateBloodGlucoseEvent(ResourceManager.getInstance().getString("general","mgperdl"),Math.round(theEvent.bloodGlucoseLevel/(new Number(0.0555))),theEvent.timeStamp,theEvent.comment,new Date().valueOf());
+							for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
+								if (ModelLocator.trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
+									var theEvent:BloodGlucoseEvent = ModelLocator.trackingList.getItemAt(cntr) as BloodGlucoseEvent;
+									if (theEvent.unit == ModelLocator.resourceManagerInstance.getString("general","mmoll")) {
+										theEvent.updateBloodGlucoseEvent(ModelLocator.resourceManagerInstance.getString("general","mgperdl"),Math.round(theEvent.bloodGlucoseLevel/(new Number(0.0555))),theEvent.timeStamp,theEvent.comment,new Date().valueOf());
 									}
 									
 								}
 							}
 							//change the correctionfactor in mealevents
-							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
-								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is MealEvent) {
-									var theMealEvent:MealEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent;
+							for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
+								if (ModelLocator.trackingList.getItemAt(cntr) is MealEvent) {
+									var theMealEvent:MealEvent = ModelLocator.trackingList.getItemAt(cntr) as MealEvent;
 									if (!isNaN(theMealEvent.correctionFactor)) {
 										if (theMealEvent.correctionFactor > 0) {
 											theMealEvent.updateMealEvent(theMealEvent.mealName,theMealEvent.comment,theMealEvent.insulinRatio,Math.round(theMealEvent.correctionFactor/(new Number(0.0555))),(new Date()).valueOf(),theMealEvent.timeStamp);	
@@ -226,19 +226,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							Settings.getInstance().setSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL,
 								((Math.round((new Number(Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL)))*(new Number(0.0555))*10))/10).toString());
 							//change the bloodglucoseevents that area in tracking database
-							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
-								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
-									var theEvent:BloodGlucoseEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as BloodGlucoseEvent;
-									if (theEvent.unit == ResourceManager.getInstance().getString("general","mgperdl")) {
-										theEvent.updateBloodGlucoseEvent(ResourceManager.getInstance().getString("general","mmoll"),(Math.round(theEvent.bloodGlucoseLevel*(new Number(0.0555))*10))/10,theEvent.timeStamp,theEvent.comment,new Date().valueOf());
+							for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
+								if (ModelLocator.trackingList.getItemAt(cntr) is BloodGlucoseEvent) {
+									var theEvent:BloodGlucoseEvent = ModelLocator.trackingList.getItemAt(cntr) as BloodGlucoseEvent;
+									if (theEvent.unit == ModelLocator.resourceManagerInstance.getString("general","mgperdl")) {
+										theEvent.updateBloodGlucoseEvent(ModelLocator.resourceManagerInstance.getString("general","mmoll"),(Math.round(theEvent.bloodGlucoseLevel*(new Number(0.0555))*10))/10,theEvent.timeStamp,theEvent.comment,new Date().valueOf());
 									}
 									
 								}
 							}
 							//change the correctionfactor in mealevents
-							for (cntr = 0;cntr < ModelLocator.getInstance().trackingList.length;cntr++) {
-								if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is MealEvent) {
-									var theMealEvent:MealEvent = ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent;
+							for (cntr = 0;cntr < ModelLocator.trackingList.length;cntr++) {
+								if (ModelLocator.trackingList.getItemAt(cntr) is MealEvent) {
+									var theMealEvent:MealEvent = ModelLocator.trackingList.getItemAt(cntr) as MealEvent;
 									if (!isNaN(theMealEvent.correctionFactor)) {
 										if (theMealEvent.correctionFactor > 0) {
 											theMealEvent.updateMealEvent(theMealEvent.mealName,theMealEvent.comment,theMealEvent.insulinRatio,(Math.round(theMealEvent.correctionFactor*(new Number(0.0555))*10))/10,(new Date()).valueOf(),theMealEvent.timeStamp);	

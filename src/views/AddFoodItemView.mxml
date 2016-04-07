@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -164,7 +164,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					else {
 						checkLastMealUpdateRequired = false;
 						mealButtonRequired=false;
-						meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " : " + (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;;
+						meal_textarea_text = resourceManager.getString('addfooditemview','meal_text_if_there_is_no_button') + " : " + (ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealName;;
 					}
 				}
 				
@@ -173,7 +173,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				//comment added 20/07/2011 : variable checkLastMealUpdateRequired is not really having the correct meaning. Before I called here refreshMeals with checkLastMealUpdateRequired as parameter
 				//  but that was not good.
 				if (checkLastMealUpdateRequired)
-					ModelLocator.getInstance().refreshMeals();
+					ModelLocator.refreshMeals();
 				
 				if (data.foodItem) {
 					//addfooditemview has been created via foodcounter view, so initial setup is necessary
@@ -229,10 +229,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					
 					//find back the mealevent to which this selectedfooditem belongs
 					//then check if it belongs to a meal and if no don't show the trashbutton
-					for (var cntr:int = ModelLocator.getInstance().trackingList.length - 1 ;cntr >= 0;cntr--) {
-						if (ModelLocator.getInstance().trackingList.getItemAt(cntr) is MealEvent) {
-							if ((ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent).eventid == (data.selectedFoodItem as SelectedFoodItem).mealEventId) {
-								if ((ModelLocator.getInstance().trackingList.getItemAt(cntr) as MealEvent).meal == null)
+					for (var cntr:int = ModelLocator.trackingList.length - 1 ;cntr >= 0;cntr--) {
+						if (ModelLocator.trackingList.getItemAt(cntr) is MealEvent) {
+							if ((ModelLocator.trackingList.getItemAt(cntr) as MealEvent).eventid == (data.selectedFoodItem as SelectedFoodItem).mealEventId) {
+								if ((ModelLocator.trackingList.getItemAt(cntr) as MealEvent).meal == null)
 									TrashButton.visible = false;
 								else 
 									TrashButton.visible = true;
@@ -261,7 +261,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				}
 				
 				//here's the set the correct initial value for meal_button_text
-				if (ModelLocator.getInstance().selectedMeal >= 0) {
+				if (ModelLocator.selectedMeal >= 0) {
 					if (checkLastMealUpdateRequired)
 						checkLastMealUpdate();
 					meal_button_text = 	 initMealButtonText();				
@@ -269,63 +269,86 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			}
 			
 			private function showHelpText1():void {
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_selectUnitButton');
-				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(addFoodItemGroup.details_button,true)
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_selectUnitButton');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectUnitButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(addFoodItemGroup.details_button,true)
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_changeMeal');
-				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut.open(addFoodItemGroup.meal_button,true);
+				if (helpCallOut != null)
+					helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewSelectMealButton) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_changeMeal');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewSelectMealButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+					helpCallOut.open(addFoodItemGroup.meal_button,true);
+				} else {
+					helptext2Removed(null);
+				}
 			}
 			
 			private function helptext2Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
-				helpCallOut = new HelpCallOut();
-				if (data.foodItem) {
-					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromFoodCounterView');
-					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromFoodCounterView;
-				} else if (data.selectedFoodItem) {
-					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromTrackingView');
-					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromTrackingView;
-				} else
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext2Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromFoodCounterView) == 'true'
+				|| Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromTrackingView) == 'true') {
+					helpCallOut = new HelpCallOut();
+					if (data.foodItem) {
+						helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromFoodCounterView');
+						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromFoodCounterView;
+					} else if (data.selectedFoodItem) {
+						helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_amount_comingFromTrackingView');
+						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewAmountButtonsWhenComingFromTrackingView;
+					} else
+						helptext3Removed(null);
+					
+					if (data.foodItem || data.selectedFoodItem) {
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+						helpCallOut.open(addFoodItemGroup.button_5,true);
+					}
+				} else {
 					helptext3Removed(null);
-				
-				if (data.foodItem || data.selectedFoodItem) {
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext3Removed);
-					helpCallOut.open(addFoodItemGroup.button_5,true);
 				}
 			}
 			
 			private function helptext3Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_ok_button');
-				helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewOkButton;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext4Removed);
-				helpCallOut.open(OkButton,true);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext3Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewOkButton) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_ok_button');
+					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewOkButton;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext4Removed);
+					helpCallOut.open(OkButton,true);
+				} else {
+					helptext4Removed(null);
+				}
 			}
 			
 			private function helptext4Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext4Removed);
-				if (TrashButton.visible) {
-					helpCallOut = new HelpCallOut();
-					helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_delete_button');
-					helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewTrashButton;
-					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext5Removed);
-					helpCallOut.open(TrashButton,true);
-				} else
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext4Removed);
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextAddFoodItemViewTrashButton) == 'true') {
+					
+					if (TrashButton.visible) {
+						helpCallOut = new HelpCallOut();
+						helpCallOut.helpText = resourceManager.getString('addfooditemview','help_text_delete_button');
+						helpCallOut.settingId = Settings.SettingsHelpTextAddFoodItemViewTrashButton;
+						helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext5Removed);
+						helpCallOut.open(TrashButton,true);
+					} else
+						helptext5Removed(null);
+				} else {
 					helptext5Removed(null);
+				}
 			}
 			
 			private function helptext5Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext5Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext5Removed);
 			}
 			
 			private function onSelectedMealChanged(e:flash.events.Event):void {
@@ -349,12 +372,12 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				if (((new Date()).valueOf() - new Number(Settings.getInstance().getSetting(Settings.SettingTIME_OF_LAST_MEAL_ADDITION))) < 15*60*1000) {
 					//it's less than 15 minutes since the last meal addition
 					//..try to find the meal with corresponding mealeventid
-					for (var l:int = 0;l < ModelLocator.getInstance().meals.length; l++) {
-						if (ModelLocator.getInstance().meals.getItemAt(l) is Meal) {
-							if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).hasMealEvent()) {
-								if ((ModelLocator.getInstance().meals.getItemAt(l) as Meal).mealEvent.eventid == Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID)) {
-									ModelLocator.getInstance().selectedMeal = l;
-									l = ModelLocator.getInstance().meals.length;
+					for (var l:int = 0;l < ModelLocator.meals.length; l++) {
+						if (ModelLocator.meals.getItemAt(l) is Meal) {
+							if ((ModelLocator.meals.getItemAt(l) as Meal).hasMealEvent()) {
+								if ((ModelLocator.meals.getItemAt(l) as Meal).mealEvent.eventid == Settings.getInstance().getSetting(Settings.SettingLAST_MEAL_ID)) {
+									ModelLocator.selectedMeal = l;
+									l = ModelLocator.meals.length;
 								}
 							}
 						}
@@ -412,27 +435,27 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 
 			private function initMealButtonText():String {
 				var returnValue:String = " ";
-				if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null) {
+				if ((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealEvent == null) {
 					//mealevent is null, so we will check if the current time is later than the timestamp of the meal, ie the timestamp that normally meal would start if we would 
 					//just take defalt starttimes
 					//but only if defaultMealTimeStamp =  true; - if false it means we come from selectmealview, where another timestamp has been set by the user, we will not overwrite this
-					if ((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp < (new Date()).valueOf() && defaultMealTimeSTamp) {
+					if ((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp < (new Date()).valueOf() && defaultMealTimeSTamp) {
 						returnValue = 
 							timeformatter.format((new Date()).valueOf()) + " - "
-							+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+							+ (ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealName;
 					} else {
 						returnValue = 
-							(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
-								"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
-							+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
-							+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+							(((new Date()).date == (new Date((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp)).date) ? 
+								"" : dateformatter.format((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp) + " - ")
+							+ timeformatter.format((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp) + " - "
+							+ (ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealName;
 					}
 				} else {
 					returnValue = 
-						(((new Date()).date == (new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp)).date) ? 
-							"" : dateformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - ")
-						+ timeformatter.format((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp) + " - "
-						+ (ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealName;
+						(((new Date()).date == (new Date((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp)).date) ? 
+							"" : dateformatter.format((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp) + " - ")
+						+ timeformatter.format((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp) + " - "
+						+ (ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealName;
 				}
 				return returnValue;
 			}
@@ -452,9 +475,9 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				
 				if (data.selectedFoodItem) {
 					var mealEventId:String = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
-					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().trackingList.length;trackingCntr++) {
-						if (((ModelLocator.getInstance().trackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
-							(ModelLocator.getInstance().trackingList.getItemAt(trackingCntr) as MealEvent)
+					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.trackingList.length;trackingCntr++) {
+						if (((ModelLocator.trackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
+							(ModelLocator.trackingList.getItemAt(trackingCntr) as MealEvent)
 							.updateSelectedFoodItemChosenAmount(data.selectedFoodItem,new Number(amount_textinput_text));
 							break;
 						}
@@ -464,48 +487,48 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					//- get the selected meal (which may or may not already include a mealevent
 					//- create a selectedfooditem and add it
 					//but first change the timestamp
-					if (((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp < (new Date()).valueOf() 
+					if (((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp < (new Date()).valueOf() 
 						&&
 						defaultMealTimeSTamp)
 						&&
-						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent == null
+						(ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealEvent == null
 					) {
-						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp = (new Date()).valueOf();
+						(ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp = (new Date()).valueOf();
 					}
 					
-					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal)
+					(ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal)
 					.addSelectedFoodItem(
 						new SelectedFoodItem(DateTimeUtilities.createEventId(),
 							retrievedFoodItem.itemDescription,
 							retrievedFoodItem.getUnit(selectedUnit),
 							new Number(amount_textinput_text)));
-					ModelLocator.getInstance().trackingEventToShow = 
-						(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent.eventid;
+					ModelLocator.trackingEventToShow = 
+						(ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealEvent.eventid;
 				}
-				var creationTimeStampAsDate:Date = new Date((ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).timeStamp);
+				var creationTimeStampAsDate:Date = new Date((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp);
 				creationTimeStampAsDate.setHours(0,0,0,0);
-				if (creationTimeStampAsDate.valueOf() > ModelLocator.getInstance().oldestDayLineStoredInTrackingList) {
-					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.getInstance().oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
-						ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(i));
-						if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-							i =  ModelLocator.getInstance().oldestDayLineStoredInTrackingList;//we don't need to do that 
+				if (creationTimeStampAsDate.valueOf() > ModelLocator.oldestDayLineStoredInTrackingList) {
+					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
+						ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(i));
+						if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+							i =  ModelLocator.oldestDayLineStoredInTrackingList;//we don't need to do that 
 					}
-					ModelLocator.getInstance().trackingList.refresh();
-					ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-					if (ModelLocator.getInstance().youngestDayLineStoredInTrackingList == 5000000000000)
-						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+					ModelLocator.trackingList.refresh();
+					ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+					if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+						ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 				}
 				else
-					if (creationTimeStampAsDate.valueOf() < ModelLocator.getInstance().youngestDayLineStoredInTrackingList) {
-						for (var j:Number = creationTimeStampAsDate.valueOf(); j <  ModelLocator.getInstance().youngestDayLineStoredInTrackingList;j = j + 86400000) {
-							ModelLocator.getInstance().trackingList.addItem(new DayLineWithTotalAmount(j));
-							if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-								j = ModelLocator.getInstance().youngestDayLineStoredInTrackingList;
+					if (creationTimeStampAsDate.valueOf() < ModelLocator.youngestDayLineStoredInTrackingList) {
+						for (var j:Number = creationTimeStampAsDate.valueOf(); j <  ModelLocator.youngestDayLineStoredInTrackingList;j = j + 86400000) {
+							ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(j));
+							if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+								j = ModelLocator.youngestDayLineStoredInTrackingList;
 						}
-						ModelLocator.getInstance().trackingList.refresh();
-						ModelLocator.getInstance().youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-						if (ModelLocator.getInstance().oldestDayLineStoredInTrackingList == 0)
-							ModelLocator.getInstance().oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+						ModelLocator.trackingList.refresh();
+						ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+						if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+							ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
 					}
 				Synchronize.getInstance().startSynchronize(true,false);
 			}
@@ -590,8 +613,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				
 				//in case we it is the last selectedfooditem being deleted, then also the mealevent will be deleted
 				//we need to make sure the previous tracking event is visible so we store the itemindex
-				var trackinglistPointer:Number = ModelLocator.getInstance().trackingList.getItemIndex(
-					(ModelLocator.getInstance().meals.getItemAt(ModelLocator.getInstance().selectedMeal) as Meal).mealEvent);
+				var trackinglistPointer:Number = ModelLocator.trackingList.getItemIndex(
+					(ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealEvent);
 				
 				confirmationPicker = new RequestConfirmation();
 				confirmationPicker.labelText1 = resourceManager.getString('general','delete_event');
@@ -611,10 +634,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					localdispatcher.addEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
 
 					var mealEventId:String = ((data.selectedFoodItem) as SelectedFoodItem).mealEventId;
-					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.getInstance().trackingList.length;trackingCntr++) {
-						if (((ModelLocator.getInstance().trackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
-							length = (ModelLocator.getInstance().trackingList.getItemAt(trackingCntr) as MealEvent).selectedFoodItems.length;
-							(ModelLocator.getInstance().trackingList.getItemAt(trackingCntr) as MealEvent)
+					for (var trackingCntr:int = 0;trackingCntr < ModelLocator.trackingList.length;trackingCntr++) {
+						if (((ModelLocator.trackingList.getItemAt(trackingCntr)) as TrackingViewElement).eventid == mealEventId) {
+							length = (ModelLocator.trackingList.getItemAt(trackingCntr) as MealEvent).selectedFoodItems.length;
+							(ModelLocator.trackingList.getItemAt(trackingCntr) as MealEvent)
 							.meal
 							.deleteSelectedFoodItem(data.selectedFoodItem,localdispatcher);
 							break;
@@ -635,9 +658,10 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					if (length == 1) {
 						//it was the last selectedfooditem which was being deleted, so we need to pop also the view editmealeventview
 						//but make sure the previous item is visible
-						if (trackinglistPointer > 0)
-							ModelLocator.getInstance().trackingEventToShow = 
-								(ModelLocator.getInstance().trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;						
+						if (trackinglistPointer > 0) {
+							ModelLocator.trackingEventToShow = 
+								(ModelLocator.trackingList.getItemAt(trackinglistPointer - 1) as TrackingViewElement).eventid;
+						}
 						
 						navigator.popView();
 					}
@@ -656,8 +680,8 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 		<s:Button   label="{back_label}" id="backButton" click="backLabelClicked = true;navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/Trash_48x48.png')" id="TrashButton" click="deleteEvent(event)"/>
-		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="addButtonClicked()"/>
+		<s:Button icon="{ModelLocator.trashImage_48x48}" id="TrashButton" click="deleteEvent(event)"/>
+		<s:Button icon="{ModelLocator.doneImage_48x48}" id="OkButton" click="addButtonClicked()"/>
 	</s:actionContent>
 	
 	<myComponents:AddFoodItemGroup id="addFoodItemGroup"

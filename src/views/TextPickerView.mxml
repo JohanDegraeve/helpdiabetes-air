@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Script>
 		<![CDATA[
 			import mx.utils.StringUtil;
+			
+			import model.ModelLocator;
 			
 			import myComponents.HelpCallOut;
 			[Bindable]
@@ -90,7 +92,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button   label="{back_label}" id="backButton" click="createdText.text='NaN';navigator.popView()" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="navigator.popView()"/>
+		<s:Button icon="{ModelLocator.doneImage_48x48}" id="OkButton" click="navigator.popView()"/>
 	</s:actionContent>
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
 		<s:layout>

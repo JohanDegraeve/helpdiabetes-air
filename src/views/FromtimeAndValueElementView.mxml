@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import mx.managers.PopUpManager;
 			
 			import spark.components.View;
+			
+			import model.ModelLocator;
 			
 			import myComponents.AmountPicker;
 			import myComponents.PickerEvent;
@@ -261,7 +263,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<s:Button label="{back_label}" click="back_clickHandler(event)" height="48"/>
 	</s:navigationContent>
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" id="OkButton" click="okClicked(event)"/>
+		<s:Button icon="{ModelLocator.doneImage_48x48}" id="OkButton" click="okClicked(event)"/>
 	</s:actionContent>
 	<s:Group y="0" x="0" width="100%" height = "100%" left="5" top="5" right="5">
 		<s:layout>

@@ -22,7 +22,6 @@
 			import model.ModelLocator;
 			
 			import myComponents.AmountPicker;
-			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			
 			import utilities.Synchronize;
@@ -33,8 +32,6 @@
 			
 			[Bindable]
 			private var back_label:String;
-			
-			private var helpCallOut:HelpCallOut;
 			
 			protected function view1_creationCompleteHandler(event:FlexEvent):void
 			{
@@ -69,7 +66,7 @@
 					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 					maxTimeButton.label = (event.newValue as Number).toString();
 					Settings.getInstance().setSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL,((event.newValue as Number) * 60).toString());
-					ModelLocator.getInstance().recalculateInsulinAmoutInAllYoungerMealEvents(0);
+					ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents((new Date()).valueOf(), true);
 					Synchronize.getInstance().startSynchronize(true,false);
 				}
 			}

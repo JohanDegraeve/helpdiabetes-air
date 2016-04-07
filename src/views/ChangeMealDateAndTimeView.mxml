@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2013  hippoandfriends
+Copyright (C) 2016  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			private var helpCallOut:HelpCallOut;
 			
 			private function helptext1Removed(event:Event):void {
-				helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 			}
 			
 			private function preInit():void {
@@ -106,13 +106,17 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				
 				mealname_textarea_text = (data.meal as Meal).mealName ;
 				previousTimeStamp = (data.meal as Meal).timeStamp ;
-				selectedMealIndex = ModelLocator.getInstance().meals.getItemIndex(data.meal as Meal);
+				selectedMealIndex = ModelLocator.meals.getItemIndex(data.meal as Meal);
 
-				helpCallOut = new HelpCallOut();
-				helpCallOut.helpText = resourceManager.getString('changemealdateandtimeview','help_text_setdateandtimeoffuturemeal');
-				helpCallOut.settingId = Settings.SettingsHelpTextChangeMealDateAndTimeViewButtons;
-				helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
-				helpCallOut.open(time_button,true)
+				if (Settings.getInstance().getSetting(Settings.SettingsHelpTextChangeMealDateAndTimeViewButtons) == 'true') {
+					helpCallOut = new HelpCallOut();
+					helpCallOut.helpText = resourceManager.getString('changemealdateandtimeview','help_text_setdateandtimeoffuturemeal');
+					helpCallOut.settingId = Settings.SettingsHelpTextChangeMealDateAndTimeViewButtons;
+					helpCallOut.addEventListener(PickerEvent.PICKER_SET,helptext1Removed);
+					helpCallOut.open(time_button,true)
+				} else {
+					helptext1Removed(null);
+				}
 			}
 			
 			private function dateClicked():void {
@@ -148,8 +152,8 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				buttonDateAndTime = (event.newValue as Date).valueOf();
 				//time_button_text = timeformatter.format(new Date((data.meal as Meal).timeStamp));
 				//date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
-				ModelLocator.getInstance().meals.refresh();
-				selectedMealIndex = ModelLocator.getInstance().meals.getItemIndex(data.meal as Meal);
+				ModelLocator.meals.refresh();
+				selectedMealIndex = ModelLocator.meals.getItemIndex(data.meal as Meal);
 			}
 			
 			/**
@@ -194,7 +198,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 	</s:navigationContent>
 
 	<s:actionContent>
-		<s:Button icon="@Embed(source='../assets/Done_48x48.png')" click="okClicked()"/>
+		<s:Button icon="{ModelLocator.doneImage_48x48}" click="okClicked()"/>
 	</s:actionContent>
 
 	<s:Group y="0" x="0" width="100%" height = "100%" >
