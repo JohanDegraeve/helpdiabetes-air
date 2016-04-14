@@ -67,7 +67,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 					return;
 				}
 								
-				monitor = new URLMonitor(new URLRequest("http://www.google.com"));
+				monitor = new URLMonitor(new URLRequest("https://www.google.com"));
 				monitor.addEventListener(StatusEvent.STATUS, statusEventHandler);
 				monitor.start();
 				
@@ -125,8 +125,6 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
 					}
 				}
-				if (navigator)
-					navigator.popToFirstView();
 			}
 
 			
