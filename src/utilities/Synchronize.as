@@ -3070,9 +3070,9 @@ package utilities
 				
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gsx=\"http://schemas.google.com/spreadsheets/2006/extended">\n';
-				outputString += '    <gsx:description><![CDATA[' + retrievedFoodItem.itemDescription.replace(quoteRegExp,'\\\'') + ']]></gsx:description>\n';
+				outputString += '    <gsx:description><![CDATA[' + retrievedFoodItem.itemDescription + ']]></gsx:description>\n';
 				for (var unitCtr:int = 0;unitCtr < retrievedFoodItem.getNumberOfUnits() && unitCtr < 5;unitCtr++ ) {
-					outputString += '    <gsx:unit' + (unitCtr + 1) + '><![CDATA[' + retrievedFoodItem.getUnit(unitCtr).unitDescription.replace(quoteRegExp,'\\\'') + ']]></gsx:unit' + (unitCtr + 1) + '> \n';
+					outputString += '    <gsx:unit' + (unitCtr + 1) + '><![CDATA[' + retrievedFoodItem.getUnit(unitCtr).unitDescription + ']]></gsx:unit' + (unitCtr + 1) + '> \n';
 					outputString += '    <gsx:standardamount' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).standardAmount + '</gsx:standardamount' + (unitCtr + 1) + '>\n';
 					outputString += '    <gsx:kcal' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).kcal + '</gsx:kcal' + (unitCtr + 1) +  '>\n';
 					outputString += '    <gsx:protein' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).protein.toString().replace('.',',') + '</gsx:protein' + (unitCtr + 1) + '>\n';
