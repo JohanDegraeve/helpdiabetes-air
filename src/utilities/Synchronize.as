@@ -79,6 +79,8 @@ package utilities
 		private var googleExcelDeleteWorkSheetUrl:String = "";
 		//https://spreadsheets.google.com/feeds/spreadsheets/private/full
 		
+		private static var quoteRegExp:RegExp = new RegExp('\'','g');
+			
 		/**
 		 * replace {key} by the spreadsheet key<br>
 		 */
@@ -2079,7 +2081,7 @@ package utilities
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[0][1] + " ";
 							sqlStatement += "(id,medicinname,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as MedicinEvent).eventid.toString() + "\',\'" +
-								(localElements.getItemAt(i) as MedicinEvent).medicinName + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolusDurationInMinutes.toString() + "\',\'" +
+								(localElements.getItemAt(i) as MedicinEvent).medicinName.replace(quoteRegExp,'\\\'') + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(i) as MedicinEvent).bolusDurationInMinutes.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).amount.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).timeStamp.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MedicinEvent).lastModifiedTimestamp.toString() + "\'," +
@@ -2091,7 +2093,7 @@ package utilities
 									:
 									(localElements.getItemAt(i) as MedicinEvent).lastModifiedTimestamp.toString())
 								+ "\',\'" +
-								(localElements.getItemAt(i) as MedicinEvent).comment + "\')" ;
+								(localElements.getItemAt(i) as MedicinEvent).comment.replace(quoteRegExp,'\\\'') + "\')" ;
 							localElements.removeItemAt(i);
 							i--;
 						}
@@ -2101,7 +2103,7 @@ package utilities
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[1][1] + " ";
 							sqlStatement += "(id,unit,value,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).eventid.toString() + "\',\'" +
-								(localElements.getItemAt(i) as BloodGlucoseEvent).unit + "\',\'" +
+								(localElements.getItemAt(i) as BloodGlucoseEvent).unit.replace(quoteRegExp,'\\\'') + "\',\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).bloodGlucoseLevel + "\',\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).timeStamp.toString() + "\',\'" +
 								(localElements.getItemAt(i) as BloodGlucoseEvent).lastModifiedTimestamp.toString() + "\'," +
@@ -2113,7 +2115,7 @@ package utilities
 									:
 									(localElements.getItemAt(i) as BloodGlucoseEvent).lastModifiedTimestamp.toString())
 								+ "\',\'" +
-								(localElements.getItemAt(i) as BloodGlucoseEvent).comment + "\')" ;
+								(localElements.getItemAt(i) as BloodGlucoseEvent).comment.replace(quoteRegExp,'\\\'') + "\')" ;
 							localElements.removeItemAt(i);
 							i--;
 						}
@@ -2123,7 +2125,7 @@ package utilities
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[2][1] + " ";
 							sqlStatement += "(id,level,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as ExerciseEvent).eventid.toString() + "\',\'" +
-								(localElements.getItemAt(i) as ExerciseEvent).level + "\',\'" +
+								(localElements.getItemAt(i) as ExerciseEvent).level.replace(quoteRegExp,'\\\'') + "\',\'" +
 								(localElements.getItemAt(i) as ExerciseEvent).timeStamp.toString() + "\',\'" +
 								(localElements.getItemAt(i) as ExerciseEvent).lastModifiedTimestamp.toString() + "\'," +
 								"\'false\'" +
@@ -2134,7 +2136,7 @@ package utilities
 									:
 									(localElements.getItemAt(i) as ExerciseEvent).lastModifiedTimestamp.toString())
 								+ "\',\'" +
-								(localElements.getItemAt(i) as ExerciseEvent).comment + "\')" ;
+								(localElements.getItemAt(i) as ExerciseEvent).comment.replace(quoteRegExp,'\\\'') + "\')" ;
 							localElements.removeItemAt(i);
 							i--;
 						}
@@ -2144,7 +2146,7 @@ package utilities
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[3][1] + " ";
 							sqlStatement += "(id,mealname,insulinratio,correctionfactor,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp,comment) VALUES (\'" +
 								(localElements.getItemAt(i) as MealEvent).eventid.toString() + "\',\'" +
-								(localElements.getItemAt(i) as MealEvent).mealName + "\',\'" +
+								(localElements.getItemAt(i) as MealEvent).mealName.replace(quoteRegExp,'\\\'') + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).insulinRatio.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).correctionFactor.toString() + "\',\'" +
 								(localElements.getItemAt(i) as MealEvent).timeStamp.toString() + "\',\'" +
@@ -2157,7 +2159,7 @@ package utilities
 									:
 									(localElements.getItemAt(i) as MealEvent).lastModifiedTimestamp.toString())
 								+ "\',\'" +
-								(localElements.getItemAt(i) as MealEvent).comment + "\')" ;
+								(localElements.getItemAt(i) as MealEvent).comment.replace(quoteRegExp,'\\\'') + "\')" ;
 							localElements.removeItemAt(i);
 							i--;
 						}
@@ -2166,8 +2168,8 @@ package utilities
 							sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[4][1] + " ";
 							sqlStatement += "(id,description,unitdescription,unitstandardamount,unitkcal,unitprotein,unitcarbs,unitfat,chosenamount,mealeventid,creationtimestamp,modifiedtimestamp,deleted,addedtoormodifiedintabletimestamp) VALUES (\'" +
 								(localElements.getItemAt(i) as SelectedFoodItem).eventid.toString() + "\',\'" +
-								(localElements.getItemAt(i) as SelectedFoodItem).itemDescription + "\',\'" +
-								(localElements.getItemAt(i) as SelectedFoodItem).unit.unitDescription + "\',\'" +
+								(localElements.getItemAt(i) as SelectedFoodItem).itemDescription.replace(quoteRegExp,'\\\'') + "\',\'" +
+								(localElements.getItemAt(i) as SelectedFoodItem).unit.unitDescription.replace(quoteRegExp,'\\\'') + "\',\'" +
 								(localElements.getItemAt(i) as SelectedFoodItem).unit.standardAmount + "\',\'" +
 								(localElements.getItemAt(i) as SelectedFoodItem).unit.kcal + "\',\'" +
 								(localElements.getItemAt(i) as SelectedFoodItem).unit.protein + "\',\'" +
@@ -2209,10 +2211,10 @@ package utilities
 									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
 									sqlStatement += 
 										"id = \'" + (localElements.getItemAt(k) as MedicinEvent).eventid.toString() + "\'," +
-										"medicinname = \'" + (localElements.getItemAt(k) as MedicinEvent).medicinName.replace('\'','\'\'') + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolusDurationInMinutes.toString() + "\'," +
+										"medicinname = \'" + (localElements.getItemAt(k) as MedicinEvent).medicinName.replace(quoteRegExp,'\\\'') + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolustype + Database.medicinnamesplitter + (localElements.getItemAt(k) as MedicinEvent).bolusDurationInMinutes.toString() + "\'," +
 										"value = \'" + (localElements.getItemAt(k) as MedicinEvent).amount.toString() + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as MedicinEvent).timeStamp.toString() + "\'," +
-										"comment = \'" + (localElements.getItemAt(k) as MedicinEvent).comment.replace('\'','\'\'') + "\'," +
+										"comment = \'" + (localElements.getItemAt(k) as MedicinEvent).comment.replace(quoteRegExp,'\\\'') + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as MedicinEvent).lastModifiedTimestamp.toString() + "\'," +
 										"addedtoormodifiedintabletimestamp = \'" +
 										((new Date()).valueOf() - (localElements.getItemAt(k) as MedicinEvent).lastModifiedTimestamp > 10000 
@@ -2237,10 +2239,10 @@ package utilities
 									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[1][1] + " SET ";
 									sqlStatement += 
 										"id = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).eventid.toString() + "\'," +
-										"unit = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).unit.replace('\'','\'\'') + "\'," +
+										"unit = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).unit.replace(quoteRegExp,'\\\'') + "\'," +
 										"value = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).bloodGlucoseLevel + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).timeStamp.toString() + "\'," +
-										"comment = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).comment.replace('\'','\'\'') + "\'," +
+										"comment = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).comment.replace(quoteRegExp,'\\\'') + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as BloodGlucoseEvent).lastModifiedTimestamp.toString() + "\'," +
 										"addedtoormodifiedintabletimestamp = \'" +
 										((new Date()).valueOf() - (localElements.getItemAt(k) as BloodGlucoseEvent).lastModifiedTimestamp > 10000 
@@ -2265,10 +2267,10 @@ package utilities
 									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[2][1] + " SET ";
 									sqlStatement += 
 										"id = \'" + (localElements.getItemAt(k) as ExerciseEvent).eventid.toString() + "\'," +
-										"level = \'" + (localElements.getItemAt(k) as ExerciseEvent).level.replace('\'','\'\'') + "\'," +
+										"level = \'" + (localElements.getItemAt(k) as ExerciseEvent).level.replace(quoteRegExp,'\\\'') + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as ExerciseEvent).timeStamp.toString() + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as ExerciseEvent).lastModifiedTimestamp.toString() + "\'," +
-										"comment = \'" + (localElements.getItemAt(k) as ExerciseEvent).comment.replace('\'','\'\'') + "\'," +
+										"comment = \'" + (localElements.getItemAt(k) as ExerciseEvent).comment.replace(quoteRegExp,'\\\'') + "\'," +
 										"addedtoormodifiedintabletimestamp = \'" +
 										((new Date()).valueOf() - (localElements.getItemAt(k) as ExerciseEvent).lastModifiedTimestamp > 10000 
 											? 
@@ -2292,11 +2294,11 @@ package utilities
 									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[3][1] + " SET ";
 									sqlStatement += 
 										"id = \'" + (localElements.getItemAt(k) as MealEvent).eventid.toString() + "\'," +
-										"mealname = \'" + (localElements.getItemAt(k) as MealEvent).mealName.replace('\'','\'\'') + "\'," +
+										"mealname = \'" + (localElements.getItemAt(k) as MealEvent).mealName.replace(quoteRegExp,'\\\'') + "\'," +
 										"insulinratio = \'" + (localElements.getItemAt(k) as MealEvent).insulinRatio.toString() + "\'," +
 										"correctionfactor = \'" + (localElements.getItemAt(k) as MealEvent).correctionFactor.toString() + "\'," +
 										"creationtimestamp = \'" + (localElements.getItemAt(k) as MealEvent).timeStamp.toString() + "\'," +
-										"comment = \'" + (localElements.getItemAt(k) as MealEvent).comment.replace('\'','\'\'') + "\'," +
+										"comment = \'" + (localElements.getItemAt(k) as MealEvent).comment.replace(quoteRegExp,'\\\'') + "\'," +
 										"modifiedtimestamp = \'" + (localElements.getItemAt(k) as MealEvent).lastModifiedTimestamp.toString() + "\'," +
 										"addedtoormodifiedintabletimestamp = \'" +
 										((new Date()).valueOf() - (localElements.getItemAt(k) as MealEvent).lastModifiedTimestamp > 10000 
@@ -2321,8 +2323,8 @@ package utilities
 									sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "UPDATE " + tableNamesAndColumnNames[4][1] + " SET ";
 									sqlStatement += 
 										"id = \'" + (localElements.getItemAt(k) as SelectedFoodItem).eventid.toString() + "\'," +
-										"description = \'" + (localElements.getItemAt(k) as SelectedFoodItem).itemDescription.replace('\'','\'\'') + "\'," +
-										"unitdescription = \'" + (localElements.getItemAt(k) as SelectedFoodItem).unit.unitDescription.replace('\'','\'\'') + "\'," +
+										"description = \'" + (localElements.getItemAt(k) as SelectedFoodItem).itemDescription.replace(quoteRegExp,'\\\'') + "\'," +
+										"unitdescription = \'" + (localElements.getItemAt(k) as SelectedFoodItem).unit.unitDescription.replace(quoteRegExp,'\\\'') + "\'," +
 										"unitstandardamount = \'" + (localElements.getItemAt(k) as SelectedFoodItem).unit.standardAmount + "\'," +
 										"unitkcal = \'" + (localElements.getItemAt(k) as SelectedFoodItem).unit.kcal + "\'," +
 										"unitprotein = \'" + (localElements.getItemAt(k) as SelectedFoodItem).unit.protein + "\'," +
@@ -2361,7 +2363,6 @@ package utilities
 					var request:URLRequest = new URLRequest(googleSelectUrl);
 					request.requestHeaders.push(new URLRequestHeader("Authorization", "Bearer " + access_token ));
 					request.contentType = "application/x-www-form-urlencoded";
-					
 					createAndLoadURLRequest(googleSelectUrl,URLRequestMethod.POST,new URLVariables("sql=" + escape(sqlStatement)),null,syncLocalEvents,true,null);
 				}
 				
@@ -2491,7 +2492,7 @@ package utilities
 					sqlStatement += (sqlStatement.length == 0 ? "" : ";") + "INSERT INTO " + tableNamesAndColumnNames[5][1] + " ";
 					sqlStatement += "(id,value,addedtoormodifiedintabletimestamp) VALUES (\'" +
 						(remoteElementIds.getItemAt(i) as int) + "\',\'" +
-						(Settings.getInstance().getSetting(remoteElementIds.getItemAt(i) as int)).replace('\'','\'\'') + "\',\'" +
+						(Settings.getInstance().getSetting(remoteElementIds.getItemAt(i) as int)).replace(quoteRegExp,'\\\'') + "\',\'" +
 						(Settings.getInstance().getSettingLastModifiedTimeStamp(remoteElementIds.getItemAt(i) as int)) +  "\')";
 					i++;
 				}
@@ -2550,7 +2551,7 @@ package utilities
 				sqlStatement = "UPDATE " + tableNamesAndColumnNames[5][1] + " SET ";
 				sqlStatement += 
 					"id = \'" + (remoteElements.getItemAt(0) as Array)[0] + "\'," +
-					"value = \'" + Settings.getInstance().getSetting(new Number((remoteElements.getItemAt(0) as Array)[0]) as int).replace('\'','\'\'') + "\'," +
+					"value = \'" + Settings.getInstance().getSetting(new Number((remoteElements.getItemAt(0) as Array)[0]) as int).replace(quoteRegExp,'\\\'') + "\'," +
 					"addedtoormodifiedintabletimestamp = \'" + 
 					((((new Date()).valueOf() - new Number(Settings.getInstance().getSettingLastModifiedTimeStamp(new Number((remoteElements.getItemAt(0) as Array)[0]) as int))) > 10000)
 						?
@@ -2687,7 +2688,7 @@ package utilities
 					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[0][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
-						"medicinname = \'" + (objectToBeDeleted as MedicinEvent).medicinName + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolustype + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolusDurationInMinutes.toString() +"\'," + 
+						"medicinname = \'" + (objectToBeDeleted as MedicinEvent).medicinName.replace(quoteRegExp,'\\\'') + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolustype + Database.medicinnamesplitter + (objectToBeDeleted as MedicinEvent).bolusDurationInMinutes.toString() +"\'," + 
 						"value = \'" + (objectToBeDeleted as MedicinEvent).amount.toString() + "\'," +
 						"creationtimestamp = \'" + (objectToBeDeleted as MedicinEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
@@ -2737,7 +2738,7 @@ package utilities
 					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[1][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
-						"unit = \'" + (objectToBeDeleted as BloodGlucoseEvent).unit + "\'," +
+						"unit = \'" + (objectToBeDeleted as BloodGlucoseEvent).unit.replace(quoteRegExp,'\\\'') + "\'," +
 						"value = \'" + (objectToBeDeleted as BloodGlucoseEvent).bloodGlucoseLevel + "\'," +
 						"creationtimestamp = \'" + (objectToBeDeleted as BloodGlucoseEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
@@ -2791,7 +2792,7 @@ package utilities
 					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[2][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
-						"level = \'" + (objectToBeDeleted as ExerciseEvent).level + "\'," +
+						"level = \'" + (objectToBeDeleted as ExerciseEvent).level.replace(quoteRegExp,'\\\'') + "\'," +
 						"creationtimestamp = \'" + (objectToBeDeleted as ExerciseEvent).timeStamp.toString() + "\'," +
 						"modifiedtimestamp = \'" + (new Date()).valueOf() + "\'," +
 						"addedtoormodifiedintabletimestamp = \'" +
@@ -2838,7 +2839,7 @@ package utilities
 					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[3][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + objectToBeDeleted.eventid.toString() + "\'," +
-						"mealname = \'" + (objectToBeDeleted as MealEvent).mealName + "\'," +
+						"mealname = \'" + (objectToBeDeleted as MealEvent).mealName.replace(quoteRegExp,'\\\'') + "\'," +
 						"insulinratio = \'" + (objectToBeDeleted as MealEvent).insulinRatio + "\'," +
 						"correctionfactor = \'" + (objectToBeDeleted as MealEvent).correctionFactor + "\'," +
 						"creationtimestamp = \'" + (objectToBeDeleted as MealEvent).timeStamp.toString() + "\'," +
@@ -2887,8 +2888,8 @@ package utilities
 					var sqlStatement:String = "UPDATE " + tableNamesAndColumnNames[4][1] + " SET ";
 					sqlStatement += 
 						"id = \'" + selectedItemToBeDeleted.eventid.toString() + "\'," +
-						"description = \'" + (selectedItemToBeDeleted).itemDescription + "\'," +
-						"unitdescription = \'" + (selectedItemToBeDeleted).unit.unitDescription + "\'," +
+						"description = \'" + (selectedItemToBeDeleted).itemDescription.replace(quoteRegExp,'\\\'') + "\'," +
+						"unitdescription = \'" + (selectedItemToBeDeleted).unit.unitDescription.replace(quoteRegExp,'\\\'') + "\'," +
 						"unitstandardamount = \'" + (selectedItemToBeDeleted).unit.standardAmount + "\'," +
 						"unitkcal = \'" + (selectedItemToBeDeleted).unit.kcal.toString() + "\'," +
 						"unitprotein = \'" + (selectedItemToBeDeleted).unit.protein.toString() + "\'," +
@@ -2961,10 +2962,10 @@ package utilities
 					outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_time],timeFormatter.format(trackElement.timeStamp));
 					if (ModelLocator.trackingList.getItemAt(trackinglistcntr) is MealEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnamemeal'));
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealtype],(trackElement as MealEvent).mealName).replace('\'','\'\'');
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealtype],(trackElement as MealEvent).mealName);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealcarbamount],(Math.round((trackElement as MealEvent).totalCarbs)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealinsulinratio],((Math.round((trackElement as MealEvent).insulinRatio*10)/10)).toString().replace('.',','));
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MealEvent).comment.replace('\'','\'\''));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MealEvent).comment);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealkcalamount],(Math.round((trackElement as MealEvent).totalKilocalories)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount],(Math.round((trackElement as MealEvent).totalProtein)).toString());
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount],(Math.round((trackElement as MealEvent).totalFat)).toString());
@@ -2972,23 +2973,23 @@ package utilities
 						var selectedItems:ArrayCollection = (trackElement as MealEvent).selectedFoodItems;
 						var selectedItemsString:String = "";
 						for (var selecteditemscntr:int = 0;selecteditemscntr < selectedItems.length;selecteditemscntr++) {
-							selectedItemsString += (selectedItems.getItemAt(selecteditemscntr) as SelectedFoodItem).chosenAmount + ' ' + (selectedItems.getItemAt(selecteditemscntr) as SelectedFoodItem).unit.unitDescription.replace('\'','\'\'') + ' ' + (selectedItems.getItemAt(selecteditemscntr) as SelectedFoodItem).itemDescription.replace('\'','\'\'');
+							selectedItemsString += (selectedItems.getItemAt(selecteditemscntr) as SelectedFoodItem).chosenAmount + ' ' + (selectedItems.getItemAt(selecteditemscntr) as SelectedFoodItem).unit.unitDescription + ' ' + (selectedItems.getItemAt(selecteditemscntr) as SelectedFoodItem).itemDescription;
 							if (selecteditemscntr < selectedItems.length)
 								selectedItemsString += "\n";
 						}
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems],selectedItemsString.replace('\'','\'\''));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_mealselecteditems],selectedItemsString);
 					} else if (ModelLocator.trackingList.getItemAt(trackinglistcntr) is BloodGlucoseEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnamebloodglucose'));
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as BloodGlucoseEvent).comment.replace('\'','\'\''));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as BloodGlucoseEvent).comment);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_bloodglucosevalue],((Math.round((trackElement as BloodGlucoseEvent).bloodGlucoseLevel * 10))/10).toString().replace('.',','));
 					} else if (ModelLocator.trackingList.getItemAt(trackinglistcntr) is ExerciseEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnameexercise'));
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as ExerciseEvent).comment.replace('\'','\'\''));
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel],(trackElement as ExerciseEvent).level.replace('\'','\'\''));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as ExerciseEvent).comment);
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_exerciselevel],(trackElement as ExerciseEvent).level);
 					} else if (ModelLocator.trackingList.getItemAt(trackinglistcntr) is MedicinEvent) {
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_eventtype],ModelLocator.resourceManagerInstance.getString('uploadtrackingview','eventnamemedicin'));
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MedicinEvent).comment.replace('\'','\'\''));
-						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicintype],(trackElement as MedicinEvent).medicinName.replace('\'','\'\''));
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_comment],(trackElement as MedicinEvent).comment);
+						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicintype],(trackElement as MedicinEvent).medicinName);
 						outputString += '    ' + createGSXElement(googleExcelLogBookColumnNames[foodValueNames_Index_medicinvalue],((Math.round((trackElement as MedicinEvent).amount*10))/10).toString().replace('.',','));
 					} else {
 						//it's a dayline, no need to export
@@ -3069,9 +3070,9 @@ package utilities
 				
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gsx=\"http://schemas.google.com/spreadsheets/2006/extended">\n';
-				outputString += '    <gsx:description><![CDATA[' + retrievedFoodItem.itemDescription.replace('\'','\'\'') + ']]></gsx:description>\n';
+				outputString += '    <gsx:description><![CDATA[' + retrievedFoodItem.itemDescription.replace(quoteRegExp,'\\\'') + ']]></gsx:description>\n';
 				for (var unitCtr:int = 0;unitCtr < retrievedFoodItem.getNumberOfUnits() && unitCtr < 5;unitCtr++ ) {
-					outputString += '    <gsx:unit' + (unitCtr + 1) + '><![CDATA[' + retrievedFoodItem.getUnit(unitCtr).unitDescription.replace('\'','\'\'') + ']]></gsx:unit' + (unitCtr + 1) + '> \n';
+					outputString += '    <gsx:unit' + (unitCtr + 1) + '><![CDATA[' + retrievedFoodItem.getUnit(unitCtr).unitDescription.replace(quoteRegExp,'\\\'') + ']]></gsx:unit' + (unitCtr + 1) + '> \n';
 					outputString += '    <gsx:standardamount' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).standardAmount + '</gsx:standardamount' + (unitCtr + 1) + '>\n';
 					outputString += '    <gsx:kcal' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).kcal + '</gsx:kcal' + (unitCtr + 1) +  '>\n';
 					outputString += '    <gsx:protein' + (unitCtr + 1) + '>' + retrievedFoodItem.getUnit(unitCtr).protein.toString().replace('.',',') + '</gsx:protein' + (unitCtr + 1) + '>\n';
