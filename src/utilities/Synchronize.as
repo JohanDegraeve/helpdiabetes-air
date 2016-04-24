@@ -3964,7 +3964,7 @@ package utilities
 							if (nextPageToken != null) {
 								urlVariables = new URLVariables();
 								urlVariables.pageToken = nextPageToken;
-								urlVariables.q = "trashed = false";
+								urlVariables.q = "trashed = false and mimeType = 'application/vnd.google-apps.spreadsheet'";
 								
 								if (debugMode)
 									trace("Synchronize.as : load url for googleExcelFindAllSpreadSheets - not the 1st call");
@@ -3993,7 +3993,7 @@ package utilities
 					trace("Synchronize.as : load url for googleExcelFindAllSpreadSheets 1 st time");
 				_spreadSheetList = new ArrayList();
 				urlVariables = new URLVariables();
-				urlVariables.q = "trashed = false";
+				urlVariables.q = "trashed = false and mimeType = 'application/vnd.google-apps.spreadsheet'";
 				
 				createAndLoadURLRequest(
 					googleDriveFilesUrl,
