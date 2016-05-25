@@ -65,11 +65,11 @@ package utilities
 	{
 		[ResourceBundle("analytics")]
 		[ResourceBundle("uploadtrackingview")] 
-		private static var googleRequestTablesUrl:String = "https://www.googleapis.com/fusiontables/v1/tables";
-		private static var googleSelectUrl:String = "https://www.googleapis.com/fusiontables/v1/query";
+		private static var googleRequestTablesUrl:String = "https://www.googleapis.com/fusiontables/v2/tables";
+		private static var googleSelectUrl:String = "https://www.googleapis.com/fusiontables/v2/query";
 		private static var googleDriveFilesUrl:String = "https://www.googleapis.com/drive/v2/files";
 		private static var googleTokenRefreshUrl:String = "https://accounts.google.com/o/oauth2/token";
-		private static var googleInsertColumnInTableUrl:String = "https://www.googleapis.com/fusiontables/v1/tables/{tableId}/columns";
+		private static var googleInsertColumnInTableUrl:String = "https://www.googleapis.com/fusiontables/v2/tables/{tableId}/columns";
 		
 		/**
 		 * replace {key} by the spreadsheet key<br>
