@@ -80,7 +80,7 @@ package utilities
 		//https://spreadsheets.google.com/feeds/spreadsheets/private/full
 		
 		private static var quoteRegExp:RegExp = new RegExp('\'','g');
-			
+		
 		/**
 		 * replace {key} by the spreadsheet key<br>
 		 */
@@ -234,11 +234,12 @@ package utilities
 		private var tableCounterForFunctionUpdateGoogleTablesIfNecessary:int;
 		public static var syncErrorList:ArrayList;
 		
+		
 		/**
 		 * tablename, tableid and list of columns with columnname and type <br>
 		 * tableid "" string means there's no table i known yet
 		 */
-		private var tableNamesAndColumnNames:Array = [
+		private static var tableNamesAndColumnNames:Array = [
 			[	"HD-MedicinEvent",//0
 				"",	
 				[						
@@ -489,7 +490,17 @@ package utilities
 		
 		private static var callingDispatcher:EventDispatcher;
 		private static var updateGoogleTablesIsNecessary:Boolean;
-		
+		private static var timeStampOfLastPOSTorPUT:Number = 0;
+		/**
+		 * minimum delay between two posts or puts<br>
+		 * Google restricts to 30 per pinute, that's 2 seconds, adding 100 ms
+		 */
+		private static const minimumDelayBetweenTwoPOSTsOrPUTs:Number =  2100;
+		/**
+		 * reset to false after finishing a sync<br>
+		 * set to true if rate limit exceeded and wait for retry
+		 */
+		private static var alreadyTrackedRateLimitExceeded:Boolean = false;
 		
 		/**
 		 * used for event dispatching, when sync finished, no matter if it was successful or not
@@ -680,7 +691,7 @@ package utilities
 			if (!globalImmediateRunNecessary && immediateRunNecessary)//we're not going to set here globalimmediatererunnecessary to false, that will only be done after calling nightscoutsync
 				globalImmediateRunNecessary = true;
 			access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
-			if (access_token && access_token.length == 0  ) {
+			if (access_token != null && access_token.length == 0  ) {
 				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				//ModelLocator.logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
 				Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
@@ -1177,16 +1188,16 @@ package utilities
 							
 							//trace(" in synchronize.as, creating a newMedicinEvent with timestamp = " + (new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]))).toString() + " and eventid = " + remoteElements.getItemAt(m)[positionId]);
 							ModelLocator.trackingList.addItem(
-							(new MedicinEvent(
-								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
-								medicinName1,
-								remoteElements.getItemAt(m)[positionId],
-								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
-								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),//creationtimestamp
-								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]),
-								true,
-								bolusType1,
-								bolusDuration2))
+								(new MedicinEvent(
+									remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
+									medicinName1,
+									remoteElements.getItemAt(m)[positionId],
+									remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][6][0])],//comment
+									new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),//creationtimestamp
+									new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]),
+									true,
+									bolusType1,
+									bolusDuration2))
 							);
 							ModelLocator.recalculateActiveInsulin();
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
@@ -1344,14 +1355,14 @@ package utilities
 							localElementsUpdated = true;
 							
 							ModelLocator.trackingList.addItem(
-							(new BloodGlucoseEvent(
-								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_value)],
-								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unit)],
-								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)],
-								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
-								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
-								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
-								true, true))
+								(new BloodGlucoseEvent(
+									remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_value)],
+									remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_unit)],
+									remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)],
+									remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
+									new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
+									new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
+									true, true))
 							);
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)]);
 						}
@@ -1505,13 +1516,13 @@ package utilities
 							localElementsUpdated = true;
 							
 							ModelLocator.trackingList.addItem(
-							(new ExerciseEvent(
-								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_level)],
-								remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
-								remoteElements.getItemAt(m)[positionId],
-								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
-								new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
-								true))
+								(new ExerciseEvent(
+									remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_level)],
+									remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
+									remoteElements.getItemAt(m)[positionId],
+									new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]),
+									new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
+									true))
 							);
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
@@ -1782,7 +1793,7 @@ package utilities
 										remoteElements.removeItemAt(k);
 										//NightScoutSync.getInstance().addObjectToBeDeleted(localElements.getItemAt(j)); - don't because we don't seperately add selectedfooditems in NS
 										(localElements.getItemAt(j) as SelectedFoodItem).deleteEvent();//delete from local database
-																				
+										
 										localElementsUpdated = true;//as we deleted one from local database,
 										//copyTrackingListIfNotDoneYet();
 										localElements.removeItemAt(j);//remove also from list used here
@@ -2604,6 +2615,18 @@ package utilities
 					loader.load(request);
 					if (debugMode)
 						trace("Synchronize.as : loader : request = " + request.data); 
+				} else if (message == "Rate Limit Exceeded") {
+					if (!alreadyTrackedRateLimitExceeded)
+						MyGATracker.getInstance().trackPageview( "Synchronize-rate-limit-exceeded");
+					alreadyTrackedRateLimitExceeded = true;
+					var start:Number = (new Date()).valueOf();
+					var current:Number = start;
+					while ((current - start) < minimumDelayBetweenTwoPOSTsOrPUTs) {//we just wait for a very short period, taking the same value as used between two queries
+						//the waiting has to be short because it block the ui, the consequence is that there will probably be more rate limits exceeded, until the minute has passed 
+						//because google restricts to 30 per minute
+						current = (new Date()).valueOf();
+					}
+					synchronize();
 				} else {
 					syncFinished(false);
 				}
@@ -2622,7 +2645,7 @@ package utilities
 			access_token = JSON.parse(event.target.data as String).access_token;
 			if (access_token != null)
 				Settings.getInstance().setSetting(Settings.SettingsAccessToken,access_token);
-		
+			
 			
 			functionToRecall.call();
 		}
@@ -3755,7 +3778,8 @@ package utilities
 			if (debugMode) {
 				_synchronize_debugString = "in syncFinished with success = " + success 
 					+ "syncRunning = " + syncRunning + "\n\n\n" ;
-				this.dispatchEvent(new Event(SYNCHRONIZE_ERROR_OCCURRED));
+				if (!success) 
+					this.dispatchEvent(new Event(SYNCHRONIZE_ERROR_OCCURRED));
 			}
 			
 			if (syncRunning) {
@@ -3879,10 +3903,24 @@ package utilities
 		 * if requestMethod == null then GET is taken as default value
 		 */
 		private function createAndLoadURLRequest(url:String,requestMethod:String,urlVariables:URLVariables, data:String, paramFunctionToRecall:Function,addIOErrorListener:Boolean,contentType:String):void {
+			var currentTime:Number = (new Date()).valueOf();
+			if (requestMethod != null) {
+				if ((requestMethod == URLRequestMethod.POST || requestMethod == URLRequestMethod.PUT) && url == googleSelectUrl) {
+					while ((currentTime - timeStampOfLastPOSTorPUT) < minimumDelayBetweenTwoPOSTsOrPUTs) {
+						currentTime = (new Date()).valueOf();
+					}
+					timeStampOfLastPOSTorPUT = (new Date()).valueOf();
+					if (debugMode) trace("currenttime = " + (new Date()).seconds + " seconds " + (new Date()).milliseconds + " milliseconds");
+				}
+			}
+			
+			
 			var request:URLRequest = new URLRequest(url);
 			loader = new URLLoader();
 			if (debugMode) {
 				trace ("in createAndLoadURLRequest, urlVariable string = " + urlVariables);
+				//trace("method = " + requestMethod);
+				trace("url = " + url);
 			}
 			
 			//all requestmethods
@@ -4239,6 +4277,15 @@ package utilities
 				}
 			}
 			return "";
+		}
+		
+		public static function removeGoogleSync():void {
+			var i:int;
+			for (i = 0;i < tableNamesAndColumnNames.length;i++) {
+				tableNamesAndColumnNames[i][1] = "";
+			}
+			Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
+			Settings.getInstance().setSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable,"false");
 		}
 	}
 }
