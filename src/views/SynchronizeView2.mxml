@@ -45,6 +45,8 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			
 			import myComponents.AlertPopUp;
 			
+			import utilities.Synchronize;
+			
 			[Bindable]
 			private var back_label:String;
 			private var alertPopUp:AlertPopUp;
@@ -107,6 +109,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						trace("night scout api secret reset to blanc, Synchronizeview2");
 						Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);//also nightscoutsync is reset
 						Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
+						Synchronize.removeGoogleSync();
 						alertPopUp = new AlertPopUp();
 						alertPopUp.addEventListener(PopUpEvent.CLOSE, okClicked);
 						alertPopUp.show(this);
@@ -125,6 +128,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						alertPopUp.removeEventListener(PopUpEvent.CLOSE, okClicked);
 					}
 				}
+				navigator.popView();
 			}
 
 			
