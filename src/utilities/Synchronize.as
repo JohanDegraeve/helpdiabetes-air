@@ -52,6 +52,7 @@ package utilities
 	
 	import model.ModelLocator;
 	
+	import myComponents.DayLineWithTotalAmount;
 	import myComponents.IListElement;
 	import myComponents.TrackingViewElement;
 	
@@ -1199,6 +1200,8 @@ package utilities
 									bolusType1,
 									bolusDuration2))
 							);
+							
+							ModelLocator.checkYoungestAndOldestDayLine(new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])])));
 							ModelLocator.recalculateActiveInsulin();
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
@@ -1364,6 +1367,7 @@ package utilities
 									new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 									true, true))
 							);
+							ModelLocator.checkYoungestAndOldestDayLine(new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)])));
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)]);
 						}
 					}
@@ -1524,6 +1528,7 @@ package utilities
 									new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 									true))
 							);
+							ModelLocator.checkYoungestAndOldestDayLine(new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)])));
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
@@ -1707,6 +1712,8 @@ package utilities
 								true, null, null, false);
 							ModelLocator.addMeal(new Meal(null,newMealEvent,Number.NaN));
 							trackingList.addItem(newMealEvent);
+							ModelLocator.checkYoungestAndOldestDayLine(new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)])));
+
 							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}

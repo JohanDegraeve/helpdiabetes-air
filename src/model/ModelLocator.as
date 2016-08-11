@@ -41,6 +41,7 @@ package model
 	import databaseclasses.Settings;
 	
 	import myComponents.DayLine;
+	import myComponents.DayLineWithTotalAmount;
 	import myComponents.SimpleTextEvent;
 	import myComponents.TrackingViewElement;
 	
@@ -891,6 +892,37 @@ package model
 			}
 		}
 
+		/**
+		 * checks if it is necessary to add a dayline - and if so adds it to Modellocator.trackinglist<br>
+		 * 
+		 */
+		public static function checkYoungestAndOldestDayLine(creationTimeStampAsDate:Date):void {
+			creationTimeStampAsDate.setHours(0,0,0,0);
+			if (creationTimeStampAsDate.valueOf() > ModelLocator.oldestDayLineStoredInTrackingList) {
+				for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
+					ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(i));
+					if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+						i =  ModelLocator.oldestDayLineStoredInTrackingList;//we don't need to do that 
+				}
+				ModelLocator.trackingList.refresh();
+				ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+				if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
+					ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+			}
+			else
+				if (creationTimeStampAsDate.valueOf() < ModelLocator.youngestDayLineStoredInTrackingList) {
+					for (var j:Number = creationTimeStampAsDate.valueOf(); j <  ModelLocator.youngestDayLineStoredInTrackingList;j = j + 86400000) {
+						ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(j));
+						if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+							j = ModelLocator.youngestDayLineStoredInTrackingList;
+					}
+					ModelLocator.trackingList.refresh();
+					ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+					if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
+						ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
+				}
+			
+		}
 		
 	}
 }

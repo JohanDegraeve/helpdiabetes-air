@@ -505,31 +505,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					ModelLocator.trackingEventToShow = 
 						(ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).mealEvent.eventid;
 				}
-				var creationTimeStampAsDate:Date = new Date((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp);
-				creationTimeStampAsDate.setHours(0,0,0,0);
-				if (creationTimeStampAsDate.valueOf() > ModelLocator.oldestDayLineStoredInTrackingList) {
-					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
-						ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(i));
-						if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
-							i =  ModelLocator.oldestDayLineStoredInTrackingList;//we don't need to do that 
-					}
-					ModelLocator.trackingList.refresh();
-					ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-					if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
-						ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-				}
-				else
-					if (creationTimeStampAsDate.valueOf() < ModelLocator.youngestDayLineStoredInTrackingList) {
-						for (var j:Number = creationTimeStampAsDate.valueOf(); j <  ModelLocator.youngestDayLineStoredInTrackingList;j = j + 86400000) {
-							ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(j));
-							if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
-								j = ModelLocator.youngestDayLineStoredInTrackingList;
-						}
-						ModelLocator.trackingList.refresh();
-						ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-						if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
-							ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-					}
+				ModelLocator.checkYoungestAndOldestDayLine(new Date((ModelLocator.meals.getItemAt(ModelLocator.selectedMeal) as Meal).timeStamp));
 				Synchronize.getInstance().startSynchronize(true,false);
 			}
 			

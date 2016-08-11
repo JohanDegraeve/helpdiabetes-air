@@ -274,33 +274,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theBloodGlucoseEvent.updateBloodGlucoseEvent(unit,new Number(meteringResultText), eventDateAndTime.valueOf(), comment,new Date().valueOf());
 				}
 				
-				var creationTimeStampAsDate:Date = new Date(theBloodGlucoseEvent.timeStamp);
-				creationTimeStampAsDate.setHours(0,0,0,0);
-				if (creationTimeStampAsDate.valueOf() > ModelLocator.oldestDayLineStoredInTrackingList) {
-					for (var i:Number = creationTimeStampAsDate.valueOf(); i >  (ModelLocator.oldestDayLineStoredInTrackingList + 1); i = i - 86400000) {
-						ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(i));
-						if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
-							i =  ModelLocator.oldestDayLineStoredInTrackingList;//we don't need to do that 
-					}
-					ModelLocator.trackingList.refresh();
-					ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-					if (ModelLocator.youngestDayLineStoredInTrackingList == 5000000000000)
-						ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-				}
-				else
-					if (creationTimeStampAsDate.valueOf() < ModelLocator.youngestDayLineStoredInTrackingList) {
-						for (var j:Number = creationTimeStampAsDate.valueOf(); j <  ModelLocator.youngestDayLineStoredInTrackingList;j = j + 86400000) {
-							ModelLocator.trackingList.addItem(new DayLineWithTotalAmount(j));
-							if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
-								j = ModelLocator.youngestDayLineStoredInTrackingList;
-						}
-						ModelLocator.trackingList.refresh();
-						ModelLocator.youngestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-						if (ModelLocator.oldestDayLineStoredInTrackingList == 0)
-							ModelLocator.oldestDayLineStoredInTrackingList = creationTimeStampAsDate.valueOf();
-					}
-				
-				
+				ModelLocator.checkYoungestAndOldestDayLine(new Date(theBloodGlucoseEvent.timeStamp));
 				if (ModelLocator.trackingList.refresh())
 					finishOkClicked();
 				else {
