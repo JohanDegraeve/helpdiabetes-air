@@ -21,8 +21,6 @@ package databaseclasses
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
-	import mx.resources.ResourceManager;
-	
 	import model.ModelLocator;
 	
 	/**
@@ -136,9 +134,17 @@ package databaseclasses
 		public static const SettingsMeal9GraphDescription:int = -78;
 		public static const SettingsMeal10GraphDescription:int = -77;
 		
+		/**
+		* take into account active insulin when calculating insulin amount in a meal<br>
+		* default false
+		*/
+		public static const SettingsUseActiveInsulinInCalculationMealBolus:int = -76;
+		/**
+		 * take into account insulin given during meal when calculating insulin amount in a meal
+		 * default false
+		 */
+		public static const SettingsUseInsulinGivenDuringMealInCalculationMealBolus:int = -75;
 		/** is meal aob calculation active or not ? **/
-		public static const SettingsMeal1_AOBActive:int = -76;
-		public static const SettingsMeal2_AOBActive:int = -75;
 		public static const SettingsMeal3_AOBActive:int = -74;
 		public static const SettingsMeal4_AOBActive:int = -73;
 		public static const SettingsMeal5_AOBActive:int = -72;
@@ -502,8 +508,8 @@ package databaseclasses
 			"",//meal Type 8
 			"",//meal Type 9
 			"",//meal Type 10
-			"false",//carbs 1 aob active or not
-			"false",//carbs 2 aob active or not
+			"false",//take into account active insulin when calculating insulin amount in a meal
+			"false",//take into account insulin given during meal when calculating insulin amount in a meal
 			"false",//carbs 3 aob active or not
 			"false",//carbs 4 aob active or not
 			"false",//carbs 5 aob active or not

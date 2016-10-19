@@ -1000,7 +1000,6 @@
 		  * creates URL request and loads it<br>
 		  * if paramFunctionToRecall != null then <br>
 		  * - eventlistener is registered for that function for Event.COMPLETE<br>
-		  * - paramFunctionToRecall is assigned to variable functionToRemoveFromEventListener<br>
 		  * - paramFunctionToRecall is assigned to variable functionToRecall<br>
 		  * if addIOErrorListener then a listener will be added for the event IOErrorEvent.IO_ERROR, with function googleAPICallFailed<br>
 		  * urlVariables or data needs to be supplied, not both.
