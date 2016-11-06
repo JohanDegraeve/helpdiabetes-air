@@ -32,7 +32,6 @@ package utilities
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
-	import mx.resources.ResourceManager;
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
@@ -55,8 +54,6 @@ package utilities
 	import myComponents.DayLineWithTotalAmount;
 	import myComponents.IListElement;
 	import myComponents.TrackingViewElement;
-	
-	import views.TrackingView;
 	
 	/**
 	 * class with function to synchronize with google docs, and to export tracking history 

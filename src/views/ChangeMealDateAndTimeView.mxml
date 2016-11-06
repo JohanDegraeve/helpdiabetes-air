@@ -42,6 +42,12 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 	
 	<fx:Script>
 		<![CDATA[
+			import com.distriqt.extension.dialog.DateTimeDialogView;
+			import com.distriqt.extension.dialog.Dialog;
+			import com.distriqt.extension.dialog.DialogType;
+			import com.distriqt.extension.dialog.builders.DateTimeDialogBuilder;
+			import com.distriqt.extension.dialog.events.DialogDateTimeEvent;
+			import com.distriqt.extension.dialog.events.DialogViewEvent;
 			import com.google.analytics.AnalyticsTracker;
 			
 			import mx.events.FlexEvent;
@@ -86,6 +92,14 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			
 			private var helpCallOut:HelpCallOut;
 			
+			private var tempDate:int = 0;
+			private var tempMonth:int = 0;
+			private var tempYear:int = 0;
+			private var tempHour:int = 0;
+			private var tempMinute:int = 0;
+			private var tempSeconds:int = 0;
+			var eventDateAndTime:Date;
+			
 			private function helptext1Removed(event:Event):void {
 				if (helpCallOut != null) helpCallOut.removeEventListener(PickerEvent.PICKER_SET,helptext1Removed);
 			}
@@ -100,9 +114,12 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				//change 19/08/2015 if it's a meal with a mealevent, then we'll change the timestamp of that meal to the current date
 				//  before that, when clicking such a meal, it always showed as timestamp the default time for that type of meal, eg 00:00 for breakfast
 				if ((data.meal as Meal).mealEvent == null) {
-					buttonDateAndTime  = new Date().valueOf();
-				} else 
+					eventDateAndTime = (new Date());
+					buttonDateAndTime  = eventDateAndTime.valueOf();
+				} else {
 					buttonDateAndTime = (data.meal as Meal).timeStamp;
+					eventDateAndTime = new Date(buttonDateAndTime);
+				}
 				
 				mealname_textarea_text = (data.meal as Meal).mealName ;
 				previousTimeStamp = (data.meal as Meal).timeStamp ;
@@ -119,7 +136,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				}
 			}
 			
-			private function dateClicked():void {
+			/*private function dateClicked():void {
 				dateOrTimePicket = new DatePicker();
 				(dateOrTimePicket as DatePicker).currentDate = new Date((data.meal as Meal).timeStamp);
 				dateOrTimePicket.addEventListener(PickerEvent.PICKER_SET, onTimeSet);
@@ -142,9 +159,9 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_SET, onTimeSet);
 				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
 				(data.meal as Meal).timeStamp = previousTimeStamp;
-			}
+			}*/
 			
-			private function onTimeSet(event: PickerEvent): void
+			/*private function onTimeSet(event: PickerEvent): void
 			{
 				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_SET, onTimeSet);
 				dateOrTimePicket.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeCancel);
@@ -154,7 +171,7 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 				//date_button_text = dateformatter.format(new Date((data.meal as Meal).timeStamp ));
 				ModelLocator.meals.refresh();
 				selectedMealIndex = ModelLocator.meals.getItemIndex(data.meal as Meal);
-			}
+			}*/
 			
 			/**
 			 * refresh the meals list, and pop two views so that we return back to addfooditemview
@@ -189,7 +206,84 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 					dateOrTimePicket = null;
 				}
 			}
+
+			private function dateClicked(e:MouseEvent = null):void {
+				tempDate = eventDateAndTime.date;
+				tempMonth = eventDateAndTime.month;
+				tempYear = eventDateAndTime.fullYear;
+				tempHour = eventDateAndTime.hours;
+				tempMinute = eventDateAndTime.minutes;
+				tempSeconds = eventDateAndTime.seconds;
+				
+				var dateTime:DateTimeDialogView = Dialog.service.create(
+					new DateTimeDialogBuilder()
+					.setMode(DialogType.MODE_DATE)
+					.setTitle(ModelLocator.resourceManagerInstance.getString("general","date"))
+					.setAcceptLabel("Ok")
+					.setCancelable(true)
+					.setCancelLabel(ModelLocator.resourceManagerInstance.getString('general','cancel'))
+					.build()
+				);
+				dateTime.setDate(tempYear, tempMonth, tempDate);
+				dateTime.setTime(tempHour, tempMinute);
+				dateTime.addEventListener(DialogViewEvent.CLOSED, dateortime_closedRequestHandler);
+				dateTime.addEventListener(DialogDateTimeEvent.SELECTED, date_selectedHandler);
+				dateTime.show();
+			}
 			
+			private function timeClicked(e:MouseEvent = null):void {
+				tempDate = eventDateAndTime.date;
+				tempMonth = eventDateAndTime.month;
+				tempYear = eventDateAndTime.fullYear;
+				tempHour = eventDateAndTime.hours;
+				tempMinute = eventDateAndTime.minutes;
+				tempSeconds = eventDateAndTime.seconds;
+				
+				var dateTime:DateTimeDialogView = Dialog.service.create(
+					new DateTimeDialogBuilder()
+					.setMode(DialogType.MODE_TIME)
+					.setTitle(ModelLocator.resourceManagerInstance.getString("general","time"))
+					.setAcceptLabel("Ok")
+					.setCancelable(true)
+					.setCancelLabel(ModelLocator.resourceManagerInstance.getString('general','cancel'))
+					.build()
+				);
+				dateTime.setDate(tempYear, tempMonth, tempDate);
+				dateTime.setTime(tempHour, tempMinute);
+				dateTime.addEventListener(DialogViewEvent.CLOSED, dateortime_closedRequestHandler);
+				dateTime.addEventListener(DialogDateTimeEvent.SELECTED, time_selectedHandler);
+				dateTime.show();
+			}
+			
+			private function time_selectedHandler( event:DialogDateTimeEvent ):void
+			{
+				tempDate = eventDateAndTime.date;
+				tempMonth = eventDateAndTime.month;
+				tempYear = eventDateAndTime.fullYear;
+				tempHour = event.date.hours;
+				tempMinute = event.date.minutes;
+				tempSeconds = event.date.seconds;
+			}
+			
+			private function date_selectedHandler( event:DialogDateTimeEvent ):void
+			{
+				tempDate = event.date.date;
+				tempMonth = event.date.month;
+				tempYear = event.date.fullYear;
+				tempHour = eventDateAndTime.hours;
+				tempMinute = eventDateAndTime.minutes;
+				tempSeconds = eventDateAndTime.seconds;
+			}
+			
+			private function dateortime_closedRequestHandler( event:DialogViewEvent ):void {
+				eventDateAndTime = new Date(tempYear, tempMonth, tempDate, tempHour, tempMinute, tempSeconds);
+		
+				buttonDateAndTime = eventDateAndTime.valueOf();
+				ModelLocator.meals.refresh();
+				selectedMealIndex = ModelLocator.meals.getItemIndex(data.meal as Meal);
+			}
+			
+
 		]]>
 	</fx:Script>
 	

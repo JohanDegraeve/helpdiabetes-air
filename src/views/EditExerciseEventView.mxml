@@ -31,6 +31,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import com.distriqt.extension.dialog.DateTimeDialogView;
+			import com.distriqt.extension.dialog.Dialog;
+			import com.distriqt.extension.dialog.DialogType;
+			import com.distriqt.extension.dialog.builders.DateTimeDialogBuilder;
+			import com.distriqt.extension.dialog.events.DialogDateTimeEvent;
+			import com.distriqt.extension.dialog.events.DialogViewEvent;
+			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			import mx.managers.PopUpManager;
@@ -80,6 +87,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			 */
 			private var newExerciseEvent:Boolean;
 			
+			private var tempDate:int = 0;
+			private var tempMonth:int = 0;
+			private var tempYear:int = 0;
+			private var tempHour:int = 0;
+			private var tempMinute:int = 0;
+			private var tempSeconds:int = 0;
+
 			private var confirmationPicker:RequestConfirmation;
 			
 			private var _eventDateAndTime:Date;
@@ -176,7 +190,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
-
 				//setting initial values, will be overwritten in oncreationcomplete if data is an medicinevent
 				eventDateAndTime = new Date();
 				dateText = dateformatter.format(_eventDateAndTime);
@@ -210,36 +223,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 			}
 			
-			private function datumClicked(e:MouseEvent = null):void {
+			/*private function dateClicked(e:MouseEvent = null):void {
 				dateOrTimePicker  = new DatePicker();
 				(dateOrTimePicker as DatePicker).currentDate = eventDateAndTime;
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				PopUpManager.addPopUp(dateOrTimePicker, this, true);
 				PopUpManager.centerPopUp(dateOrTimePicker);
-			}
+			}*/
 			
-			private function onTimeOrDateCancel(event: PickerEvent): void
+			/*private function onTimeOrDateCancel(event: PickerEvent): void
 			{
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
-			}
+			}*/
 			
-			private function onTimeOrDateSet(event: PickerEvent): void
+			/*private function onTimeOrDateSet(event: PickerEvent): void
 			{
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.removeEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				eventDateAndTime = (event.newValue as Date);
-			}
+			}*/
 			
-			private function timeClicked(e:MouseEvent = null):void {
+			/*private function timeClicked(e:MouseEvent = null):void {
 				dateOrTimePicker = new TimePicker();
 				(dateOrTimePicker as TimePicker).currentTime = eventDateAndTime;
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_SET, onTimeOrDateSet);
 				dateOrTimePicker.addEventListener(PickerEvent.PICKER_CANCEL, onTimeOrDateCancel);
 				PopUpManager.addPopUp(dateOrTimePicker, this, true);
 				PopUpManager.centerPopUp(dateOrTimePicker);
-			}
+			}*/
 			
 			private function okClicked(e:MouseEvent = null):void {
 				MyGATracker.getInstance().trackPageview( "EditExerciseEventView-OkClicked" );
@@ -351,6 +364,80 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					theExerciseEvent.updateExerciseEvent(exerciseName,eventDateAndTime.valueOf(),new Date().valueOf(),comment);
 				}
 			}
+			
+			private function dateClicked(e:MouseEvent = null):void {
+				tempDate = eventDateAndTime.date;
+				tempMonth = eventDateAndTime.month;
+				tempYear = eventDateAndTime.fullYear;
+				tempHour = eventDateAndTime.hours;
+				tempMinute = eventDateAndTime.minutes;
+				tempSeconds = eventDateAndTime.seconds;
+				
+				var dateTime:DateTimeDialogView = Dialog.service.create(
+					new DateTimeDialogBuilder()
+					.setMode(DialogType.MODE_DATE)
+					.setTitle(ModelLocator.resourceManagerInstance.getString("general","date"))
+					.setAcceptLabel("Ok")
+					.setCancelable(true)
+					.setCancelLabel(ModelLocator.resourceManagerInstance.getString('general','cancel'))
+					.build()
+				);
+				dateTime.setDate(tempYear, tempMonth, tempDate);
+				dateTime.setTime(tempHour, tempMinute);
+				dateTime.addEventListener(DialogViewEvent.CLOSED, dateortime_closedRequestHandler);
+				dateTime.addEventListener(DialogDateTimeEvent.SELECTED, date_selectedHandler);
+				dateTime.show();
+			}
+			
+			private function timeClicked(e:MouseEvent = null):void {
+				tempDate = eventDateAndTime.date;
+				tempMonth = eventDateAndTime.month;
+				tempYear = eventDateAndTime.fullYear;
+				tempHour = eventDateAndTime.hours;
+				tempMinute = eventDateAndTime.minutes;
+				tempSeconds = eventDateAndTime.seconds;
+				
+				var dateTime:DateTimeDialogView = Dialog.service.create(
+					new DateTimeDialogBuilder()
+					.setMode(DialogType.MODE_TIME)
+					.setTitle(ModelLocator.resourceManagerInstance.getString("general","time"))
+					.setAcceptLabel("Ok")
+					.setCancelable(true)
+					.setCancelLabel(ModelLocator.resourceManagerInstance.getString('general','cancel'))
+					.build()
+				);
+				dateTime.setDate(tempYear, tempMonth, tempDate);
+				dateTime.setTime(tempHour, tempMinute);
+				dateTime.addEventListener(DialogViewEvent.CLOSED, dateortime_closedRequestHandler);
+				dateTime.addEventListener(DialogDateTimeEvent.SELECTED, time_selectedHandler);
+				dateTime.show();
+			}
+			
+			private function time_selectedHandler( event:DialogDateTimeEvent ):void
+			{
+				tempDate = eventDateAndTime.date;
+				tempMonth = eventDateAndTime.month;
+				tempYear = eventDateAndTime.fullYear;
+				tempHour = event.date.hours;
+				tempMinute = event.date.minutes;
+				tempSeconds = event.date.seconds;
+			}
+			
+			private function date_selectedHandler( event:DialogDateTimeEvent ):void
+			{
+				tempDate = event.date.date;
+				tempMonth = event.date.month;
+				tempYear = event.date.fullYear;
+				tempHour = eventDateAndTime.hours;
+				tempMinute = eventDateAndTime.minutes;
+				tempSeconds = eventDateAndTime.seconds;
+			}
+			
+			private function dateortime_closedRequestHandler( event:DialogViewEvent ):void {
+				var newDate:Date = new Date(tempYear, tempMonth, tempDate, tempHour, tempMinute, tempSeconds);
+				eventDateAndTime = newDate;
+			}
+
 		]]>
 	</fx:Script>
 	<s:navigationContent>
@@ -385,7 +472,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				<s:SolidColorStroke color="0xADADAD" weight="1"/>
 			</s:stroke>
 		</s:Line>	
-		<s:Group id="datumGroup" y="0" x="0" width="100%" click="datumClicked(event)">
+		<s:Group id="datumGroup" y="0" x="0" width="100%" click="dateClicked(event)">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle">
 				</s:HorizontalLayout>

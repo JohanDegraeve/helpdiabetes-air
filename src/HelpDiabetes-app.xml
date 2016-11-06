@@ -235,4 +235,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</manifest>
 ]]></manifestAdditions>
   </android>
+<extensions>
+        <extensionID>com.distriqt.AndroidSupport</extensionID>
+    <extensionID>com.distriqt.Core</extensionID>
+    <extensionID>com.distriqt.Dialog</extensionID>
+    </extensions>
 </application>

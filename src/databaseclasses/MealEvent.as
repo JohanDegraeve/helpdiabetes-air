@@ -476,46 +476,49 @@ package databaseclasses
 						 + " = " +
 						 ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
 					 
-					 //now substract the active insulin
-					 activeInsulin = ModelLocator.calculateActiveInsulin(timeStamp);
-					 
-					 if (activeInsulin > 0) {
-						 returnValue += "{active_insulin}* = " + ((Math.round(activeInsulin * 10))/10).toString() + "\n";
-						 returnValue += "{calculated_insulinamount} = " + ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + " - " +
+					 //now substract the active insulin, if enabled in the sttings
+					 if (Settings.getInstance().getSetting(Settings.SettingsUseActiveInsulinInCalculationMealBolus) == "true") {
+						 activeInsulin = ModelLocator.calculateActiveInsulin(timeStamp);
+						 if (activeInsulin > 0) {
+							 returnValue += "{active_insulin}* = " + ((Math.round(activeInsulin * 10))/10).toString() + "\n";
+							 returnValue += "{calculated_insulinamount} = " + ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + " - " +
 							 ((Math.round(activeInsulin * 10))/10).toString();
-						 _calculatedInsulinAmount -= activeInsulin;
-						 returnValue += " = " + ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
+							 _calculatedInsulinAmount -= activeInsulin;
+							 returnValue += " = " + ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
+						 }
 					 }
 					 
-					 //get the timestamp of the last added selecteditem
-					 var timeOfLastMealChange:Number = timeStamp;
-					 for (var selcntr:int = 0;selcntr < selectedFoodItems.length;selcntr++) {
-						 if ((selectedFoodItems.getItemAt(selcntr) as SelectedFoodItem).lastModifiedTimestamp > timeOfLastMealChange)
-							 timeOfLastMealChange = (selectedFoodItems.getItemAt(selcntr) as SelectedFoodItem).lastModifiedTimestamp;
-					 }
-					 //calculate how much was given during the meal
+					 //calculate how much was given during the meal, if enabled in the settings
 					 var insulinGivenDuringMeal:Number = 0;
-					 for (var trackcntr:int = ModelLocator.trackingList.length - 1 ;trackcntr >= 0 ;trackcntr--) {
-						 if ((ModelLocator.trackingList.getItemAt(trackcntr) as TrackingViewElement).timeStamp < timeStamp)
-							 break;
-						 if (ModelLocator.trackingList.getItemAt(trackcntr) is MedicinEvent) {
-							 if (ModelLocator.resourceManagerInstance.getString('editmedicineventview','listofnormalbolustypes').indexOf((ModelLocator.trackingList.getItemAt(trackcntr) as MedicinEvent).bolustype) > -1) {
-								 var timeStampOfThatMedicinEvent:Number = (ModelLocator.trackingList.getItemAt(trackcntr) as MedicinEvent).timeStamp; 
-								 if (timeStampOfThatMedicinEvent < timeOfLastMealChange ) {
-									 insulinGivenDuringMeal += (ModelLocator.trackingList.getItemAt(trackcntr) as MedicinEvent).amount;
+					 if (Settings.getInstance().getSetting(Settings.SettingsUseInsulinGivenDuringMealInCalculationMealBolus) == "true") {
+						 //get the timestamp of the last added selecteditem
+						 var timeOfLastMealChange:Number = timeStamp;
+						 for (var selcntr:int = 0;selcntr < selectedFoodItems.length;selcntr++) {
+							 if ((selectedFoodItems.getItemAt(selcntr) as SelectedFoodItem).lastModifiedTimestamp > timeOfLastMealChange)
+								 timeOfLastMealChange = (selectedFoodItems.getItemAt(selcntr) as SelectedFoodItem).lastModifiedTimestamp;
+						 }
+						 for (var trackcntr:int = ModelLocator.trackingList.length - 1 ;trackcntr >= 0 ;trackcntr--) {
+							 if ((ModelLocator.trackingList.getItemAt(trackcntr) as TrackingViewElement).timeStamp < timeStamp)
+								 break;
+							 if (ModelLocator.trackingList.getItemAt(trackcntr) is MedicinEvent) {
+								 if (ModelLocator.resourceManagerInstance.getString('editmedicineventview','listofnormalbolustypes').indexOf((ModelLocator.trackingList.getItemAt(trackcntr) as MedicinEvent).bolustype) > -1) {
+									 var timeStampOfThatMedicinEvent:Number = (ModelLocator.trackingList.getItemAt(trackcntr) as MedicinEvent).timeStamp; 
+									 if (timeStampOfThatMedicinEvent < timeOfLastMealChange ) {
+										 insulinGivenDuringMeal += (ModelLocator.trackingList.getItemAt(trackcntr) as MedicinEvent).amount;
+									 }
 								 }
 							 }
 						 }
-					 }
-					 if (insulinGivenDuringMeal > 0) {
-						 returnValue += "{bolus_already_given}** = " + ((Math.round(insulinGivenDuringMeal * 10))/10).toString() + "\n";
-						 
-						 returnValue += "{calculated_insulinamount} = " + 
+						 if (insulinGivenDuringMeal > 0) {
+							 returnValue += "{bolus_already_given}** = " + ((Math.round(insulinGivenDuringMeal * 10))/10).toString() + "\n";
+							 
+							 returnValue += "{calculated_insulinamount} = " + 
 							 ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + 
 							 " - " +
 							 ((Math.round(insulinGivenDuringMeal * 10))/10).toString();
-						 _calculatedInsulinAmount = _calculatedInsulinAmount - insulinGivenDuringMeal;
-						 returnValue += " = " + ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
+							 _calculatedInsulinAmount = _calculatedInsulinAmount - insulinGivenDuringMeal;
+							 returnValue += " = " + ((Math.round(_calculatedInsulinAmount * 10))/10).toString() + "\n";
+						 }
 					 }
 					 
 					 if (activeInsulin > 0 || insulinGivenDuringMeal > 0) {
