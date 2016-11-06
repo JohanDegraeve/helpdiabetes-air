@@ -32,11 +32,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Style source="assets/style.css"/>
 	<fx:Script>
 		<![CDATA[
+			import com.distriqt.extension.dialog.Dialog;
+			
 			import mx.collections.ArrayCollection;
 			
 			import spark.events.IndexChangeEvent;
 			
 			import databaseclasses.Settings;
+			
+			import distriqtkey.DistriqtKey;
 			
 			import model.ModelLocator;
 			
@@ -129,6 +133,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 					}
 				}
 				FoodCounterView.screenSizeKnown();
+				
+				Dialog.init(DistriqtKey.distriqtKey);
+				Dialog.service.root = this.stage;
 			}
 			
 			private function orientationChanged(event:Event):void {
