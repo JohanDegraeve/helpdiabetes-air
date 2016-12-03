@@ -58,10 +58,8 @@ When creating a ChangeMealDateAndTimeView with navigator.pushView, the second pa
 			
 			import model.ModelLocator;
 			
-			import myComponents.DatePicker;
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
-			import myComponents.TimePicker;
 			
 			import utilities.MyGATracker;
 			

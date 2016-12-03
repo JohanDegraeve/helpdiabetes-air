@@ -105,7 +105,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var tempMinute:int = 0;
 			private var tempSeconds:int = 0;
 
-			
 			/**
 			 * if true then this view is created for a new mealevent 
 			 */
