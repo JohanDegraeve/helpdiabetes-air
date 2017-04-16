@@ -264,11 +264,13 @@
 					 }
 				 }
 				 
+				 /* not very useful to launch timer for ios
+				 and even for Android, startsync is always called at end of google sync
 				 if (timer2 == null) {
 					 timer2 = new Timer(300000, 1);
 					 timer2.addEventListener(TimerEvent.TIMER, startNightScoutSync);
 					 timer2.start();
-				 }
+				 }*/
 			 }
 			 
 		 }

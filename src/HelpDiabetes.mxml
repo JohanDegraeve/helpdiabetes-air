@@ -34,7 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<![CDATA[
 			import com.distriqt.extension.core.Core;
 			import com.distriqt.extension.dialog.Dialog;
-			import com.distriqt.extension.googleidentity.GoogleIdentity;
 			import com.freshplanet.ane.AirBackgroundFetch.BackgroundFetch;
 			
 			import mx.collections.ArrayCollection;
@@ -140,7 +139,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				BackgroundFetch.init();
 				Dialog.init(DistriqtKey.distriqtKey);
 				Core.init(DistriqtKey.distriqtKey);
-				GoogleIdentity.init(DistriqtKey.distriqtKey);
 				Dialog.service.root = this.stage;
 			}
 			

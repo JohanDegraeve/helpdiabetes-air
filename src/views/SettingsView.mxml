@@ -28,7 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<![CDATA[
 			import com.distriqt.extension.googleidentity.GoogleIdentity;
 			import com.distriqt.extension.googleidentity.GoogleIdentityOptions;
-			import com.distriqt.extension.googleidentity.events.GoogleIdentityEvent;
 			
 			import flash.net.navigateToURL;
 			
