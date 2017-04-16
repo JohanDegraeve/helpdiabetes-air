@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2016  hippoandfriends
+ Copyright (C) 2017  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -17,6 +17,11 @@
  */
 package utilities
 {
+	import com.distriqt.extension.googleidentity.GoogleIdentity;
+	import com.distriqt.extension.googleidentity.GoogleIdentityOptions;
+	import com.distriqt.extension.googleidentity.events.GoogleIdentityEvent;
+	import com.freshplanet.ane.AirBackgroundFetch.BackgroundFetch;
+	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -35,6 +40,7 @@ package utilities
 	
 	import spark.collections.Sort;
 	import spark.collections.SortField;
+	import spark.components.ViewNavigator;
 	import spark.formatters.DateTimeFormatter;
 	
 	import databaseclasses.BloodGlucoseEvent;
@@ -51,9 +57,10 @@ package utilities
 	
 	import model.ModelLocator;
 	
-	import myComponents.DayLineWithTotalAmount;
 	import myComponents.IListElement;
 	import myComponents.TrackingViewElement;
+	
+	import views.SynchronizeView;
 	
 	/**
 	 * class with function to synchronize with google docs, and to export tracking history 
@@ -63,6 +70,7 @@ package utilities
 	{
 		[ResourceBundle("analytics")]
 		[ResourceBundle("uploadtrackingview")] 
+		[ResourceBundle("client_secret")] 
 		private static var googleRequestTablesUrl:String = "https://www.googleapis.com/fusiontables/v2/tables";
 		private static var googleSelectUrl:String = "https://www.googleapis.com/fusiontables/v2/query";
 		private static var googleDriveFilesUrl:String = "https://www.googleapis.com/drive/v2/files";
@@ -194,6 +202,7 @@ package utilities
 		private var asOfTimeStamp:Number
 		
 		private var _synchronize_debugString:String = "";
+		public static var navigator:ViewNavigator = null;
 		
 		public function get synchronize_debugString():String
 		{
@@ -231,7 +240,7 @@ package utilities
 		private var timer2:Timer;
 		private var tableCounterForFunctionUpdateGoogleTablesIfNecessary:int;
 		public static var syncErrorList:ArrayList;
-		
+		private static var googleSetupCompleted:Boolean = false;
 		
 		/**
 		 * tablename, tableid and list of columns with columnname and type <br>
@@ -671,6 +680,13 @@ package utilities
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealproteinamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealproteinamount');
 			googleExcelLogBookColumnNames[foodValueNames_Index_mealfatamount] = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','mealfatamount');
 			syncErrorList = new ArrayList();
+			
+			GoogleIdentity.service.addEventListener( GoogleIdentityEvent.SIGN_IN, googleSignInHandler );
+			GoogleIdentity.service.addEventListener( GoogleIdentityEvent.ERROR, googleErrorHandler );
+			GoogleIdentity.service.addEventListener(GoogleIdentityEvent.TOKEN_UPDATED, accessTokenRefreshSuccess);
+			GoogleIdentity.service.addEventListener(GoogleIdentityEvent.TOKEN_FAILED, accessTokenRefreshFailed);
+			GoogleIdentity.service.addEventListener( GoogleIdentityEvent.SETUP_COMPLETE, googleSetupCompleteHandler );
+
 		}
 		
 		public static function getInstance():Synchronize {
@@ -735,7 +751,7 @@ package utilities
 					currentSyncTimeStamp = new Date().valueOf();
 					lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastGoogleSyncTimeStamp));
 					if (debugMode)
-						trace("Synchronize.as : lastsynctimestamp = " + new DateTimeFormatter().format(new Date(lastSyncTimeStamp)));
+						Trace.myTrace("Synchronize.as : lastsynctimestamp = " + new DateTimeFormatter().format(new Date(lastSyncTimeStamp)));
 					asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 					rerunNecessary = false;
 					syncRunning = true;
@@ -756,7 +772,7 @@ package utilities
 						getTheSettings();
 					else {
 						synchronize();
-						trace("Synchronize.as : starting startsynchronize");						
+						Trace.myTrace("Synchronize.as : starting startsynchronize");						
 					}
 				} else {
 					if (immediateRunNecessary) {
@@ -791,7 +807,7 @@ package utilities
 							for (var j:int = 0;j < tableNamesAndColumnNames.length;j++) {
 								if (eventAsJSONObject.items[i].name == tableNamesAndColumnNames[j][0]) {
 									if (debugMode)
-										trace("Synchronize.as : found a table : " + eventAsJSONObject.items[i].name);
+										Trace.myTrace("Synchronize.as : found a table : " + eventAsJSONObject.items[i].name);
 									tableNamesAndColumnNames[j][1] = eventAsJSONObject.items[i].tableId;	
 									//check if the tables has the column id as type int, and if so mark that we'll have to modify
 									//applicble for HD-BloodglucoseEvent, .. exercise, medicin, meals, selecteditems
@@ -822,7 +838,7 @@ package utilities
 			} else  {
 				trackingListAlreadyModified = false;
 				if (debugMode)
-					trace("Synchronize.as : start method synchronize");
+					Trace.myTrace("Synchronize.as : start method synchronize");
 				
 				if (!alReadyGATracked) {
 					alReadyGATracked = MyGATracker.getInstance().trackPageview( "Synchronize-SyncStarted");
@@ -847,7 +863,7 @@ package utilities
 		
 		private function createMissingTables(event:Event = null): void {
 			if (debugMode)
-				trace("Synchronize.as : start method createMissingTables");
+				Trace.myTrace("Synchronize.as : start method createMissingTables");
 			
 			if (event != null) {
 				removeEventListeners();
@@ -911,7 +927,7 @@ package utilities
 				return;
 			}
 			if (debugMode)
-				trace("Synchronize.as : updateGoogleTablesIsNecessary = true , starting method updateGoogleTablesIfNecessary");
+				Trace.myTrace("Synchronize.as : updateGoogleTablesIsNecessary = true , starting method updateGoogleTablesIfNecessary");
 			//continue but it could still be that there's no more updates necessary, this depends on the value of tableCounterForFunctionUpdateGoogleTablesIfNecessary
 			
 			if (event != null) {
@@ -982,7 +998,7 @@ package utilities
 		 */
 		private function addColumnToExistingTable(functionToReCall:Function,tableId:String,columnName:String,columnType:String):void {
 			if (debugMode)
-				trace("Synchronize.as : start method addColumnToExistingTable for tableid = " + tableId + "columnName = " + columnName);
+				Trace.myTrace("Synchronize.as : start method addColumnToExistingTable for tableid = " + tableId + "columnName = " + columnName);
 			
 			var jsonObject:Object = new Object();
 			jsonObject.name = columnName;
@@ -1018,7 +1034,7 @@ package utilities
 			var eventAsJSONObject:Object;
 			
 			if (debugMode)
-				trace("Synchronize.as : start method getTheMedicinEvents");
+				Trace.myTrace("Synchronize.as : start method getTheMedicinEvents");
 			//ModelLocator.logString += "start method getthemedicinevents"+ "\n";;
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
@@ -1131,7 +1147,7 @@ package utilities
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][5][0])] as String) == "true") {
 									if (debugMode)
-										trace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
+										Trace.myTrace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
 									//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
 									NightScoutSync.getInstance().addObjectToBeDeleted(trackingList.getItemAt(l));
 									(trackingList.getItemAt(l) as MedicinEvent).deleteEvent();
@@ -1159,7 +1175,7 @@ package utilities
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][4][0])]));
 									ModelLocator.trackingViewRedrawNecessary = true;
-									if (debugMode) trace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
+									if (debugMode) Trace.myTrace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as MedicinEvent).eventid);
 								}
 								break;
 							}
@@ -1184,7 +1200,7 @@ package utilities
 							
 							var medicinName1:String = medicinArray1[0];
 							
-							//trace(" in synchronize.as, creating a newMedicinEvent with timestamp = " + (new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]))).toString() + " and eventid = " + remoteElements.getItemAt(m)[positionId]);
+							//Trace.myTrace(" in synchronize.as, creating a newMedicinEvent with timestamp = " + (new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])]))).toString() + " and eventid = " + remoteElements.getItemAt(m)[positionId]);
 							ModelLocator.trackingList.addItem(
 								(new MedicinEvent(
 									remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][2][0])],
@@ -1200,7 +1216,7 @@ package utilities
 							
 							ModelLocator.checkYoungestAndOldestDayLine(new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(tableNamesAndColumnNames[0][2][3][0])])));
 							ModelLocator.recalculateActiveInsulin();
-							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
+							if (debugMode) Trace.myTrace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
 				}
@@ -1215,7 +1231,7 @@ package utilities
 			var eventAsJSONObject:Object;
 			
 			if (debugMode)
-				trace("Synchronize.as : start method getTheBloodGlucoseEvents");
+				Trace.myTrace("Synchronize.as : start method getTheBloodGlucoseEvents");
 			
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
@@ -1330,7 +1346,7 @@ package utilities
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 									if (debugMode)
-										trace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
+										Trace.myTrace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
 									//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
 									NightScoutSync.getInstance().addObjectToBeDeleted(trackingList.getItemAt(l));
 									(trackingList.getItemAt(l) as BloodGlucoseEvent).deleteEvent();
@@ -1342,7 +1358,7 @@ package utilities
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)],
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]));
 									ModelLocator.trackingViewRedrawNecessary = true;
-									if (debugMode) trace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
+									if (debugMode) Trace.myTrace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as BloodGlucoseEvent).eventid);
 								}
 								break;
 							}
@@ -1365,7 +1381,7 @@ package utilities
 									true, true))
 							);
 							ModelLocator.checkYoungestAndOldestDayLine(new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)])));
-							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)]);
+							if (debugMode) Trace.myTrace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_id)]);
 						}
 					}
 				}
@@ -1380,7 +1396,7 @@ package utilities
 			var eventAsJSONObject:Object;
 			
 			if (debugMode)
-				trace("Synchronize.as : start method getTheExerciseEvents");
+				Trace.myTrace("Synchronize.as : start method getTheExerciseEvents");
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -1493,7 +1509,7 @@ package utilities
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 									if (debugMode)
-										trace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
+										Trace.myTrace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
 									//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
 									NightScoutSync.getInstance().addObjectToBeDeleted(trackingList.getItemAt(l));
 									(trackingList.getItemAt(l) as ExerciseEvent).deleteEvent();
@@ -1504,7 +1520,7 @@ package utilities
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_comment)]);
 									ModelLocator.trackingViewRedrawNecessary = true;
-									if (debugMode) trace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
+									if (debugMode) Trace.myTrace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as ExerciseEvent).eventid);
 								}
 								break;
 							}
@@ -1526,7 +1542,7 @@ package utilities
 									true))
 							);
 							ModelLocator.checkYoungestAndOldestDayLine(new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)])));
-							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
+							if (debugMode) Trace.myTrace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
 				}
@@ -1542,7 +1558,7 @@ package utilities
 			var eventAsJSONObject:Object;
 			
 			if (debugMode)
-				trace("Synchronize.as : start method getTheMealEvents");
+				Trace.myTrace("Synchronize.as : start method getTheMealEvents");
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -1673,7 +1689,7 @@ package utilities
 								localElementsUpdated = true;
 								if ((remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_deleted)] as String) == "true") {
 									if (debugMode)
-										trace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
+										Trace.myTrace("Synchronize.as : local element deleted, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
 									//add the element to list at nightscoutsync, because maybe it also needs to be deleted remotely
 									NightScoutSync.getInstance().addObjectToBeDeleted(trackingList.getItemAt(l));
 									(trackingList.getItemAt(l) as MealEvent).deleteEvent();
@@ -1686,7 +1702,7 @@ package utilities
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_modifiedtimestamp)]),
 										new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)]));
 									ModelLocator.trackingViewRedrawNecessary = true;
-									if (debugMode) trace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
+									if (debugMode) Trace.myTrace("Synchronize.as : local element updated, id = " + (trackingList.getItemAt(l) as MealEvent).eventid);
 								}
 								break;
 							}
@@ -1710,8 +1726,8 @@ package utilities
 							ModelLocator.addMeal(new Meal(null,newMealEvent,Number.NaN));
 							trackingList.addItem(newMealEvent);
 							ModelLocator.checkYoungestAndOldestDayLine(new Date(new Number(remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_creationtimestamp)])));
-
-							if (debugMode) trace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
+							
+							if (debugMode) Trace.myTrace("Synchronize.as : local element created, id = " + remoteElements.getItemAt(m)[positionId]);
 						}
 					}
 				}
@@ -1725,7 +1741,7 @@ package utilities
 			var eventAsJSONObject:Object;
 			
 			if (debugMode)
-				trace("Synchronize.as : start method getTheSelectedItems");
+				Trace.myTrace("Synchronize.as : start method getTheSelectedItems");
 			//start with remoteElements
 			//I'm assuming here that the nextpagetoken principle will be used by google, not sure however
 			if (event != null) {
@@ -1856,7 +1872,7 @@ package utilities
 											remoteElements.getItemAt(m)[eventAsJSONObject.columns.indexOf(ColumnName_chosenamount)],
 											theMealEvent2);
 										ModelLocator.trackingViewRedrawNecessary = true;
-										if (debugMode) trace("Synchronize.as : local element updated, id = " + theSelectedFoodItem.eventid);
+										if (debugMode) Trace.myTrace("Synchronize.as : local element updated, id = " + theSelectedFoodItem.eventid);
 									}
 									break;
 									//l =  trackingList.length;
@@ -2400,7 +2416,7 @@ package utilities
 			//localelements will be all local elements that are not in the remotelements
 			
 			if (debugMode)
-				trace("Synchronize.as : start method getTheSettings");
+				Trace.myTrace("Synchronize.as : start method getTheSettings");
 			
 			var positionId:int;
 			var eventAsJSONObject:Object;
@@ -2587,6 +2603,39 @@ package utilities
 			
 		}
 		
+		private function googleSetupCompleteHandler( event:GoogleIdentityEvent ):void
+		{
+			Trace.myTrace("in googleSetupCompleteHandler");
+			googleSetupCompleted = true;
+			GoogleIdentity.service.signIn();
+		}
+		
+		private function googleSignInHandler( event:GoogleIdentityEvent ):void
+		{
+			Trace.myTrace("google signin success");
+			if (event.user != null) {
+				Trace.myTrace("ok we have a user");
+				Trace.myTrace("event.user.authentication.accessToken = " + event.user.authentication.accessToken);
+				Settings.getInstance().setSetting(Settings.SettingsAccessToken,event.user.authentication.accessToken);
+				secondAttempt = false;
+				if (navigator != null) {
+					navigator.pushView(SynchronizeView);
+					navigator = null;
+					startSynchronize();					
+				} else {
+					functionToRecall.call();
+				}
+			} else {
+				Trace.myTrace("user is null, calling gettoken");
+				GoogleIdentity.service.getToken();
+			}
+		}
+		
+		private function googleErrorHandler( event:GoogleIdentityEvent ):void
+		{
+			Trace.myTrace("googleErrorHandler");
+		}
+		
 		private function googleAPICallFailed(event:Event):void {
 			if (debugMode) {
 				_synchronize_debugString = event.target.data as String;
@@ -2595,7 +2644,7 @@ package utilities
 			
 			removeEventListeners();
 			if (debugMode)
-				trace("Synchronize.as : in googleapicall failed : event.target.data = " + event.target.data as String);
+				Trace.myTrace("Synchronize.as : in googleapicall failed : event.target.data = " + event.target.data as String);
 			//let's first see if the event.target.data has json
 			try {
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
@@ -2604,21 +2653,26 @@ package utilities
 					syncErrorList.addItem((new Date()).toLocaleString() + " " + event.target.data);
 				if (message == googleError_Invalid_Credentials /*|| message == googleError_Login_Required*/) {
 					secondAttempt = true;
-					//get a new access_token
-					var request:URLRequest = new URLRequest(googleTokenRefreshUrl);
-					request.contentType = "application/x-www-form-urlencoded";
-					request.data = new URLVariables(
-						"client_id=" + ModelLocator.resourceManagerInstance.getString('client_secret','client_id') + "&" +
-						"client_secret=" + ModelLocator.resourceManagerInstance.getString('client_secret','client_secret') + "&" +
-						"refresh_token=" + Settings.getInstance().getSetting(Settings.SettingsRefreshToken) + "&" + 
-						"grant_type=refresh_token");
-					request.method = URLRequestMethod.POST;
-					loader = new URLLoader();
-					loader.addEventListener(Event.COMPLETE,accessTokenRefreshed);
-					loader.addEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
-					loader.load(request);
-					if (debugMode)
-						trace("Synchronize.as : loader : request = " + request.data); 
+					
+					if (googleSetupCompleted) {
+						Trace.myTrace("Synchronize.as : in googleapicall failed , calling gettoken");
+						//GoogleIdentity.service.signIn();
+						GoogleIdentity.service.getToken();
+					} else {
+						Trace.myTrace("Synchronize.as : setting up google service");
+						
+						var options:GoogleIdentityOptions = new GoogleIdentityOptions( ModelLocator.resourceManagerInstance.getString('client_secret','client_id_android'), ModelLocator.resourceManagerInstance.getString('client_secret','client_id_ios'));
+						
+						options.requestIdToken = true;
+						options.requestServerAuthCode = true;
+						//options.clientSecret_iOS = resourceManager.getString('client_secret','client_secret');
+						//options.clientSecret_Android = resourceManager.getString('client_secret','client_secret');
+						options.scopes.push( "https://www.googleapis.com/auth/fusiontables.readonly" );
+						options.scopes.push( "https://www.googleapis.com/auth/fusiontables" );
+						options.scopes.push( "https://spreadsheets.google.com/feeds" );
+						options.scopes.push( "https://docs.google.com/feeds" );
+						GoogleIdentity.service.setup( options );
+					}
 				} else if (message == "Rate Limit Exceeded") {
 					if (!alreadyTrackedRateLimitExceeded)
 						MyGATracker.getInstance().trackPageview( "Synchronize-rate-limit-exceeded");
@@ -2641,41 +2695,33 @@ package utilities
 			}
 		}
 		
-		private function accessTokenRefreshed(event:Event):void {
-			loader.removeEventListener(Event.COMPLETE,accessTokenRefreshed);
-			loader.removeEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
-			
-			secondAttempt = false;
-			access_token = JSON.parse(event.target.data as String).access_token;
-			if (access_token != null)
-				Settings.getInstance().setSetting(Settings.SettingsAccessToken,access_token);
-			
-			
-			functionToRecall.call();
-		}
-		
-		private function accessTokenRefreshFailed(event:Event):void {
+		private function accessTokenRefreshFailed(event:GoogleIdentityEvent):void {
 			try {
-				loader.removeEventListener(Event.COMPLETE,accessTokenRefreshed);
-				loader.removeEventListener(IOErrorEvent.IO_ERROR,accessTokenRefreshFailed);
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-				if (eventAsJSONObject.error == "invalid_grant") {
+				if (event.error == "invalid_grant") {//not sure if GoogleIdentiyEvent.error can have this value, this is taken over form browser based version
 					//reset access_token and grant_token, user needs to go back to settingsscreen to reinitialize
 					Settings.getInstance().setSetting(Settings.SettingsAccessToken, "");
 					Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");//also nightscoutsync is reset
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);//also nightscoutsync is reset
-					trace("night scout api secret reset to blanc, Synchronize.as");
+					Trace.myTrace("night scout api secret reset to blanc, Synchronize.as");
 					Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 					//the show stops
 				}
-			} catch (e:SyntaxError) {
+			} catch (e:SyntaxError) {//code remaining from version with browser based google sign in, not sure if still needed here
 				//event.taregt.data is not json
 				if (event.type == "ioError") {
 					//an ioError, forget about it, the show doesn't go on but we reset secondAttempt
 					secondAttempt = false;
 				}
 			}
+		}
+		
+		private function accessTokenRefreshSuccess(event:GoogleIdentityEvent):void {
+			secondAttempt = false;
+			access_token = event.user.authentication.accessToken;
+			if (access_token != null)
+				Settings.getInstance().setSetting(Settings.SettingsAccessToken,access_token);
+			functionToRecall.call();		
 		}
 		
 		/**
@@ -2699,13 +2745,13 @@ package utilities
 				" WHERE " + ColumnName_addedtoormodifiedintabletimestamp +  ">= '" + lastSyncTimeStamp.toString() + "' AND " +
 				"creationtimestamp >= '" + asOfTimeStamp.toString() + "'";
 			if (debugMode)
-				trace("Synchronize.as : querystring = " + returnValue);
+				Trace.myTrace("Synchronize.as : querystring = " + returnValue);
 			return returnValue;
 		}
 		
 		private function deleteRemoteMedicinEvent(event:Event,medicinEvent:MedicinEvent = null):void {
 			if (debugMode)
-				trace("Synchronize.as : in method deleteremotemedicinevent");
+				Trace.myTrace("Synchronize.as : in method deleteremotemedicinevent");
 			if (medicinEvent != null)
 				objectToBeDeleted = medicinEvent;
 			if (event != null)  {
@@ -2738,7 +2784,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method deleteMedicinEvent");
+					Trace.myTrace("Synchronize.as : start method deleteMedicinEvent");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
 				
@@ -2755,7 +2801,7 @@ package utilities
 		
 		private function deleteRemoteBloodGlucoseEvent(event:Event, bloodglucoseEvent:BloodGlucoseEvent = null):void {
 			if (debugMode)
-				trace("Synchronize.as : in method deleteremotebloodglucoseevent");
+				Trace.myTrace("Synchronize.as : in method deleteremotebloodglucoseevent");
 			if (bloodglucoseEvent != null)
 				objectToBeDeleted = bloodglucoseEvent;
 			if (event != null)  {
@@ -2788,7 +2834,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method deleteBloodGlucoseEvent");
+					Trace.myTrace("Synchronize.as : start method deleteBloodGlucoseEvent");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
 				
@@ -2809,7 +2855,7 @@ package utilities
 		
 		private function deleteRemoteExerciseEvent(event:Event, exerciseEvent:ExerciseEvent = null):void {
 			if (debugMode)
-				trace("Synchronize.as : in method deleteremoteexerciseevent");
+				Trace.myTrace("Synchronize.as : in method deleteremoteexerciseevent");
 			if (exerciseEvent != null)
 				objectToBeDeleted = exerciseEvent;
 			if (event != null)  {
@@ -2841,7 +2887,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method deleteExerciseEvent");
+					Trace.myTrace("Synchronize.as : start method deleteExerciseEvent");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
 				
@@ -2856,7 +2902,7 @@ package utilities
 		
 		private function deleteRemoteMealEvent(event:Event, mealEvent:MealEvent = null):void {
 			if (debugMode)
-				trace("Synchronize.as : in method deleteremotemealevent");
+				Trace.myTrace("Synchronize.as : in method deleteremotemealevent");
 			if (mealEvent != null)
 				objectToBeDeleted = mealEvent;
 			if (event != null)  {
@@ -2890,7 +2936,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method deleteRemoteMealEvent");
+					Trace.myTrace("Synchronize.as : start method deleteRemoteMealEvent");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
 				
@@ -2904,7 +2950,7 @@ package utilities
 		
 		private function deleteRemoteSelectedFoodItem(event:Event, selectedFoodItem:SelectedFoodItem = null):void {
 			if (debugMode)
-				trace("Synchronize.as : in method deleteremoteselectedfooditem");
+				Trace.myTrace("Synchronize.as : in method deleteremoteselectedfooditem");
 			if (selectedFoodItem != null)
 				objectToBeDeleted = selectedFoodItem;
 			if (event != null)  {
@@ -2946,7 +2992,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method deleteRemoteSelectedFoodItem");
+					Trace.myTrace("Synchronize.as : start method deleteRemoteSelectedFoodItem");
 				
 				access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
 				
@@ -2969,7 +3015,7 @@ package utilities
 			} else  {
 			}
 			if (debugMode)
-				trace("Synchronize.as : start method googleExcelInsertLogBookEvents");
+				Trace.myTrace("Synchronize.as : start method googleExcelInsertLogBookEvents");
 			this.dispatchEvent(new Event(INSERTING_NEW_EVENTS));
 			var dateFormatter:DateTimeFormatter =  new DateTimeFormatter();
 			dateFormatter.dateTimePattern = ModelLocator.resourceManagerInstance.getString('uploadtrackingview','datepattern');
@@ -3078,7 +3124,7 @@ package utilities
 				foodItemIdBeingTreated = new Number(Settings.getInstance().getSetting(Settings.SettingsNextRowToAddInFoodTable));
 			}
 			if (debugMode)
-				trace("Synchronize.as : start method googleExcelInsertFoodItems");
+				Trace.myTrace("Synchronize.as : start method googleExcelInsertFoodItems");
 			
 			var dispatcher:EventDispatcher = new EventDispatcher();
 			var retrievedFoodItem:FoodItem;
@@ -3125,7 +3171,7 @@ package utilities
 			}
 			
 			function unitListRetrievelError(event:DatabaseEvent):void {
-				trace("Synchronize.as : error in synchronize.as, unitlistretrievalerror, event = " + event.target.toString());
+				Trace.myTrace("Synchronize.as : error in synchronize.as, unitlistretrievalerror, event = " + event.target.toString());
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 				syncFinished(true);//stop the sync, sync itself was ok, but not the upload of fooditems
@@ -3148,7 +3194,7 @@ package utilities
 			} 
 			
 			if (debugMode)
-				trace("Synchronize.as : start method googleExcelCreateLogBookHeader");
+				Trace.myTrace("Synchronize.as : start method googleExcelCreateLogBookHeader");
 			
 			if (new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInLogBook)) == googleExcelLogBookColumnNames.length)  {
 				//actually the first time that an app runs an a device, Settings.SettingsNextColumnToAddInLogBook is always 0, means it will always recreate all header column names
@@ -3210,7 +3256,7 @@ package utilities
 				googleExcelInsertFoodItems();
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelCreateHeader");
+					Trace.myTrace("Synchronize.as : start method googleExcelCreateHeader");
 				_uploadFoodDatabaseStatus = ModelLocator.resourceManagerInstance.getString('synchronizeview','creatingheaders');
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 				
@@ -3261,7 +3307,7 @@ package utilities
 				
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelCreateLoogBook");
+					Trace.myTrace("Synchronize.as : start method googleExcelCreateLoogBook");
 				this.dispatchEvent(new Event(CREATING_LOGBOOK_SPREADSHEET));
 				var jsonObject:Object = new Object();
 				jsonObject.mimeType = "application/vnd.google-apps.spreadsheet";
@@ -3309,7 +3355,7 @@ package utilities
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 				
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelCreateFoodTable");
+					Trace.myTrace("Synchronize.as : start method googleExcelCreateFoodTable");
 				
 				var jsonObject:Object = new Object();
 				jsonObject.mimeType = "application/vnd.google-apps.spreadsheet";
@@ -3372,7 +3418,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelCreateLogBookWorkSheet");
+					Trace.myTrace("Synchronize.as : start method googleExcelCreateLogBookWorkSheet");
 				this.dispatchEvent(new Event(CREATING_LOGBOOK_WORKSHEET));
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
@@ -3442,7 +3488,7 @@ package utilities
 				this.dispatchEvent(new Event(NEW_EVENT_UPLOADED));
 				
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelCreateWorkSheet");
+					Trace.myTrace("Synchronize.as : start method googleExcelCreateWorkSheet");
 				var outputString:String = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 				outputString += '<entry xmlns="http://www.w3.org/2005/Atom\" xmlns:gs=\"http://schemas.google.com/spreadsheets/2006">\n';
 				outputString += '    <title>foodtable</title>\n';
@@ -3471,7 +3517,7 @@ package utilities
 				return;
 			
 			if (debugMode)
-				trace("Synchronize.as : start method googleExcelDeleteWorkSheet1");
+				Trace.myTrace("Synchronize.as : start method googleExcelDeleteWorkSheet1");
 			createAndLoadURLRequest(googleExcelDeleteWorkSheetUrl,URLRequestMethod.DELETE,null,null,null,false,null);
 			googleExcelDeleteWorkSheetUrl = "";
 		}
@@ -3546,7 +3592,7 @@ package utilities
 				
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelFindLogBookWorkSheet");
+					Trace.myTrace("Synchronize.as : start method googleExcelFindLogBookWorkSheet");
 				this.dispatchEvent(new Event(SEARCHING_LOGBOOK_WORKSHEET));
 				
 				createAndLoadURLRequest(
@@ -3569,7 +3615,7 @@ package utilities
 				googleExcelCreateLogBookHeader(null);//will actuall add the missing columnheaders
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelAddColumnToLogBookWorksheet");
+					Trace.myTrace("Synchronize.as : start method googleExcelAddColumnToLogBookWorksheet");
 				
 				createAndLoadURLRequest(
 					editUrl,
@@ -3633,7 +3679,7 @@ package utilities
 				
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelFindFoodTableWorkSheet");
+					Trace.myTrace("Synchronize.as : start method googleExcelFindFoodTableWorkSheet");
 				createAndLoadURLRequest(
 					googleExcelFindWorkSheetUrl.replace("{key}",helpDiabetesFoodTableSpreadSheetKey),
 					null,
@@ -3696,7 +3742,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelFindFoodTableSpreadSheet");
+					Trace.myTrace("Synchronize.as : start method googleExcelFindFoodTableSpreadSheet");
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.q = "title = '" + foodtableName + "' and trashed = false";
 				
@@ -3758,7 +3804,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelFindLogBookSpreadSheet");
+					Trace.myTrace("Synchronize.as : start method googleExcelFindLogBookSpreadSheet");
 				this.dispatchEvent(new Event(SEARCHING_LOGBOOK));
 				var urlVariables:URLVariables = new URLVariables();
 				urlVariables.q = "title = '" + logBookName + "' and trashed = false";
@@ -3791,7 +3837,7 @@ package utilities
 				
 				var localdispatcher:EventDispatcher = new EventDispatcher();
 				
-				trace("Synchronize.as : in Google syncFinished with success = " + success + "\n\n\n");
+				Trace.myTrace("Synchronize.as : in Google syncFinished with success = " + success + "\n\n\n");
 				
 				if (success) {
 					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,currentSyncTimeStamp.toString());
@@ -3914,7 +3960,7 @@ package utilities
 						currentTime = (new Date()).valueOf();
 					}
 					timeStampOfLastPOSTorPUT = (new Date()).valueOf();
-					if (debugMode) trace("currenttime = " + (new Date()).seconds + " seconds " + (new Date()).milliseconds + " milliseconds");
+					if (debugMode) Trace.myTrace("currenttime = " + (new Date()).seconds + " seconds " + (new Date()).milliseconds + " milliseconds");
 				}
 			}
 			
@@ -3923,8 +3969,8 @@ package utilities
 			loader = new URLLoader();
 			if (debugMode) {
 				trace ("in createAndLoadURLRequest, urlVariable string = " + urlVariables);
-				//trace("method = " + requestMethod);
-				trace("url = " + url);
+				//Trace.myTrace("method = " + requestMethod);
+				Trace.myTrace("url = " + url);
 			}
 			
 			//all requestmethods
@@ -3967,7 +4013,7 @@ package utilities
 			
 			loader.load(request);
 			if (debugMode)
-				trace("Synchronize.as : loader : url = " + request.url + ", method = " + request.method + ", request.data = " + request.data); 
+				Trace.myTrace("Synchronize.as : loader : url = " + request.url + ", method = " + request.method + ", request.data = " + request.data); 
 		}
 		
 		public function googleExcelFindAllSpreadSheets(event:Event = null):void  {
@@ -4009,7 +4055,7 @@ package utilities
 								urlVariables.q = "trashed = false and mimeType = 'application/vnd.google-apps.spreadsheet'";
 								
 								if (debugMode)
-									trace("Synchronize.as : load url for googleExcelFindAllSpreadSheets - not the 1st call");
+									Trace.myTrace("Synchronize.as : load url for googleExcelFindAllSpreadSheets - not the 1st call");
 								createAndLoadURLRequest(
 									googleDriveFilesUrl,
 									null,
@@ -4032,7 +4078,7 @@ package utilities
 				}
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : load url for googleExcelFindAllSpreadSheets 1 st time");
+					Trace.myTrace("Synchronize.as : load url for googleExcelFindAllSpreadSheets 1 st time");
 				_spreadSheetList = new ArrayList();
 				urlVariables = new URLVariables();
 				urlVariables.q = "trashed = false and mimeType = 'application/vnd.google-apps.spreadsheet'";
@@ -4098,7 +4144,7 @@ package utilities
 				this.dispatchEvent(new Event(WORKSHEETS_IN_FOODTABLE_RETRIEVED));
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelFindAllWorkSheetsInFoodTableSpreadSheet");
+					Trace.myTrace("Synchronize.as : start method googleExcelFindAllWorkSheetsInFoodTableSpreadSheet");
 				_workSheetList = new ArrayList();
 				
 				createAndLoadURLRequest(
@@ -4230,7 +4276,7 @@ package utilities
 				
 			} else {
 				if (debugMode)
-					trace("Synchronize.as : start method googleExcelDownloadFoodTableSpreadSheet");
+					Trace.myTrace("Synchronize.as : start method googleExcelDownloadFoodTableSpreadSheet");
 				
 				MyGATracker.getInstance().trackPageview( "DownLoadFoodTable" );
 				
@@ -4263,12 +4309,10 @@ package utilities
 					callingDispatcher.dispatchEvent(event);
 				}
 			}
-			
-			
 		}
 		
 		public static function compareFoodItemDescriptions(a:Object,b:Object):int {
-			//trace("Synchronize.as : in compare a = " + (a as XML).description.text() + ", b = " + (b as XML).description.text());
+			//Trace.myTrace("Synchronize.as : in compare a = " + (a as XML).description.text() + ", b = " + (b as XML).description.text());
 			return ExcelSorting.compareStrings((a as XML).description.text(),(b as XML).description.text());
 		}
 		
@@ -4291,6 +4335,7 @@ package utilities
 			Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
 			Settings.getInstance().setSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable,"false");
 		}
+		
 	}
 }
 

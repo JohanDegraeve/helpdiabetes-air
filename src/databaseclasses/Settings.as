@@ -441,7 +441,7 @@ package databaseclasses
 		 */
 		public static const SettingsAccessToken:int=101;
 		/**
-		 * refresh_token for Google sync
+		 * refresh_token for Google sync, not used anymore
 		 */
 		public static const SettingsRefreshToken:int=102;
 		public static const SettingsLastGoogleSyncTimeStamp:int=103;

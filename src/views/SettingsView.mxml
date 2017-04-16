@@ -26,12 +26,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import com.distriqt.extension.googleidentity.GoogleIdentity;
+			import com.distriqt.extension.googleidentity.GoogleIdentityOptions;
+			import com.distriqt.extension.googleidentity.events.GoogleIdentityEvent;
+			
 			import flash.net.navigateToURL;
 			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			import mx.managers.PopUpManager;
-			import mx.resources.ResourceManager;
 			
 			import spark.components.View;
 			import spark.events.IndexChangeEvent;
@@ -59,6 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private var thisView:View;
 			
 			[ResourceBundle("settingsview")]
+			[ResourceBundle("client_secret")]
 			
 			private var menuList:ArrayCollection = 	new ArrayCollection([
 				ModelLocator.resourceManagerInstance.getString("settingsview","bolussettings"),
@@ -297,8 +301,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							|| 
 							(Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "false"
 								&&
-								Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true"))
-							navigator.pushView(SynchronizeView);
+								Settings.getInstance().getSetting(Settings.SettingsIMtheCreateorOfGoogleExcelFoodTable) == "true")) {
+							//not adding event listeners foor googleidentifyevents because they are (or at least should be already) set up in synchronize.as
+							//GoogleIdentity.service.addEventListener( GoogleIdentityEvent.SETUP_COMPLETE, googleSetupCompleteHandler );
+							//GoogleIdentity.service.addEventListener( GoogleIdentityEvent.ERROR, googleSetupCompleteHandler );
+							var options:GoogleIdentityOptions = new GoogleIdentityOptions( resourceManager.getString('client_secret','client_id_android'), resourceManager.getString('client_secret','client_id_ios'));
+							
+							options.requestIdToken = true;
+							options.requestServerAuthCode = true;
+							//options.clientSecret_iOS = resourceManager.getString('client_secret','client_secret');
+							//options.clientSecret_Android = resourceManager.getString('client_secret','client_secret');
+							options.scopes.push( "https://www.googleapis.com/auth/fusiontables.readonly" );
+							options.scopes.push( "https://www.googleapis.com/auth/fusiontables" );
+							options.scopes.push( "https://spreadsheets.google.com/feeds" );
+							options.scopes.push( "https://docs.google.com/feeds" );
+							
+							Synchronize.navigator = navigator;
+							GoogleIdentity.service.setup(options);
+						}
 						else 
 							navigator.pushView(SynchronizeView2);
 						break;
@@ -327,9 +347,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						}
 					}
 				}
-				
-				
 			}
+
 		]]>
 	</fx:Script>
 	<s:List id="settingsList" left="0" right="0" top="0" bottom="0" itemRenderer="myComponents.MenuElementItemRenderer"

@@ -32,7 +32,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Style source="assets/style.css"/>
 	<fx:Script>
 		<![CDATA[
+			import com.distriqt.extension.core.Core;
 			import com.distriqt.extension.dialog.Dialog;
+			import com.distriqt.extension.googleidentity.GoogleIdentity;
+			import com.freshplanet.ane.AirBackgroundFetch.BackgroundFetch;
 			
 			import mx.collections.ArrayCollection;
 			
@@ -134,7 +137,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				}
 				FoodCounterView.screenSizeKnown();
 				
+				BackgroundFetch.init();
 				Dialog.init(DistriqtKey.distriqtKey);
+				Core.init(DistriqtKey.distriqtKey);
+				GoogleIdentity.init(DistriqtKey.distriqtKey);
 				Dialog.service.root = this.stage;
 			}
 			
@@ -192,7 +198,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			protected function activateHandler(event:Event):void
 			{
 				Synchronize.getInstance().startSynchronize(false,false,null);
-				ModelLocator.frameRate = stage.frameRate;
+				if (stage != null) {
+					ModelLocator.frameRate = stage.frameRate;
+				}
 				ModelLocator.recalculateActiveInsulin(null);
 			}
 			

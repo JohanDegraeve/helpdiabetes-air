@@ -1,62 +1,54 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<!--
-Copyright (C) 2016  hippoandfriends
+<!-- Copyright (C) 2017 hippoandfriends This program is free software: you 
+	can redistribute it and/or modify it under the terms of the GNU General Public 
+	License as published by the Free Software Foundation, either version 3 of 
+	the License, or (at your option) any later version. This program is distributed 
+	in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
+	the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+	See the GNU General Public License for more details. You should have received 
+	a copy of the GNU General Public License along with this program. If not, 
+	see <http://www.gnu.org/licenses/gpl.txt>. -->
+<application xmlns="http://ns.adobe.com/air/application/25.0">
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+	<!-- Adobe AIR Application Descriptor File Template. Specifies parameters 
+		for identifying, installing, and launching AIR applications. xmlns - The 
+		Adobe AIR namespace: http://ns.adobe.com/air/application/3.4 The last segment 
+		of the namespace specifies the version of the AIR runtime required for this 
+		application to run. minimumPatchLevel - The minimum patch level of the AIR 
+		runtime required to run the application. Optional. -->
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
-
--->
-<application xmlns="http://ns.adobe.com/air/application/23.0">
-
-<!-- Adobe AIR Application Descriptor File Template.
-
-	Specifies parameters for identifying, installing, and launching AIR applications.
-
-	xmlns - The Adobe AIR namespace: http://ns.adobe.com/air/application/3.4
-			The last segment of the namespace specifies the version 
-			of the AIR runtime required for this application to run.
-			
-	minimumPatchLevel - The minimum patch level of the AIR runtime required to run 
-			the application. Optional.
--->
-
-	<!-- A universally unique application identifier. Must be unique across all AIR applications.
-	Using a reverse DNS-style name as the id is recommended. (Eg. com.example.ExampleApplication.) Required. -->
+	<!-- A universally unique application identifier. Must be unique across 
+		all AIR applications. Using a reverse DNS-style name as the id is recommended. 
+		(Eg. com.example.ExampleApplication.) Required. -->
 	<id>com.hippoandfriends.helpdiabetes</id>
 
 	<!-- Used as the filename for the application. Required. -->
 	<filename>HelpDiabetes</filename>
 
-	<!-- The name that is displayed in the AIR application installer. 
-	May have multiple values for each language. See samples or xsd schema file. Optional. -->
+	<!-- The name that is displayed in the AIR application installer. May have 
+		multiple values for each language. See samples or xsd schema file. Optional. -->
 	<name>HelpDiabetes</name>
-	
-	<!-- A string value of the format <0-999>.<0-999>.<0-999> that represents application version which can be used to check for application upgrade. 
-	Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
-	An updated version of application must have a versionNumber value higher than the previous version. Required for namespace >= 2.5 . -->
-	<versionNumber>3.1.9</versionNumber>
-		         
-	<!-- A string value (such as "v1", "2.5", or "Alpha 1") that represents the version of the application, as it should be shown to users. Optional. -->
+
+	<!-- A string value of the format <0-999>.<0-999>.<0-999> that represents 
+		application version which can be used to check for application upgrade. Values 
+		can also be 1-part or 2-part. It is not necessary to have a 3-part value. 
+		An updated version of application must have a versionNumber value higher 
+		than the previous version. Required for namespace >= 2.5 . -->
+	<versionNumber>3.1.10</versionNumber>
+
+	<!-- A string value (such as "v1", "2.5", or "Alpha 1") that represents 
+		the version of the application, as it should be shown to users. Optional. -->
 	<!-- <versionLabel>1.0</versionLabel> -->
 
-	<!-- Description, displayed in the AIR application installer.
-	May have multiple values for each language. See samples or xsd schema file. Optional. -->
+	<!-- Description, displayed in the AIR application installer. May have multiple 
+		values for each language. See samples or xsd schema file. Optional. -->
 	<!-- <description></description> -->
 
 	<!-- Copyright information. Optional -->
 	<!-- <copyright></copyright> -->
 
-	<!-- Publisher ID. Used if you're updating an application created prior to 1.5.3 -->
+	<!-- Publisher ID. Used if you're updating an application created prior 
+		to 1.5.3 -->
 	<!-- <publisherID></publisherID> -->
 
 	<!-- Settings for the application's initial window. Required. -->
@@ -64,14 +56,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<!-- The main SWF or HTML file of the application. Required. -->
 		<!-- Note: In Flash Builder, the SWF reference is set automatically. -->
 		<content>[This value will be overwritten by Flash Builder in the output app.xml]</content>
-		
+
 		<!-- The title of the main window. Optional. -->
 		<!-- <title></title> -->
 
-		<!-- The type of system chrome to use (either "standard" or "none"). Optional. Default standard. -->
+		<!-- The type of system chrome to use (either "standard" or "none"). Optional. 
+			Default standard. -->
 		<!-- <systemChrome></systemChrome> -->
 
-		<!-- Whether the window is transparent. Only applicable when systemChrome is none. Optional. Default false. -->
+		<!-- Whether the window is transparent. Only applicable when systemChrome 
+			is none. Optional. Default false. -->
 		<!-- <transparent></transparent> -->
 
 		<!-- Whether the window is initially visible. Optional. Default false. -->
@@ -98,16 +92,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<!-- The window's initial y position. Optional. -->
 		<!-- <y></y> -->
 
-		<!-- The window's minimum size, specified as a width/height pair in pixels, such as "400 200". Optional. -->
+		<!-- The window's minimum size, specified as a width/height pair in pixels, 
+			such as "400 200". Optional. -->
 		<!-- <minSize></minSize> -->
 
-		<!-- The window's initial maximum size, specified as a width/height pair in pixels, such as "1600 1200". Optional. -->
+		<!-- The window's initial maximum size, specified as a width/height pair 
+			in pixels, such as "1600 1200". Optional. -->
 		<!-- <maxSize></maxSize> -->
-	<!--  aspectRatio>portrait</aspectRatio-->	
-	<autoOrients>true</autoOrients>
-    <fullScreen>false</fullScreen>
-    <visible>false</visible>
-  </initialWindow>
+		<!-- aspectRatio>portrait</aspectRatio -->
+		<autoOrients>true</autoOrients>
+		<fullScreen>false</fullScreen>
+		<visible>false</visible>
+	</initialWindow>
 
 	<!-- We recommend omitting the supportedProfiles element, -->
 	<!-- which in turn permits your application to be deployed to all -->
@@ -119,49 +115,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<!-- The subpath of the standard default installation location to use. Optional. -->
 	<!-- <installFolder></installFolder> -->
 
-	<!-- The subpath of the Programs menu to use. (Ignored on operating systems without a Programs menu.) Optional. -->
+	<!-- The subpath of the Programs menu to use. (Ignored on operating systems 
+		without a Programs menu.) Optional. -->
 	<!-- <programMenuFolder></programMenuFolder> -->
 
-	<!-- The icon the system uses for the application. For at least one resolution,
-	specify the path to a PNG file included in the AIR package. Optional. -->
-	<!-- <icon>
-		<image16x16></image16x16>
-		<image32x32></image32x32>
-		<image36x36></image36x36>
-		<image48x48></image48x48>
-		<image72x72></image72x72>
-		<image72x72></image72x72>
-		<image128x128></image128x128>
-	</icon> -->
+	<!-- The icon the system uses for the application. For at least one resolution, 
+		specify the path to a PNG file included in the AIR package. Optional. -->
+	<!-- <icon> <image16x16></image16x16> <image32x32></image32x32> <image36x36></image36x36> 
+		<image48x48></image48x48> <image72x72></image72x72> <image72x72></image72x72> 
+		<image128x128></image128x128> </icon> -->
 
-	<!-- Whether the application handles the update when a user double-clicks an update version
-	of the AIR file (true), or the default AIR application installer handles the update (false).
-	Optional. Default false. -->
+	<!-- Whether the application handles the update when a user double-clicks 
+		an update version of the AIR file (true), or the default AIR application 
+		installer handles the update (false). Optional. Default false. -->
 	<!-- <customUpdateUI></customUpdateUI> -->
-	
-	<!-- Whether the application can be launched when the user clicks a link in a web browser.
-	Optional. Default false. -->
+
+	<!-- Whether the application can be launched when the user clicks a link 
+		in a web browser. Optional. Default false. -->
 	<!-- <allowBrowserInvocation></allowBrowserInvocation> -->
 
 	<!-- Listing of file types for which the application can register. Optional. -->
 	<!-- <fileTypes> -->
 
-		<!-- Defines one file type. Optional. -->
-		<!-- <fileType> -->
+	<!-- Defines one file type. Optional. -->
+	<!-- <fileType> -->
 
-			<!-- The name that the system displays for the registered file type. Required. -->
-			<!-- <name></name> -->
+	<!-- The name that the system displays for the registered file type. Required. -->
+	<!-- <name></name> -->
 
-			<!-- The extension to register. Required. -->
-			<!-- <extension></extension> -->
-			
-			<!-- The description of the file type. Optional. -->
-			<!-- <description></description> -->
-			
-			<!-- The MIME content type. -->
-			<!-- <contentType></contentType> -->
-			
-			<!-- The icon to display for the file type. Optional. -->
+	<!-- The extension to register. Required. -->
+	<!-- <extension></extension> -->
+
+	<!-- The description of the file type. Optional. -->
+	<!-- <description></description> -->
+
+	<!-- The MIME content type. -->
+	<!-- <contentType></contentType> -->
+
+	<!-- The icon to display for the file type. Optional. -->
 	<icon>
 		<image29x29><![CDATA[assets/HelpdiabetesButton_29x29.png]]></image29x29>
 		<image36x36><![CDATA[assets/HelpdiabetesButton_36x36.png]]></image36x36>
@@ -175,14 +166,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 		<image180x180><![CDATA[assets/HelpdiabetesButton_180x180.png]]></image180x180>
 		<image512x512><![CDATA[assets/HelpdiabetesButton_512x512.png]]></image512x512>
 	</icon>
-			
-		<!-- </fileType> -->
+
+	<!-- </fileType> -->
 	<!-- </fileTypes> -->
 
-    <!-- iOS specific capabilities -->
+	<!-- iOS specific capabilities -->
 	<iPhone>
 		<!-- A list of plist key/value pairs to be added to the application Info.plist -->
-		<!--  ADDED CFBUNDLEVERSION _ IN COMSE CASES APPLE IS ASKING A NEW BUNDLE VERSION _ BY ADDING THIS, version and bundle are split -->
+		<!-- ADDED CFBUNDLEVERSION _ IN COMSE CASES APPLE IS ASKING A NEW BUNDLE 
+			VERSION _ BY ADDING THIS, version and bundle are split -->
 		<InfoAdditions>
             <![CDATA[
                 <key>UIDeviceFamily</key>
@@ -194,50 +186,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
                 <string>UIStatusBarStyleBlackOpaque</string>
                 <key>MinimumOSVersion</key>
                 <string>5.1.1</string>
+                <key>CFBundleURLTypes</key>
+				<array>
+					<dict>
+						<key>CFBundleURLSchemes</key>
+						<array>
+							<string>com.googleusercontent.apps.591356876665-uchchpfoqn5u0ljdadjc5t6gq9k97dga</string>
+						</array>
+						<key>CFBundleURLName</key>
+						<string>com.hippoandfriends.helpdiabetes</string>
+					</dict>
+				</array>
             ]]>
-        </InfoAdditions>
-        <Entitlements>
-        </Entitlements>
+		</InfoAdditions>
+		<Entitlements>
+		</Entitlements>
 	</iPhone>
 
 
-	<!-- Specify Android specific tags that get passed to AndroidManifest.xml file. -->
-	<!--<android> 
-		<manifestAdditions>
-		<![CDATA[
-			<manifest android:installLocation="auto">
-				<uses-permission android:name="android.permission.INTERNET"/>
-				<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-				<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-				<uses-configuration android:reqFiveWayNav="true"/>
-				<supports-screens android:normalScreens="true"/>
-				<uses-feature android:required="true" android:name="android.hardware.touchscreen.multitouch"/>
-				<application android:enabled="true">
-					<activity android:excludeFromRecents="false">
-						<intent-filter>
-							<action android:name="android.intent.action.MAIN"/>
-							<category android:name="android.intent.category.LAUNCHER"/>
-						</intent-filter>
-					</activity>
-				</application>
-			</manifest>
-		]]>
-		</manifestAdditions> 
-	</android> -->
-	<!-- End of the schema for adding the android specific tags in AndroidManifest.xml file -->
+	<android>
+		<colorDepth>16bit</colorDepth>
+		<manifestAdditions><![CDATA[
+<manifest>
+	<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="23"/>
 
-<android>
-	<colorDepth>16bit</colorDepth>
-    <manifestAdditions><![CDATA[
-	<manifest>
-		<!-- See the Adobe AIR documentation for more information about setting Google Android permissions -->
-		<uses-permission android:name="android.permission.INTERNET"/>
-	</manifest>
-]]></manifestAdditions>
-  </android>
-<extensions>
-        <extensionID>com.distriqt.AndroidSupport</extensionID>
-    <extensionID>com.distriqt.Core</extensionID>
-    <extensionID>com.distriqt.Dialog</extensionID>
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	
+	<application>
+		<meta-data 
+			android:name="com.google.android.gms.version"
+			android:value="@integer/google_play_services_version" />
+		<activity 
+			android:name="com.distriqt.extension.googleidentity.GoogleIdentityActivity" 
+			android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+		<activity 
+			android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity" 
+			android:windowSoftInputMode="stateAlwaysHidden|adjustPan" 
+			android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+				
+	</application>
+
+</manifest>]]></manifestAdditions>
+	</android>
+	<extensions>
+		<extensionID>com.distriqt.AndroidSupport</extensionID>
+		<extensionID>com.distriqt.Core</extensionID>
+		<extensionID>com.distriqt.Dialog</extensionID>
+		<extensionID>com.distriqt.GoogleIdentity</extensionID>
+		<extensionID>com.distriqt.androidsupport.V4</extensionID>
+	<extensionID>com.distriqt.androidsupport.AppCompatV7</extensionID>
+    <extensionID>com.freshplanet.AirBackgroundFetch</extensionID>
     </extensions>
 </application>

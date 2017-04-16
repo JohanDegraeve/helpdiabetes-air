@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Copyright (C) 2016  hippoandfriends
+Copyright (C) 2017  hippoandfriends
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,30 +31,9 @@ initial setup of sync settings
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import flash.net.navigateToURL;
-			
 			import mx.events.FlexEvent;
-			import mx.rpc.events.FaultEvent;
-			import mx.rpc.events.ResultEvent;
-			
 			import spark.components.View;
-			
-			import databaseclasses.Settings;
-			
-			import myComponents.AlertPopUp;
-			import myComponents.HelpCallOut;
-			import myComponents.PickerEvent;
-			
 			import utilities.Synchronize;
-			private var _authorizationCode:String;
-			private var stageWebView:StageWebView;
-			private var alertPopUp:AlertPopUp;
-			private var errorWarning:HelpCallOut;
-			private var timerToCheckIfAuthenticationCompleted:Timer;
-			private var timerToCheckBrowserConnection:Timer;
-			private var thisView:View;
-			
-			private static var googleAuthUrl:String = "https://accounts.google.com/o/oauth2/token";
 			
 			[Bindable]
 			private var back_label:String;
@@ -62,196 +41,27 @@ initial setup of sync settings
 			[Bindable]
 			private var topLabelText1:String;			
 			
-			[Bindable]
-			private function get authorizationCode_text():String
-			{
-				return _authorizationCode;
-			}
-			
-			private function set authorizationCode_text(value:String):void
-			{
-				_authorizationCode = value;
-				if ((value == "") || (value == resourceManager.getString('synchronizeview','copyauthorizationcode')) )
-					return;
-				buttonStoreAuthorizationCode.label = resourceManager.getString('synchronizeview','startsynchronizing') ;
-				buttonStoreAuthorizationCode.visible = true;
-				buttonStoreAuthorizationCode.addEventListener(MouseEvent.CLICK,getAccessTokenAndRefreshToken);				
-			}
-			
-			
 			private var loader:URLLoader;
 			
 			private function onInitialize():void {
-				thisView = this;
 				back_label = resourceManager.getString('general','back');
 				title = resourceManager.getString('synchronizeview','titlesettingssync');
-				authorizationCode_text = resourceManager.getString('synchronizeview','copyauthorizationcode');
-				authorizationcodeTextArea.addEventListener(FocusEvent.FOCUS_IN, authorizationcodeTextAreaClicked);
 				
-				if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) != "") {
-					//access token is not empty but still we got here, this is because user started syncing, then went to other tab, and back to this tab,
-					//apparently oninitialize gets called
-					setViewInStatusSynchronizing();
-					Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
-					//but you never know that sync is not really running, so let's try to retart it
-					Synchronize.getInstance().startSynchronize(true,false);
-				} else {
-					topLabelText1 = resourceManager.getString('synchronizeview','synchronizewithgoogledocs1');
-					
-					resourceManager.getString('synchronizeview','synchronisationwillstart');
-					
-					buttonAuthenticateToGoogle.addEventListener(MouseEvent.CLICK,buttonClicked);
-				}
-			}
-			
-			private function buttonClicked(event:MouseEvent):void {
-				stageWebView = new StageWebView();
-				stageWebView.stage = stage;
-				stageWebView.viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
-				//stageWebView.loadURL("http://www.scobleizer.com");
-				stageWebView.loadURL("https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/fusiontables.readonly https://www.googleapis.com/auth/fusiontables https://spreadsheets.google.com/feeds https://docs.google.com/feeds&response_type=code&redirect_uri=urn:ietf:wg:oauth:2.0:oob&client_id=" 
-					+ resourceManager.getString('client_secret','client_id') 
-					+ "&hl=" + resourceManager.getString('general','googleauthlanguage') 
-					+ "&from_login=1&as=6d24e440f72448b2&pli=1");//googleauthlanguage
-				stageWebView.addEventListener(ErrorEvent.ERROR,errorLoadingURL);
-				timerToCheckIfAuthenticationCompleted = new Timer(500, 1);
-				timerToCheckIfAuthenticationCompleted.addEventListener(TimerEvent.TIMER,timerEndOftimerToCheckIfAuthenticationCompleted);
-				timerToCheckIfAuthenticationCompleted.start();
-				
-				timerToCheckBrowserConnection = new Timer(10000, 1);
-				timerToCheckBrowserConnection.addEventListener(TimerEvent.TIMER,errorLoadingURL);
-				timerToCheckBrowserConnection.start();
-			}
-			
-			private function errorLoadingURL(event:Event = null):void {
-				if (timerToCheckBrowserConnection)
-					if (timerToCheckBrowserConnection.running) {
-						timerToCheckBrowserConnection.stop();
-					}
-				if (stageWebView) {
-					if (stageWebView.title == null) {//was never the case in emulator mode, but you never know
-						processLoadError();
-					} else 	if (stageWebView.title == "") {//same piece off code as if stagewebview.title == null
-						processLoadError();
-					}
-				}
-				
-				function processLoadError():void {
-					stageWebView.dispose();	
-					if (timerToCheckIfAuthenticationCompleted)
-						if (timerToCheckIfAuthenticationCompleted.running)
-							timerToCheckIfAuthenticationCompleted.stop();
-					alertPopUp = new AlertPopUp();
-					var textToShow:String = 
-						resourceManager.getString('synchronizeview','erroropeningbrowser') ;
-					alertPopUp.show(thisView);
-					alertPopUp.setMessage(textToShow);
-				}
-			}
-			
-			private function timerEndOftimerToCheckIfAuthenticationCompleted(event:TimerEvent):void {
-				var authorizationCode:String = getValue('code=', stageWebView.title);
-				if (authorizationCode) {
-					authorizationCode_text = authorizationCode;
-					getAccessTokenAndRefreshToken();
-					stageWebView.dispose();
-					stageWebView = null;
-					if (timerToCheckBrowserConnection)
-						if (timerToCheckBrowserConnection.running) {
-							timerToCheckBrowserConnection.stop();
-						}
-				} else if (stageWebView.title.indexOf("error") > -1) {
-					stageWebView.dispose();
-					stageWebView = null;
-					if (timerToCheckBrowserConnection)
-						if (timerToCheckBrowserConnection.running) {
-							timerToCheckBrowserConnection.stop();
-						}
-				} else {
-					timerToCheckIfAuthenticationCompleted = new Timer(500, 1);
-					timerToCheckIfAuthenticationCompleted.addEventListener(TimerEvent.TIMER,timerEndOftimerToCheckIfAuthenticationCompleted);
-					timerToCheckIfAuthenticationCompleted.start();
-				}
-			}
-			
-			private function getValue(key:String, str:String):String {
-				const pattern:RegExp = /[-_a-zA-Z0-9\/.]+/;
-				var index:int = str.indexOf(key);
-				if (index > -1) {
-					var matches:Array = str.substring(index + key.length).match(pattern);
-					if (matches.length > 0)
-						return matches[0];
-				}
-				return null;
-			}
-			
-			private function authorizationcodeTextAreaClicked(event:Event):void {
-				authorizationCode_text = "";
-				authorizationcodeTextArea.removeEventListener(FocusEvent.FOCUS_IN, authorizationcodeTextAreaClicked);
-			}
-			
-			private function getAccessTokenAndRefreshToken(event:MouseEvent = null):void {
-				var request:URLRequest = new URLRequest(googleAuthUrl);
-				request.contentType = "application/x-www-form-urlencoded";
-				request.data = new URLVariables("code=" + authorizationCode_text + "&" + 
-					"client_id=" + resourceManager.getString('client_secret','client_id') + "&" +
-					"client_secret=" + resourceManager.getString('client_secret','client_secret') + "&" +
-					"redirect_uri=urn:ietf:wg:oauth:2.0:oob" + "&" +
-					"grant_type=authorization_code");
-				request.method = URLRequestMethod.POST;
-				loader = new URLLoader();
-				loader.addEventListener(Event.COMPLETE,getAccessTokenAndRefreshTokenResult);
-				loader.addEventListener(IOErrorEvent.IO_ERROR,getAccessTokenAndRefreshTokenFault);
-				loader.load(request);
-				buttonHelp.label = resourceManager.getString('synchronizeview','help');
-			}
-			
-			private function getAccessTokenAndRefreshTokenFault(event:IOErrorEvent):void {
-				//refreshtoken failed
-				loader.removeEventListener(ResultEvent.RESULT,getAccessTokenAndRefreshTokenResult);
-				loader.removeEventListener(FaultEvent.FAULT,getAccessTokenAndRefreshTokenFault);
-				
-				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
-				if (eventAsJSONObject.error)
-					if (eventAsJSONObject.error == "invalid_grant") {
-						showErrorMessage(resourceManager.getString('synchronizeview','authenticationerror'),authorizationcodeTextArea);						
-					}
-			}
-			
-			private function showErrorMessage(errorText:String, owner:DisplayObjectContainer):void {
-				errorWarning = new HelpCallOut();
-				errorWarning.settingId = 0;
-				errorWarning.addEventListener(PickerEvent.PICKER_SET,errorMessageConfirmed);
-				errorWarning.helpText = errorText;
-				errorWarning.open(owner,true);
-			}
-			
-			private function errorMessageConfirmed(event:Event):void {
-				errorWarning.removeEventListener(PickerEvent.PICKER_SET,errorMessageConfirmed);
-				authorizationCode_text = resourceManager.getString('synchronizeview','copyauthorizationcode');
-				authorizationcodeTextArea.addEventListener(FocusEvent.FOCUS_IN, authorizationcodeTextAreaClicked);
-				buttonHelp.label = resourceManager.getString('synchronizeview','step1help');
-				buttonStoreAuthorizationCode.visible = false;
-			}
-			
-			private function getAccessTokenAndRefreshTokenResult(event:Event):void {
 				setViewInStatusSynchronizing();
-				//hier is de refreshtoken gelukt.
-				loader.removeEventListener(ResultEvent.RESULT,getAccessTokenAndRefreshTokenResult);
-				loader.removeEventListener(FaultEvent.FAULT,getAccessTokenAndRefreshTokenFault);
-				var temp:Object = JSON.parse(event.target.data as String);
-				Settings.getInstance().setSetting(Settings.SettingsAccessToken,temp.access_token);
-				Settings.getInstance().setSetting(Settings.SettingsRefreshToken,temp.refresh_token);
 				Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
-				Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
-				Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
+				Synchronize.getInstance().addEventListener(Synchronize.SYNC_FINISHED,onSyncFinishedEvent);
+				//but you never know that sync is not really running, so let's try to retart it
 				Synchronize.getInstance().startSynchronize(true,false);
 			}
 			
+			private function onSyncFinishedEvent(event:Event):void {
+				if (navigator != null) {
+					navigator.popView();
+					navigator.pushView(SynchronizeView2);
+				}
+			}
+			
 			private function setViewInStatusSynchronizing(event:Event = null):void {
-				buttonAuthenticateToGoogle.visible = false;
-				authorizationcodeTextArea.visible = false;
-				buttonStoreAuthorizationCode.visible = false;
 				topLabelText1 = resourceManager.getString('synchronizeview','alreadyauthorized') + '\n' +
 					resourceManager.getString('synchronizeview','synchronisationwillstart');
 				if (event == null)
@@ -260,13 +70,6 @@ initial setup of sync settings
 					topLabelText1+= Synchronize.getInstance().uploadFoodDatabaseStatus.
 						replace("{outof}",resourceManager.getString('synchronizeview','outof')).
 						replace("{elementsuploaded}",resourceManager.getString('synchronizeview','elementsuploaded'));	
-				}
-			}
-			
-			private function onSyncFinishedEvent(event:Event):void {
-				if (navigator != null) {
-					navigator.popView();
-					navigator.pushView(SynchronizeView2);
 				}
 			}
 			
@@ -281,9 +84,6 @@ initial setup of sync settings
 			</s:VerticalLayout>
 		</s:layout>
 		<s:Label id="topLabel1" width="100%" text="{topLabelText1}" />
-		<s:Button id="buttonAuthenticateToGoogle" width="100%" label="{resourceManager.getString('synchronizeview','buttonauthenticatetogoogletext')}"/>
-		<s:TextArea id="authorizationcodeTextArea" width="100%"  height = "65" text="@{authorizationCode_text}"/>
-		<s:Button id="buttonStoreAuthorizationCode" width="100%" visible="false"/>
 		<s:Button id="buttonHelp" width="100%" label="{resourceManager.getString('synchronizeview','step1help')}" click="{navigateToURL(new URLRequest(resourceManager.getString('synchronizeview','helpurl')))}"/>
 	</s:Group>
 </s:View>

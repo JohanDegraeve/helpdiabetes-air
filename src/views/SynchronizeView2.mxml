@@ -32,7 +32,6 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 		<![CDATA[
 			import mx.collections.ArrayCollection;
 			import mx.managers.PopUpManager;
-			import mx.resources.ResourceManager;
 			
 			import spark.events.IndexChangeEvent;
 			import spark.events.PopUpEvent;
@@ -63,7 +62,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			]);	
 
 			private function onInitialize():void {
-				if (Settings.getInstance().getSetting(Settings.SettingsRefreshToken) == "") {
+				if (Settings.getInstance().getSetting(Settings.SettingsAccessToken) == "") {
 					if (navigator)
 						navigator.popToFirstView();
 					return;
