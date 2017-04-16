@@ -249,14 +249,14 @@
 					 currentSyncTimeStamp = new Date().valueOf();
 					 lastSyncTimeStamp = new Number(Settings.getInstance().getSetting(Settings.SettingsLastNightScoutSyncTimeStamp));
 					 if (debugMode) 
-						 trace("NightScoutSync.as : lastsynctimestamp = " + new DateTimeFormatter().format(new Date(lastSyncTimeStamp)));
+						 Trace.myTrace("NightScoutSync.as : lastsynctimestamp = " + new DateTimeFormatter().format(new Date(lastSyncTimeStamp)));
 					 asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 					 rerunNecessary = false;
 					 nightScoutSyncRunning = true;
 					 currentSyncTimeStamp = new Date().valueOf();
 					 asOfTimeStamp = currentSyncTimeStamp - new Number(Settings.getInstance().getSetting(Settings.SettingsMAXTRACKINGSIZE)) * 24 * 3600 * 1000;
 					 
-					 trace("NightScoutSync.as : starting startNightScoutSync");
+					 Trace.myTrace("NightScoutSync.as : starting startNightScoutSync");
 					 synchronize();
 				 } else {
 					 if (immediateRunNecessary) {
@@ -275,7 +275,7 @@
 		 
 		 private function synchronize():void {
 			 if (debugMode)
-				 trace("NightScoutSync.as : in synchronize");
+				 Trace.myTrace("NightScoutSync.as : in synchronize");
 			 localElements = new ArrayList();
 			 trackingListAlreadyModified = false;
 			 
@@ -298,7 +298,7 @@
 		 private function deleteRemoteItems(event:Event = null):void {
 			 if (event != null) {
 				 if (debugMode)
-					 trace("NightScoutSync.as : in method deleteRemoteItems, there's a deletion result to be processed");
+					 Trace.myTrace("NightScoutSync.as : in method deleteRemoteItems, there's a deletion result to be processed");
 				 removeEventListeners();
 				 var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				 //DEBUGGEN WAT HIER UIT KOMT EN HOE CONTROLEREN OF HET SUCCESVOL WAS EN EVENTUELE FOUTBEHANDELING DOEN
@@ -324,7 +324,7 @@
 					 deleteRemoteItems();
 				 } else {
 					 if (debugMode)
-						 trace("NightScoutSync.as : in method deleteRemoteItems, there's an alement to be deleted");
+						 Trace.myTrace("NightScoutSync.as : in method deleteRemoteItems, there's an alement to be deleted");
 					 //if the lengthe of the eventid is less than 24, then it's an  old element that was 'downloaded' from google sync, we will skip it
 					 if ((elementToBeDeleted as TrackingViewElement).eventid.length < 24 || (elementToBeDeleted as TrackingViewElement).eventid.indexOf("HelpDiabet") > -1) {
 						 listOfElementsToBeDeleted.removeItem(elementToBeDeleted);
@@ -384,7 +384,7 @@
 		 
 		 private function getAllEvents(event:Event = null):void {
 			 if (debugMode)
-				 trace("NightScoutSync.as : start method getAllEvents");
+				 Trace.myTrace("NightScoutSync.as : start method getAllEvents");
 			 var remoteElement:Object;
 			 var localElement:Object;
 			 var newBloodGlucoseLevel:Number;
@@ -866,7 +866,7 @@
 			 //note that there could be elements here that already exist remotely, but that's not a problem. Doing a PUT for an object with an _id that already exists will simply update this object remotely.
 			 //
 			 if (debugMode)
-				 trace("NightScoutSync.as : start method updateRemoteElements");
+				 Trace.myTrace("NightScoutSync.as : start method updateRemoteElements");
 			 if (event != null) {
 				 removeEventListeners();
 				 //TODOTODOTODO need to see here what we need to check
@@ -985,8 +985,8 @@
 		 
 		 private function nightScoutAPICallFailed(event:Event):void {
 			 if (debugMode) {
-				 trace("NightScoutSync.as : in nightScoutAPICallFailed");
-				 trace("Synchronize.as : in nightscoutapicall failed : event.target.data = " + event.target.data as String);
+				 Trace.myTrace("NightScoutSync.as : in nightScoutAPICallFailed");
+				 Trace.myTrace("Synchronize.as : in nightscoutapicall failed : event.target.data = " + event.target.data as String);
 			 }
 			 removeEventListeners();
 			 var syncError:String = event.target.data;
@@ -1036,7 +1036,7 @@
 			 
 			 loader.load(request);
 			 if (debugMode)
-				 trace("NightScoutSync.as : loader : url = " + request.url + ", method = " + request.method + ", request.data = " + request.data); 
+				 Trace.myTrace("NightScoutSync.as : loader : url = " + request.url + ", method = " + request.method + ", request.data = " + request.data); 
 		 }
 		 
 		 private function createDummySelectedFoodItem(chosenAmount:Number):SelectedFoodItem {
@@ -1053,7 +1053,7 @@
 		  */
 		 private function syncFinished(success:Boolean = true):void {
 			 
-			 trace("NightScoutSync.as : in NightScout syncFinished with success = " + success + "\n\n\n");
+			 Trace.myTrace("NightScoutSync.as : in NightScout syncFinished with success = " + success + "\n\n\n");
 			 var localdispatcher:EventDispatcher = new EventDispatcher();
 			 
 			 if (success) {

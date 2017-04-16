@@ -45,6 +45,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 			import myComponents.AlertPopUp;
 			
 			import utilities.Synchronize;
+			import utilities.Trace;
 			
 			[Bindable]
 			private var back_label:String;
@@ -105,7 +106,7 @@ Not the initial setup of sync settings, meaning Synchronizeview shown when googl
 						Settings.getInstance().setSetting(Settings.SettingsAccessToken,"");
 						Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
 						Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");//also nightscoutsync is reset
-						trace("night scout api secret reset to blanc, Synchronizeview2");
+						Trace.myTrace("night scout api secret reset to blanc, Synchronizeview2");
 						Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);//also nightscoutsync is reset
 						Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 						Synchronize.removeGoogleSync();

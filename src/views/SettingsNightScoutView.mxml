@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import databaseclasses.Settings;
 			
 			import utilities.Synchronize;
+			import utilities.Trace;
 
 			[Bindable] private var back_label:String;
 			[Bindable] private var usersAPISecret:String = Settings.NightScoutDefaultAPISECRET;
@@ -53,7 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			{
 				if (usersAPISecret.length == 0 || usersAPISecret == Settings.NightScoutDefaultAPISECRET) {
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutAPISECRET,Settings.NightScoutDefaultAPISECRET);
-					trace("night scout api secret reset to blanc, SettingsNightScoutView line 56");
+					Trace.myTrace("night scout api secret reset to blanc, SettingsNightScoutView line 56");
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
 					Settings.getInstance().setSetting(Settings.SettingsLastNightScoutSyncTimeStamp,"0");
 					navigator.popView();

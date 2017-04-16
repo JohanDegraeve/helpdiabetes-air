@@ -295,7 +295,7 @@ package utilities
 		 * 
 		 **/
 		static public function compareStrings ( stringA:String ,stringB:String):int {
-			//trace("in comparestrings, stringA =  " + stringA + " and stringB = " + stringB);
+			//Trace.myTrace("in comparestrings, stringA =  " + stringA + " and stringB = " + stringB);
 			var returnvalue:int = 0;
 			var index:int = 0;
 			

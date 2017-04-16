@@ -62,6 +62,7 @@ the home screen
 			import utilities.ExcelSorting;
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
+			import utilities.Trace;
 			
 			private static var excelSorting:ExcelSorting;
 			
@@ -118,14 +119,14 @@ the home screen
 					timerForSplashScreenRemoval = new Timer(maxTimeForSplashScreenInSeconds * 1000, 1);
 					timerForSplashScreenRemoval.addEventListener(TimerEvent.TIMER,removeSplashScreen);
 					timerForSplashScreenRemoval.start();
-					trace("splash screen shown, removealtimer started");
+					Trace.myTrace("splash screen shown, removealtimer started");
 				}
 			}
 			
 			private function removeSplashScreen(event:Event = null):void {
-				trace("in removesplashscreen");
+				Trace.myTrace("in removesplashscreen");
 				if (splashScreenPopUp != null) {
-					trace("removing splashscreen");
+					Trace.myTrace("removing splashscreen");
 					PopUpManager.removePopUp(splashScreenPopUp);
 					splashScreenPopUp = null;
 				}
@@ -259,17 +260,17 @@ the home screen
 					//splashscreen will be shown for 4 seconds, so we wait for the timer timerForSplashScreenRemoval
 						Settings.getInstance().setSetting(Settings.SettingsTimeStampOfLastTimeSplashScreenWasShownForLongTime,(new Date()).valueOf().toString());
 					} else {
-						trace("in retreivedfooditemlist, calling removesplashscreen");
+						Trace.myTrace("in retreivedfooditemlist, calling removesplashscreen");
 						removeSplashScreen();
 					}
-					trace("application launchfinished");
+					Trace.myTrace("application launchfinished");
 					MyGATracker.getInstance(thisView).trackPageview("launch of Application");//just to make sure mygatracker is initialized with a displayobject
 					
 					//forcing resync all
 					Settings.getInstance().setSetting(Settings.SettingsLastGoogleSyncTimeStamp,"0");
 					Synchronize.getInstance().startSynchronize(false,false);
 					
-					trace("applicationlaunch finished");
+					Trace.myTrace("applicationlaunch finished");
 				}
 				
 				function onRetrieveListError(event:Event):void

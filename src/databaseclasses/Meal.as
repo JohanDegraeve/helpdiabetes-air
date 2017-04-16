@@ -31,6 +31,7 @@ package databaseclasses
 	import utilities.DateTimeUtilities;
 	import utilities.FromtimeAndValueArrayCollection;
 	import utilities.Synchronize;
+	import utilities.Trace;
 	
 	/**
 	 * a name for the meal and a mealevent that can be null<br>
@@ -161,7 +162,7 @@ package databaseclasses
 			function mealEventCreationError(de:DatabaseEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationError);
-				trace("Error while creating mealeevent. Meal.as 0002");
+				Trace.myTrace("Error while creating mealeevent. Meal.as 0002");
 			}
 		}
 		
@@ -226,7 +227,7 @@ package databaseclasses
 			function mealEventDeletionFromDBFailed(de:DatabaseEvent):void {
 				localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventDeletedFromDB);
 				localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventDeletionFromDBFailed);
-				trace("Error while deleting mealeventin meal.as");
+				Trace.myTrace("Error while deleting mealeventin meal.as");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);

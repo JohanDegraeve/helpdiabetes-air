@@ -817,7 +817,7 @@ package model
 			var newAsOf:Number = asOf - 24 * 3600 * 1000;
 			var cntr:int;
 			for (cntr = trackingList.length - 1;cntr >= 0;cntr--) {
-				trace("starting recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
+				Trace.myTrace("starting recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
 				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp > newAsOf) {
 					if (trackingList.getItemAt(cntr) is MealEvent) {
 						(trackingList.getItemAt(cntr) as MealEvent).recalculateInsulinAmount();
@@ -826,7 +826,7 @@ package model
 					break;
 				}
 			}
-			trace("stopping recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
+			Trace.myTrace("stopping recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
 		}*/
 
 		private static var recalculateInsulinAmountRunning:Boolean = false;

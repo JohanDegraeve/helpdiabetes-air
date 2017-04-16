@@ -65,6 +65,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import utilities.DateTimeUtilities;
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
+			import utilities.Trace;
 			
 			private var confirmationPicker:RequestConfirmation;
 			private var theBloodGlucoseEvent:BloodGlucoseEvent;
@@ -292,7 +293,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				if (ModelLocator.trackingList.refresh())
 					finishOkClicked();
 				else {
-					trace("in editbgeventview, setting timeout in finishokclicked");
+					Trace.myTrace("in editbgeventview, setting timeout in finishokclicked");
 					setTimeout(finishOkClicked,1000);
 				}
 			}

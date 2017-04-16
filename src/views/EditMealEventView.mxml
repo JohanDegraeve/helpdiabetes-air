@@ -58,6 +58,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
+			import utilities.Trace;
 			
 			[Bindable]
 			private var dateTimeAndMealName_text:String;
@@ -150,7 +151,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onInitialize():void {
-				trace("editmealeventview oninitialize");
+				Trace.myTrace("editmealeventview oninitialize");
 				
 				if (TrackingView.popToFirstViewNecessary())
 					navigator.popToFirstView();

@@ -31,6 +31,8 @@ package databaseclasses
 	import myComponents.MealEventItemRenderer;
 	import myComponents.TrackingViewElement;
 	
+	import utilities.Trace;
+	
 	
 	/**
 	 * this is a meal event,<br>
@@ -195,7 +197,7 @@ package databaseclasses
 			function mealEventCreationFailed (errorEvent:DatabaseEvent):void {
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,mealEventCreated);
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,mealEventCreationFailed);
-				trace("Error while storing mealevent in database. MealEvent.as 0001");
+				Trace.myTrace("Error while storing mealevent in database. MealEvent.as 0001");
 				if (dispatcher != null) {
 					dispatcher.dispatchEvent(new DatabaseEvent(DatabaseEvent.ERROR_EVENT));
 				}
@@ -243,7 +245,7 @@ package databaseclasses
 				localDispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedItemCreationFailed);
 				localDispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedItemCreated);
 				//Settings.getInstance().setSetting(Settings.SettingNEXT_SELECTEDITEM_ID, selectedFoodItem.selectedItemId.toString() );
-				trace("Error while creation selected item. MealEvent.as 0002");
+				Trace.myTrace("Error while creation selected item. MealEvent.as 0002");
 				if (dispatcher != null) {
 					var event:DatabaseEvent = new DatabaseEvent(DatabaseEvent.ERROR_EVENT);
 					dispatcher.dispatchEvent(event);

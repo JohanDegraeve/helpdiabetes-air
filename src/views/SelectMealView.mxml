@@ -32,17 +32,18 @@ view to show ModelLocator.meals in a list
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
 			import databaseclasses.Meal;
 			
 			import model.ModelLocator;
 			
-			import mx.events.FlexEvent;
-			
 			import myComponents.IListElement;
 			
-			import spark.events.IndexChangeEvent;
-			
 			import utilities.MyGATracker;
+			import utilities.Trace;
 			[Bindable]
 			private var back_label:String;
 
@@ -96,7 +97,7 @@ view to show ModelLocator.meals in a list
 				try {//doing this because sometimes an exception was thrown here, not sure why
 					meallist.ensureIndexIsVisible(meallist.dataProvider.length -1);
 				} catch (error:Error) {
-					trace("exception thrown in SelectedMealView.onSelectedMeall Changed - not important");
+					Trace.myTrace("exception thrown in SelectedMealView.onSelectedMeall Changed - not important");
 					;
 				}
 				meallist.ensureIndexIsVisible(ModelLocator.selectedMeal);

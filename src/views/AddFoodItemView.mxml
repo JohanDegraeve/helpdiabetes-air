@@ -70,6 +70,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 			import utilities.DateTimeUtilities;
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
+			import utilities.Trace;
 			
 			[Bindable]
 			private var description_textarea_text:String ;
@@ -213,7 +214,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 					}
 					
 					function unitListRetrievelError(event:DatabaseEvent):void {
-						trace("error in addvoeoditemveiw.mxml, unitlistretrievalerror, event = " + event.target.toString());
+						Trace.myTrace("error in addvoeoditemveiw.mxml, unitlistretrievalerror, event = " + event.target.toString());
 						dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 						dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
 					}
@@ -645,7 +646,7 @@ The reader will see here a lot of interaction between AddFoodItemGroup.as and Ad
 				function selectedFoodItemDeletionFailed(de:DatabaseEvent):void {
 					localdispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,selectedFoodItemDeleted);
 					localdispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,selectedFoodItemDeletionFailed);
-					trace("Error while deleting selectedfooditem in addfooditemview.mxml");
+					Trace.myTrace("Error while deleting selectedfooditem in addfooditemview.mxml");
 				}
 			}
 			

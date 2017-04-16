@@ -55,10 +55,10 @@ package utilities
 			if (gaTracker == null && display != null && display is DisplayObject) {
 				try {
 					gaTracker = new GATracker(display as DisplayObject, trackerId, "AS3", false, null, null);
-					trace("gatracker successfuly created");
+					Trace.myTrace("gatracker successfuly created");
 				} catch (error:Error) {
 					//creation of gatracker failed, hopefully better luck next time
-					trace("error while creating gaTracker = " + error.message);
+					Trace.myTrace("error while creating gaTracker = " + error.message);
 				}
 			}
 			
@@ -71,7 +71,7 @@ package utilities
 		public function  trackPageview(pageURL:String=""):Boolean {
 			if (gaTracker != null) {
 				gaTracker.trackPageview(pageURL);
-				trace("called trackPageview with " + pageURL);
+				Trace.myTrace("called trackPageview with " + pageURL);
 				return true;
 			}
 			return false;

@@ -45,7 +45,7 @@ package myComponents
 			if (defaultHeight == 0)
 				defaultHeight = measuredHeight;
 			
-			//trace("in fooditemlistitemrendere, fooditem = " + (data as FoodItem).itemDescription + ", showninlist = " + (data as FoodItem).shownInList + ", height = " + height);
+			//Trace.myTrace("in fooditemlistitemrendere, fooditem = " + (data as FoodItem).itemDescription + ", showninlist = " + (data as FoodItem).shownInList + ", height = " + height);
 			if (!(data as FoodItem).shownInList) {
 				measuredHeight = 0;
 				height = 0;

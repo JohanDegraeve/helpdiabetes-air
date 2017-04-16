@@ -20,7 +20,6 @@ package utilities
 	import com.distriqt.extension.googleidentity.GoogleIdentity;
 	import com.distriqt.extension.googleidentity.GoogleIdentityOptions;
 	import com.distriqt.extension.googleidentity.events.GoogleIdentityEvent;
-	import com.freshplanet.ane.AirBackgroundFetch.BackgroundFetch;
 	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -686,7 +685,7 @@ package utilities
 			GoogleIdentity.service.addEventListener(GoogleIdentityEvent.TOKEN_UPDATED, accessTokenRefreshSuccess);
 			GoogleIdentity.service.addEventListener(GoogleIdentityEvent.TOKEN_FAILED, accessTokenRefreshFailed);
 			GoogleIdentity.service.addEventListener( GoogleIdentityEvent.SETUP_COMPLETE, googleSetupCompleteHandler );
-
+			
 		}
 		
 		public static function getInstance():Synchronize {
@@ -706,9 +705,11 @@ package utilities
 				globalImmediateRunNecessary = true;
 			access_token = Settings.getInstance().getSetting(Settings.SettingsAccessToken);
 			if (access_token != null && access_token.length == 0  ) {
+				Trace.myTrace("in startSynchronize, access_token != null && access_token.length == 0");
 				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				//ModelLocator.logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
 				Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
+				Trace.myTrace("calling syncFinished 9");
 				syncFinished(false);
 			} else {
 				if (timer2 != null) {
@@ -2615,7 +2616,8 @@ package utilities
 			Trace.myTrace("google signin success");
 			if (event.user != null) {
 				Trace.myTrace("ok we have a user");
-				Trace.myTrace("event.user.authentication.accessToken = " + event.user.authentication.accessToken);
+				if (debugMode)
+					Trace.myTrace("access_token = " + event.user.authentication.accessToken);
 				Settings.getInstance().setSetting(Settings.SettingsAccessToken,event.user.authentication.accessToken);
 				secondAttempt = false;
 				if (navigator != null) {
@@ -2643,12 +2645,12 @@ package utilities
 			}
 			
 			removeEventListeners();
-			if (debugMode)
-				Trace.myTrace("Synchronize.as : in googleapicall failed : event.target.data = " + event.target.data as String);
+			Trace.myTrace("Synchronize.as : in googleapicall failed : event.target.data = " + event.target.data as String);
 			//let's first see if the event.target.data has json
 			try {
 				var eventAsJSONObject:Object = JSON.parse(event.target.data as String);
 				var message:String = eventAsJSONObject.error.message as String;
+				Trace.myTrace("Synchronize.as : in googleapicall failed : message = " + message);
 				if (message != googleError_Login_Required)
 					syncErrorList.addItem((new Date()).toLocaleString() + " " + event.target.data);
 				if (message == googleError_Invalid_Credentials /*|| message == googleError_Login_Required*/) {
@@ -2686,19 +2688,23 @@ package utilities
 					}
 					synchronize();
 				} else {
+					Trace.myTrace("calling syncFinished 1");
 					syncFinished(false);
 				}
 			} catch (e:SyntaxError) {
 				if (event.type == "ioError") {
+					Trace.myTrace("calling syncFinished 2");
 					syncFinished(false);
 				}
 			}
 		}
 		
 		private function accessTokenRefreshFailed(event:GoogleIdentityEvent):void {
+			Trace.myTrace("in accessTokenRefreshFailed");
 			try {
 				if (event.error == "invalid_grant") {//not sure if GoogleIdentiyEvent.error can have this value, this is taken over form browser based version
 					//reset access_token and grant_token, user needs to go back to settingsscreen to reinitialize
+					Trace.myTrace("in accessTokenRefreshFailed, error = invalid_grant");
 					Settings.getInstance().setSetting(Settings.SettingsAccessToken, "");
 					Settings.getInstance().setSetting(Settings.SettingsRefreshToken, "");
 					Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");//also nightscoutsync is reset
@@ -2717,8 +2723,12 @@ package utilities
 		}
 		
 		private function accessTokenRefreshSuccess(event:GoogleIdentityEvent):void {
+			Trace.myTrace("in accessTokenRefreshSuccess");
 			secondAttempt = false;
+			if (debugMode)
+				Trace.myTrace("access_token = " + event.user.authentication.accessToken);
 			access_token = event.user.authentication.accessToken;
+			
 			if (access_token != null)
 				Settings.getInstance().setSetting(Settings.SettingsAccessToken,access_token);
 			functionToRecall.call();		
@@ -3103,6 +3113,7 @@ package utilities
 		
 		private function googleExcelInsertFoodItems(event:Event = null):void {
 			if (Settings.getInstance().getSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel) == "true")  {
+				Trace.myTrace("calling syncFinished 3");
 				syncFinished(true);
 				return;
 			}
@@ -3112,6 +3123,7 @@ package utilities
 				//not checking if there's an error in event, if we get here it should mean there wasn't an error - let's hope so
 				if (foodItemIdBeingTreated == ModelLocator.foodItemList.length - 1) {
 					Settings.getInstance().setSetting(Settings.SettingsAllFoodItemsUploadedToGoogleExcel,"true");
+					Trace.myTrace("calling syncFinished 4");
 					syncFinished(true);
 					return;
 				} // else we continue
@@ -3174,6 +3186,7 @@ package utilities
 				Trace.myTrace("Synchronize.as : error in synchronize.as, unitlistretrievalerror, event = " + event.target.toString());
 				dispatcher.removeEventListener(DatabaseEvent.RESULT_EVENT,unitListRetrieved);
 				dispatcher.removeEventListener(DatabaseEvent.ERROR_EVENT,unitListRetrievelError);
+				Trace.myTrace("calling syncFinished 5");
 				syncFinished(true);//stop the sync, sync itself was ok, but not the upload of fooditems
 			}
 		}
@@ -3247,6 +3260,7 @@ package utilities
 					Settings.getInstance().setSetting(Settings.SettingsNextColumnToAddInFoodTable,(new Number(Settings.getInstance().getSetting(Settings.SettingsNextColumnToAddInFoodTable)) + 1).toString());
 					//seems insert of cel was successfull
 				} else {
+					Trace.myTrace("calling syncFinished 6");
 					syncFinished(false);
 					return;
 				}
@@ -3478,6 +3492,7 @@ package utilities
 				if (helpDiabetesFoodTableWorkSheetId == "") {
 					//we can say here that something went wrong with the creation of the worksheet
 					//we'll stop but say that sync was successful, because that already ended successfully, it's just the creation of the worksheet that failed
+					Trace.myTrace("calling syncFinished 7");
 					syncFinished(true);
 					return;
 				} else {
@@ -3727,6 +3742,7 @@ package utilities
 								googleExcelFindFoodTableWorkSheet();
 							} else {
 								//this instance has not created the foodtable
+								Trace.myTrace("calling syncFinished 8");
 								syncFinished(true);
 							}
 						} else {
