@@ -235,8 +235,11 @@
 		<extensionID>com.distriqt.Core</extensionID>
 		<extensionID>com.distriqt.Dialog</extensionID>
 		<extensionID>com.distriqt.GoogleIdentity</extensionID>
-		<extensionID>com.distriqt.androidsupport.V4</extensionID>
+		
 	<extensionID>com.distriqt.androidsupport.AppCompatV7</extensionID>
     <extensionID>com.freshplanet.AirBackgroundFetch</extensionID>
+    <extensionID>com.distriqt.playservices.Base</extensionID>
+    <extensionID>com.distriqt.playservices.Identity</extensionID>
+    <extensionID>com.distriqt.playservices.Auth</extensionID>
     </extensions>
 </application>

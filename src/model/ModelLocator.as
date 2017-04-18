@@ -1,5 +1,5 @@
 /**
- Copyright (C) 2016  hippoandfriends
+ Copyright (C) 2017  hippoandfriends
  
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -301,7 +301,7 @@ package model
 		 */
 		public static var firstInitOfFoodCounterView:Boolean = true;
 		
-		public static var debugMode:Boolean = false;
+		public static var debugMode:Boolean = true;
 
 		public static var BOLUS_AMOUNT_FOR_SQUARE_WAVE_BOLUSSES:Number = 0.1;//unit s of insulin
 
