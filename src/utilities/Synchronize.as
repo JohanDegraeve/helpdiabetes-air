@@ -2617,16 +2617,22 @@ package utilities
 			Trace.myTrace("google signin success");
 			if (event.user != null) {
 				Trace.myTrace("ok we have a user");
-				if (debugMode)
-					Trace.myTrace("access_token = " + event.user.authentication.accessToken);
-				Settings.getInstance().setSetting(Settings.SettingsAccessToken,event.user.authentication.accessToken);
-				secondAttempt = false;
-				if (navigator != null) {
-					navigator.pushView(SynchronizeView);
-					navigator = null;
-					startSynchronize();					
+				if ((event.user.authentication.accessToken as String) != "") {
+					Trace.myTrace("accesstoken length > 0");
+					if (debugMode)
+						Trace.myTrace("access_token = " + event.user.authentication.accessToken);
+					Settings.getInstance().setSetting(Settings.SettingsAccessToken,event.user.authentication.accessToken);
+					secondAttempt = false;
+					if (navigator != null) {
+						navigator.pushView(SynchronizeView);
+						navigator = null;
+						startSynchronize();					
+					} else {
+						functionToRecall.call();
+					}
 				} else {
-					functionToRecall.call();
+					Trace.myTrace("accesstoken length > 0, calling gettoken");
+					GoogleIdentity.service.getToken();
 				}
 			} else {
 				Trace.myTrace("user is null, calling gettoken");
@@ -2666,10 +2672,10 @@ package utilities
 						
 						var options:GoogleIdentityOptions = new GoogleIdentityOptions( ModelLocator.resourceManagerInstance.getString('client_secret','client_id_android'), ModelLocator.resourceManagerInstance.getString('client_secret','client_id_ios'));
 						
-						options.requestIdToken = true;
-						options.requestServerAuthCode = true;
+						options.requestIdToken = false;
+						options.requestServerAuthCode = false;
 						//options.clientSecret_iOS = resourceManager.getString('client_secret','client_secret');
-						//options.clientSecret_Android = resourceManager.getString('client_secret','client_secret');
+						options.clientSecret_Android = ModelLocator.resourceManagerInstance.getString('client_secret','client_secret');
 						options.scopes.push( "https://www.googleapis.com/auth/fusiontables.readonly" );
 						options.scopes.push( "https://www.googleapis.com/auth/fusiontables" );
 						options.scopes.push( "https://spreadsheets.google.com/feeds" );

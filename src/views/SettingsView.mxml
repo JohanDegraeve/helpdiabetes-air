@@ -306,10 +306,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							//GoogleIdentity.service.addEventListener( GoogleIdentityEvent.ERROR, googleSetupCompleteHandler );
 							var options:GoogleIdentityOptions = new GoogleIdentityOptions( resourceManager.getString('client_secret','client_id_android'), resourceManager.getString('client_secret','client_id_ios'));
 							
-							options.requestIdToken = true;
-							options.requestServerAuthCode = true;
+							options.requestIdToken = false;
+							options.requestServerAuthCode = false;
+							
 							//options.clientSecret_iOS = resourceManager.getString('client_secret','client_secret');
-							//options.clientSecret_Android = resourceManager.getString('client_secret','client_secret');
+							options.clientSecret_Android = resourceManager.getString('client_secret','client_secret');
 							options.scopes.push( "https://www.googleapis.com/auth/fusiontables.readonly" );
 							options.scopes.push( "https://www.googleapis.com/auth/fusiontables" );
 							options.scopes.push( "https://spreadsheets.google.com/feeds" );
