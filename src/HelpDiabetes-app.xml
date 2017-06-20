@@ -241,5 +241,6 @@
     <extensionID>com.distriqt.playservices.Base</extensionID>
     <extensionID>com.distriqt.playservices.Identity</extensionID>
     <extensionID>com.distriqt.playservices.Auth</extensionID>
+    <extensionID>com.distriqt.androidsupport.V4</extensionID>
     </extensions>
 </application>

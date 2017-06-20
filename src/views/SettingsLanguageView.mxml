@@ -79,7 +79,8 @@
 						elementPicker.elements = new ArrayCollection([
 							resourceManager.getString('general','english'),
 							resourceManager.getString('general','dutch'),
-							resourceManager.getString('general','french')]);
+							resourceManager.getString('general','french'),
+							"Alain"]);
 						elementPicker.addEventListener(UnitChangedEvent.ITEM_SELECTED, foodtableLanguageSelected);
 						elementPicker.labelText1 = resourceManager.getString('general','choose_language');
 						
@@ -107,6 +108,8 @@
 							selectedLanguage = "nl";
 						} else if ((event as UnitChangedEvent).index == 2) {
 							selectedLanguage = "fr";
+						} else if ((event as UnitChangedEvent).index == 3) {
+							selectedLanguage = "alain";
 						}
 					}
 					var foodFileName:String;
