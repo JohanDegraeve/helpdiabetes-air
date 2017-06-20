@@ -3725,10 +3725,12 @@ package utilities
 						var tableFound:Boolean = false;
 						if (eventAsJSONObject.items.length > 0)  {
 							for (var itemLength:int = 0;itemLength < eventAsJSONObject.items.length;itemLength++) {
-								if (eventAsJSONObject.items[itemLength].parents[0].isRoot == true) {
-									helpDiabetesFoodTableSpreadSheetKey = eventAsJSONObject.items[itemLength].id;
-									tableFound = true;
-									break;
+								if (eventAsJSONObject.items[itemLength].parents.length > 0) {
+									if (eventAsJSONObject.items[itemLength].parents[0].isRoot == true) {
+										helpDiabetesFoodTableSpreadSheetKey = eventAsJSONObject.items[itemLength].id;
+										tableFound = true;
+										break;
+									}
 								}
 							}
 						} else {
