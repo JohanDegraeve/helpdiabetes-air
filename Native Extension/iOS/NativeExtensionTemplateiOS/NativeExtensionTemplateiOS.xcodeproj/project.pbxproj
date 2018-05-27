@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F86D5C4420B7275A009F0BD6 /* NativeExtensionTemplateiOS.m in Sources */ = {isa = PBXBuildFile; fileRef = F86D5C4320B7275A009F0BD6 /* NativeExtensionTemplateiOS.m */; };
-		F86D5C4520B7275A009F0BD6 /* NativeExtensionTemplateiOS.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = F86D5C4220B7275A009F0BD6 /* NativeExtensionTemplateiOS.h */; };
+		F86D5C4F20BB2130009F0BD6 /* FPANEUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = F86D5C4E20BB2130009F0BD6 /* FPANEUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -18,7 +18,6 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				F86D5C4520B7275A009F0BD6 /* NativeExtensionTemplateiOS.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -26,8 +25,11 @@
 
 /* Begin PBXFileReference section */
 		F86D5C3F20B7275A009F0BD6 /* libNativeExtensionTemplateiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNativeExtensionTemplateiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		F86D5C4220B7275A009F0BD6 /* NativeExtensionTemplateiOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NativeExtensionTemplateiOS.h; sourceTree = "<group>"; };
 		F86D5C4320B7275A009F0BD6 /* NativeExtensionTemplateiOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeExtensionTemplateiOS.m; sourceTree = "<group>"; };
+		F86D5C4B20B72911009F0BD6 /* FlashRuntimeExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlashRuntimeExtensions.h; sourceTree = "<group>"; };
+		F86D5C4C20B76825009F0BD6 /* NativeExtensionTemplateiOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NativeExtensionTemplateiOS.h; sourceTree = "<group>"; };
+		F86D5C4D20BB212F009F0BD6 /* FPANEUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FPANEUtils.h; sourceTree = "<group>"; };
+		F86D5C4E20BB2130009F0BD6 /* FPANEUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FPANEUtils.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,8 +62,11 @@
 		F86D5C4120B7275A009F0BD6 /* NativeExtensionTemplateiOS */ = {
 			isa = PBXGroup;
 			children = (
-				F86D5C4220B7275A009F0BD6 /* NativeExtensionTemplateiOS.h */,
+				F86D5C4D20BB212F009F0BD6 /* FPANEUtils.h */,
+				F86D5C4E20BB2130009F0BD6 /* FPANEUtils.m */,
+				F86D5C4B20B72911009F0BD6 /* FlashRuntimeExtensions.h */,
 				F86D5C4320B7275A009F0BD6 /* NativeExtensionTemplateiOS.m */,
+				F86D5C4C20B76825009F0BD6 /* NativeExtensionTemplateiOS.h */,
 			);
 			path = NativeExtensionTemplateiOS;
 			sourceTree = "<group>";
@@ -122,6 +127,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F86D5C4F20BB2130009F0BD6 /* FPANEUtils.m in Sources */,
 				F86D5C4420B7275A009F0BD6 /* NativeExtensionTemplateiOS.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -180,10 +186,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv7";
 			};
 			name = Debug;
 		};
@@ -232,10 +240,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 armv7";
 			};
 			name = Release;
 		};
@@ -273,7 +283,7 @@
 				F86D5C4720B7275A009F0BD6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		F86D5C4820B7275A009F0BD6 /* Build configuration list for PBXNativeTarget "NativeExtensionTemplateiOS" */ = {
 			isa = XCConfigurationList;
@@ -282,7 +292,7 @@
 				F86D5C4A20B7275A009F0BD6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
