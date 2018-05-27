@@ -2670,12 +2670,12 @@ package utilities
 					} else {
 						Trace.myTrace("Synchronize.as : setting up google service");
 						
-						var options:GoogleIdentityOptions = new GoogleIdentityOptions( ModelLocator.resourceManagerInstance.getString('client_secret','client_id_android'), ModelLocator.resourceManagerInstance.getString('client_secret','client_id_ios'));
+						var options:GoogleIdentityOptions = new GoogleIdentityOptions( ModelLocator.resourceManagerInstance.getString('client_secret','client_id_web'), ModelLocator.resourceManagerInstance.getString('client_secret','client_id_ios'));
 						
 						options.requestIdToken = false;
 						options.requestServerAuthCode = false;
 						//options.clientSecret_iOS = resourceManager.getString('client_secret','client_secret');
-						options.clientSecret_Android = ModelLocator.resourceManagerInstance.getString('client_secret','client_secret');
+						options.clientSecret_Android = ModelLocator.resourceManagerInstance.getString('client_secret','client_secret_web');
 						options.scopes.push( "https://www.googleapis.com/auth/fusiontables.readonly" );
 						options.scopes.push( "https://www.googleapis.com/auth/fusiontables" );
 						options.scopes.push( "https://spreadsheets.google.com/feeds" );

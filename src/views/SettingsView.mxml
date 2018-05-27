@@ -304,13 +304,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 							//not adding event listeners foor googleidentifyevents because they are (or at least should be already) set up in synchronize.as
 							//GoogleIdentity.service.addEventListener( GoogleIdentityEvent.SETUP_COMPLETE, googleSetupCompleteHandler );
 							//GoogleIdentity.service.addEventListener( GoogleIdentityEvent.ERROR, googleSetupCompleteHandler );
-							var options:GoogleIdentityOptions = new GoogleIdentityOptions( resourceManager.getString('client_secret','client_id_android'), resourceManager.getString('client_secret','client_id_ios'));
+							var options:GoogleIdentityOptions = new GoogleIdentityOptions( resourceManager.getString('client_secret','client_id_web'), resourceManager.getString('client_secret','client_id_ios'));
 							
 							options.requestIdToken = false;
 							options.requestServerAuthCode = false;
 							
 							//options.clientSecret_iOS = resourceManager.getString('client_secret','client_secret');
-							options.clientSecret_Android = resourceManager.getString('client_secret','client_secret');
+							options.clientSecret_Android = resourceManager.getString('client_secret','client_secret_web');
 							options.scopes.push( "https://www.googleapis.com/auth/fusiontables.readonly" );
 							options.scopes.push( "https://www.googleapis.com/auth/fusiontables" );
 							options.scopes.push( "https://spreadsheets.google.com/feeds" );

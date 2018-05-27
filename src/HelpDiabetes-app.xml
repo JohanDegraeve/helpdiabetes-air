@@ -8,7 +8,7 @@
 	See the GNU General Public License for more details. You should have received 
 	a copy of the GNU General Public License along with this program. If not, 
 	see <http://www.gnu.org/licenses/gpl.txt>. -->
-<application xmlns="http://ns.adobe.com/air/application/25.0">
+<application xmlns="http://ns.adobe.com/air/application/29.0">
 
 	<!-- Adobe AIR Application Descriptor File Template. Specifies parameters 
 		for identifying, installing, and launching AIR applications. xmlns - The 
@@ -185,7 +185,7 @@
                 <key>UIStatusBarStyle</key>
                 <string>UIStatusBarStyleBlackOpaque</string>
                 <key>MinimumOSVersion</key>
-                <string>5.1.1</string>
+                <string>8.1</string>
                 <key>CFBundleURLTypes</key>
 				<array>
 					<dict>
@@ -237,10 +237,13 @@
 		<extensionID>com.distriqt.GoogleIdentity</extensionID>
 		
 	<extensionID>com.distriqt.androidsupport.AppCompatV7</extensionID>
-    <extensionID>com.freshplanet.AirBackgroundFetch</extensionID>
+    
     <extensionID>com.distriqt.playservices.Base</extensionID>
     <extensionID>com.distriqt.playservices.Identity</extensionID>
     <extensionID>com.distriqt.playservices.Auth</extensionID>
     <extensionID>com.distriqt.androidsupport.V4</extensionID>
+    <extensionID>com.distriqt.BluetoothLE</extensionID>
+    
+    <extensionID>com.hippoandfriends.helpdiabetes.AirNativeExtension</extensionID>
     </extensions>
 </application>

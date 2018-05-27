@@ -1,0 +1,13 @@
+<extension xmlns="http://ns.adobe.com/air/extension/4.0">
+	<id>com.hippoandfriends.helpdiabetes.AirNativeExtension</id>
+	<versionNumber>1.0.0</versionNumber>
+	<platforms>
+		<platform name="iPhone-ARM"> <!-- platform name="iPhone-x86" -->
+			<applicationDeployment>
+				<nativeLibrary>libNativeExtensionTemplateiOS.a</nativeLibrary>
+				<initializer>NativeExtensionTemplateExtensionInitializer</initializer>
+				<finalizer>NativeExtensionTemplateExtensionFinalizer</finalizer>
+			</applicationDeployment>
+		</platform>
+	</platforms>
+</extension>

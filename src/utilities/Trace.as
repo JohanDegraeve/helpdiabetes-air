@@ -1,6 +1,6 @@
 package utilities
 {
-	import com.freshplanet.ane.AirBackgroundFetch.BackgroundFetch;
+	import com.hippoandfriends.helpdiabetes.airlibrary.AirNativeExtension;
 
 	public class Trace
 	{
@@ -9,7 +9,8 @@ package utilities
 		}
 		
 		public static function myTrace(log:String):void {
-			BackgroundFetch.traceNSLog("helpdiabetestrace " + log);
+			AirNativeExtension.init();
+			AirNativeExtension.traceNSLog("helpdiabetestrace " + log);
 		}
 
 	}
