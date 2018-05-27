@@ -468,13 +468,15 @@
 												 //change the applicable values of the remoteElement
 												 //we're not changing the units of the remote element but we change the blood glucose value accordingly
 												 newBloodGlucoseLevel = (localElement as BloodGlucoseEvent).bloodGlucoseLevel;
-												 if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) > -1) {
-													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mmoll") {
-														 newBloodGlucoseLevel = Math.round((localElement as BloodGlucoseEvent).bloodGlucoseLevel/(new Number(0.0555)));//convert from mgperdlto mmol
-													 } 
-												 } else {
-													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mgperdl") {
-														 newBloodGlucoseLevel = Math.round((localElement as BloodGlucoseEvent).bloodGlucoseLevel*(new Number(0.0555))*10)/10;
+												 if (remoteElement.units) {
+													 if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) > -1) {
+														 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mmoll") {
+															 newBloodGlucoseLevel = Math.round((localElement as BloodGlucoseEvent).bloodGlucoseLevel/(new Number(0.0555)));//convert from mgperdlto mmol
+														 } 
+													 } else {
+														 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mgperdl") {
+															 newBloodGlucoseLevel = Math.round((localElement as BloodGlucoseEvent).bloodGlucoseLevel*(new Number(0.0555))*10)/10;
+														 }
 													 }
 												 }
 												 remoteElement.glucose = newBloodGlucoseLevel;
@@ -614,13 +616,15 @@
 											 if (remoteElement.glucose) {
 												 //we're not changing the units of the local element but we change the blood glucose value accordingly
 												 newBloodGlucoseLevel = (remoteElement.glucose as Number);
-												 if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) > -1) {
-													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == ModelLocator.resourceManagerInstance.getString('general','mmoll')) {
-														 newBloodGlucoseLevel = Math.round((remoteElement.glucose as Number)/(new Number(0.0555)));
-													 }
-												 } else {
-													 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == ModelLocator.resourceManagerInstance.getString('general','mgperdl')) {
-														 newBloodGlucoseLevel = Math.round((remoteElement.glucose as Number)*(new Number(0.0555))*10)/10;
+												 if (remoteElement.units) {
+													 if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) > -1) {
+														 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == ModelLocator.resourceManagerInstance.getString('general','mmoll')) {
+															 newBloodGlucoseLevel = Math.round((remoteElement.glucose as Number)/(new Number(0.0555)));
+														 }
+													 } else {
+														 if (Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == ModelLocator.resourceManagerInstance.getString('general','mgperdl')) {
+															 newBloodGlucoseLevel = Math.round((remoteElement.glucose as Number)*(new Number(0.0555))*10)/10;
+														 }
 													 }
 												 }
 												 (localElement as BloodGlucoseEvent).updateBloodGlucoseEvent(
@@ -733,12 +737,14 @@
 							 if (!elementIsInDeletionList) {
 								 var newGlucose:Number = new Number(remoteElement.glucose);
 								 var newUnit:String = ModelLocator.resourceManagerInstance.getString('general',Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT));
-								 if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) > -1 && newUnit == 
-									 ModelLocator.resourceManagerInstance.getString('general','mmoll')) {
-									 newGlucose = Math.round(newGlucose*(new Number(0.0555))*10)/10;
-								 } else if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) == -1 && newUnit == 
-									 ModelLocator.resourceManagerInstance.getString('general','mgperdl')) {
-									 newGlucose = Math.round(newGlucose/(new Number(0.0555)));
+								 if (remoteElement.units) {
+									 if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) > -1 && newUnit == 
+										 ModelLocator.resourceManagerInstance.getString('general','mmoll')) {
+										 newGlucose = Math.round(newGlucose*(new Number(0.0555))*10)/10;
+									 } else if ((remoteElement.units as String).toUpperCase().indexOf(ModelLocator.resourceManagerInstance.getString('general','mgperdl').toUpperCase()) == -1 && newUnit == 
+										 ModelLocator.resourceManagerInstance.getString('general','mgperdl')) {
+										 newGlucose = Math.round(newGlucose/(new Number(0.0555)));
+									 }
 								 }
 								 
 								 ModelLocator.trackingList.addItem(
