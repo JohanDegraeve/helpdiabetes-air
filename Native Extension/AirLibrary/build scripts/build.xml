@@ -87,7 +87,7 @@
 		</exec> 
 		<mkdir dir="${ane.destination}"/> 
 		<move file="${temp.packagedir}/ane/${air.library.name}.ane" todir="${ane.destination}" overwrite="true"/> 
-		<delete dir="${tempdir}"/> 
+		<!--  dir="${tempdir}"/ --> 
 	</target>
 
 	<!-- ************************************************************ 
