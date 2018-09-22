@@ -47,6 +47,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import myComponents.AlertPopUp;
 			
+			import services.DialogService;
+			
 			import utilities.Synchronize;
 			
 			import views.FoodCounterView;
@@ -138,6 +140,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 				Dialog.init(DistriqtKey.distriqtKey);
 				Core.init(DistriqtKey.distriqtKey);
 				Dialog.service.root = this.stage;
+				DialogService.init(this.stage);
 			}
 			
 			private function orientationChanged(event:Event):void {
