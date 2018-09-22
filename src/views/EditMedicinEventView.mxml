@@ -29,15 +29,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	<fx:Metadata>
 		[ResourceBundle("editmedicineventview")]
 		[ResourceBundle("editbgeventview")]
+		[ResourceBundle("general")]
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
 			import com.distriqt.extension.dialog.DateTimeDialogView;
 			import com.distriqt.extension.dialog.Dialog;
 			import com.distriqt.extension.dialog.DialogType;
+			import com.distriqt.extension.dialog.DialogView;
+			import com.distriqt.extension.dialog.builders.AlertBuilder;
 			import com.distriqt.extension.dialog.builders.DateTimeDialogBuilder;
 			import com.distriqt.extension.dialog.events.DialogDateTimeEvent;
 			import com.distriqt.extension.dialog.events.DialogViewEvent;
+			import com.distriqt.extension.dialog.objects.DialogAction;
 			
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
@@ -61,6 +65,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import myComponents.TrackingViewElement;
 			import myComponents.elementFromListPicker;
 			
+			import services.DialogService;
 			
 			import utilities.DateTimeUtilities;
 			import utilities.MyGATracker;
@@ -292,28 +297,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function amountGroupClicked(e:MouseEvent = null):void {
-				amountPicker = new AmountPicker();
-				amountPicker.amount = amountText;
-				amountPicker.maxNonDecimalDigits = 2;
-				amountPicker.decimalDigits = 1;
-				amountPicker.labelText1 = resourceManager.getString('editmedicineventview','amount_of_units');
-				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
-				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
 				
-				PopUpManager.addPopUp(amountPicker, this, true);
-				PopUpManager.centerPopUp(amountPicker);
+				var alert:DialogView = Dialog.service.create(
+					new AlertBuilder()
+					.setTitle(resourceManager.getString('editmedicineventview','amount_of_units'))
+					.addTextField("", amountText, false, 8)
+					.addOption("Ok", DialogAction.STYLE_POSITIVE, 0)
+					.addOption(resourceManager.getString("general","cancel"), DialogAction.STYLE_CANCEL, 1)
+					.build()
+				);
+				alert.addEventListener(DialogViewEvent.CLOSED, onAmountSet);
+				DialogService.addDialog(alert);
 				
-				function onAmountCancel(event: PickerEvent): void
-				{
-					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
-					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-				}
-				
-				function onAmountSet(event: PickerEvent): void
-				{
-					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
-					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-					amountText = (event.newValue as Number).toString();
+				function onAmountSet(event:DialogViewEvent):void {
+					if (event.index == 1) {
+						return;
+					}
+					amountText = new Number((event.values[0] as String).replace(",",".")).toString();
 				}
 			}
 			
