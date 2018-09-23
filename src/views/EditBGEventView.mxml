@@ -56,7 +56,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import model.ModelLocator;
 			
-			import myComponents.AmountPicker;
 			import myComponents.DatePicker;
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.HelpCallOut;
@@ -89,7 +88,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private var unit:String;
 			
-			private var amountPicker:AmountPicker;
 			[Bindable]
 			private var meteringResultText:String;
 			[Bindable]
@@ -199,13 +197,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onBackKeyPressed(event:Event):void {
-				if (amountPicker != null) {
-					if (amountPicker.isPopUp) {
-						PopUpManager.removePopUp(amountPicker);
-						event.preventDefault();
-					}
-					amountPicker = null;
-				} 
 				if (dateOrTimePicker != null) {
 					if (dateOrTimePicker.isPopUp) {
 						PopUpManager.removePopUp(dateOrTimePicker);
