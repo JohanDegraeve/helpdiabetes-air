@@ -31,6 +31,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 	
 	<fx:Script>
 		<![CDATA[
+			import com.distriqt.extension.dialog.Dialog;
+			import com.distriqt.extension.dialog.DialogView;
+			import com.distriqt.extension.dialog.builders.AlertBuilder;
+			import com.distriqt.extension.dialog.events.DialogViewEvent;
+			import com.distriqt.extension.dialog.objects.DialogAction;
+			
 			import mx.managers.PopUpManager;
 			
 			import spark.components.View;
@@ -41,17 +47,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import model.ModelLocator;
 			
-			import myComponents.AmountPicker;
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
 			import myComponents.RequestConfirmation;
+			
+			import services.DialogService;
 			
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
 			private var thisView:View;
 			
-			private var amountPicker:AmountPicker;
 			private var confirmationPicker:RequestConfirmation;
 			
 			[Bindable]
@@ -96,13 +102,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			}
 			
 			private function onBackKeyPressed(event:Event):void {
-				if (amountPicker != null) {
-					if (amountPicker.isPopUp) {
-						PopUpManager.removePopUp(amountPicker);
-						event.preventDefault();
-					}
-					amountPicker = null;
-				} 
 				if (confirmationPicker != null) {
 					if (confirmationPicker.isPopUp) {
 						PopUpManager.removePopUp(confirmationPicker);
@@ -130,31 +129,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			private function prepareAmountPicker(amount:Number, mealName:String, settingId:int, button:Button):void {
 				var newAmount:Number;
-				var secondMeal:int 
-				amountPicker = new AmountPicker();
-				amountPicker.amount = amount.toString();
-				amountPicker.maxNonDecimalDigits = 2;
-				amountPicker.decimalDigits = 1;
-				amountPicker.labelText1 = resourceManager.getString('settingsboluscalculationview','insulinratio_for');
-				amountPicker.labelText2 = mealName;
-				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
-				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-				PopUpManager.addPopUp(amountPicker, this, true);
-				PopUpManager.centerPopUp(amountPicker);
+				var secondMeal:int
+				var alert:DialogView = Dialog.service.create(
+					new AlertBuilder()
+					.setTitle(resourceManager.getString('settingsboluscalculationview','insulinratio_for') + " " + mealName)
+					.addTextField("", amount.toString(), false, 8)
+					.addOption("Ok", DialogAction.STYLE_POSITIVE, 0)
+					.addOption(resourceManager.getString("general","cancel"), DialogAction.STYLE_CANCEL, 1)
+					.build()
+				);
+				alert.addEventListener(DialogViewEvent.CLOSED, onAmountSet);
+				DialogService.addDialog(alert);
 				
-				function onAmountCancel(event: PickerEvent): void
-				{
-					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
-					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-				}
-				
-				function onAmountSet(event: PickerEvent): void
-				{
+				function onAmountSet(event:DialogViewEvent):void {
+					if (event.index == 1) {
+						return;
+					}
+
 					MyGATracker.getInstance().trackPageview( "SettingsBolusCalculationView-carbRatioChanged" );
 
-					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
-					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-					newAmount = event.newValue as Number;
+					newAmount = new Number((event.values[0] as String).replace(",","."));
 					Settings.getInstance().setSetting(settingId,newAmount.toString());
 
 					//selectedmeal might still point to a previous meal which is finished by now,
