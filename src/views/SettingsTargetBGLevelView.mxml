@@ -12,19 +12,22 @@
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import com.distriqt.extension.dialog.Dialog;
+			import com.distriqt.extension.dialog.DialogView;
+			import com.distriqt.extension.dialog.builders.AlertBuilder;
+			import com.distriqt.extension.dialog.events.DialogViewEvent;
+			import com.distriqt.extension.dialog.objects.DialogAction;
+			
 			import mx.events.FlexEvent;
-			import mx.managers.PopUpManager;
 			
 			import spark.components.View;
 			
 			import databaseclasses.Settings;
 			
-			import myComponents.AmountPicker;
-			import myComponents.PickerEvent;
+			import services.DialogService;
 			
 			import utilities.Synchronize;
 			
-			private var amountPicker:AmountPicker;
 			
 			private var thisView:View;
 			
@@ -44,28 +47,24 @@
 			}
 			
 			private function targetBGLevelClicked(event:Event):void  {
-				amountPicker = new AmountPicker();
-				amountPicker.amount = Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL);
-				amountPicker.maxNonDecimalDigits = Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mgperdl" ? 3:2;
-				amountPicker.decimalDigits = Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mgperdl" ? 0:1;
-				//amountPicker.labelText1 = resourceManager.getString('editmedicineventview','amount_of_units');
-				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
-				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
+				var alert:DialogView = Dialog.service.create(
+					new AlertBuilder()
+					.setTitle(resourceManager.getString('settingstargetbglevelview','targetbglevel'))
+					.addTextField("", Settings.getInstance().getSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL), false, Settings.getInstance().getSetting(Settings.SettingsBLOODGLUCOSE_UNIT) == "mmoll" ? 8:4)
+					.addOption("Ok", DialogAction.STYLE_POSITIVE, 0)
+					.addOption(resourceManager.getString("general","cancel"), DialogAction.STYLE_CANCEL, 1)
+					.build()
+				);
+				alert.addEventListener(DialogViewEvent.CLOSED, onAmountSet);
+				DialogService.addDialog(alert);
 				
-				PopUpManager.addPopUp(amountPicker, this, true);
-				PopUpManager.centerPopUp(amountPicker);
-				
-				function onAmountCancel(event: PickerEvent): void
+
+				function onAmountSet(event:DialogViewEvent): void
 				{
-					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
-					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-				}
-				
-				function onAmountSet(event: PickerEvent): void
-				{
-					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
-					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-					targetBGLevelButton.label = (event.newValue as Number).toString();
+					if (event.index == 1) {
+						return;
+					}
+					targetBGLevelButton.label = (event.values[0] as String).replace(",",".");
 					Settings.getInstance().setSetting(Settings.SettingsTARGET_BLOODGLUCOSELEVEL,targetBGLevelButton.label );
 					Synchronize.getInstance().startSynchronize(true,false);
 				}
