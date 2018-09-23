@@ -56,7 +56,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import model.ModelLocator;
 			
-			import myComponents.AmountPicker;
 			import myComponents.DayLineWithTotalAmount;
 			import myComponents.HelpCallOut;
 			import myComponents.PickerEvent;
@@ -71,7 +70,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			import utilities.MyGATracker;
 			import utilities.Synchronize;
 			
-			private var amountPicker:AmountPicker;
 			private var medicinPicker:elementFromListPicker;
 			private var bolusTypePicker:elementFromListPicker;
 			private var dateOrTimePicker:Group;
@@ -245,13 +243,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 						event.preventDefault();
 					}
 					dateOrTimePicker = null;
-				} 
-				if (amountPicker != null) {
-					if (amountPicker.isPopUp) {
-						PopUpManager.removePopUp(amountPicker);
-						event.preventDefault();
-					}
-					amountPicker = null;
 				} 
 				if (confirmationPicker != null) {
 					if (confirmationPicker.isPopUp) {
