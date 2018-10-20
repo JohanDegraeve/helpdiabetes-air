@@ -9,7 +9,6 @@ package utilities
 		}
 		
 		public static function myTrace(log:String):void {
-			AirNativeExtension.init();
 			AirNativeExtension.traceNSLog("helpdiabetestrace " + log);
 		}
 

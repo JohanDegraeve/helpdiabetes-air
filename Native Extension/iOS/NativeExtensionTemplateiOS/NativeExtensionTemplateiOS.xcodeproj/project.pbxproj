@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F85F13A7216E9F5500C29ADD /* PlaySound.m in Sources */ = {isa = PBXBuildFile; fileRef = F85F13A6216E9F5400C29ADD /* PlaySound.m */; };
 		F86D5C4420B7275A009F0BD6 /* NativeExtensionTemplateiOS.m in Sources */ = {isa = PBXBuildFile; fileRef = F86D5C4320B7275A009F0BD6 /* NativeExtensionTemplateiOS.m */; };
 		F86D5C4F20BB2130009F0BD6 /* FPANEUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = F86D5C4E20BB2130009F0BD6 /* FPANEUtils.m */; };
 /* End PBXBuildFile section */
@@ -24,6 +25,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F85F13A5216E9F5400C29ADD /* PlaySound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaySound.h; sourceTree = "<group>"; };
+		F85F13A6216E9F5400C29ADD /* PlaySound.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaySound.m; sourceTree = "<group>"; };
 		F86D5C3F20B7275A009F0BD6 /* libNativeExtensionTemplateiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNativeExtensionTemplateiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F86D5C4320B7275A009F0BD6 /* NativeExtensionTemplateiOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeExtensionTemplateiOS.m; sourceTree = "<group>"; };
 		F86D5C4B20B72911009F0BD6 /* FlashRuntimeExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlashRuntimeExtensions.h; sourceTree = "<group>"; };
@@ -62,6 +65,8 @@
 		F86D5C4120B7275A009F0BD6 /* NativeExtensionTemplateiOS */ = {
 			isa = PBXGroup;
 			children = (
+				F85F13A5216E9F5400C29ADD /* PlaySound.h */,
+				F85F13A6216E9F5400C29ADD /* PlaySound.m */,
 				F86D5C4D20BB212F009F0BD6 /* FPANEUtils.h */,
 				F86D5C4E20BB2130009F0BD6 /* FPANEUtils.m */,
 				F86D5C4B20B72911009F0BD6 /* FlashRuntimeExtensions.h */,
@@ -128,6 +133,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F86D5C4F20BB2130009F0BD6 /* FPANEUtils.m in Sources */,
+				F85F13A7216E9F5500C29ADD /* PlaySound.m in Sources */,
 				F86D5C4420B7275A009F0BD6 /* NativeExtensionTemplateiOS.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

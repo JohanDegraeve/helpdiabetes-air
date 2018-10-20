@@ -813,22 +813,6 @@ package model
 			timerForRecalculateActiveInsulin.start();
 		}
 		
-/*		public static function recalculateInsulinAmoutInAllYoungerMealEvents(asOf:Number):void {
-			var newAsOf:Number = asOf - 24 * 3600 * 1000;
-			var cntr:int;
-			for (cntr = trackingList.length - 1;cntr >= 0;cntr--) {
-				Trace.myTrace("starting recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
-				if ((trackingList.getItemAt(cntr) as TrackingViewElement).timeStamp > newAsOf) {
-					if (trackingList.getItemAt(cntr) is MealEvent) {
-						(trackingList.getItemAt(cntr) as MealEvent).recalculateInsulinAmount();
-					}
-				} else {
-					break;
-				}
-			}
-			Trace.myTrace("stopping recalculateInsulinAmoutInAllYoungerMealEvents with cntr = " + cntr + " at " + (new Date()).valueOf());
-		}*/
-
 		private static var recalculateInsulinAmountRunning:Boolean = false;
 		private static var rerunrecalculateInsulinAmountNecessary:Boolean = false;
 		private static var trackingListCounter:int = -1;

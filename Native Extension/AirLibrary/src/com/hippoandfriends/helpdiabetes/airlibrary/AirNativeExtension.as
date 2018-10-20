@@ -25,5 +25,15 @@ package com.hippoandfriends.helpdiabetes.airlibrary
 				context.call("init");
 			}
 		}
+		
+		public static function isPlayingSound():Boolean {
+			return (context.call("isPlayingSound") as Boolean);
+		}
+
+		public static function playSound(sound:String):void {
+			context.call("playSound", sound);
+		}
+		
+
 	}
 }

@@ -39,6 +39,8 @@ the home screen
 	
 	<fx:Script>
 		<![CDATA[
+			import com.hippoandfriends.helpdiabetes.airlibrary.AirNativeExtension;
+			
 			import mx.collections.ArrayCollection;
 			import mx.managers.PopUpManager;
 			
@@ -179,6 +181,8 @@ the home screen
 				//resourceManager.localeChain = ["nl_NL","en_US","fr_FR"];
 				//resourceManager.localeChain = ["fr_FR","en_US","nl_NL"];
 				Database.getInstance().init(dispatcher);
+				
+				AirNativeExtension.init();
 
 				function onInitResult(event:Event):void
 				{
