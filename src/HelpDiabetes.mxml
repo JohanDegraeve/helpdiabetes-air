@@ -49,7 +49,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			
 			import services.DialogService;
 			
-			//import utilities.DeepSleepService;
 			import utilities.Synchronize;
 			
 			import views.FoodCounterView;
@@ -164,6 +163,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
 			private function initApplication():void {
 				this.addEventListener( Event.ADDED_TO_STAGE, addedToStageHandler );
 				tabbedNavigator.addEventListener(IndexChangeEvent.CHANGE, changeIcon);
+				NativeApplication.nativeApplication.executeInBackground = true;
 			}
 			
 			protected function changeIcon(event:IndexChangeEvent):void {

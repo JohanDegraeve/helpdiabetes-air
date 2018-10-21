@@ -197,7 +197,6 @@
 						<string>com.hippoandfriends.helpdiabetes</string>
 					</dict>
 				</array>
-				<key>UIBackgroundModes</key>
             ]]>
 		</InfoAdditions>
 		<Entitlements>

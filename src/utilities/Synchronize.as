@@ -3903,7 +3903,6 @@ package utilities
 						insertlogbookeventsWaiting = false;
 						googleExcelInsertLogBookEvents(null);
 					} 
-					//DeepSleepService.stopDeepSleepService();
 				}
 			} else {
 				//syncfinished must have been called although sync is not running, not need to process any further
