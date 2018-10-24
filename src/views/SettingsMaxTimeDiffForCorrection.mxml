@@ -12,8 +12,13 @@
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
+			import com.distriqt.extension.dialog.Dialog;
+			import com.distriqt.extension.dialog.DialogView;
+			import com.distriqt.extension.dialog.builders.AlertBuilder;
+			import com.distriqt.extension.dialog.events.DialogViewEvent;
+			import com.distriqt.extension.dialog.objects.DialogAction;
+			
 			import mx.events.FlexEvent;
-			import mx.managers.PopUpManager;
 			
 			import spark.components.View;
 			
@@ -21,12 +26,10 @@
 			
 			import model.ModelLocator;
 			
-			import myComponents.AmountPicker;
-			import myComponents.PickerEvent;
+			import services.DialogService;
 			
 			import utilities.Synchronize;
 			
-			private var amountPicker:AmountPicker;
 			
 			private var thisView:View;
 			
@@ -43,29 +46,24 @@
 			}
 			
 			private function maxTimeDiffClicked(event:Event):void  {
-				amountPicker = new AmountPicker();
-				amountPicker.amount = (new Number(Settings.getInstance().getSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL)) / 60).toString();
-				amountPicker.maxNonDecimalDigits = 3;
-				amountPicker.decimalDigits = 0;
-				//amountPicker.labelText1 = resourceManager.getString('editmedicineventview','amount_of_units');
-				amountPicker.addEventListener(PickerEvent.PICKER_SET, onAmountSet);
-				amountPicker.addEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
+				var alert:DialogView = Dialog.service.create(
+					new AlertBuilder()
+					.addTextField("", (new Number(Settings.getInstance().getSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL))/60).toString(), false, 4)
+					.addOption("Ok", DialogAction.STYLE_POSITIVE, 0)
+					.addOption(resourceManager.getString("general","cancel"), DialogAction.STYLE_CANCEL, 1)
+					.build()
+				);
+				alert.addEventListener(DialogViewEvent.CLOSED, onAmountSet);
+				DialogService.addDialog(alert);
 				
-				PopUpManager.addPopUp(amountPicker, this, true);
-				PopUpManager.centerPopUp(amountPicker);
-				
-				function onAmountCancel(event: PickerEvent): void
+				function onAmountSet(event:DialogViewEvent): void
 				{
-					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
-					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-				}
-				
-				function onAmountSet(event: PickerEvent): void
-				{
-					amountPicker.removeEventListener(PickerEvent.PICKER_SET, onAmountSet);
-					amountPicker.removeEventListener(PickerEvent.PICKER_CANCEL, onAmountCancel);
-					maxTimeButton.label = (event.newValue as Number).toString();
-					Settings.getInstance().setSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL,((event.newValue as Number) * 60).toString());
+					if (event.index == 1) {
+						return;
+					}
+					maxTimeButton.label = (event.values[0] as String).replace(",",".");
+
+					Settings.getInstance().setSetting(Settings.SettingMAX_TIME_DIFFERENCE_LATEST_BGEVENT_AND_START_OF_MEAL,((new Number(maxTimeButton.label)) * 60).toString());
 					ModelLocator.asyncrecalculateInsulinAmoutInAllYoungerMealEvents((new Date()).valueOf(), true);
 					Synchronize.getInstance().startSynchronize(true,false);
 				}
