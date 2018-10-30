@@ -710,7 +710,10 @@ package utilities
 				Trace.myTrace("in startSynchronize, access_token != null && access_token.length == 0");
 				//there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize
 				//ModelLocator.logString += "error 1 : there's no access_token, and that means there should also be no refresh_token, so it's not possible to synchronize"+ "\n";
-				Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
+				
+				//commented out, why wsetting api secret to "" ? access_token failure happens sometimes but later it works again
+				//Settings.getInstance().setSetting(Settings.SettingsNightScoutHashedAPISecret,"");
+				
 				syncFinished(false);
 			} else {
 				if (timer2 != null) {
