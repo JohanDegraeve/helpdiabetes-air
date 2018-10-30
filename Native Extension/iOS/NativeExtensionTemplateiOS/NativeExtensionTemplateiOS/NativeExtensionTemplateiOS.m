@@ -33,7 +33,7 @@ FREObject playSound (FREContext ctx, void* funcData, uint32_t argc, FREObject ar
 }
 
 FREObject init( FREContext ctx, void* funcData, uint32_t argc, FREObject argv[] ) {
-    NSLog(@"Initializing context");
+    NSLog(@"helpdiabetestrace ANE NativeExtensionTemplateiOS.m Initializing context");
     _soundPlayer =[PlaySound alloc];
     _context = ctx;
     return NULL;

@@ -68,9 +68,9 @@
 }
 
 - (void) say:(NSString *) text language:(NSString *) language {
-    NSLog(@"spiketrace ANE PlaySound.m say");
+    NSLog(@"helpdiabetestrace ANE NativeExtensionTemplateiOS.m PlaySound.m say");
     if (![_audioPlayer isPlaying]) {
-        NSLog(@"spiketrace ANE PlaySound.m say, audioPlayer not playing, trying to speak text now");
+        NSLog(@"helpdiabetestrace ANE NativeExtensionTemplateiOS.m  say, audioPlayer not playing, trying to speak text now");
         _syn = [[AVSpeechSynthesizer alloc] init];
         AVSpeechUtterance *utterance = [AVSpeechUtterance speechUtteranceWithString:text];
         [utterance setRate:0.51f];
